@@ -103,7 +103,7 @@ export class HeadlessBattleSimulator {
                 if (livingEnemies.length > 0) {
                     let target = livingEnemies[0];
                     for (const e of livingEnemies) if (e.stats.hp < target.stats.hp) target = e;
-                    await this.dealDamage(unit, target, 4);
+                    await this.dealDamage(unit, target, 4, true);
                 } else break;
             }
         }
@@ -191,7 +191,7 @@ export class HeadlessBattleSimulator {
             const allUnits = [...myTeam, ...opTeam].filter(u => u !== null && u.stats.hp > 0);
             for (const target of allUnits) {
                 if (target.synergies.includes('Snow')) continue;
-                await this.dealDamage(null, target, 5);
+                await this.dealDamage(null, target, 5, true);
             }
         }
     }
@@ -350,7 +350,7 @@ export class HeadlessBattleSimulator {
                 const living = opTeam.filter(u => u && u.stats.hp > 0);
                 if (living.length > 0) {
                     const target = living[Math.floor(Math.random() * living.length)];
-                    await this.dealDamage(unit, target, [0, 2, 5, 10][unit.level] || 2);
+                    await this.dealDamage(unit, target, [0, 2, 5, 10][unit.level] || 2, true);
                 }
             });
         }
@@ -359,8 +359,8 @@ export class HeadlessBattleSimulator {
                 const s = this.unitStates.get(unit);
                 if (s?.isSilenced || e.source !== unit) return;
                 const { opTeam } = this.getTeams(unit);
-                const dmg = [0, 2, 5, 10][unit.level] || 2;
-                await Promise.all(opTeam.filter(u => u && u.stats.hp > 0).map(u => this.dealDamage(unit, u!, dmg)));
+                const dmg = [0, 1, 3, 8][unit.level] || 1;
+                await Promise.all(opTeam.filter(u => u && u.stats.hp > 0).map(u => this.dealDamage(unit, u!, dmg, true)));
             });
         }
         if (unit.family === 'mimikyu') {
@@ -400,7 +400,7 @@ export class HeadlessBattleSimulator {
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
                     const dmg = [0, 2, 4, 6][unit.level] || 2;
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
-                    if (living.length > 0) await this.dealDamage(unit, living[0], dmg);
+                    if (living.length > 0) await this.dealDamage(unit, living[0], dmg, true);
                 }
             });
         }
@@ -445,11 +445,11 @@ export class HeadlessBattleSimulator {
         if (attacker.stats.hp <= 0 || defender.stats.hp <= 0) return;
         await this.eventBus.emit({ type: 'BEFORE_ATTACK', source: attacker, target: defender, context: {} });
         const dmg = attacker.stats.attack;
-        const promises = [this.dealDamage(attacker, defender, dmg)];
+        const promises = [this.dealDamage(attacker, defender, dmg, false)];
         const s = this.unitStates.get(attacker);
         if (attacker.family === 'kangaskhan' && (attacker.templateId !== attacker.family) && !s?.isSilenced) {
             await promises[0];
-            if (defender.stats.hp > 0) promises.push(this.dealDamage(attacker, defender, dmg));
+            if (defender.stats.hp > 0) promises.push(this.dealDamage(attacker, defender, dmg, false));
         }
         if (attacker.family === 'doduo' && !s?.isSilenced) {
             if (Math.random() < ([0, 0.25, 0.33, 0.5][attacker.level] || 0.25)) {
@@ -467,7 +467,7 @@ export class HeadlessBattleSimulator {
             const { opTeam } = this.getTeams(attacker);
             const idx = opTeam.indexOf(defender);
             if (idx !== -1 && idx < opTeam.length - 1 && opTeam[idx + 1] && opTeam[idx + 1]!.stats.hp > 0) {
-                promises.push(this.dealDamage(attacker, opTeam[idx + 1]!, Math.floor(dmg * 0.5)));
+                promises.push(this.dealDamage(attacker, opTeam[idx + 1]!, Math.floor(dmg * 0.5), true));
             }
         }
         await Promise.all(promises);
@@ -491,7 +491,7 @@ export class HeadlessBattleSimulator {
         await this.eventBus.emit({ type: 'AFTER_ATTACK', source: attacker, target: defender, context: {} });
     }
 
-    public async dealDamage(source: Unit | null, target: Unit, amount: number) {
+    public async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false) {
         if (target.stats.hp <= 0) return;
         const targetState = this.unitStates.get(target) || {};
         const sourceState = source ? this.unitStates.get(source) || {} : {};
@@ -502,7 +502,8 @@ export class HeadlessBattleSimulator {
             sourceState.isLethalStrike = false;
             amount = 99;
         }
-        if (target.family === 'diglett' && !targetState.isSilenced) {
+        // Diglett: only dodge basic attacks, not skills; Pinsir bypasses
+        if (target.family === 'diglett' && !targetState.isSilenced && !isSkillDamage && !isBypassing) {
             if (Math.random() < ([0, 0.25, 0.33, 0.5][target.level] || 0.25)) return;
         }
         if (!isBypassing) {
@@ -520,7 +521,7 @@ export class HeadlessBattleSimulator {
             if (reflect > 0) await this.dealDamage(target, source, reflect);
         }
         if (!isBypassing) {
-            if (this.getSynergyCountForUnit(target, 'Slow') >= 2 && target.synergies.includes('Slow')) amount = Math.max(1, Math.ceil(amount / 2));
+            if (this.getSynergyCountForUnit(target, 'Slow') >= 2 && target.synergies.includes('Slow')) amount = Math.max(1, Math.ceil(amount * 2 / 3));
             if (target.family === 'squirtle' && amount > 0) amount = Math.max(1, amount - target.level);
         }
         target.stats.hp -= amount;
@@ -631,6 +632,7 @@ export class HeadlessBattleSimulator {
         if (!pFront || !eFront) return false;
         this.turnCount++;
         await Promise.all([this.performAttack(pFront, eFront), this.performAttack(eFront, pFront)]);
+        this.compactTeams();
         return this.playerTeam.some(u => u !== null && u.stats.hp > 0) && this.enemyTeam.some(u => u !== null && u.stats.hp > 0);
     }
 

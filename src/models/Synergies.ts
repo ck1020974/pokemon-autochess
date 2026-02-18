@@ -20,7 +20,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     // --- Traits ---
     'Triplets': { id: 'Triplets', name: '三胞胎', icon: '👨‍👧‍👦', description: '[3] 戰鬥開始時，所有三胞胎獲得 +3/+3', tiers: [3], color: '#fcd34d' },
     'Angry': { id: 'Angry', name: '憤怒', icon: '💢', description: '[2] 受傷後獲得 +2 攻擊', tiers: [2], color: '#dc2626' },
-    'Slow': { id: 'Slow', name: '遲鈍', icon: '🌀', description: '[2] 所受到的傷害減半 (最低1)', tiers: [2], color: '#f87171' },
+    'Slow': { id: 'Slow', name: '遲鈍', icon: '🌀', description: '[2] 所受到的傷害減少33% (最低1)', tiers: [2], color: '#f87171' },
     'Hard': { id: 'Hard', name: '堅硬', icon: '🛡️', description: '[2] 抵擋死亡，保留 1 生命 (每場戰鬥 1 次)', tiers: [2], color: '#9ca3af' },
     'Cave': { id: 'Cave', name: '洞穴', icon: '🕳️', description: '[2] 攻擊後，移動至最後方', tiers: [2], color: '#78350f' },
     'Snow': { id: 'Snow', name: '降雪', icon: '❄️', description: '[2] 戰鬥開始時，全體其他角色受到 5 傷害', tiers: [2], color: '#bae6fd' },

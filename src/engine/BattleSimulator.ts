@@ -164,7 +164,7 @@ export class BattleSimulator {
                         if (e.stats.hp < target.stats.hp) target = e;
                     }
                     await this.notifySkill(unit, '火花', `噴向了 ${target.name}`);
-                    await this.dealDamage(unit, target, 4);
+                    await this.dealDamage(unit, target, 4, true);
                     // Wait for death effects/compaction to settle before next fire breath
                     await this.delay(50);
                 } else break;
@@ -297,7 +297,7 @@ export class BattleSimulator {
                 if (target.synergies.includes('Snow')) continue;
 
                 this.log(`Snow Synergy: ${target.name} takes 5 damage!`);
-                await this.dealDamage(null, target, 5);
+                await this.dealDamage(null, target, 5, true);
             }
         }
     }
@@ -566,7 +566,7 @@ export class BattleSimulator {
                         const target = living[Math.floor(Math.random() * living.length)];
                         await this.notifySkill(unit, '詛咒', `帶給 ${target.name} 災難`);
                         const dmg = [0, 2, 5, 10][unit.level] || 2;
-                        await this.dealDamage(unit, target, dmg);
+                        await this.dealDamage(unit, target, dmg, true);
                     }
                 }
             });
@@ -579,8 +579,8 @@ export class BattleSimulator {
                 if (e.source === unit) {
                     const { opTeam } = this.getTeams(unit);
                     await this.notifySkill(unit, '自爆', '對全體造成傷害');
-                    const dmg = [0, 2, 5, 10][unit.level] || 2;
-                    await Promise.all(opTeam.filter(u => u && u.stats.hp > 0).map(u => this.dealDamage(unit, u!, dmg)));
+                    const dmg = [0, 1, 3, 8][unit.level] || 1;
+                    await Promise.all(opTeam.filter(u => u && u.stats.hp > 0).map(u => this.dealDamage(unit, u!, dmg, true)));
                 }
             });
         }
@@ -633,7 +633,7 @@ export class BattleSimulator {
                     if (living.length > 0) {
                         const target = living[0]; // Target the FIRST living enemy
                         this.log(`${unit.name} strikes ${target.name} for summon! (Damage: ${dmg})`);
-                        await this.dealDamage(unit, target, dmg);
+                        await this.dealDamage(unit, target, dmg, true);
                     }
                 }
             });
@@ -662,14 +662,14 @@ export class BattleSimulator {
         const dmg = attacker.stats.attack;
 
         // Base attack
-        attackPromises.push(this.dealDamage(attacker, defender, dmg));
+        attackPromises.push(this.dealDamage(attacker, defender, dmg, false));
 
         // Kangaskhan: Second hit if evolved and defender still alive
         if (attacker.family === 'kangaskhan' && (defender.templateId !== defender.family) && !this.unitStates.get(attacker)?.isSilenced) {
             await Promise.all(attackPromises); // Wait for the first hit
             if (defender.stats.hp > 0) {
                 await this.notifySkill(attacker, '親子愛', '發動連擊');
-                attackPromises.push(this.dealDamage(attacker, defender, dmg));
+                attackPromises.push(this.dealDamage(attacker, defender, dmg, false));
             }
         }
 
@@ -710,7 +710,7 @@ export class BattleSimulator {
                 if (neighbor && neighbor.stats.hp > 0) {
                     const splashDmg = Math.floor(dmg * 0.5);
                     await this.notifySkill(attacker, '水之波動', `波及到了 ${neighbor.name}`);
-                    attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg));
+                    attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
                 }
             }
         }
@@ -740,7 +740,7 @@ export class BattleSimulator {
         await this.eventBus.emit({ type: 'AFTER_ATTACK', source: attacker, target: defender, context: {} });
     }
 
-    private async dealDamage(source: Unit | null, target: Unit, amount: number) {
+    private async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false) {
         if (target.stats.hp <= 0) return;
 
         const targetState = this.unitStates.get(target) || {};
@@ -756,8 +756,8 @@ export class BattleSimulator {
             this.log(`Critical Hit! ${target.name} is eliminated!`);
         }
 
-        // Diglett: Chance to dodge
-        if (target.family === 'diglett' && !targetState.isSilenced) {
+        // Diglett: Chance to dodge (only basic attacks, not skills; Pinsir bypasses)
+        if (target.family === 'diglett' && !targetState.isSilenced && !isSkillDamage && !isBypassing) {
             const dodgeChance = [0, 0.25, 0.33, 0.5][target.level] || 0.25;
             if (Math.random() < dodgeChance) {
                 this.log(`${target.name} dodged!`);
@@ -779,9 +779,9 @@ export class BattleSimulator {
 
         // Pinsir/Sableye ignore reductions
         if (!isBypassing) {
-            // Slow: Halve damage
+            // Slow: 33% damage reduction
             if (this.getSynergyCountForUnit(target, 'Slow') >= 2 && target.synergies.includes('Slow')) {
-                amount = Math.max(1, Math.ceil(amount / 2));
+                amount = Math.max(1, Math.ceil(amount * 2 / 3));
             }
             // Squirtle: Flat reduction
             if (target.family === 'squirtle' && amount > 0) amount = Math.max(1, amount - target.level);
@@ -1050,6 +1050,9 @@ export class BattleSimulator {
 
         // 4. Wait for animations to complete before finishing the step
         await Promise.all(anims);
+
+        // 5. Compact teams to ensure summons are settled before victory check
+        await this.compactTeams();
 
         return this.playerTeam.some(u => u !== null && u.stats.hp > 0) &&
             this.enemyTeam.some(u => u !== null && u.stats.hp > 0);

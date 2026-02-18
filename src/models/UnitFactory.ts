@@ -310,19 +310,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'diglett', name: '地鼠', tier: 2, family: 'diglett',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/地鼠00.webp', battleImageUrl: 'assets/地鼠01.webp',
-        description: '有 25% 機率閃避傷害。', synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio'
+        description: '有 25% 機率閃避攻擊（不含技能傷害）。', synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio'
     },
     dugtrio: {
         id: 'dugtrio', name: '三地鼠', tier: 2, family: 'diglett',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/三地鼠00.webp', battleImageUrl: 'assets/三地鼠01.webp',
-        description: '有 33% 機率閃避傷害。', synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio_final', isHiddenFromShop: true
+        description: '有 33% 機率閃避攻擊（不含技能傷害）。', synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio_final', isHiddenFromShop: true
     },
     dugtrio_final: {
         id: 'dugtrio_final', name: '三地鼠', tier: 2, family: 'diglett',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/三地鼠00.webp', battleImageUrl: 'assets/三地鼠01.webp',
-        description: '有 50% 機率閃避傷害。', synergies: ['Triplets', 'Cave'], isHiddenFromShop: true
+        description: '有 50% 機率閃避攻擊（不含技能傷害）。', synergies: ['Triplets', 'Cave'], isHiddenFromShop: true
     },
 
     // 17. Meowth
@@ -510,19 +510,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'drifloon', name: '飄飄球', tier: 2, family: 'drifloon',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/飄飄球00.webp', battleImageUrl: 'assets/飄飄球01.webp',
-        description: '死亡後對全體敵方造成 2 傷害。', synergies: ['Ghost'], evolveId: 'drifblim'
+        description: '死亡後對全體敵方造成 1 傷害。', synergies: ['Ghost'], evolveId: 'drifblim'
     },
     drifblim: {
         id: 'drifblim', name: '隨風球', tier: 2, family: 'drifloon',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/隨風球00.webp', battleImageUrl: 'assets/隨風球01.webp',
-        description: '死亡後對全體敵方造成 5 傷害。', synergies: ['Ghost'], evolveId: 'drifblim_final', isHiddenFromShop: true
+        description: '死亡後對全體敵方造成 3 傷害。', synergies: ['Ghost'], evolveId: 'drifblim_final', isHiddenFromShop: true
     },
     drifblim_final: {
         id: 'drifblim_final', name: '隨風球', tier: 2, family: 'drifloon',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/隨風球00.webp', battleImageUrl: 'assets/隨風球01.webp',
-        description: '死亡後對全體敵方造成 10 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '死亡後對全體敵方造成 8 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 27. Snover
@@ -696,7 +696,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'pinsir', name: '凱羅斯', tier: 3, family: 'pinsir',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/凱羅斯00.webp', battleImageUrl: 'assets/凱羅斯01.webp',
-        description: '攻擊無視減傷、堅硬及謎擬Q的技能效果。', synergies: ['Beetle']
+        description: '攻擊無視所有減傷和閃避效果。', synergies: ['Beetle']
     },
     farfetchd: {
         id: 'farfetchd', name: '大蔥鴨', tier: 5, family: 'farfetchd',
