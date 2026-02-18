@@ -196,12 +196,18 @@ export class HeadlessBattleSimulator {
         }
     }
 
-    private growUnit(unit: Unit, hp: number, atk: number) {
+    private growUnit(unit: Unit, hp: number, atk: number, permanentTarget?: Unit | null) {
         if (hp === 0 && atk === 0) return;
         unit.addGrowth(hp, atk);
+        if (permanentTarget) permanentTarget.addGrowth(hp, atk);
+
         if (this.getSynergyCountForUnit(unit, 'Claw') >= 2 && unit.synergies.includes('Claw')) {
             unit.stats.attack += 2;
             unit.capStats();
+            if (permanentTarget) {
+                permanentTarget.stats.attack += 2;
+                permanentTarget.capStats();
+            }
         }
     }
 
@@ -472,8 +478,12 @@ export class HeadlessBattleSimulator {
         }
         if (attacker.family === 'sneasel' && !s?.isSilenced) {
             const { opTeam } = this.getTeams(attacker);
-            const others = opTeam.filter(u => u && u !== defender && u.stats.hp > 0);
-            if (others.length > 0) promises.push(this.dealDamage(attacker, others[Math.floor(Math.random() * others.length)], dmg));
+            const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+            if (liveEnemies.length > 0) {
+                const others = liveEnemies.filter(u => u !== defender);
+                const r = others.length > 0 ? others[Math.floor(Math.random() * others.length)] : defender;
+                promises.push(this.dealDamage(attacker, r, dmg));
+            }
         }
         if (attacker.family === 'totodile' && !s?.isSilenced) {
             const { opTeam } = this.getTeams(attacker);
@@ -566,21 +576,31 @@ export class HeadlessBattleSimulator {
             if (this.enemyTeam[idx] === unit || (this.enemyTeam[idx] && this.enemyTeam[idx].stats.hp <= 0)) this.enemyTeam[idx] = null as any;
         }
         if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
-            if (killer.family === 'sneasel') this.growUnit(killer, 0, 3);
+            const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
+
+            if (killer.family === 'sneasel') {
+                this.growUnit(killer, 0, 3, original);
+            }
             if (killer.family === 'charmander') {
                 const buff = killer.level;
-                if (Math.random() < 0.5) this.growUnit(killer, 0, buff);
-                else this.growUnit(killer, buff, 0);
+                if (Math.random() < 0.5) {
+                    this.growUnit(killer, 0, buff, original);
+                } else {
+                    this.growUnit(killer, buff, 0, original);
+                }
             }
             if (killer.family === 'cyndaquil') {
                 const kState = this.unitStates.get(killer) || {};
                 if ((kState.cyndaquilKills || 0) < killer.level) {
                     kState.cyndaquilKills = (kState.cyndaquilKills || 0) + 1;
                     this.unitStates.set(killer, kState);
-                    this.growUnit(killer, 3, 2);
+                    this.growUnit(killer, 3, 2, original);
                 }
             }
-            if (killer.family === 'quaxly') this.growUnit(killer, 0, [0, 3, 5, 10][killer.level] || 3);
+            if (killer.family === 'quaxly') {
+                const buff = [0, 3, 5, 10][killer.level] || 3;
+                this.growUnit(killer, 0, buff, original);
+            }
         }
         this.compactTeams();
     }

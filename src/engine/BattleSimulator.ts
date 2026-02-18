@@ -302,9 +302,11 @@ export class BattleSimulator {
         }
     }
 
-    private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string) {
+    private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string, permanentTarget?: Unit | null) {
         if (hp === 0 && atk === 0) return;
         unit.addGrowth(hp, atk);
+        if (permanentTarget) permanentTarget.addGrowth(hp, atk);
+
         if (sourceName) {
             let msg = `${unit.name} gains `;
             if (hp > 0 && atk > 0) msg += `+${hp}/+${atk}`;
@@ -318,6 +320,10 @@ export class BattleSimulator {
         if (this.getSynergyCountForUnit(unit, 'Claw') >= 2 && unit.synergies.includes('Claw')) {
             unit.stats.attack += 2;
             unit.capStats();
+            if (permanentTarget) {
+                permanentTarget.stats.attack += 2;
+                permanentTarget.capStats();
+            }
             this.log(`${unit.name} gains +2 Atk from Claw!`);
         }
     }
@@ -699,13 +705,15 @@ export class BattleSimulator {
             }
         }
 
-        // Sneasel: 1 extra random hit
+        // Sneasel: 1 extra random hit (Can hit same target if only 1 enemy)
         if (attacker.family === 'sneasel' && !this.unitStates.get(attacker)?.isSilenced) {
             const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
             const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
-            const others = opTeam.filter(u => u && u !== defender && u.stats.hp > 0);
-            if (others.length > 0) {
-                const r = others[Math.floor(Math.random() * others.length)];
+            const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+            if (liveEnemies.length > 0) {
+                // Priority to other enemies, but hit same if only 1 enemy total
+                const others = liveEnemies.filter(u => u !== defender);
+                const r = others.length > 0 ? others[Math.floor(Math.random() * others.length)] : defender;
                 this.log(`${attacker.name} 揮擊了 ${r.name}！`);
                 attackPromises.push(this.dealDamage(attacker, r, dmg));
             }
@@ -870,16 +878,16 @@ export class BattleSimulator {
         if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
             // Sneasel family: Atk on kill (Permanent)
             if (killer.family === 'sneasel') {
-                this.growUnit(killer, 0, 3, 'Sneasel');
                 const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                if (original) original.addGrowth(0, 3);
+                this.growUnit(killer, 0, 3, '狃拉技能', original);
             }
 
             // Charmander family: Stats on kill
             if (killer.family === 'charmander') {
                 const buff = killer.level;
-                if (Math.random() < 0.5) this.growUnit(killer, 0, buff, 'Charmander');
-                else this.growUnit(killer, buff, 0, 'Charmander');
+                const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
+                if (Math.random() < 0.5) this.growUnit(killer, 0, buff, 'Charmander', original);
+                else this.growUnit(killer, buff, 0, 'Charmander', original);
             }
 
             // Cyndaquil family: Atk and HP on kill
@@ -890,14 +898,16 @@ export class BattleSimulator {
                 if (used < maxTimes) {
                     kState.cyndaquilKills = used + 1;
                     this.unitStates.set(killer, kState);
-                    this.growUnit(killer, 3, 2, 'Cyndaquil');
+                    const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
+                    this.growUnit(killer, 3, 2, 'Cyndaquil', original);
                 }
             }
 
             // Quaxly family: Atk on kill
             if (killer.family === 'quaxly') {
                 const buff = [0, 3, 5, 10][killer.level] || 3;
-                this.growUnit(killer, 0, buff, 'Quaxly');
+                const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
+                this.growUnit(killer, 0, buff, 'Quaxly', original);
             }
         }
 
