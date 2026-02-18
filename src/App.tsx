@@ -597,7 +597,7 @@ function App() {
         setDraggedItem({ index, source });
         e.dataTransfer.effectAllowed = "move";
         // Sync selected with dragged for visual consistency
-        const unit = source === 'SHOP' ? game.shopUnits[index].unit : game.playerTeam[index];
+        const unit = source === 'SHOP' ? game.shop.slots[index] : game.playerTeam[index];
         if (unit) setSelected({ unit, index, source });
     };
 
