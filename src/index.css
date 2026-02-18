@@ -336,23 +336,45 @@ h3 {
   display: none !important;
 }
 
-/* Mergeable Unit Glow Effect */
-.unit-card.is-mergeable {
-  animation: merge-glow 2s infinite ease-in-out;
-  z-index: 5;
+/* Mergeable Unit Glow Effect - Targeted to image, restricted logic to shop */
+.shop-slots .unit-card.is-mergeable .unit-image {
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+  animation: merge-glow-gentle 2.5s infinite ease-in-out;
 }
 
-@keyframes merge-glow {
+@keyframes merge-glow-gentle {
 
   0%,
   100% {
     filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
-    transform: translateY(0);
   }
 
   50% {
-    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
-    transform: translateY(-2px);
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+  }
+}
+
+/* Evolution Flash Effect */
+.unit-card.is-evolving {
+  animation: evolution-pulse 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 200 !important;
+}
+
+@keyframes evolution-pulse {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  30% {
+    transform: scale(1.15);
+    filter: brightness(2.5);
+    box-shadow: 0 0 40px white;
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
   }
 }
 
@@ -996,10 +1018,8 @@ h3 {
 
 /* --- Visual Selection Highlight --- */
 .unit-card.is-selected {
-  outline: 3px solid #60a5fa;
-  outline-offset: -2px;
-  /* Inward offset for a tighter, more precise fit */
-  box-shadow: 0 0 15px rgba(96, 165, 250, 0.6);
+  /* Soft blue atmospheric glow instead of outline */
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.5), inset 0 0 10px rgba(96, 165, 250, 0.2);
   z-index: 100;
   border-radius: 12px;
 }

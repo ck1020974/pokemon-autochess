@@ -23,7 +23,7 @@ interface DraggedItemState {
 // --- Helper Components ---
 
 // UnitCard with Direct Lock & Silence Support
-function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, isSelected }: any) {
+function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, isSelected, isEvolving, showMergeGlow }: any) {
     if (!unit || unit.stats.hp <= 0) {
         return (
             <div className="slot-placeholder">
@@ -35,7 +35,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
     return (
         <div
             id={unit.id}
-            className={`unit-card ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${isSelected ? 'is-selected' : ''} ${unit.isMergeable ? 'is-mergeable' : ''}`}
+            className={`unit-card ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${isSelected ? 'is-selected' : ''} ${showMergeGlow ? 'is-mergeable' : ''} ${isEvolving ? 'is-evolving' : ''}`}
             onClick={(e) => { e.stopPropagation(); onClick(); }}
             draggable={draggable}
             onDragStart={onDragStart}
@@ -196,8 +196,17 @@ function App() {
     // Battle Timeout Timing
     const [battleElapsedSeconds, setBattleElapsedSeconds] = useState(0);
 
-    // Store Initial Enemy Team for Synergy Display (Persists through battle)
     const [initialEnemyTeam, setInitialEnemyTeam] = useState<(Unit | null)[]>([]);
+
+    // Evolution Visual State
+    const [evolvingUnitId, setEvolvingUnitId] = useState<string | null>(null);
+
+    const triggerEvolutionEffect = (unit: Unit | null) => {
+        if (unit) {
+            setEvolvingUnitId(unit.id);
+            setTimeout(() => setEvolvingUnitId(null), 800);
+        }
+    };
 
     // Battle Paused State
     const [isPaused, setIsPaused] = useState(false);
@@ -582,16 +591,26 @@ function App() {
             // If we click a valid target location (the Board) while holding something
             if (source === 'BOARD') {
                 if (sourceLoc === 'BOARD') {
-                    // Try to Move or Synthesize (Move logic usually handles synthesis in engine)
+                    // Try to Move or Synthesize
                     if (sourceIndex !== index) {
+                        const oldLevel = game.playerTeam[sourceIndex]?.level || 0;
                         game.moveUnit(sourceIndex, index);
+                        const targetUnit = game.playerTeam[index];
+                        if (targetUnit && targetUnit.level > oldLevel) {
+                            triggerEvolutionEffect(targetUnit);
+                        }
                         setSelected(null);
                         update();
                         return;
                     }
                 } else if (sourceLoc === 'SHOP') {
                     // Try to Buy or Synthesize from Shop
-                    if (game.buyUnit(sourceIndex, index)) {
+                    const shopUnit = game.shop.slots[sourceIndex];
+                    if (shopUnit && game.buyUnit(sourceIndex, index)) {
+                        const targetUnit = game.playerTeam[index];
+                        if (targetUnit && targetUnit.level > shopUnit.level) {
+                            triggerEvolutionEffect(targetUnit);
+                        }
                         setSelected(null);
                         update();
                         return;
@@ -638,11 +657,21 @@ function App() {
 
             if (source === 'BOARD') {
                 if (sourceIndex !== targetIndex) {
+                    const oldLevel = game.playerTeam[sourceIndex]?.level || 0;
                     game.moveUnit(sourceIndex, targetIndex);
+                    const targetUnit = game.playerTeam[targetIndex];
+                    if (targetUnit && targetUnit.level > oldLevel) {
+                        triggerEvolutionEffect(targetUnit);
+                    }
                     update();
                 }
             } else if (source === 'SHOP') {
-                if (game.buyUnit(sourceIndex, targetIndex)) {
+                const shopUnit = game.shop.slots[sourceIndex];
+                if (shopUnit && game.buyUnit(sourceIndex, targetIndex)) {
+                    const targetUnit = game.playerTeam[targetIndex];
+                    if (targetUnit && targetUnit.level > shopUnit.level) {
+                        triggerEvolutionEffect(targetUnit);
+                    }
                     update();
                 }
             }
@@ -762,6 +791,7 @@ function App() {
                                         isInteractive={isInteractive}
                                         isSelected={selected?.unit === unit && selected?.source === 'BOARD'}
                                         silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
+                                        isEvolving={unit && evolvingUnitId === unit.id}
                                     />
                                 </div>
                             );
@@ -781,6 +811,7 @@ function App() {
                                         onClick={() => handleSelect(unit, i, 'ENEMY')}
                                         flipped={true}
                                         silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
+                                        isEvolving={unit && evolvingUnitId === unit.id}
                                     />
                                 </div>
                             );
@@ -852,6 +883,8 @@ function App() {
                                         draggable={!!unit && game.gold >= 3}
                                         onDragStart={(e: React.DragEvent) => onDragStart(e, i, 'SHOP')}
                                         onToggleFreeze={() => handleFreezeToggle(i)}
+                                        showMergeGlow={unit && (unit as any).isMergeable}
+                                        isEvolving={unit && evolvingUnitId === unit.id}
                                     />
                                 );
                             })}
@@ -871,14 +904,13 @@ function App() {
                                         flexDirection: 'column',
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        gap: '0px'
+                                        gap: '2px' /* Tightened gap */
                                     }}>
                                         <div style={{
-                                            fontSize: '6rem',
+                                            fontSize: '3.5rem', /* Reduced from 6rem */
                                             color: 'rgba(255,255,255,0.12)',
                                             lineHeight: 1,
                                             fontWeight: 'bold',
-                                            marginTop: '-10px'
                                         }}>×</div>
                                         {turnsLeft > 0 && (
                                             <div style={{
