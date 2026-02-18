@@ -546,7 +546,7 @@ export class BattleSimulator {
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    const amount = 2 * unit.level;
+                    const amount = [0, 3, 5, 10][unit.level] || 3;
                     this.growUnit(unit, amount, 0, '呆火鱷技能');
                 }
             });
@@ -662,7 +662,7 @@ export class BattleSimulator {
         // Chikorita Family: Buff Summons
         if (unit.family === 'chikorita') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
-                if (this.unitStates.get(unit)?.isSilenced) return;
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
                 const { side: mySide } = this.getTeams(unit);
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
                 if (e.source && mySide === sSide && e.source !== unit) {
