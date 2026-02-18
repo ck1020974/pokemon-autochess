@@ -77,8 +77,8 @@ h3 {
 .board-teams-horizontal {
   display: flex;
   justify-content: center;
-  /* Shift slightly to the left for better balance as requested */
-  padding-right: 80px;
+  /* Shift to the left for better balance */
+  padding-right: 150px;
   align-items: flex-end;
   min-width: fit-content;
   /* Ensure background stretches to content */
