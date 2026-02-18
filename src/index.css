@@ -855,14 +855,14 @@ h3 {
 
   .unit-card,
   .slot-placeholder {
-    width: 84px;
-    height: 104px;
-    margin: 0 -15px;
+    width: 90px;
+    height: 100px;
+    margin: 0 -14px;
   }
 
   .unit-image {
-    width: 84px;
-    height: 84px;
+    width: 90px;
+    height: 90px;
   }
 
   .shop-slots .unit-image {
@@ -894,8 +894,8 @@ h3 {
   }
 
   .shop-controls {
-    width: 100px;
-    padding-right: 10px;
+    width: 80px;
+    padding-right: 5px;
     gap: 4px;
   }
 
@@ -918,11 +918,11 @@ h3 {
   }
 
   .shop-slots-area {
-    padding-left: 10px;
+    padding-left: 0px;
   }
 
   .shop-slots {
-    gap: 4px;
+    gap: 2px;
   }
 
   /* Removed shop-specific scaling to keep them same size as team area */
@@ -958,9 +958,11 @@ h3 {
     font-size: 1.1rem !important;
   }
 
-  .btn-premium.btn-reroll {
-    height: 28px !important;
-    font-size: 0.85rem !important;
+  .btn-premium.btn-reroll,
+  .btn-premium.btn-sell-action {
+    height: 32px !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
   }
 
   .detail-desc {
