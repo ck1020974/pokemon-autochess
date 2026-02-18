@@ -203,6 +203,28 @@ function App() {
     const [isPaused, setIsPaused] = useState(false);
     const isPausedRef = useRef(false);
 
+    // Image Preloading
+    useEffect(() => {
+        const preloadImages = () => {
+            const urls: string[] = [];
+            Object.values(UNIT_TEMPLATES).forEach(t => {
+                if (t.imageUrl) urls.push(t.imageUrl);
+                if (t.battleImageUrl) urls.push(t.battleImageUrl);
+            });
+
+            // De-duplicate
+            const uniqueUrls = Array.from(new Set(urls));
+
+            uniqueUrls.forEach(url => {
+                const img = new Image();
+                img.src = url;
+            });
+            console.log(`Preloading ${uniqueUrls.length} assets...`);
+        };
+
+        preloadImages();
+    }, []);
+
     const togglePause = () => {
         isPausedRef.current = !isPausedRef.current;
         setIsPaused(isPausedRef.current);
