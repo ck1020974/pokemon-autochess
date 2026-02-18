@@ -82,8 +82,8 @@ h3 {
   min-width: fit-content;
   /* Ensure background stretches to content */
   width: 100%;
-  gap: 20px;
-  /* Increased gap to 20px for better separation between teams */
+  gap: 80px;
+  /* Increased gap to push teams further apart for a clearer face-off */
 }
 
 .board-side {
@@ -313,8 +313,8 @@ h3 {
 
 .shop-slots {
   display: flex;
-  gap: 4px;
-  /* Decreased spacing for shop */
+  gap: 0px;
+  /* Minimized spacing for shop to group them tightly */
   align-items: flex-end;
 }
 
@@ -346,8 +346,8 @@ h3 {
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
   animation: unit-appear 0.4s cubic-bezier(0.2, 0, 0, 1);
-  margin: 0 -22px;
-  /* Increased spacing by decreasing overlap from -32px */
+  margin: 0 -10px;
+  /* Relaxed overlap as requested, creating more breathing room between characters */
 }
 
 .unit-card:hover {
@@ -488,8 +488,8 @@ h3 {
   justify-content: center;
   align-items: flex-end;
   position: relative;
-  margin: 0 -22px;
-  /* Matched with unit-card */
+  margin: 0 -10px;
+  /* Matched with unit-card for consistency */
 }
 
 /* --- Premium Buttons --- */
@@ -928,9 +928,19 @@ h3 {
     height: 80px;
   }
 
-  .unit-image {
+  .unit-image,
+  .shop-slots .unit-image {
     width: 55px;
     height: 55px;
+  }
+
+  /* Ensure shop units also scale down */
+  .shop-slots .unit-card,
+  .shop-slots .slot-placeholder {
+    width: 65px;
+    height: 80px;
+    margin: 0 2px;
+    /* Slight positive margin for small screens */
   }
 
   .header {
