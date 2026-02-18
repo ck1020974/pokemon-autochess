@@ -174,6 +174,10 @@ function App() {
     const game = gameRef.current;
     const update = useForceUpdate();
 
+    useEffect(() => {
+        console.log("Pokemon AutoChess v4.5 - Visual Delay & UI Sync");
+    }, []);
+
     const handleRestart = () => {
         gameRef.current = new GameLoop();
         // Force update to reflect new game instance
@@ -747,8 +751,8 @@ function App() {
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '20px',
-                        marginTop: '5vh' // Shifting down slightly
+                        gap: '10px',
+                        marginTop: '2vh'
                     }}>
                         <div className="result-title" style={{
                             fontSize: 'min(5rem, 12vw)',
@@ -775,14 +779,15 @@ function App() {
                     {/* Operational Area - Decoupled to bottom */}
                     <div style={{
                         position: 'absolute',
-                        bottom: '10%',
-                        color: '#ddd',
-                        fontSize: '1.1rem',
+                        bottom: '50px',
+                        color: '#bbb',
+                        fontSize: '1rem',
                         letterSpacing: '1px',
                         animation: 'pulse 2s infinite',
-                        background: 'rgba(0,0,0,0.5)',
-                        padding: '8px 20px',
-                        borderRadius: '20px'
+                        background: 'rgba(255,255,255,0.05)',
+                        padding: '6px 15px',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '15px'
                     }}>
                         [ 點擊任意處重新開始 ]
                     </div>
