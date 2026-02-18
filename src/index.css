@@ -82,8 +82,8 @@ h3 {
   min-width: fit-content;
   /* Ensure background stretches to content */
   width: 100%;
-  gap: 25px;
-  /* Increased gap to maintain breathing room around VS */
+  gap: 10px;
+  /* Reduced gap to bring teams even closer to the center VS */
 }
 
 .board-side {
@@ -481,12 +481,15 @@ h3 {
 
 .slot-placeholder {
   width: 135px;
+  /* Unified with .unit-card */
   height: 155px;
+  /* Unified with .unit-card */
   display: flex;
   justify-content: center;
   align-items: flex-end;
   position: relative;
-  margin: 0 -22px;
+  margin: 0 -32px;
+  /* Fixed consistency: matched with occupied card overlap */
 }
 
 /* --- Premium Buttons --- */

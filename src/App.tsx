@@ -714,8 +714,6 @@ function App() {
 
                 {/* 4. Units Area */}
                 <div className="board-teams-horizontal">
-                    <div className="board-vs">VS</div>
-
                     {/* Left Side: Player Team */}
                     <div className="board-side player">
                         {Array.from({ length: 5 }).map((_, i) => {
@@ -747,6 +745,8 @@ function App() {
                             );
                         })}
                     </div>
+
+                    <div className="board-vs">VS</div>
 
                     {/* Right Side: Enemy Team (Flipped) */}
                     <div className="board-side enemy">
