@@ -18,7 +18,7 @@
 
 ## 🚀 線上遊玩
 
-[點擊這裡開始遊戲](https://你的GitHub用戶名.github.io/pokemon-autochess/)
+[點擊這裡開始遊戲](https://ck1020974.github.io/pokemon-autochess/)
 
 ## 💻 本地開發
 
