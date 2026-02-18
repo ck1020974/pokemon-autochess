@@ -911,7 +911,7 @@ h3 {
   }
 
   .shop-controls {
-    width: 77px;
+    width: 80px;
     padding-right: 0px;
     gap: 2px;
   }
@@ -935,7 +935,7 @@ h3 {
   }
 
   .shop-slots-area {
-    padding-left: 68px;
+    padding-left: 65px;
     position: relative;
   }
 
@@ -955,8 +955,8 @@ h3 {
   .reroll-icon-btn {
     font-size: 1.5rem !important;
     top: -10px !important;
-    left: 4px !important;
-    /* Card starts at 68px, button at 4px = 64px gap */
+    left: 2px !important;
+    /* Adjusted: divider width 80, slot start 65, button 2 */
   }
 
   /* Selection glow tweak for mobile: narrower width and reduced height */
