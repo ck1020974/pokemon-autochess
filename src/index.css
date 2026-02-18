@@ -879,7 +879,7 @@ h3 {
   .floor-marker {
     width: 45px;
     height: 10px;
-    bottom: 12px;
+    bottom: 5px;
   }
 
   .unit-stats {
@@ -896,7 +896,8 @@ h3 {
 
   /* 2. Scale down Shop Section */
   .shop-container {
-    padding: 8px 12px;
+    padding: 12px 10px;
+    min-height: 125px;
   }
 
   .shop-controls {
@@ -935,7 +936,7 @@ h3 {
   .shop-slots .slot-placeholder {
     width: 75px !important;
     height: 90px !important;
-    margin: 0 -5px !important;
+    margin: 0 0px !important;
   }
 
   /* Removed shop-specific scaling to keep them same size as team area */

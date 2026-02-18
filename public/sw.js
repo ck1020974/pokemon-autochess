@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pkm-autochess-v2.2';
+const CACHE_NAME = 'pkm-autochess-v2.3';
 
 // Install: Cache the app shell
 self.addEventListener('install', (event) => {

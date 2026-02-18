@@ -832,7 +832,7 @@ function App() {
             {game.phase === GamePhase.SHOP && (
                 <div className="shop-container">
                     {/* Left Controls: Compact & Side-by-Side */}
-                    <div className="shop-controls" style={{ width: '100px', paddingRight: '10px' }}>
+                    <div className="shop-controls">
                         {/* Row 1: Shop Level Text - Higher and Better Color */}
                         <div className="shop-info-row" style={{ justifyContent: 'center', marginBottom: '0px', marginTop: '-15px' }}>
                             <span className="tier-text" style={{ color: '#e2e8f0', fontSize: '1rem', opacity: 0.9 }}>商店 Lv.{game.shop.getTier(game.turn)}</span>
@@ -851,7 +851,7 @@ function App() {
                     </div>
 
                     {/* Right Shop Slots - Shifted right while button stays fixed */}
-                    <div className="shop-slots-area" style={{ position: 'relative', paddingLeft: '50px' }}>
+                    <div className="shop-slots-area" style={{ position: 'relative' }}>
                         {/* Reroll Button: Icon-only, Top-Left of Slot 1 - Moved down and left */}
                         <button
                             className={`reroll-icon-btn ${game.gold < 1 ? 'btn-disabled' : ''}`}
