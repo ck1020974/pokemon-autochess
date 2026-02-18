@@ -881,8 +881,8 @@ h3 {
   }
 
   .shop-slots .unit-image {
-    width: 70px;
-    height: 70px;
+    width: 75px;
+    height: 75px;
   }
 
   .floor-marker {
@@ -954,8 +954,8 @@ h3 {
   .reroll-icon-btn {
     font-size: 1.5rem !important;
     top: -10px !important;
-    left: -20px !important;
-    /* Adjusted from -24px to move slightly more to the right */
+    left: -45px !important;
+    /* Increased gap to ~20px from the first card (24px icon + 21px gap) */
   }
 
   /* Selection glow tweak for mobile: narrower width and reduced height */
@@ -986,8 +986,8 @@ h3 {
   }
 
   .detail-image {
-    width: 70px !important;
-    height: 70px !important;
+    width: 75px !important;
+    height: 75px !important;
   }
 
   .detail-left {
