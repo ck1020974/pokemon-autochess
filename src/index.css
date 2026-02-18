@@ -381,8 +381,8 @@ h3 {
 
 /* --- Minimal Card (Character) --- */
 .unit-card {
-  width: 130px;
-  height: 150px;
+  width: 105px;
+  height: 120px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -391,8 +391,7 @@ h3 {
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
   animation: unit-appear 0.4s cubic-bezier(0.2, 0, 0, 1);
-  margin: 0 -23px;
-  /* Slightly wider as requested (-23px) */
+  margin: 0 -12px;
 }
 
 .unit-card:hover {
@@ -525,16 +524,13 @@ h3 {
 }
 
 .slot-placeholder {
-  width: 130px;
-  /* Unified with .unit-card */
-  height: 150px;
-  /* Unified with .unit-card */
+  width: 105px;
+  height: 120px;
   display: flex;
   justify-content: center;
   align-items: flex-end;
   position: relative;
-  margin: 0 -23px;
-  /* Matched with unit-card (-23px) */
+  margin: 0 -12px;
 }
 
 /* --- Premium Buttons --- */
@@ -860,10 +856,11 @@ h3 {
   .unit-card,
   .slot-placeholder {
     width: 75px;
-    /* Scaled down from 115px */
+    /* Scaled down from 105px */
     height: 90px;
-    /* Scaled down from 140px */
-    margin: 0 -6px;
+    /* Scaled down from 120px */
+    margin: 0 2px;
+    /* Positive margin for breathing room on mobile */
   }
 
   .unit-image {
@@ -973,8 +970,8 @@ h3 {
   .slot-placeholder {
     width: 65px;
     height: 80px;
-    margin: 0 -8px !important;
-    /* Relaxed from -28px to -8px for small screens */
+    margin: 0 0px !important;
+    /* No overlap on very small screens */
   }
 
   .unit-image,
@@ -987,7 +984,8 @@ h3 {
   .shop-slots .slot-placeholder {
     width: 60px;
     height: 75px;
-    margin: 0 1px;
+    margin: 0 4px;
+    /* Wider gap for shop on very small screens */
   }
 
   .header {
