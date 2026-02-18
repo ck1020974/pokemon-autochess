@@ -175,7 +175,7 @@ function App() {
     const update = useForceUpdate();
 
     useEffect(() => {
-        console.log("Pokemon AutoChess v4.7 - Fixed Overlay & Final Trans");
+        console.log("Pokemon AutoChess v4.8.3 - Syntax Fix & Final Logs");
     }, []);
 
     const handleRestart = () => {
