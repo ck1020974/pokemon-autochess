@@ -468,19 +468,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
     // 24. Sneasel
     sneasel: {
         id: 'sneasel', name: '狃拉', tier: 4, family: 'sneasel',
-        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/狃拉00.webp', battleImageUrl: 'assets/狃拉01.webp',
         description: '攻擊時，再隨機攻擊 1 個敵方；擊殺後攻擊永久 +3。', synergies: ['Claw', 'Snow'], evolveId: 'weavile'
     },
     weavile: {
         id: 'weavile', name: '瑪狃拉', tier: 4, family: 'sneasel',
-        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
         description: '攻擊時，再隨機攻擊 1 個敵方；擊殺後攻擊永久 +3。', synergies: ['Claw', 'Snow'], evolveId: 'weavile_final', isHiddenFromShop: true
     },
     weavile_final: {
         id: 'weavile_final', name: '瑪狃拉', tier: 4, family: 'sneasel',
-        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
         description: '攻擊時，再隨機攻擊 1 個敵方；擊殺後攻擊永久 +3。', synergies: ['Claw', 'Snow'], isHiddenFromShop: true
     },

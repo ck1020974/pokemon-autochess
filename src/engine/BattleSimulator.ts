@@ -438,7 +438,8 @@ export class BattleSimulator {
 
                         const idx = myTeam.indexOf(unit);
                         if (idx !== -1 && idx < myTeam.length - 1) {
-                            myTeam.push(unit);
+                            myTeam.splice(idx, 1); // Properly remove from current spot
+                            myTeam.push(unit); // Move to the end
                             this.log(`${unit.name} 撤退到了後排！`);
                             await this.compactTeams();
                             await this.eventBus.emit({ type: 'ON_MOVE', source: unit, context: {} });
