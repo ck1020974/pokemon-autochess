@@ -793,7 +793,7 @@ export class BattleSimulator {
         if (sourceState.isLethalStrike) {
             sourceState.isLethalStrike = false; // Consume it
             amount = 99;
-            this.log(`致命一擊！ ${target.name} 被擊倒了！`);
+            this.log(` ${target.name} 被一擊擊殺了！`);
         }
 
         // Diglett: Chance to dodge (only basic attacks, not skills; Pinsir bypasses)
