@@ -468,8 +468,8 @@ h3 {
 
 /* Floor Marker */
 .floor-marker {
-  width: 70px;
-  /* Reduced from 90px */
+  width: 55px;
+  /* Reduced to 55px */
   height: 22px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
