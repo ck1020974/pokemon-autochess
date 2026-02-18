@@ -7,62 +7,62 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
 
     // 1. Bulbasaur
     bulbasaur: {
-        id: 'bulbasaur', name: '妙�?種�?', tier: 1, family: 'bulbasaur',
+        id: 'bulbasaur', name: '妙蛙種子', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/妙�?種�?00.webp', battleImageUrl: 'assets/妙�?種�?01.webp',
-        description: '死亡後召??1 ??1/1 小種子�?, synergies: ['Starter', 'Grass'], evolveId: 'ivysaur'
+        imageUrl: 'assets/妙蛙種子00.webp', battleImageUrl: 'assets/妙蛙種子01.webp',
+        description: '死亡後召喚 1 隻 1/1 小種子。', synergies: ['Starter', 'Grass'], evolveId: 'ivysaur'
     },
     ivysaur: {
-        id: 'ivysaur', name: '妙�???, tier: 1, family: 'bulbasaur',
+        id: 'ivysaur', name: '妙蛙草', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/妙�???0.webp', battleImageUrl: 'assets/妙�???1.webp',
-        description: '死亡後召??2 ??1/1 小種子�?, synergies: ['Starter', 'Grass'], evolveId: 'venusaur', isHiddenFromShop: true
+        imageUrl: 'assets/妙蛙草00.webp', battleImageUrl: 'assets/妙蛙草01.webp',
+        description: '死亡後召喚 2 隻 1/1 小種子。', synergies: ['Starter', 'Grass'], evolveId: 'venusaur', isHiddenFromShop: true
     },
     venusaur: {
-        id: 'venusaur', name: '妙�???, tier: 1, family: 'bulbasaur',
+        id: 'venusaur', name: '妙蛙花', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/妙�???0.webp', battleImageUrl: 'assets/妙�???1.webp',
-        description: '死亡後召??3 ??1/1 小種子�?, synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        imageUrl: 'assets/妙蛙花00.webp', battleImageUrl: 'assets/妙蛙花01.webp',
+        description: '死亡後召喚 3 隻 1/1 小種子。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 2. Charmander
     charmander: {
-        id: 'charmander', name: '小火�?, tier: 1, family: 'charmander',
+        id: 'charmander', name: '小火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/小火�?0.webp', battleImageUrl: 'assets/小火�?1.webp',
-        description: '?�殺?�方後隨機獲�?+1 ?��? ???�命??, synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
+        imageUrl: 'assets/小火龍00.webp', battleImageUrl: 'assets/小火龍01.webp',
+        description: '擊殺敵方後隨機獲得 +1 攻擊 或 生命。', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
     },
     charmeleon: {
-        id: 'charmeleon', name: '?��?�?, tier: 1, family: 'charmander',
+        id: 'charmeleon', name: '火恐龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?��?�?0.webp', battleImageUrl: 'assets/?��?�?1.webp',
-        description: '?�殺?�方後隨機獲�?+2 ?��? ???�命??, synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
+        imageUrl: 'assets/火恐龍00.webp', battleImageUrl: 'assets/火恐龍01.webp',
+        description: '擊殺敵方後隨機獲得 +2 攻擊 或 生命。', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
     },
     charizard: {
-        id: 'charizard', name: '?�火�?, tier: 1, family: 'charmander',
+        id: 'charizard', name: '噴火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?�火�?0.webp', battleImageUrl: 'assets/?�火�?1.webp',
-        description: '?�殺?�方後隨機獲�?+3 ?��? ???�命??, synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        imageUrl: 'assets/噴火龍00.webp', battleImageUrl: 'assets/噴火龍01.webp',
+        description: '擊殺敵方後隨機獲得 +3 攻擊 或 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 3. Squirtle
     squirtle: {
-        id: 'squirtle', name: '?�尼�?, tier: 1, family: 'squirtle',
+        id: 'squirtle', name: '傑尼龜', tier: 1, family: 'squirtle',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?�尼�?0.webp', battleImageUrl: 'assets/?�尼�?1.webp',
-        description: '?�到?�傷害�?�?1 (?�低為 1)??, synergies: ['Starter', 'Water'], evolveId: 'wartortle'
+        imageUrl: 'assets/傑尼龜00.webp', battleImageUrl: 'assets/傑尼龜01.webp',
+        description: '受到的傷害減少 1 (最低為 1)。', synergies: ['Starter', 'Water'], evolveId: 'wartortle'
     },
     wartortle: {
-        id: 'wartortle', name: '?�咪�?, tier: 1, family: 'squirtle',
+        id: 'wartortle', name: '卡咪龜', tier: 1, family: 'squirtle',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?�咪�?0.webp', battleImageUrl: 'assets/?�咪�?1.webp',
-        description: '?�到?�傷害�?�?2 (?�低為 1)??, synergies: ['Starter', 'Water'], evolveId: 'blastoise', isHiddenFromShop: true
+        imageUrl: 'assets/卡咪龜00.webp', battleImageUrl: 'assets/卡咪龜01.webp',
+        description: '受到的傷害減少 2 (最低為 1)。', synergies: ['Starter', 'Water'], evolveId: 'blastoise', isHiddenFromShop: true
     },
     blastoise: {
-        id: 'blastoise', name: '水箭�?, tier: 1, family: 'squirtle',
+        id: 'blastoise', name: '水箭龜', tier: 1, family: 'squirtle',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/水箭�?0.webp', battleImageUrl: 'assets/水箭�?1.webp',
-        description: '?�到?�傷害�?�?3 (?�低為 1)??, synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        imageUrl: 'assets/水箭龜00.webp', battleImageUrl: 'assets/水箭龜01.webp',
+        description: '受到的傷害減少 3 (最低為 1)。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 4. Gastly
@@ -70,499 +70,499 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'gastly', name: '鬼斯', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/鬼斯00.webp', battleImageUrl: 'assets/鬼斯01.webp',
-        description: '?��??��??��?�?+2 ?��???, synergies: ['Ghost'], evolveId: 'haunter'
+        description: '合成時前方友軍 +2 攻擊。', synergies: ['Ghost'], evolveId: 'haunter'
     },
     haunter: {
-        id: 'haunter', name: '鬼斯??, tier: 1, family: 'gastly',
+        id: 'haunter', name: '鬼斯通', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
-        imageUrl: 'assets/鬼斯??0.webp', battleImageUrl: 'assets/鬼斯??1.webp',
-        description: '?��??��??��?�?+5 ?��???, synergies: ['Ghost'], evolveId: 'gengar', isHiddenFromShop: true
+        imageUrl: 'assets/鬼斯通00.webp', battleImageUrl: 'assets/鬼斯通01.webp',
+        description: '合成時前方友軍 +5 攻擊。', synergies: ['Ghost'], evolveId: 'gengar', isHiddenFromShop: true
     },
     gengar: {
-        id: 'gengar', name: '?�鬼', tier: 1, family: 'gastly',
+        id: 'gengar', name: '耿鬼', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
-        imageUrl: 'assets/?�鬼00.webp', battleImageUrl: 'assets/?�鬼01.webp',
-        description: '?�售?��??��?�?+10 ?��???, synergies: ['Ghost'], isHiddenFromShop: true
+        imageUrl: 'assets/耿鬼00.webp', battleImageUrl: 'assets/耿鬼01.webp',
+        description: '出售時前方友軍 +10 攻擊。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 5. Chikorita
     chikorita: {
-        id: 'chikorita', name: '?��???, tier: 2, family: 'chikorita',
+        id: 'chikorita', name: '菊草葉', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?��??��???+1 ?��? ???�命??, synergies: ['Starter', 'Grass'], evolveId: 'bayleef'
+        imageUrl: 'assets/菊草葉00.webp', battleImageUrl: 'assets/菊草葉01.webp',
+        description: '友軍召喚物 +1 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'bayleef'
     },
     bayleef: {
-        id: 'bayleef', name: '?��???, tier: 2, family: 'chikorita',
+        id: 'bayleef', name: '月桂葉', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?��??��???+2 ?��? ???�命??, synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
+        imageUrl: 'assets/月桂葉00.webp', battleImageUrl: 'assets/月桂葉01.webp',
+        description: '友軍召喚物 +2 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
     },
     meganium: {
-        id: 'meganium', name: '大竺??, tier: 2, family: 'chikorita',
+        id: 'meganium', name: '大竺葵', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
-        imageUrl: 'assets/大竺??0.webp', battleImageUrl: 'assets/大竺??1.webp',
-        description: '?��??��???+3 ?��? ???�命??, synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        imageUrl: 'assets/大竺葵00.webp', battleImageUrl: 'assets/大竺葵01.webp',
+        description: '友軍召喚物 +3 攻擊 與 生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 6. Cyndaquil
     cyndaquil: {
-        id: 'cyndaquil', name: '?��?�?, tier: 2, family: 'cyndaquil',
+        id: 'cyndaquil', name: '火球鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?��?�?0.webp', battleImageUrl: 'assets/?��?�?1.webp',
-        description: '?�殺後獲�?+2 ?��? ??+3 ?�命 (每場?�鬥?��?1 �???, synergies: ['Starter', 'Fire'], evolveId: 'quilava'
+        imageUrl: 'assets/火球鼠00.webp', battleImageUrl: 'assets/火球鼠01.webp',
+        description: '擊殺後獲得 +2 攻擊 與 +3 生命 (每場戰鬥最多 1 次)。', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
     },
     quilava: {
-        id: 'quilava', name: '?�岩�?, tier: 2, family: 'cyndaquil',
+        id: 'quilava', name: '火岩鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?�岩�?0.webp', battleImageUrl: 'assets/?�岩�?1.webp',
-        description: '?�殺後獲�?+2 ?��? ??+3 ?�命 (每場?�鬥?��?2 �???, synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
+        imageUrl: 'assets/火岩鼠00.webp', battleImageUrl: 'assets/火岩鼠01.webp',
+        description: '擊殺後獲得 +2 攻擊 與 +3 生命 (每場戰鬥最多 2 次)。', synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
     },
     typhlosion: {
-        id: 'typhlosion', name: '?��???, tier: 2, family: 'cyndaquil',
+        id: 'typhlosion', name: '火爆獸', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�殺後獲�?+2 ?��? ??+3 ?�命 (每場?�鬥?��?3 �???, synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        imageUrl: 'assets/火爆獸00.webp', battleImageUrl: 'assets/火爆獸01.webp',
+        description: '擊殺後獲得 +2 攻擊 與 +3 生命 (每場戰鬥最多 3 次)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 7. Totodile
     totodile: {
-        id: 'totodile', name: '小鋸�?, tier: 2, family: 'totodile',
+        id: 'totodile', name: '小鋸鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
-        imageUrl: 'assets/小鋸�?0.webp', battleImageUrl: 'assets/小鋸�?1.webp',
-        description: '?��??��??��?對�??�敵人造�? 2 ?�害??, synergies: ['Starter', 'Water'], evolveId: 'croconaw'
+        imageUrl: 'assets/小鋸鱷00.webp', battleImageUrl: 'assets/小鋸鱷01.webp',
+        description: '攻擊時，同時對後排敵人造成 2 傷害。', synergies: ['Starter', 'Water'], evolveId: 'croconaw'
     },
     croconaw: {
-        id: 'croconaw', name: '?�鱷', tier: 2, family: 'totodile',
+        id: 'croconaw', name: '藍鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
-        imageUrl: 'assets/?�鱷00.webp', battleImageUrl: 'assets/?�鱷01.webp',
-        description: '?��??��??��?對�??�敵人造�? 4 ?�害??, synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
+        imageUrl: 'assets/藍鱷00.webp', battleImageUrl: 'assets/藍鱷01.webp',
+        description: '攻擊時，同時對後排敵人造成 4 傷害。', synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
     },
     feraligatr: {
-        id: 'feraligatr', name: '大�?�?, tier: 2, family: 'totodile',
+        id: 'feraligatr', name: '大力鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
-        imageUrl: 'assets/大�?�?0.webp', battleImageUrl: 'assets/大�?�?1.webp',
-        description: '?��??��??��?對�??�敵人造�? 6 ?�害??, synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        imageUrl: 'assets/大力鱷00.webp', battleImageUrl: 'assets/大力鱷01.webp',
+        description: '攻擊時，同時對後排敵人造成 6 傷害。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 8. Igglybuff (New)
     igglybuff: {
-        id: 'igglybuff', name: '寶寶�?, tier: 1, family: 'igglybuff',
+        id: 'igglybuff', name: '寶寶丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
-        imageUrl: 'assets/寶寶�?0.webp', battleImageUrl: 'assets/寶寶�?1.webp',
-        description: '?��??��??��?�?+2 ?�命??, synergies: ['Normal'], evolveId: 'jigglypuff'
+        imageUrl: 'assets/寶寶丁00.webp', battleImageUrl: 'assets/寶寶丁01.webp',
+        description: '合成時前方友軍 +2 生命。', synergies: ['Normal'], evolveId: 'jigglypuff'
     },
     jigglypuff: {
-        id: 'jigglypuff', name: '?��?', tier: 1, family: 'igglybuff',
+        id: 'jigglypuff', name: '胖丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
-        imageUrl: 'assets/?��?00.webp', battleImageUrl: 'assets/?��?01.webp',
-        description: '?��??��??��?�?+5 ?�命??, synergies: ['Normal'], evolveId: 'wigglytuff', isHiddenFromShop: true
+        imageUrl: 'assets/胖丁00.webp', battleImageUrl: 'assets/胖丁01.webp',
+        description: '合成時前方友軍 +5 生命。', synergies: ['Normal'], evolveId: 'wigglytuff', isHiddenFromShop: true
     },
     wigglytuff: {
-        id: 'wigglytuff', name: '?�可�?, tier: 1, family: 'igglybuff',
+        id: 'wigglytuff', name: '胖可丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
-        imageUrl: 'assets/?�可�?0.webp', battleImageUrl: 'assets/?�可�?1.webp',
-        description: '?�售?��??��?�?+10 ?�命??, synergies: ['Normal'], isHiddenFromShop: true
+        imageUrl: 'assets/胖可丁00.webp', battleImageUrl: 'assets/胖可丁01.webp',
+        description: '出售時前方友軍 +10 生命。', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 9. Treecko
     treecko: {
-        id: 'treecko', name: '?��?�?, tier: 3, family: 'treecko',
+        id: 'treecko', name: '木守宮', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
-        imageUrl: 'assets/?��?�?0.webp', battleImageUrl: 'assets/?��?�?1.webp',
-        description: '?��??��?後�?首�??�方?��? 2 ?�害??, synergies: ['Starter', 'Grass'], evolveId: 'grovyle'
+        imageUrl: 'assets/木守宮00.webp', battleImageUrl: 'assets/木守宮01.webp',
+        description: '召喚友軍後對首位敵方造成 2 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'grovyle'
     },
     grovyle: {
-        id: 'grovyle', name: '森�??�蜴', tier: 3, family: 'treecko',
+        id: 'grovyle', name: '森林蜥蜴', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
-        imageUrl: 'assets/森�??�蜴00.webp', battleImageUrl: 'assets/森�??�蜴01.webp',
-        description: '?��??��?後�?首�??�方?��? 4 ?�害??, synergies: ['Starter', 'Grass'], evolveId: 'sceptile', isHiddenFromShop: true
+        imageUrl: 'assets/森林蜥蜴00.webp', battleImageUrl: 'assets/森林蜥蜴01.webp',
+        description: '召喚友軍後對首位敵方造成 4 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'sceptile', isHiddenFromShop: true
     },
     sceptile: {
-        id: 'sceptile', name: '?�蜴??, tier: 3, family: 'treecko',
+        id: 'sceptile', name: '蜥蜴王', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
-        imageUrl: 'assets/?�蜴??0.webp', battleImageUrl: 'assets/?�蜴??1.webp',
-        description: '?��??��?後�?首�??�方?��? 6 ?�害??, synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        imageUrl: 'assets/蜥蜴王00.webp', battleImageUrl: 'assets/蜥蜴王01.webp',
+        description: '召喚友軍後對首位敵方造成 6 傷害。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 10. Torchic
     torchic: {
-        id: 'torchic', name: '?��???, tier: 3, family: 'torchic',
+        id: 'torchic', name: '火稚雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�方?��??��??��?對目標造�? 2 ?�害??, synergies: ['Starter', 'Fire'], evolveId: 'combusken'
+        imageUrl: 'assets/火稚雞00.webp', battleImageUrl: 'assets/火稚雞01.webp',
+        description: '前方友軍攻擊時，對目標造成 2 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'combusken'
     },
     combusken: {
-        id: 'combusken', name: '?�壯??, tier: 3, family: 'torchic',
+        id: 'combusken', name: '力壯雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
-        imageUrl: 'assets/?�壯??0.webp', battleImageUrl: 'assets/?�壯??1.webp',
-        description: '?�方?��??��??��?對目標造�? 4 ?�害??, synergies: ['Starter', 'Fire'], evolveId: 'blaziken', isHiddenFromShop: true
+        imageUrl: 'assets/力壯雞00.webp', battleImageUrl: 'assets/力壯雞01.webp',
+        description: '前方友軍攻擊時，對目標造成 4 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'blaziken', isHiddenFromShop: true
     },
     blaziken: {
-        id: 'blaziken', name: '?�焰??, tier: 3, family: 'torchic',
+        id: 'blaziken', name: '火焰雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
-        imageUrl: 'assets/?�焰??0.webp', battleImageUrl: 'assets/?�焰??1.webp',
-        description: '?�方?��??��??��?對目標造�? 6 ?�害??, synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        imageUrl: 'assets/火焰雞00.webp', battleImageUrl: 'assets/火焰雞01.webp',
+        description: '前方友軍攻擊時，對目標造成 6 傷害。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 11. Mudkip
     mudkip: {
-        id: 'mudkip', name: '水�?�?, tier: 3, family: 'mudkip',
+        id: 'mudkip', name: '水躍魚', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
-        imageUrl: 'assets/水�?�?0.webp', battleImageUrl: 'assets/水�?�?1.webp',
-        description: '?�鬥?��??��??�方?��?增�? 3 ?�命 ???��???, synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
+        imageUrl: 'assets/水躍魚00.webp', battleImageUrl: 'assets/水躍魚01.webp',
+        description: '戰鬥開始時，前方友軍增加 3 生命 與 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
     },
     marshtomp: {
-        id: 'marshtomp', name: '沼�?�?, tier: 3, family: 'mudkip',
+        id: 'marshtomp', name: '沼躍魚', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
-        imageUrl: 'assets/沼�?�?0.webp', battleImageUrl: 'assets/沼�?�?1.webp',
-        description: '?�鬥?��??��??�方?��?增�? 5 ?�命 ???��???, synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
+        imageUrl: 'assets/沼躍魚00.webp', battleImageUrl: 'assets/沼躍魚01.webp',
+        description: '戰鬥開始時，前方友軍增加 5 生命 與 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
     },
     swampert: {
-        id: 'swampert', name: '巨沼??, tier: 3, family: 'mudkip',
+        id: 'swampert', name: '巨沼怪', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
-        imageUrl: 'assets/巨沼??0.webp', battleImageUrl: 'assets/巨沼??1.webp',
-        description: '?�鬥?��??��??�方?��?增�? 10 ?�命 ???��???, synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        imageUrl: 'assets/巨沼怪00.webp', battleImageUrl: 'assets/巨沼怪01.webp',
+        description: '戰鬥開始時，前方友軍增加 10 生命 與 攻擊。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 12. Sprigatito
     sprigatito: {
-        id: 'sprigatito', name: '?��???, tier: 4, family: 'sprigatito',
+        id: 'sprigatito', name: '新葉喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?��??��?後�??�身?��? +3 ?��? ???�命??, synergies: ['Starter', 'Grass'], evolveId: 'floragato'
+        imageUrl: 'assets/新葉喵00.webp', battleImageUrl: 'assets/新葉喵01.webp',
+        description: '召喚友軍後，自身獲得 +3 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'floragato'
     },
     floragato: {
-        id: 'floragato', name: '?�蕾??, tier: 4, family: 'sprigatito',
+        id: 'floragato', name: '蒂蕾喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/?�蕾??0.webp', battleImageUrl: 'assets/?�蕾??1.webp',
-        description: '?��??��?後�??�身?��? +5 ?��? ???�命??, synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
+        imageUrl: 'assets/蒂蕾喵00.webp', battleImageUrl: 'assets/蒂蕾喵01.webp',
+        description: '召喚友軍後，自身獲得 +5 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
     },
     meowscarada: {
-        id: 'meowscarada', name: '魔幻?�面??, tier: 4, family: 'sprigatito',
+        id: 'meowscarada', name: '魔幻假面喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/魔幻?�面??0.webp', battleImageUrl: 'assets/魔幻?�面??1.webp',
-        description: '?��??��?後�??�身?��? +10 ?��? ???�命??, synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        imageUrl: 'assets/魔幻假面喵00.webp', battleImageUrl: 'assets/魔幻假面喵01.webp',
+        description: '召喚友軍後，自身獲得 +10 攻擊 與 生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 13. Fuecoco
     fuecoco: {
-        id: 'fuecoco', name: '?�火�?, tier: 4, family: 'fuecoco',
+        id: 'fuecoco', name: '呆火鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
-        imageUrl: 'assets/?�火�?0.webp', battleImageUrl: 'assets/?�火�?1.webp',
-        description: '?��?死亡後�??�身?��? +3 ?�命??, synergies: ['Starter', 'Fire'], evolveId: 'crocalor'
+        imageUrl: 'assets/呆火鱷00.webp', battleImageUrl: 'assets/呆火鱷01.webp',
+        description: '友軍死亡後，自身獲得 +3 生命。', synergies: ['Starter', 'Fire'], evolveId: 'crocalor'
     },
     crocalor: {
-        id: 'crocalor', name: '?��?�?, tier: 4, family: 'fuecoco',
+        id: 'crocalor', name: '炙燙鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
-        imageUrl: 'assets/?��?�?0.webp', battleImageUrl: 'assets/?��?�?1.webp',
-        description: '?��?死亡後�??�身?��? +5 ?�命??, synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
+        imageUrl: 'assets/炙燙鱷00.webp', battleImageUrl: 'assets/炙燙鱷01.webp',
+        description: '友軍死亡後，自身獲得 +5 生命。', synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
     },
     skeledirge: {
-        id: 'skeledirge', name: '骨�?巨聲�?, tier: 4, family: 'fuecoco',
+        id: 'skeledirge', name: '骨紋巨聲鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
-        imageUrl: 'assets/骨�?巨聲�?0.webp', battleImageUrl: 'assets/骨�?巨聲�?1.webp',
-        description: '?��?死亡後�??�身?��? +10 ?�命??, synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        imageUrl: 'assets/骨紋巨聲鱷00.webp', battleImageUrl: 'assets/骨紋巨聲鱷01.webp',
+        description: '友軍死亡後，自身獲得 +10 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 14. Quaxly
     quaxly: {
-        id: 'quaxly', name: '潤水�?, tier: 4, family: 'quaxly',
+        id: 'quaxly', name: '潤水鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
-        imageUrl: 'assets/潤水�?0.webp', battleImageUrl: 'assets/潤水�?1.webp',
-        description: '?�殺?�方後�??�身?��? +3 ?��???, synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
+        imageUrl: 'assets/潤水鴨00.webp', battleImageUrl: 'assets/潤水鴨01.webp',
+        description: '擊殺敵方後，自身獲得 +3 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
     },
     quaxwell: {
-        id: 'quaxwell', name: '湧�?�?, tier: 4, family: 'quaxly',
+        id: 'quaxwell', name: '湧躍鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
-        imageUrl: 'assets/湧�?�?0.webp', battleImageUrl: 'assets/湧�?�?1.webp',
-        description: '?�殺?�方後�??�身?��? +5 ?��???, synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
+        imageUrl: 'assets/湧躍鴨00.webp', battleImageUrl: 'assets/湧躍鴨01.webp',
+        description: '擊殺敵方後，自身獲得 +5 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
     },
     quaquaval: {
-        id: 'quaquaval', name: '?�歡浪�?�?, tier: 4, family: 'quaxly',
+        id: 'quaquaval', name: '狂歡浪舞鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
-        imageUrl: 'assets/?�歡浪�?�?0.webp', battleImageUrl: 'assets/?�歡浪�?�?1.webp',
-        description: '?�殺?�方後�??�身?��? +10 ?��???, synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        imageUrl: 'assets/狂歡浪舞鴨00.webp', battleImageUrl: 'assets/狂歡浪舞鴨01.webp',
+        description: '擊殺敵方後，自身獲得 +10 攻擊。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 15. Rattata (Loop same name for stage 3)
     rattata: {
-        id: 'rattata', name: '小�???, tier: 1, family: 'rattata',
+        id: 'rattata', name: '小拉達', tier: 1, family: 'rattata',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
-        imageUrl: 'assets/小�???0.webp', battleImageUrl: 'assets/小�???1.webp',
-        description: '死亡後召??2 ??1/1 迷�??��???, synergies: ['Normal'], evolveId: 'raticate'
+        imageUrl: 'assets/小拉達00.webp', battleImageUrl: 'assets/小拉達01.webp',
+        description: '死亡後召喚 2 隻 1/1 迷你拉達。', synergies: ['Normal'], evolveId: 'raticate'
     },
     raticate: {
-        id: 'raticate', name: '?��?', tier: 1, family: 'rattata',
+        id: 'raticate', name: '拉達', tier: 1, family: 'rattata',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
-        imageUrl: 'assets/?��?00.webp', battleImageUrl: 'assets/?��?01.webp',
-        description: '死亡後召??2 ??2/2 迷�??��???, synergies: ['Normal'], evolveId: 'raticate_final', isHiddenFromShop: true
+        imageUrl: 'assets/拉達00.webp', battleImageUrl: 'assets/拉達01.webp',
+        description: '死亡後召喚 2 隻 2/2 迷你拉達。', synergies: ['Normal'], evolveId: 'raticate_final', isHiddenFromShop: true
     },
     raticate_final: {
-        id: 'raticate_final', name: '?��?', tier: 1, family: 'rattata',
+        id: 'raticate_final', name: '拉達', tier: 1, family: 'rattata',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
-        imageUrl: 'assets/?��?00.webp', battleImageUrl: 'assets/?��?01.webp',
-        description: '死亡後召??2 ??3/3 迷�??��???, synergies: ['Normal'], isHiddenFromShop: true
+        imageUrl: 'assets/拉達00.webp', battleImageUrl: 'assets/拉達01.webp',
+        description: '死亡後召喚 2 隻 3/3 迷你拉達。', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 16. Diglett
     diglett: {
-        id: 'diglett', name: '?��?', tier: 2, family: 'diglett',
+        id: 'diglett', name: '地鼠', tier: 2, family: 'diglett',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?��?00.webp', battleImageUrl: 'assets/?��?01.webp',
-        description: '??25% 機�??�避?�害??, synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio'
+        imageUrl: 'assets/地鼠00.webp', battleImageUrl: 'assets/地鼠01.webp',
+        description: '有 25% 機率閃避傷害。', synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio'
     },
     dugtrio: {
-        id: 'dugtrio', name: '三地�?, tier: 2, family: 'diglett',
+        id: 'dugtrio', name: '三地鼠', tier: 2, family: 'diglett',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/三地�?0.webp', battleImageUrl: 'assets/三地�?1.webp',
-        description: '??33% 機�??�避?�害??, synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio_final', isHiddenFromShop: true
+        imageUrl: 'assets/三地鼠00.webp', battleImageUrl: 'assets/三地鼠01.webp',
+        description: '有 33% 機率閃避傷害。', synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio_final', isHiddenFromShop: true
     },
     dugtrio_final: {
-        id: 'dugtrio_final', name: '三地�?, tier: 2, family: 'diglett',
+        id: 'dugtrio_final', name: '三地鼠', tier: 2, family: 'diglett',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/三地�?0.webp', battleImageUrl: 'assets/三地�?1.webp',
-        description: '??50% 機�??�避?�害??, synergies: ['Triplets', 'Cave'], isHiddenFromShop: true
+        imageUrl: 'assets/三地鼠00.webp', battleImageUrl: 'assets/三地鼠01.webp',
+        description: '有 50% 機率閃避傷害。', synergies: ['Triplets', 'Cave'], isHiddenFromShop: true
     },
 
     // 17. Meowth
     meowth: {
-        id: 'meowth', name: '?�喵', tier: 2, family: 'meowth',
+        id: 'meowth', name: '喵喵', tier: 2, family: 'meowth',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?�喵00.webp', battleImageUrl: 'assets/?�喵01.webp',
-        description: '?��??��??�獲�?1 ?�幣??, synergies: ['Normal', 'Claw'], evolveId: 'persian'
+        imageUrl: 'assets/喵喵00.webp', battleImageUrl: 'assets/喵喵01.webp',
+        description: '回合開始時獲得 1 金幣。', synergies: ['Normal', 'Claw'], evolveId: 'persian'
     },
     persian: {
         id: 'persian', name: '貓老大', tier: 2, family: 'meowth',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/貓老大00.webp', battleImageUrl: 'assets/貓老大01.webp',
-        description: '?��??��??�獲�?3 ?�幣??, synergies: ['Normal', 'Claw'], evolveId: 'persian_final', isHiddenFromShop: true
+        description: '回合開始時獲得 3 金幣。', synergies: ['Normal', 'Claw'], evolveId: 'persian_final', isHiddenFromShop: true
     },
     persian_final: {
         id: 'persian_final', name: '貓老大', tier: 2, family: 'meowth',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/貓老大00.webp', battleImageUrl: 'assets/貓老大01.webp',
-        description: '?��??��??�獲�?5 ?�幣??, synergies: ['Normal', 'Claw'], isHiddenFromShop: true
+        description: '回合開始時獲得 5 金幣。', synergies: ['Normal', 'Claw'], isHiddenFromShop: true
     },
 
     // 18. Mankey (Tier 1)
     mankey: {
-        id: 'mankey', name: '?��?, tier: 1, family: 'mankey',
+        id: 'mankey', name: '猴怪', tier: 1, family: 'mankey',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?��?0.webp', battleImageUrl: 'assets/?��?1.webp',
-        description: '?�鬥?��??��??�方?��??��? +2 ?��???, synergies: ['Angry'], evolveId: 'primeape'
+        imageUrl: 'assets/猴怪00.webp', battleImageUrl: 'assets/猴怪01.webp',
+        description: '戰鬥開始時，前方友軍獲得 +2 攻擊。', synergies: ['Angry'], evolveId: 'primeape'
     },
     primeape: {
-        id: 'primeape', name: '?��???, tier: 1, family: 'mankey',
+        id: 'primeape', name: '火爆猴', tier: 1, family: 'mankey',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�鬥?��??��??�方?��??��? +5 ?��???, synergies: ['Angry'], evolveId: 'primeape_final', isHiddenFromShop: true
+        imageUrl: 'assets/火爆猴00.webp', battleImageUrl: 'assets/火爆猴01.webp',
+        description: '戰鬥開始時，前方友軍獲得 +5 攻擊。', synergies: ['Angry'], evolveId: 'primeape_final', isHiddenFromShop: true
     },
     primeape_final: {
-        id: 'primeape_final', name: '?��???, tier: 1, family: 'mankey',
+        id: 'primeape_final', name: '火爆猴', tier: 1, family: 'mankey',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�鬥?��??��??�方?��??��? +10 ?��???, synergies: ['Angry'], isHiddenFromShop: true
+        imageUrl: 'assets/火爆猴00.webp', battleImageUrl: 'assets/火爆猴01.webp',
+        description: '戰鬥開始時，前方友軍獲得 +10 攻擊。', synergies: ['Angry'], isHiddenFromShop: true
     },
 
     // 19. Onix
     onix: {
-        id: 'onix', name: '大岩??, tier: 4, family: 'onix',
+        id: 'onix', name: '大岩蛇', tier: 4, family: 'onix',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/大岩??0.webp', battleImageUrl: 'assets/大岩??1.webp',
-        description: '移�?後�?永�? +2 ?�命；�?�?50% ?�?�到?�傷害�?, synergies: ['Cave', 'Hard'], evolveId: 'steelix'
+        imageUrl: 'assets/大岩蛇00.webp', battleImageUrl: 'assets/大岩蛇01.webp',
+        description: '移動後，永久 +2 生命；反彈 50% 所受到的傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix'
     },
     steelix: {
-        id: 'steelix', name: '大鋼??, tier: 4, family: 'onix',
+        id: 'steelix', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/大鋼??0.webp', battleImageUrl: 'assets/大鋼??1.webp',
-        description: '移�?後�?永�? +2 ?�命；�?�?50% ?�?�到?�傷害�?, synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
+        imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
+        description: '移動後，永久 +2 生命；反彈 50% 所受到的傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
     },
     steelix_final: {
-        id: 'steelix_final', name: '大鋼??, tier: 4, family: 'onix',
+        id: 'steelix_final', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/大鋼??0.webp', battleImageUrl: 'assets/大鋼??1.webp',
-        description: '移�?後�?永�?  +2 ?�命；�?�?50% ?�?�到?�傷害�?, synergies: ['Cave', 'Hard'], isHiddenFromShop: true
+        imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
+        description: '移動後，永久  +2 生命；反彈 50% 所受到的傷害。', synergies: ['Cave', 'Hard'], isHiddenFromShop: true
     },
 
     // 20. Doduo
     doduo: {
-        id: 'doduo', name: '?��?', tier: 2, family: 'doduo',
+        id: 'doduo', name: '嘟嘟', tier: 2, family: 'doduo',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?��?00.webp', battleImageUrl: 'assets/?��?01.webp',
-        description: '??25% 機�?額�??��?一次�?, synergies: ['Triplets', 'Angry'], evolveId: 'dodrio'
+        imageUrl: 'assets/嘟嘟00.webp', battleImageUrl: 'assets/嘟嘟01.webp',
+        description: '有 25% 機率額外攻擊一次。', synergies: ['Triplets', 'Angry'], evolveId: 'dodrio'
     },
     dodrio: {
-        id: 'dodrio', name: '?��???, tier: 2, family: 'doduo',
+        id: 'dodrio', name: '嘟嘟利', tier: 2, family: 'doduo',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '??33% 機�?額�??��?一次�?, synergies: ['Triplets', 'Angry'], evolveId: 'dodrio_final', isHiddenFromShop: true
+        imageUrl: 'assets/嘟嘟利00.webp', battleImageUrl: 'assets/嘟嘟利01.webp',
+        description: '有 33% 機率額外攻擊一次。', synergies: ['Triplets', 'Angry'], evolveId: 'dodrio_final', isHiddenFromShop: true
     },
     dodrio_final: {
-        id: 'dodrio_final', name: '?��???, tier: 2, family: 'doduo',
+        id: 'dodrio_final', name: '嘟嘟利', tier: 2, family: 'doduo',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '??50% 機�?額�??��?一次�?, synergies: ['Triplets', 'Angry'], isHiddenFromShop: true
+        imageUrl: 'assets/嘟嘟利00.webp', battleImageUrl: 'assets/嘟嘟利01.webp',
+        description: '有 50% 機率額外攻擊一次。', synergies: ['Triplets', 'Angry'], isHiddenFromShop: true
     },
 
     // 21. Slowpoke
     slowpoke: {
-        id: 'slowpoke', name: '?��???, tier: 3, family: 'slowpoke',
+        id: 'slowpoke', name: '呆呆獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�傷?��??��???< 50%，�?�?6 ?�命 (每場?�鬥 1 �???, synergies: ['Slow', 'Water'], evolveId: 'slowbro'
+        imageUrl: 'assets/呆呆獸00.webp', battleImageUrl: 'assets/呆呆獸01.webp',
+        description: '受傷時，若生命 < 50%，回復 6 生命 (每場戰鬥 1 次)。', synergies: ['Slow', 'Water'], evolveId: 'slowbro'
     },
     slowbro: {
-        id: 'slowbro', name: '?�殼??, tier: 3, family: 'slowpoke',
+        id: 'slowbro', name: '呆殼獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
-        imageUrl: 'assets/?�殼??0.webp', battleImageUrl: 'assets/?�殼??1.webp',
-        description: '?�傷?��??��???< 50%，�?�?12 ?�命 (每場?�鬥 1 �???, synergies: ['Slow', 'Water'], evolveId: 'slowbro_final', isHiddenFromShop: true
+        imageUrl: 'assets/呆殼獸00.webp', battleImageUrl: 'assets/呆殼獸01.webp',
+        description: '受傷時，若生命 < 50%，回復 12 生命 (每場戰鬥 1 次)。', synergies: ['Slow', 'Water'], evolveId: 'slowbro_final', isHiddenFromShop: true
     },
     slowbro_final: {
-        id: 'slowbro_final', name: '?�殼??, tier: 3, family: 'slowpoke',
+        id: 'slowbro_final', name: '呆殼獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
-        imageUrl: 'assets/?�殼??0.webp', battleImageUrl: 'assets/?�殼??1.webp',
-        description: '?�傷?��??��???< 50%，�?�?20 ?�命 (每場?�鬥 1 �???, synergies: ['Slow', 'Water'], isHiddenFromShop: true
+        imageUrl: 'assets/呆殼獸00.webp', battleImageUrl: 'assets/呆殼獸01.webp',
+        description: '受傷時，若生命 < 50%，回復 20 生命 (每場戰鬥 1 次)。', synergies: ['Slow', 'Water'], isHiddenFromShop: true
     },
 
     // 22. Magnemite
     magnemite: {
-        id: 'magnemite', name: '小�???, tier: 2, family: 'magnemite',
+        id: 'magnemite', name: '小磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/小�???0.webp', battleImageUrl: 'assets/小�???1.webp',
-        description: '準�?結�??��??��??��? +2 ?��? ???�命 (??1 �???, synergies: ['Triplets', 'Hard'], evolveId: 'magneton'
+        imageUrl: 'assets/小磁怪00.webp', battleImageUrl: 'assets/小磁怪01.webp',
+        description: '準備結束時，隨機獲得 +2 攻擊 或 生命 (共 1 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton'
     },
     magneton: {
-        id: 'magneton', name: '三�?一磁�?, tier: 2, family: 'magnemite',
+        id: 'magneton', name: '三合一磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
-        imageUrl: 'assets/三�?一磁�?0.webp', battleImageUrl: 'assets/三�?一磁�?1.webp',
-        description: '準�?結�??��??��??��? +2 ?��? ???�命 (??2 �???, synergies: ['Triplets', 'Hard'], evolveId: 'magneton_final', isHiddenFromShop: true
+        imageUrl: 'assets/三合一磁怪00.webp', battleImageUrl: 'assets/三合一磁怪01.webp',
+        description: '準備結束時，隨機獲得 +2 攻擊 或 生命 (共 2 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton_final', isHiddenFromShop: true
     },
     magneton_final: {
-        id: 'magneton_final', name: '三�?一磁�?, tier: 2, family: 'magnemite',
+        id: 'magneton_final', name: '三合一磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
-        imageUrl: 'assets/三�?一磁�?0.webp', battleImageUrl: 'assets/三�?一磁�?1.webp',
-        description: '準�?結�??��??��??��? +2 ?��? ???�命 (??3 �???, synergies: ['Triplets', 'Hard'], isHiddenFromShop: true
+        imageUrl: 'assets/三合一磁怪00.webp', battleImageUrl: 'assets/三合一磁怪01.webp',
+        description: '準備結束時，隨機獲得 +2 攻擊 或 生命 (共 3 次)。', synergies: ['Triplets', 'Hard'], isHiddenFromShop: true
     },
 
     // 23. Houndour
     houndour: {
-        id: 'houndour', name: '?�魯�?, tier: 3, family: 'houndour',
+        id: 'houndour', name: '戴魯比', tier: 3, family: 'houndour',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?�魯�?0.webp', battleImageUrl: 'assets/?�魯�?1.webp',
-        description: '?�鬥?��??��?對�??��?少敵?�造�? 4 ?�害 (??1 �???, synergies: ['Angry', 'Fire'], evolveId: 'houndoom'
+        imageUrl: 'assets/戴魯比00.webp', battleImageUrl: 'assets/戴魯比01.webp',
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 1 次)。', synergies: ['Angry', 'Fire'], evolveId: 'houndoom'
     },
     houndoom: {
-        id: 'houndoom', name: '黑魯??, tier: 3, family: 'houndour',
+        id: 'houndoom', name: '黑魯加', tier: 3, family: 'houndour',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/黑魯??0.webp', battleImageUrl: 'assets/黑魯??1.webp',
-        description: '?�鬥?��??��?對�??��?少敵?�造�? 4 ?�害 (??3 �???, synergies: ['Angry', 'Fire'], evolveId: 'houndoom_final', isHiddenFromShop: true
+        imageUrl: 'assets/黑魯加00.webp', battleImageUrl: 'assets/黑魯加01.webp',
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 3 次)。', synergies: ['Angry', 'Fire'], evolveId: 'houndoom_final', isHiddenFromShop: true
     },
     houndoom_final: {
-        id: 'houndoom_final', name: '黑魯??, tier: 3, family: 'houndour',
+        id: 'houndoom_final', name: '黑魯加', tier: 3, family: 'houndour',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/黑魯??0.webp', battleImageUrl: 'assets/黑魯??1.webp',
-        description: '?�鬥?��??��?對�??��?少敵?�造�? 4 ?�害 (??5 �???, synergies: ['Angry', 'Fire'], isHiddenFromShop: true
+        imageUrl: 'assets/黑魯加00.webp', battleImageUrl: 'assets/黑魯加01.webp',
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 5 次)。', synergies: ['Angry', 'Fire'], isHiddenFromShop: true
     },
 
     // 24. Sneasel
     sneasel: {
-        id: 'sneasel', name: '?��?', tier: 4, family: 'sneasel',
+        id: 'sneasel', name: '狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/?��?00.webp', battleImageUrl: 'assets/?��?01.webp',
-        description: '?��??��??�隨機攻??1 ?�敵?��??�殺後攻?�永�?+3??, synergies: ['Claw', 'Snow'], evolveId: 'weavile'
+        imageUrl: 'assets/狃拉00.webp', battleImageUrl: 'assets/狃拉01.webp',
+        description: '攻擊時，再隨機攻擊 1 個敵方；擊殺後攻擊永久 +3。', synergies: ['Claw', 'Snow'], evolveId: 'weavile'
     },
     weavile: {
-        id: 'weavile', name: '?��???, tier: 4, family: 'sneasel',
+        id: 'weavile', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?��??��??�隨機攻??1 ?�敵?��??�殺後攻?�永�?+3??, synergies: ['Claw', 'Snow'], evolveId: 'weavile_final', isHiddenFromShop: true
+        imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
+        description: '攻擊時，再隨機攻擊 1 個敵方；擊殺後攻擊永久 +3。', synergies: ['Claw', 'Snow'], evolveId: 'weavile_final', isHiddenFromShop: true
     },
     weavile_final: {
-        id: 'weavile_final', name: '?��???, tier: 4, family: 'sneasel',
+        id: 'weavile_final', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?��??��??�隨機攻??1 ?�敵?��??�殺後攻?�永�?+3??, synergies: ['Claw', 'Snow'], isHiddenFromShop: true
+        imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
+        description: '攻擊時，再隨機攻擊 1 個敵方；擊殺後攻擊永久 +3。', synergies: ['Claw', 'Snow'], isHiddenFromShop: true
     },
 
     // 25. Shuppet (Tier 1)
     shuppet: {
-        id: 'shuppet', name: '?�影娃�?', tier: 1, family: 'shuppet',
+        id: 'shuppet', name: '怨影娃娃', tier: 1, family: 'shuppet',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?�影娃�?00.webp', battleImageUrl: 'assets/?�影娃�?01.webp',
-        description: '死亡後�??��??�方?��? 2 ?�害??, synergies: ['Ghost'], evolveId: 'banette'
+        imageUrl: 'assets/怨影娃娃00.webp', battleImageUrl: 'assets/怨影娃娃01.webp',
+        description: '死亡後對隨機敵方造成 2 傷害。', synergies: ['Ghost'], evolveId: 'banette'
     },
     banette: {
-        id: 'banette', name: '詛�?娃�?', tier: 1, family: 'shuppet',
+        id: 'banette', name: '詛咒娃娃', tier: 1, family: 'shuppet',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/詛�?娃�?00.webp', battleImageUrl: 'assets/詛�?娃�?01.webp',
-        description: '死亡後�??��??�方?��? 5 ?�害??, synergies: ['Ghost'], evolveId: 'banette_final', isHiddenFromShop: true
+        imageUrl: 'assets/詛咒娃娃00.webp', battleImageUrl: 'assets/詛咒娃娃01.webp',
+        description: '死亡後對隨機敵方造成 5 傷害。', synergies: ['Ghost'], evolveId: 'banette_final', isHiddenFromShop: true
     },
     banette_final: {
-        id: 'banette_final', name: '詛�?娃�?', tier: 3, family: 'shuppet',
+        id: 'banette_final', name: '詛咒娃娃', tier: 3, family: 'shuppet',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/詛�?娃�?00.webp', battleImageUrl: 'assets/詛�?娃�?01.webp',
-        description: '死亡後�??��??�方?��? 10 ?�害??, synergies: ['Ghost'], isHiddenFromShop: true
+        imageUrl: 'assets/詛咒娃娃00.webp', battleImageUrl: 'assets/詛咒娃娃01.webp',
+        description: '死亡後對隨機敵方造成 10 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 26. Drifloon (Renamed from Drifblim Base)
     drifloon: {
-        id: 'drifloon', name: '飄�???, tier: 2, family: 'drifloon',
+        id: 'drifloon', name: '飄飄球', tier: 2, family: 'drifloon',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/飄�???0.webp', battleImageUrl: 'assets/飄�???1.webp',
-        description: '死亡後�??��??�方?��? 2 ?�害??, synergies: ['Ghost'], evolveId: 'drifblim'
+        imageUrl: 'assets/飄飄球00.webp', battleImageUrl: 'assets/飄飄球01.webp',
+        description: '死亡後對全體敵方造成 2 傷害。', synergies: ['Ghost'], evolveId: 'drifblim'
     },
     drifblim: {
-        id: 'drifblim', name: '?�風??, tier: 2, family: 'drifloon',
+        id: 'drifblim', name: '隨風球', tier: 2, family: 'drifloon',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?�風??0.webp', battleImageUrl: 'assets/?�風??1.webp',
-        description: '死亡後�??��??�方?��? 5 ?�害??, synergies: ['Ghost'], evolveId: 'drifblim_final', isHiddenFromShop: true
+        imageUrl: 'assets/隨風球00.webp', battleImageUrl: 'assets/隨風球01.webp',
+        description: '死亡後對全體敵方造成 5 傷害。', synergies: ['Ghost'], evolveId: 'drifblim_final', isHiddenFromShop: true
     },
     drifblim_final: {
-        id: 'drifblim_final', name: '?�風??, tier: 2, family: 'drifloon',
+        id: 'drifblim_final', name: '隨風球', tier: 2, family: 'drifloon',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?�風??0.webp', battleImageUrl: 'assets/?�風??1.webp',
-        description: '死亡後�??��??�方?��? 10 ?�害??, synergies: ['Ghost'], isHiddenFromShop: true
+        imageUrl: 'assets/隨風球00.webp', battleImageUrl: 'assets/隨風球01.webp',
+        description: '死亡後對全體敵方造成 10 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 27. Snover
     snover: {
-        id: 'snover', name: '?��???, tier: 3, family: 'snover',
+        id: 'snover', name: '雪笠怪', tier: 3, family: 'snover',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?��?�?+1 ?��?並�??�?�方角色??, synergies: ['Grass', 'Snow'], evolveId: 'abomasnow'
+        imageUrl: 'assets/雪笠怪00.webp', battleImageUrl: 'assets/雪笠怪01.webp',
+        description: '攻擊後 +1 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], evolveId: 'abomasnow'
     },
     abomasnow: {
-        id: 'abomasnow', name: '?�雪??, tier: 3, family: 'snover',
+        id: 'abomasnow', name: '暴雪王', tier: 3, family: 'snover',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
-        imageUrl: 'assets/?�雪??0.webp', battleImageUrl: 'assets/?�雪??1.webp',
-        description: '?��?�?+1 ?��?並�??�?�方角色??, synergies: ['Grass', 'Snow'], evolveId: 'abomasnow_final', isHiddenFromShop: true
+        imageUrl: 'assets/暴雪王00.webp', battleImageUrl: 'assets/暴雪王01.webp',
+        description: '攻擊後 +1 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], evolveId: 'abomasnow_final', isHiddenFromShop: true
     },
     abomasnow_final: {
-        id: 'abomasnow_final', name: '?�雪??, tier: 3, family: 'snover',
+        id: 'abomasnow_final', name: '暴雪王', tier: 3, family: 'snover',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
-        imageUrl: 'assets/?�雪??0.webp', battleImageUrl: 'assets/?�雪??1.webp',
-        description: '?��?�?+1 ?��?並�??�?�方角色??, synergies: ['Grass', 'Snow'], isHiddenFromShop: true
+        imageUrl: 'assets/暴雪王00.webp', battleImageUrl: 'assets/暴雪王01.webp',
+        description: '攻擊後 +1 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], isHiddenFromShop: true
     },
 
     // 28. Dwebble (Tier 1)
     dwebble: {
-        id: 'dwebble', name: '?��???, tier: 1, family: 'dwebble',
+        id: 'dwebble', name: '石居蟹', tier: 1, family: 'dwebble',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�鬥?��??��??�方?��? +2 ?�命??, synergies: ['Hard'], evolveId: 'crustle'
+        imageUrl: 'assets/石居蟹00.webp', battleImageUrl: 'assets/石居蟹01.webp',
+        description: '戰鬥開始時，前方友軍 +2 生命。', synergies: ['Hard'], evolveId: 'crustle'
     },
     crustle: {
         id: 'crustle', name: '岩殿居蟹', tier: 1, family: 'dwebble',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/岩殿居蟹00.webp', battleImageUrl: 'assets/岩殿居蟹01.webp',
-        description: '?�鬥?��??��??�方?��? +5 ?�命??, synergies: ['Hard'], evolveId: 'crustle_final', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍 +5 生命。', synergies: ['Hard'], evolveId: 'crustle_final', isHiddenFromShop: true
     },
     crustle_final: {
         id: 'crustle_final', name: '岩殿居蟹', tier: 1, family: 'dwebble',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/岩殿居蟹00.webp', battleImageUrl: 'assets/岩殿居蟹01.webp',
-        description: '?�鬥?��??��??�方?��? +10 ?�命??, synergies: ['Hard'], isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍 +10 生命。', synergies: ['Hard'], isHiddenFromShop: true
     },
 
     // 29. Kangaskhan
@@ -570,138 +570,138 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'kangaskhan', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '?�敵?�已?��?，�??��?一次�??�目標死亡�?不發??', synergies: ['Normal'], evolveId: 'kangaskhan_2'
+        description: '若敵方已進化，再攻擊一次。(若目標死亡則不發動)', synergies: ['Normal'], evolveId: 'kangaskhan_2'
     },
     kangaskhan_2: {
         id: 'kangaskhan_2', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '?�敵?�已?��?，�??��?一次�??�目標死亡�?不發??', synergies: ['Normal'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
+        description: '若敵方已進化，再攻擊一次。(若目標死亡則不發動)', synergies: ['Normal'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
     },
     kangaskhan_3: {
         id: 'kangaskhan_3', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '?�敵?�已?��?，�??��?一次�??�目標死亡�?不發??', synergies: ['Normal'], isHiddenFromShop: true
+        description: '若敵方已進化，再攻擊一次。(若目標死亡則不發動)', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 30. Ditto
     ditto: {
-        id: 'ditto', name: '?��???, tier: 5, family: 'ditto',
+        id: 'ditto', name: '百變怪', tier: 5, family: 'ditto',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�鬥?��??��?變身?��??��??��?高�?角色??, synergies: ['Normal'], evolveId: 'ditto_2'
+        imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
+        description: '戰鬥開始時，變身為我方生命最高的角色。', synergies: ['Normal'], evolveId: 'ditto_2'
     },
     ditto_2: {
-        id: 'ditto_2', name: '?��???, tier: 5, family: 'ditto',
+        id: 'ditto_2', name: '百變怪', tier: 5, family: 'ditto',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�鬥?��??��?變身?��??��??��?高�?角色??, synergies: ['Normal'], evolveId: 'ditto_3', isHiddenFromShop: true
+        imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
+        description: '戰鬥開始時，變身為我方生命最高的角色。', synergies: ['Normal'], evolveId: 'ditto_3', isHiddenFromShop: true
     },
     ditto_3: {
-        id: 'ditto_3', name: '?��???, tier: 5, family: 'ditto',
+        id: 'ditto_3', name: '百變怪', tier: 5, family: 'ditto',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�鬥?��??��?變身?��??��??��?高�?角色??, synergies: ['Normal'], isHiddenFromShop: true
+        imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
+        description: '戰鬥開始時，變身為我方生命最高的角色。', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 31. Sableye
     sableye: {
-        id: 'sableye', name: '?��???, tier: 4, family: 'sableye',
+        id: 'sableye', name: '勾魂眼', tier: 4, family: 'sableye',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '殺死?��??��??�方立即死亡??, synergies: ['Ghost'], evolveId: 'sableye_2'
+        imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
+        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], evolveId: 'sableye_2'
     },
     sableye_2: {
-        id: 'sableye_2', name: '?��???, tier: 4, family: 'sableye',
+        id: 'sableye_2', name: '勾魂眼', tier: 4, family: 'sableye',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '殺死?��??��??�方立即死亡??, synergies: ['Ghost'], evolveId: 'sableye_3', isHiddenFromShop: true
+        imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
+        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], evolveId: 'sableye_3', isHiddenFromShop: true
     },
     sableye_3: {
-        id: 'sableye_3', name: '?��???, tier: 4, family: 'sableye',
+        id: 'sableye_3', name: '勾魂眼', tier: 4, family: 'sableye',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '殺死?��??��??�方立即死亡??, synergies: ['Ghost'], isHiddenFromShop: true
+        imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
+        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 32. Mimikyu
     mimikyu: {
-        id: 'mimikyu', name: '謎擬�?, tier: 5, family: 'mimikyu',
+        id: 'mimikyu', name: '謎擬Ｑ', tier: 5, family: 'mimikyu',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
-        imageUrl: 'assets/謎擬�?0.webp', battleImageUrl: 'assets/謎擬�?1.webp',
-        description: '?��?每場?�鬥中�?首次?�害??, synergies: ['Ghost'], evolveId: 'mimikyu_2'
+        imageUrl: 'assets/謎擬Ｑ00.webp', battleImageUrl: 'assets/謎擬Ｑ01.webp',
+        description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost'], evolveId: 'mimikyu_2'
     },
     mimikyu_2: {
-        id: 'mimikyu_2', name: '謎擬�?, tier: 5, family: 'mimikyu',
+        id: 'mimikyu_2', name: '謎擬Ｑ', tier: 5, family: 'mimikyu',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
-        imageUrl: 'assets/謎擬�?0.webp', battleImageUrl: 'assets/謎擬�?1.webp',
-        description: '?��?每場?�鬥中�?首次?�害??, synergies: ['Ghost'], evolveId: 'mimikyu_3', isHiddenFromShop: true
+        imageUrl: 'assets/謎擬Ｑ00.webp', battleImageUrl: 'assets/謎擬Ｑ01.webp',
+        description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost'], evolveId: 'mimikyu_3', isHiddenFromShop: true
     },
     mimikyu_3: {
-        id: 'mimikyu_3', name: '謎擬�?, tier: 5, family: 'mimikyu',
+        id: 'mimikyu_3', name: '謎擬Ｑ', tier: 5, family: 'mimikyu',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
-        imageUrl: 'assets/謎擬�?0.webp', battleImageUrl: 'assets/謎擬�?1.webp',
-        description: '?��?每場?�鬥中�?首次?�害??, synergies: ['Ghost'], isHiddenFromShop: true
+        imageUrl: 'assets/謎擬Ｑ00.webp', battleImageUrl: 'assets/謎擬Ｑ01.webp',
+        description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // Misc
     sprout: {
-        id: 'sprout', name: '小種�?, tier: 1, family: 'bulbasaur',
+        id: 'sprout', name: '小種子', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
-        imageUrl: 'assets/妙�?種�?00.webp', battleImageUrl: 'assets/妙�?種�?01.webp',
-        description: '妙�?種�??�身?��?, synergies: ['Grass'], isHiddenFromShop: true
+        imageUrl: 'assets/妙蛙種子00.webp', battleImageUrl: 'assets/妙蛙種子01.webp',
+        description: '妙蛙種子的身分。', synergies: ['Grass'], isHiddenFromShop: true
     },
     mouse: {
-        id: 'mouse', name: '迷�??��?', tier: 1, family: 'rattata',
+        id: 'mouse', name: '迷你拉達', tier: 1, family: 'rattata',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
-        imageUrl: 'assets/小�???0.webp', battleImageUrl: 'assets/小�???1.webp',
-        description: '小�??��??�身??, synergies: ['Normal'], isHiddenFromShop: true
+        imageUrl: 'assets/小拉達00.webp', battleImageUrl: 'assets/小拉達01.webp',
+        description: '小拉達的分身。', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 33. Spiritomb
     spiritomb: {
-        id: 'spiritomb', name: '?�岩??, tier: 5, family: 'spiritomb',
+        id: 'spiritomb', name: '花岩怪', tier: 5, family: 'spiritomb',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
-        imageUrl: 'assets/?�岩??0.webp', battleImageUrl: 'assets/?�岩??1.webp',
-        description: '?�鬥?��??��?使隨�?2 ?�敵?��??��??�?�無?��???, synergies: ['Ghost']
+        imageUrl: 'assets/花岩怪00.webp', battleImageUrl: 'assets/花岩怪01.webp',
+        description: '戰鬥開始時，使隨機 2 個敵方角色的技能無效化。', synergies: ['Ghost']
     },
 
     // 34. Gulpin
     gulpin: {
-        id: 'gulpin', name: '溶�???, tier: 2, family: 'gulpin',
+        id: 'gulpin', name: '溶食獸', tier: 2, family: 'gulpin',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/溶�???0.webp', battleImageUrl: 'assets/溶�???1.webp',
-        description: '?�鬥?��??��??�噬?�方?��?並繼?�其?�命?�攻?��?, synergies: ['Slow'], evolveId: 'swalot'
+        imageUrl: 'assets/溶食獸00.webp', battleImageUrl: 'assets/溶食獸01.webp',
+        description: '戰鬥開始時，吞噬前方友軍並繼承其生命和攻擊。', synergies: ['Slow'], evolveId: 'swalot'
     },
     swalot: {
-        id: 'swalot', name: '?��???, tier: 2, family: 'gulpin',
+        id: 'swalot', name: '吞食獸', tier: 2, family: 'gulpin',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�鬥?��??��??�噬?�方?��?並繼?�其?�命?�攻?��?, synergies: ['Slow'], evolveId: 'swalot_final', isHiddenFromShop: true
+        imageUrl: 'assets/吞食獸00.webp', battleImageUrl: 'assets/吞食獸01.webp',
+        description: '戰鬥開始時，吞噬前方友軍並繼承其生命和攻擊。', synergies: ['Slow'], evolveId: 'swalot_final', isHiddenFromShop: true
     },
     swalot_final: {
-        id: 'swalot_final', name: '?��???, tier: 2, family: 'gulpin',
+        id: 'swalot_final', name: '吞食獸', tier: 2, family: 'gulpin',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?�鬥?��??��??�噬?�方?��?並繼?�其?�命?�攻?��?, synergies: ['Slow'], isHiddenFromShop: true
+        imageUrl: 'assets/吞食獸00.webp', battleImageUrl: 'assets/吞食獸01.webp',
+        description: '戰鬥開始時，吞噬前方友軍並繼承其生命和攻擊。', synergies: ['Slow'], isHiddenFromShop: true
     },
     heracross: {
-        id: 'heracross', name: '赫�??��???, tier: 3, family: 'heracross',
+        id: 'heracross', name: '赫拉克羅斯', tier: 3, family: 'heracross',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
-        imageUrl: 'assets/赫�??��???0.webp', battleImageUrl: 'assets/赫�??��???1.webp',
-        description: '首次?�傷後�??�場?�鬥中攻?��?翻倍�?, synergies: ['Beetle']
+        imageUrl: 'assets/赫拉克羅斯00.webp', battleImageUrl: 'assets/赫拉克羅斯01.webp',
+        description: '首次受傷後，本場戰鬥中攻擊力翻倍。', synergies: ['Beetle']
     },
     pinsir: {
-        id: 'pinsir', name: '?��???, tier: 3, family: 'pinsir',
+        id: 'pinsir', name: '凱羅斯', tier: 3, family: 'pinsir',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
-        imageUrl: 'assets/?��???0.webp', battleImageUrl: 'assets/?��???1.webp',
-        description: '?��??��?減傷?��?硬�?謎擬Q?��??��??��?, synergies: ['Beetle']
+        imageUrl: 'assets/凱羅斯00.webp', battleImageUrl: 'assets/凱羅斯01.webp',
+        description: '攻擊無視減傷、堅硬及謎擬Q的技能效果。', synergies: ['Beetle']
     },
     farfetchd: {
-        id: 'farfetchd', name: '大蔥�?, tier: 5, family: 'farfetchd',
+        id: 'farfetchd', name: '大蔥鴨', tier: 5, family: 'farfetchd',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
-        imageUrl: 'assets/大蔥�?0.webp', battleImageUrl: 'assets/大蔥�?1.webp',
-        description: '首次?��??��? 99 ?�害??, synergies: ['Normal']
+        imageUrl: 'assets/大蔥鴨00.webp', battleImageUrl: 'assets/大蔥鴨01.webp',
+        description: '首次攻擊造成 99 傷害。', synergies: ['Normal']
     }
 }

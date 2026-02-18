@@ -1,0 +1,707 @@
+﻿
+import type { UnitTemplate } from './Unit';
+
+export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
+    // --- Evolution Paths Define ---
+    // Format: Base -> Stage 2 -> Stage 3
+
+    // 1. Bulbasaur
+    bulbasaur: {
+        id: 'bulbasaur', name: '憒?蝔桀?', tier: 1, family: 'bulbasaur',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/憒?蝔桀?00.webp', battleImageUrl: '/src/assets/憒?蝔桀?01.webp',
+        description: '甇颱滿敺??1 ??1/1 撠車摮?, synergies: ['Starter', 'Grass'], evolveId: 'ivysaur'
+    },
+    ivysaur: {
+        id: 'ivysaur', name: '憒???, tier: 1, family: 'bulbasaur',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/憒???0.webp', battleImageUrl: '/src/assets/憒???1.webp',
+        description: '甇颱滿敺??2 ??1/1 撠車摮?, synergies: ['Starter', 'Grass'], evolveId: 'venusaur', isHiddenFromShop: true
+    },
+    venusaur: {
+        id: 'venusaur', name: '憒???, tier: 1, family: 'bulbasaur',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/憒???0.webp', battleImageUrl: '/src/assets/憒???1.webp',
+        description: '甇颱滿敺??3 ??1/1 撠車摮?, synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+    },
+
+    // 2. Charmander
+    charmander: {
+        id: 'charmander', name: '撠樴?, tier: 1, family: 'charmander',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/撠樴?0.webp', battleImageUrl: '/src/assets/撠樴?1.webp',
+        description: '?捏?菜敺璈敺?+1 ?餅? ?????, synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
+    },
+    charmeleon: {
+        id: 'charmeleon', name: '?急?樴?, tier: 1, family: 'charmander',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?急?樴?0.webp', battleImageUrl: '/src/assets/?急?樴?1.webp',
+        description: '?捏?菜敺璈敺?+2 ?餅? ?????, synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
+    },
+    charizard: {
+        id: 'charizard', name: '?渡樴?, tier: 1, family: 'charmander',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?渡樴?0.webp', battleImageUrl: '/src/assets/?渡樴?1.webp',
+        description: '?捏?菜敺璈敺?+3 ?餅? ?????, synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+    },
+
+    // 3. Squirtle
+    squirtle: {
+        id: 'squirtle', name: '?側樴?, tier: 1, family: 'squirtle',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?側樴?0.webp', battleImageUrl: '/src/assets/?側樴?1.webp',
+        description: '??摰單?撠?1 (?雿 1)??, synergies: ['Starter', 'Water'], evolveId: 'wartortle'
+    },
+    wartortle: {
+        id: 'wartortle', name: '?∪樴?, tier: 1, family: 'squirtle',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?∪樴?0.webp', battleImageUrl: '/src/assets/?∪樴?1.webp',
+        description: '??摰單?撠?2 (?雿 1)??, synergies: ['Starter', 'Water'], evolveId: 'blastoise', isHiddenFromShop: true
+    },
+    blastoise: {
+        id: 'blastoise', name: '瘞渡悌樴?, tier: 1, family: 'squirtle',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/瘞渡悌樴?0.webp', battleImageUrl: '/src/assets/瘞渡悌樴?1.webp',
+        description: '??摰單?撠?3 (?雿 1)??, synergies: ['Starter', 'Water'], isHiddenFromShop: true
+    },
+
+    // 4. Gastly
+    gastly: {
+        id: 'gastly', name: '擛潭', tier: 1, family: 'gastly',
+        baseStats: { hp: 1, maxHp: 1, attack: 3 },
+        imageUrl: '/src/assets/擛潭00.webp', battleImageUrl: '/src/assets/擛潭01.webp',
+        description: '?????孵?頠?+2 ?餅???, synergies: ['Ghost'], evolveId: 'haunter'
+    },
+    haunter: {
+        id: 'haunter', name: '擛潭??, tier: 1, family: 'gastly',
+        baseStats: { hp: 1, maxHp: 1, attack: 3 },
+        imageUrl: '/src/assets/擛潭??0.webp', battleImageUrl: '/src/assets/擛潭??1.webp',
+        description: '?????孵?頠?+5 ?餅???, synergies: ['Ghost'], evolveId: 'gengar', isHiddenFromShop: true
+    },
+    gengar: {
+        id: 'gengar', name: '?輸狩', tier: 1, family: 'gastly',
+        baseStats: { hp: 1, maxHp: 1, attack: 3 },
+        imageUrl: '/src/assets/?輸狩00.webp', battleImageUrl: '/src/assets/?輸狩01.webp',
+        description: '?箏???孵?頠?+10 ?餅???, synergies: ['Ghost'], isHiddenFromShop: true
+    },
+
+    // 5. Chikorita
+    chikorita: {
+        id: 'chikorita', name: '????, tier: 2, family: 'chikorita',
+        baseStats: { hp: 4, maxHp: 4, attack: 2 },
+        imageUrl: '/src/assets/????0.webp', battleImageUrl: '/src/assets/????1.webp',
+        description: '???砍???+1 ?餅? ?????, synergies: ['Starter', 'Grass'], evolveId: 'bayleef'
+    },
+    bayleef: {
+        id: 'bayleef', name: '????, tier: 2, family: 'chikorita',
+        baseStats: { hp: 4, maxHp: 4, attack: 2 },
+        imageUrl: '/src/assets/????0.webp', battleImageUrl: '/src/assets/????1.webp',
+        description: '???砍???+2 ?餅? ?????, synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
+    },
+    meganium: {
+        id: 'meganium', name: '憭抒姿??, tier: 2, family: 'chikorita',
+        baseStats: { hp: 4, maxHp: 4, attack: 2 },
+        imageUrl: '/src/assets/憭抒姿??0.webp', battleImageUrl: '/src/assets/憭抒姿??1.webp',
+        description: '???砍???+3 ?餅? ?????, synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+    },
+
+    // 6. Cyndaquil
+    cyndaquil: {
+        id: 'cyndaquil', name: '?怎?曌?, tier: 2, family: 'cyndaquil',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/?怎?曌?0.webp', battleImageUrl: '/src/assets/?怎?曌?1.webp',
+        description: '?捏敺敺?+2 ?餅? ??+3 ? (瘥?圈洛?憭?1 甈???, synergies: ['Starter', 'Fire'], evolveId: 'quilava'
+    },
+    quilava: {
+        id: 'quilava', name: '?怠痔曌?, tier: 2, family: 'cyndaquil',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/?怠痔曌?0.webp', battleImageUrl: '/src/assets/?怠痔曌?1.webp',
+        description: '?捏敺敺?+2 ?餅? ??+3 ? (瘥?圈洛?憭?2 甈???, synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
+    },
+    typhlosion: {
+        id: 'typhlosion', name: '?怎???, tier: 2, family: 'cyndaquil',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/?怎???0.webp', battleImageUrl: '/src/assets/?怎???1.webp',
+        description: '?捏敺敺?+2 ?餅? ??+3 ? (瘥?圈洛?憭?3 甈???, synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+    },
+
+    // 7. Totodile
+    totodile: {
+        id: 'totodile', name: '撠敼?, tier: 2, family: 'totodile',
+        baseStats: { hp: 2, maxHp: 2, attack: 4 },
+        imageUrl: '/src/assets/撠敼?0.webp', battleImageUrl: '/src/assets/撠敼?1.webp',
+        description: '?餅?????撠??鈭粹? 2 ?瑕拿??, synergies: ['Starter', 'Water'], evolveId: 'croconaw'
+    },
+    croconaw: {
+        id: 'croconaw', name: '?捧', tier: 2, family: 'totodile',
+        baseStats: { hp: 2, maxHp: 2, attack: 4 },
+        imageUrl: '/src/assets/?捧00.webp', battleImageUrl: '/src/assets/?捧01.webp',
+        description: '?餅?????撠??鈭粹? 4 ?瑕拿??, synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
+    },
+    feraligatr: {
+        id: 'feraligatr', name: '憭批?敼?, tier: 2, family: 'totodile',
+        baseStats: { hp: 2, maxHp: 2, attack: 4 },
+        imageUrl: '/src/assets/憭批?敼?0.webp', battleImageUrl: '/src/assets/憭批?敼?1.webp',
+        description: '?餅?????撠??鈭粹? 6 ?瑕拿??, synergies: ['Starter', 'Water'], isHiddenFromShop: true
+    },
+
+    // 8. Igglybuff (New)
+    igglybuff: {
+        id: 'igglybuff', name: '撖嗅窄銝?, tier: 1, family: 'igglybuff',
+        baseStats: { hp: 3, maxHp: 3, attack: 1 },
+        imageUrl: '/src/assets/撖嗅窄銝?0.webp', battleImageUrl: '/src/assets/撖嗅窄銝?1.webp',
+        description: '?????孵?頠?+2 ???, synergies: ['Normal'], evolveId: 'jigglypuff'
+    },
+    jigglypuff: {
+        id: 'jigglypuff', name: '??', tier: 1, family: 'igglybuff',
+        baseStats: { hp: 3, maxHp: 3, attack: 1 },
+        imageUrl: '/src/assets/??00.webp', battleImageUrl: '/src/assets/??01.webp',
+        description: '?????孵?頠?+5 ???, synergies: ['Normal'], evolveId: 'wigglytuff', isHiddenFromShop: true
+    },
+    wigglytuff: {
+        id: 'wigglytuff', name: '?銝?, tier: 1, family: 'igglybuff',
+        baseStats: { hp: 3, maxHp: 3, attack: 1 },
+        imageUrl: '/src/assets/?銝?0.webp', battleImageUrl: '/src/assets/?銝?1.webp',
+        description: '?箏???孵?頠?+10 ???, synergies: ['Normal'], isHiddenFromShop: true
+    },
+
+    // 9. Treecko
+    treecko: {
+        id: 'treecko', name: '?典?摰?, tier: 3, family: 'treecko',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: '/src/assets/?典?摰?0.webp', battleImageUrl: '/src/assets/?典?摰?1.webp',
+        description: '?砍???敺?擐??菜?? 2 ?瑕拿??, synergies: ['Starter', 'Grass'], evolveId: 'grovyle'
+    },
+    grovyle: {
+        id: 'grovyle', name: '璉格??亥', tier: 3, family: 'treecko',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: '/src/assets/璉格??亥00.webp', battleImageUrl: '/src/assets/璉格??亥01.webp',
+        description: '?砍???敺?擐??菜?? 4 ?瑕拿??, synergies: ['Starter', 'Grass'], evolveId: 'sceptile', isHiddenFromShop: true
+    },
+    sceptile: {
+        id: 'sceptile', name: '?亥??, tier: 3, family: 'treecko',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: '/src/assets/?亥??0.webp', battleImageUrl: '/src/assets/?亥??1.webp',
+        description: '?砍???敺?擐??菜?? 6 ?瑕拿??, synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+    },
+
+    // 10. Torchic
+    torchic: {
+        id: 'torchic', name: '?怎???, tier: 3, family: 'torchic',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: '/src/assets/?怎???0.webp', battleImageUrl: '/src/assets/?怎???1.webp',
+        description: '????餅???撠璅? 2 ?瑕拿??, synergies: ['Starter', 'Fire'], evolveId: 'combusken'
+    },
+    combusken: {
+        id: 'combusken', name: '?ㄞ??, tier: 3, family: 'torchic',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: '/src/assets/?ㄞ??0.webp', battleImageUrl: '/src/assets/?ㄞ??1.webp',
+        description: '????餅???撠璅? 4 ?瑕拿??, synergies: ['Starter', 'Fire'], evolveId: 'blaziken', isHiddenFromShop: true
+    },
+    blaziken: {
+        id: 'blaziken', name: '?怎??, tier: 3, family: 'torchic',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: '/src/assets/?怎??0.webp', battleImageUrl: '/src/assets/?怎??1.webp',
+        description: '????餅???撠璅? 6 ?瑕拿??, synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+    },
+
+    // 11. Mudkip
+    mudkip: {
+        id: 'mudkip', name: '瘞渲?擳?, tier: 3, family: 'mudkip',
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
+        imageUrl: '/src/assets/瘞渲?擳?0.webp', battleImageUrl: '/src/assets/瘞渲?擳?1.webp',
+        description: '?圈洛???????憓? 3 ? ???餅???, synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
+    },
+    marshtomp: {
+        id: 'marshtomp', name: '瘝潸?擳?, tier: 3, family: 'mudkip',
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
+        imageUrl: '/src/assets/瘝潸?擳?0.webp', battleImageUrl: '/src/assets/瘝潸?擳?1.webp',
+        description: '?圈洛???????憓? 5 ? ???餅???, synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
+    },
+    swampert: {
+        id: 'swampert', name: '撌冽票??, tier: 3, family: 'mudkip',
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
+        imageUrl: '/src/assets/撌冽票??0.webp', battleImageUrl: '/src/assets/撌冽票??1.webp',
+        description: '?圈洛???????憓? 10 ? ???餅???, synergies: ['Starter', 'Water'], isHiddenFromShop: true
+    },
+
+    // 12. Sprigatito
+    sprigatito: {
+        id: 'sprigatito', name: '?啗???, tier: 4, family: 'sprigatito',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/?啗???0.webp', battleImageUrl: '/src/assets/?啗???1.webp',
+        description: '?砍???敺??芾澈?脣? +3 ?餅? ?????, synergies: ['Starter', 'Grass'], evolveId: 'floragato'
+    },
+    floragato: {
+        id: 'floragato', name: '???, tier: 4, family: 'sprigatito',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/???0.webp', battleImageUrl: '/src/assets/???1.webp',
+        description: '?砍???敺??芾澈?脣? +5 ?餅? ?????, synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
+    },
+    meowscarada: {
+        id: 'meowscarada', name: '擳劂???, tier: 4, family: 'sprigatito',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/擳劂???0.webp', battleImageUrl: '/src/assets/擳劂???1.webp',
+        description: '?砍???敺??芾澈?脣? +10 ?餅? ?????, synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+    },
+
+    // 13. Fuecoco
+    fuecoco: {
+        id: 'fuecoco', name: '?敼?, tier: 4, family: 'fuecoco',
+        baseStats: { hp: 6, maxHp: 6, attack: 4 },
+        imageUrl: '/src/assets/?敼?0.webp', battleImageUrl: '/src/assets/?敼?1.webp',
+        description: '??甇颱滿敺??芾澈?脣? +3 ???, synergies: ['Starter', 'Fire'], evolveId: 'crocalor'
+    },
+    crocalor: {
+        id: 'crocalor', name: '??敼?, tier: 4, family: 'fuecoco',
+        baseStats: { hp: 6, maxHp: 6, attack: 4 },
+        imageUrl: '/src/assets/??敼?0.webp', battleImageUrl: '/src/assets/??敼?1.webp',
+        description: '??甇颱滿敺??芾澈?脣? +5 ???, synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
+    },
+    skeledirge: {
+        id: 'skeledirge', name: '撉函?撌刻敼?, tier: 4, family: 'fuecoco',
+        baseStats: { hp: 6, maxHp: 6, attack: 4 },
+        imageUrl: '/src/assets/撉函?撌刻敼?0.webp', battleImageUrl: '/src/assets/撉函?撌刻敼?1.webp',
+        description: '??甇颱滿敺??芾澈?脣? +10 ???, synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+    },
+
+    // 14. Quaxly
+    quaxly: {
+        id: 'quaxly', name: '瞏斗偌暾?, tier: 4, family: 'quaxly',
+        baseStats: { hp: 4, maxHp: 4, attack: 6 },
+        imageUrl: '/src/assets/瞏斗偌暾?0.webp', battleImageUrl: '/src/assets/瞏斗偌暾?1.webp',
+        description: '?捏?菜敺??芾澈?脣? +3 ?餅???, synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
+    },
+    quaxwell: {
+        id: 'quaxwell', name: '皝扯?暾?, tier: 4, family: 'quaxly',
+        baseStats: { hp: 4, maxHp: 4, attack: 6 },
+        imageUrl: '/src/assets/皝扯?暾?0.webp', battleImageUrl: '/src/assets/皝扯?暾?1.webp',
+        description: '?捏?菜敺??芾澈?脣? +5 ?餅???, synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
+    },
+    quaquaval: {
+        id: 'quaquaval', name: '?迭瘚芾?暾?, tier: 4, family: 'quaxly',
+        baseStats: { hp: 4, maxHp: 4, attack: 6 },
+        imageUrl: '/src/assets/?迭瘚芾?暾?0.webp', battleImageUrl: '/src/assets/?迭瘚芾?暾?1.webp',
+        description: '?捏?菜敺??芾澈?脣? +10 ?餅???, synergies: ['Starter', 'Water'], isHiddenFromShop: true
+    },
+
+    // 15. Rattata (Loop same name for stage 3)
+    rattata: {
+        id: 'rattata', name: '撠???, tier: 1, family: 'rattata',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: '/src/assets/撠???0.webp', battleImageUrl: '/src/assets/撠???1.webp',
+        description: '甇颱滿敺??2 ??1/1 餈瑚?????, synergies: ['Normal'], evolveId: 'raticate'
+    },
+    raticate: {
+        id: 'raticate', name: '??', tier: 1, family: 'rattata',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: '/src/assets/??00.webp', battleImageUrl: '/src/assets/??01.webp',
+        description: '甇颱滿敺??2 ??2/2 餈瑚?????, synergies: ['Normal'], evolveId: 'raticate_final', isHiddenFromShop: true
+    },
+    raticate_final: {
+        id: 'raticate_final', name: '??', tier: 1, family: 'rattata',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: '/src/assets/??00.webp', battleImageUrl: '/src/assets/??01.webp',
+        description: '甇颱滿敺??2 ??3/3 餈瑚?????, synergies: ['Normal'], isHiddenFromShop: true
+    },
+
+    // 16. Diglett
+    diglett: {
+        id: 'diglett', name: '?圈?', tier: 2, family: 'diglett',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/?圈?00.webp', battleImageUrl: '/src/assets/?圈?01.webp',
+        description: '??25% 璈???瑕拿??, synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio'
+    },
+    dugtrio: {
+        id: 'dugtrio', name: '銝曌?, tier: 2, family: 'diglett',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/銝曌?0.webp', battleImageUrl: '/src/assets/銝曌?1.webp',
+        description: '??33% 璈???瑕拿??, synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio_final', isHiddenFromShop: true
+    },
+    dugtrio_final: {
+        id: 'dugtrio_final', name: '銝曌?, tier: 2, family: 'diglett',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/銝曌?0.webp', battleImageUrl: '/src/assets/銝曌?1.webp',
+        description: '??50% 璈???瑕拿??, synergies: ['Triplets', 'Cave'], isHiddenFromShop: true
+    },
+
+    // 17. Meowth
+    meowth: {
+        id: 'meowth', name: '?萄', tier: 2, family: 'meowth',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/?萄00.webp', battleImageUrl: '/src/assets/?萄01.webp',
+        description: '?????敺?1 ?馳??, synergies: ['Normal', 'Claw'], evolveId: 'persian'
+    },
+    persian: {
+        id: 'persian', name: '鞎之', tier: 2, family: 'meowth',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/鞎之00.webp', battleImageUrl: '/src/assets/鞎之01.webp',
+        description: '?????敺?3 ?馳??, synergies: ['Normal', 'Claw'], evolveId: 'persian_final', isHiddenFromShop: true
+    },
+    persian_final: {
+        id: 'persian_final', name: '鞎之', tier: 2, family: 'meowth',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/鞎之00.webp', battleImageUrl: '/src/assets/鞎之01.webp',
+        description: '?????敺?5 ?馳??, synergies: ['Normal', 'Claw'], isHiddenFromShop: true
+    },
+
+    // 18. Mankey (Tier 1)
+    mankey: {
+        id: 'mankey', name: '?湔?, tier: 1, family: 'mankey',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?湔?0.webp', battleImageUrl: '/src/assets/?湔?1.webp',
+        description: '?圈洛????????脣? +2 ?餅???, synergies: ['Angry'], evolveId: 'primeape'
+    },
+    primeape: {
+        id: 'primeape', name: '?怎???, tier: 1, family: 'mankey',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?怎???0.webp', battleImageUrl: '/src/assets/?怎???1.webp',
+        description: '?圈洛????????脣? +5 ?餅???, synergies: ['Angry'], evolveId: 'primeape_final', isHiddenFromShop: true
+    },
+    primeape_final: {
+        id: 'primeape_final', name: '?怎???, tier: 1, family: 'mankey',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?怎???0.webp', battleImageUrl: '/src/assets/?怎???1.webp',
+        description: '?圈洛????????脣? +10 ?餅???, synergies: ['Angry'], isHiddenFromShop: true
+    },
+
+    // 19. Onix
+    onix: {
+        id: 'onix', name: '憭批痔??, tier: 4, family: 'onix',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/憭批痔??0.webp', battleImageUrl: '/src/assets/憭批痔??1.webp',
+        description: '蝘餃?敺?瘞訾? +2 ?嚗?敶?50% ???摰喋?, synergies: ['Cave', 'Hard'], evolveId: 'steelix'
+    },
+    steelix: {
+        id: 'steelix', name: '憭折??, tier: 4, family: 'onix',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/憭折??0.webp', battleImageUrl: '/src/assets/憭折??1.webp',
+        description: '蝘餃?敺?瘞訾? +2 ?嚗?敶?50% ???摰喋?, synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
+    },
+    steelix_final: {
+        id: 'steelix_final', name: '憭折??, tier: 4, family: 'onix',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/憭折??0.webp', battleImageUrl: '/src/assets/憭折??1.webp',
+        description: '蝘餃?敺?瘞訾?  +2 ?嚗?敶?50% ???摰喋?, synergies: ['Cave', 'Hard'], isHiddenFromShop: true
+    },
+
+    // 20. Doduo
+    doduo: {
+        id: 'doduo', name: '??', tier: 2, family: 'doduo',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/??00.webp', battleImageUrl: '/src/assets/??01.webp',
+        description: '??25% 璈?憿??餅?銝甈～?, synergies: ['Triplets', 'Angry'], evolveId: 'dodrio'
+    },
+    dodrio: {
+        id: 'dodrio', name: '????, tier: 2, family: 'doduo',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/????0.webp', battleImageUrl: '/src/assets/????1.webp',
+        description: '??33% 璈?憿??餅?銝甈～?, synergies: ['Triplets', 'Angry'], evolveId: 'dodrio_final', isHiddenFromShop: true
+    },
+    dodrio_final: {
+        id: 'dodrio_final', name: '????, tier: 2, family: 'doduo',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/????0.webp', battleImageUrl: '/src/assets/????1.webp',
+        description: '??50% 璈?憿??餅?銝甈～?, synergies: ['Triplets', 'Angry'], isHiddenFromShop: true
+    },
+
+    // 21. Slowpoke
+    slowpoke: {
+        id: 'slowpoke', name: '????, tier: 3, family: 'slowpoke',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: '/src/assets/????0.webp', battleImageUrl: '/src/assets/????1.webp',
+        description: '????亦???< 50%嚗?敺?6 ? (瘥?圈洛 1 甈???, synergies: ['Slow', 'Water'], evolveId: 'slowbro'
+    },
+    slowbro: {
+        id: 'slowbro', name: '?挺??, tier: 3, family: 'slowpoke',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: '/src/assets/?挺??0.webp', battleImageUrl: '/src/assets/?挺??1.webp',
+        description: '????亦???< 50%嚗?敺?12 ? (瘥?圈洛 1 甈???, synergies: ['Slow', 'Water'], evolveId: 'slowbro_final', isHiddenFromShop: true
+    },
+    slowbro_final: {
+        id: 'slowbro_final', name: '?挺??, tier: 3, family: 'slowpoke',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: '/src/assets/?挺??0.webp', battleImageUrl: '/src/assets/?挺??1.webp',
+        description: '????亦???< 50%嚗?敺?20 ? (瘥?圈洛 1 甈???, synergies: ['Slow', 'Water'], isHiddenFromShop: true
+    },
+
+    // 22. Magnemite
+    magnemite: {
+        id: 'magnemite', name: '撠???, tier: 2, family: 'magnemite',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/撠???0.webp', battleImageUrl: '/src/assets/撠???1.webp',
+        description: '皞?蝯????冽??脣? +2 ?餅? ??? (??1 甈???, synergies: ['Triplets', 'Hard'], evolveId: 'magneton'
+    },
+    magneton: {
+        id: 'magneton', name: '銝?銝蝤?, tier: 2, family: 'magnemite',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: '/src/assets/銝?銝蝤?0.webp', battleImageUrl: '/src/assets/銝?銝蝤?1.webp',
+        description: '皞?蝯????冽??脣? +2 ?餅? ??? (??2 甈???, synergies: ['Triplets', 'Hard'], evolveId: 'magneton_final', isHiddenFromShop: true
+    },
+    magneton_final: {
+        id: 'magneton_final', name: '銝?銝蝤?, tier: 2, family: 'magnemite',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: '/src/assets/銝?銝蝤?0.webp', battleImageUrl: '/src/assets/銝?銝蝤?1.webp',
+        description: '皞?蝯????冽??脣? +2 ?餅? ??? (??3 甈???, synergies: ['Triplets', 'Hard'], isHiddenFromShop: true
+    },
+
+    // 23. Houndour
+    houndour: {
+        id: 'houndour', name: '?湧陌瘥?, tier: 3, family: 'houndour',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/?湧陌瘥?0.webp', battleImageUrl: '/src/assets/?湧陌瘥?1.webp',
+        description: '?圈洛????撠??賣?撠?寥? 4 ?瑕拿 (??1 甈???, synergies: ['Angry', 'Fire'], evolveId: 'houndoom'
+    },
+    houndoom: {
+        id: 'houndoom', name: '暺陌??, tier: 3, family: 'houndour',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/暺陌??0.webp', battleImageUrl: '/src/assets/暺陌??1.webp',
+        description: '?圈洛????撠??賣?撠?寥? 4 ?瑕拿 (??3 甈???, synergies: ['Angry', 'Fire'], evolveId: 'houndoom_final', isHiddenFromShop: true
+    },
+    houndoom_final: {
+        id: 'houndoom_final', name: '暺陌??, tier: 3, family: 'houndour',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/暺陌??0.webp', battleImageUrl: '/src/assets/暺陌??1.webp',
+        description: '?圈洛????撠??賣?撠?寥? 4 ?瑕拿 (??5 甈???, synergies: ['Angry', 'Fire'], isHiddenFromShop: true
+    },
+
+    // 24. Sneasel
+    sneasel: {
+        id: 'sneasel', name: '??', tier: 4, family: 'sneasel',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/??00.webp', battleImageUrl: '/src/assets/??01.webp',
+        description: '?餅????璈??1 ??對??捏敺?偶銋?+3??, synergies: ['Claw', 'Snow'], evolveId: 'weavile'
+    },
+    weavile: {
+        id: 'weavile', name: '?芰???, tier: 4, family: 'sneasel',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/?芰???0.webp', battleImageUrl: '/src/assets/?芰???1.webp',
+        description: '?餅????璈??1 ??對??捏敺?偶銋?+3??, synergies: ['Claw', 'Snow'], evolveId: 'weavile_final', isHiddenFromShop: true
+    },
+    weavile_final: {
+        id: 'weavile_final', name: '?芰???, tier: 4, family: 'sneasel',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/?芰???0.webp', battleImageUrl: '/src/assets/?芰???1.webp',
+        description: '?餅????璈??1 ??對??捏敺?偶銋?+3??, synergies: ['Claw', 'Snow'], isHiddenFromShop: true
+    },
+
+    // 25. Shuppet (Tier 1)
+    shuppet: {
+        id: 'shuppet', name: '?典蔣憡?', tier: 1, family: 'shuppet',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?典蔣憡?00.webp', battleImageUrl: '/src/assets/?典蔣憡?01.webp',
+        description: '甇颱滿敺??冽??菜?? 2 ?瑕拿??, synergies: ['Ghost'], evolveId: 'banette'
+    },
+    banette: {
+        id: 'banette', name: '閰?憡?', tier: 1, family: 'shuppet',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/閰?憡?00.webp', battleImageUrl: '/src/assets/閰?憡?01.webp',
+        description: '甇颱滿敺??冽??菜?? 5 ?瑕拿??, synergies: ['Ghost'], evolveId: 'banette_final', isHiddenFromShop: true
+    },
+    banette_final: {
+        id: 'banette_final', name: '閰?憡?', tier: 3, family: 'shuppet',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/閰?憡?00.webp', battleImageUrl: '/src/assets/閰?憡?01.webp',
+        description: '甇颱滿敺??冽??菜?? 10 ?瑕拿??, synergies: ['Ghost'], isHiddenFromShop: true
+    },
+
+    // 26. Drifloon (Renamed from Drifblim Base)
+    drifloon: {
+        id: 'drifloon', name: '憌???, tier: 2, family: 'drifloon',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/憌???0.webp', battleImageUrl: '/src/assets/憌???1.webp',
+        description: '甇颱滿敺??券??菜?? 2 ?瑕拿??, synergies: ['Ghost'], evolveId: 'drifblim'
+    },
+    drifblim: {
+        id: 'drifblim', name: '?券◢??, tier: 2, family: 'drifloon',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?券◢??0.webp', battleImageUrl: '/src/assets/?券◢??1.webp',
+        description: '甇颱滿敺??券??菜?? 5 ?瑕拿??, synergies: ['Ghost'], evolveId: 'drifblim_final', isHiddenFromShop: true
+    },
+    drifblim_final: {
+        id: 'drifblim_final', name: '?券◢??, tier: 2, family: 'drifloon',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?券◢??0.webp', battleImageUrl: '/src/assets/?券◢??1.webp',
+        description: '甇颱滿敺??券??菜?? 10 ?瑕拿??, synergies: ['Ghost'], isHiddenFromShop: true
+    },
+
+    // 27. Snover
+    snover: {
+        id: 'snover', name: '?芰???, tier: 3, family: 'snover',
+        baseStats: { hp: 6, maxHp: 6, attack: 4 },
+        imageUrl: '/src/assets/?芰???0.webp', battleImageUrl: '/src/assets/?芰???1.webp',
+        description: '?餅?敺?+1 ?餅?銝行???菜閫??, synergies: ['Grass', 'Snow'], evolveId: 'abomasnow'
+    },
+    abomasnow: {
+        id: 'abomasnow', name: '?湧??, tier: 3, family: 'snover',
+        baseStats: { hp: 6, maxHp: 6, attack: 4 },
+        imageUrl: '/src/assets/?湧??0.webp', battleImageUrl: '/src/assets/?湧??1.webp',
+        description: '?餅?敺?+1 ?餅?銝行???菜閫??, synergies: ['Grass', 'Snow'], evolveId: 'abomasnow_final', isHiddenFromShop: true
+    },
+    abomasnow_final: {
+        id: 'abomasnow_final', name: '?湧??, tier: 3, family: 'snover',
+        baseStats: { hp: 6, maxHp: 6, attack: 4 },
+        imageUrl: '/src/assets/?湧??0.webp', battleImageUrl: '/src/assets/?湧??1.webp',
+        description: '?餅?敺?+1 ?餅?銝行???菜閫??, synergies: ['Grass', 'Snow'], isHiddenFromShop: true
+    },
+
+    // 28. Dwebble (Tier 1)
+    dwebble: {
+        id: 'dwebble', name: '?喳???, tier: 1, family: 'dwebble',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/?喳???0.webp', battleImageUrl: '/src/assets/?喳???1.webp',
+        description: '?圈洛??????? +2 ???, synergies: ['Hard'], evolveId: 'crustle'
+    },
+    crustle: {
+        id: 'crustle', name: '撗拇挪撅', tier: 1, family: 'dwebble',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/撗拇挪撅00.webp', battleImageUrl: '/src/assets/撗拇挪撅01.webp',
+        description: '?圈洛??????? +5 ???, synergies: ['Hard'], evolveId: 'crustle_final', isHiddenFromShop: true
+    },
+    crustle_final: {
+        id: 'crustle_final', name: '撗拇挪撅', tier: 1, family: 'dwebble',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: '/src/assets/撗拇挪撅00.webp', battleImageUrl: '/src/assets/撗拇挪撅01.webp',
+        description: '?圈洛??????? +10 ???, synergies: ['Hard'], isHiddenFromShop: true
+    },
+
+    // 29. Kangaskhan
+    kangaskhan: {
+        id: 'kangaskhan', name: '鋡', tier: 4, family: 'kangaskhan',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        imageUrl: '/src/assets/鋡00.webp', battleImageUrl: '/src/assets/鋡01.webp',
+        description: '?交?孵歇?脣?嚗??餅?銝甈～??亦璅香鈭∪?銝??', synergies: ['Normal'], evolveId: 'kangaskhan_2'
+    },
+    kangaskhan_2: {
+        id: 'kangaskhan_2', name: '鋡', tier: 4, family: 'kangaskhan',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        imageUrl: '/src/assets/鋡00.webp', battleImageUrl: '/src/assets/鋡01.webp',
+        description: '?交?孵歇?脣?嚗??餅?銝甈～??亦璅香鈭∪?銝??', synergies: ['Normal'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
+    },
+    kangaskhan_3: {
+        id: 'kangaskhan_3', name: '鋡', tier: 4, family: 'kangaskhan',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        imageUrl: '/src/assets/鋡00.webp', battleImageUrl: '/src/assets/鋡01.webp',
+        description: '?交?孵歇?脣?嚗??餅?銝甈～??亦璅香鈭∪?銝??', synergies: ['Normal'], isHiddenFromShop: true
+    },
+
+    // 30. Ditto
+    ditto: {
+        id: 'ditto', name: '?曇???, tier: 5, family: 'ditto',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: '/src/assets/?曇???0.webp', battleImageUrl: '/src/assets/?曇???1.webp',
+        description: '?圈洛????霈澈?箸??寧??賣?擃?閫??, synergies: ['Normal'], evolveId: 'ditto_2'
+    },
+    ditto_2: {
+        id: 'ditto_2', name: '?曇???, tier: 5, family: 'ditto',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: '/src/assets/?曇???0.webp', battleImageUrl: '/src/assets/?曇???1.webp',
+        description: '?圈洛????霈澈?箸??寧??賣?擃?閫??, synergies: ['Normal'], evolveId: 'ditto_3', isHiddenFromShop: true
+    },
+    ditto_3: {
+        id: 'ditto_3', name: '?曇???, tier: 5, family: 'ditto',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: '/src/assets/?曇???0.webp', battleImageUrl: '/src/assets/?曇???1.webp',
+        description: '?圈洛????霈澈?箸??寧??賣?擃?閫??, synergies: ['Normal'], isHiddenFromShop: true
+    },
+
+    // 31. Sableye
+    sableye: {
+        id: 'sableye', name: '?暸???, tier: 4, family: 'sableye',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/?暸???0.webp', battleImageUrl: '/src/assets/?暸???1.webp',
+        description: '畾箸香?暸??潛??菜蝡甇颱滿??, synergies: ['Ghost'], evolveId: 'sableye_2'
+    },
+    sableye_2: {
+        id: 'sableye_2', name: '?暸???, tier: 4, family: 'sableye',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/?暸???0.webp', battleImageUrl: '/src/assets/?暸???1.webp',
+        description: '畾箸香?暸??潛??菜蝡甇颱滿??, synergies: ['Ghost'], evolveId: 'sableye_3', isHiddenFromShop: true
+    },
+    sableye_3: {
+        id: 'sableye_3', name: '?暸???, tier: 4, family: 'sableye',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: '/src/assets/?暸???0.webp', battleImageUrl: '/src/assets/?暸???1.webp',
+        description: '畾箸香?暸??潛??菜蝡甇颱滿??, synergies: ['Ghost'], isHiddenFromShop: true
+    },
+
+    // 32. Mimikyu
+    mimikyu: {
+        id: 'mimikyu', name: '雓嚗?, tier: 5, family: 'mimikyu',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: '/src/assets/雓嚗?0.webp', battleImageUrl: '/src/assets/雓嚗?1.webp',
+        description: '?菜?瘥?圈洛銝剔?擐活?瑕拿??, synergies: ['Ghost'], evolveId: 'mimikyu_2'
+    },
+    mimikyu_2: {
+        id: 'mimikyu_2', name: '雓嚗?, tier: 5, family: 'mimikyu',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: '/src/assets/雓嚗?0.webp', battleImageUrl: '/src/assets/雓嚗?1.webp',
+        description: '?菜?瘥?圈洛銝剔?擐活?瑕拿??, synergies: ['Ghost'], evolveId: 'mimikyu_3', isHiddenFromShop: true
+    },
+    mimikyu_3: {
+        id: 'mimikyu_3', name: '雓嚗?, tier: 5, family: 'mimikyu',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: '/src/assets/雓嚗?0.webp', battleImageUrl: '/src/assets/雓嚗?1.webp',
+        description: '?菜?瘥?圈洛銝剔?擐活?瑕拿??, synergies: ['Ghost'], isHiddenFromShop: true
+    },
+
+    // Misc
+    sprout: {
+        id: 'sprout', name: '撠車摮?, tier: 1, family: 'bulbasaur',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: '/src/assets/憒?蝔桀?00.webp', battleImageUrl: '/src/assets/憒?蝔桀?01.webp',
+        description: '憒?蝔桀??澈??, synergies: ['Grass'], isHiddenFromShop: true
+    },
+    mouse: {
+        id: 'mouse', name: '餈瑚???', tier: 1, family: 'rattata',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: '/src/assets/撠???0.webp', battleImageUrl: '/src/assets/撠???1.webp',
+        description: '撠????澈??, synergies: ['Normal'], isHiddenFromShop: true
+    },
+
+    // 33. Spiritomb
+    spiritomb: {
+        id: 'spiritomb', name: '?勗痔??, tier: 5, family: 'spiritomb',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: '/src/assets/?勗痔??0.webp', battleImageUrl: '/src/assets/?勗痔??1.webp',
+        description: '?圈洛????雿輸璈?2 ??寡??脩???賜????, synergies: ['Ghost']
+    },
+
+    // 34. Gulpin
+    gulpin: {
+        id: 'gulpin', name: '皞園???, tier: 2, family: 'gulpin',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/皞園???0.webp', battleImageUrl: '/src/assets/皞園???1.webp',
+        description: '?圈洛????????銝衣匱?踹????, synergies: ['Slow'], evolveId: 'swalot'
+    },
+    swalot: {
+        id: 'swalot', name: '????, tier: 2, family: 'gulpin',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/????0.webp', battleImageUrl: '/src/assets/????1.webp',
+        description: '?圈洛????????銝衣匱?踹????, synergies: ['Slow'], evolveId: 'swalot_final', isHiddenFromShop: true
+    },
+    swalot_final: {
+        id: 'swalot_final', name: '????, tier: 2, family: 'gulpin',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: '/src/assets/????0.webp', battleImageUrl: '/src/assets/????1.webp',
+        description: '?圈洛????????銝衣匱?踹????, synergies: ['Slow'], isHiddenFromShop: true
+    },
+    heracross: {
+        id: 'heracross', name: '韏急?????, tier: 3, family: 'heracross',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: '/src/assets/韏急?????0.webp', battleImageUrl: '/src/assets/韏急?????1.webp',
+        description: '擐活?敺??砍?圈洛銝剜??蝧餃?, synergies: ['Beetle']
+    },
+    pinsir: {
+        id: 'pinsir', name: '?梁???, tier: 3, family: 'pinsir',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: '/src/assets/?梁???0.webp', battleImageUrl: '/src/assets/?梁???1.webp',
+        description: '?餅??∟?皜??蝖砍?雓Q???賣???, synergies: ['Beetle']
+    },
+    farfetchd: {
+        id: 'farfetchd', name: '憭扯暾?, tier: 5, family: 'farfetchd',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: '/src/assets/憭扯暾?0.webp', battleImageUrl: '/src/assets/憭扯暾?1.webp',
+        description: '擐活?餅??? 99 ?瑕拿??, synergies: ['Normal']
+    }
+}
