@@ -175,7 +175,7 @@ function App() {
     const update = useForceUpdate();
 
     useEffect(() => {
-        console.log("Pokemon AutoChess v4.6 - Localized & Layout Sync");
+        console.log("Pokemon AutoChess v4.7 - Fixed Overlay & Final Trans");
     }, []);
 
     const handleRestart = () => {
@@ -735,29 +735,32 @@ function App() {
                 <div
                     className="battle-result-overlay"
                     style={{
-                        background: 'rgba(0,0,0,0.7)',
-                        backdropFilter: 'blur(8px)',
-                        zIndex: 2000,
-                        flexDirection: 'column',
-                        cursor: 'pointer',
+                        position: 'fixed', // Key Fix: Ignore parent height collapse
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'rgba(0,0,0,0.8)',
+                        backdropFilter: 'blur(10px)',
+                        zIndex: 9999,
                         display: 'flex',
+                        flexDirection: 'column',
                         justifyContent: 'center',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        cursor: 'pointer'
                     }}
                     onClick={handleRestart}
                 >
-                    {/* Main Message - Positioned over the battlefield centrally */}
+                    {/* Main Message - Visual center of screen */}
                     <div className="result-content" style={{
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         gap: '15px',
-                        transform: 'translateY(-20px)' // Fine-tune vertical center
+                        transform: 'translateY(-10%)'
                     }}>
                         <div className="result-title" style={{
-                            fontSize: 'min(5rem, 12vw)',
+                            fontSize: 'min(6rem, 15vw)',
                             margin: 0,
-                            textShadow: '0 10px 40px rgba(0,0,0,0.8)',
+                            color: '#fff',
+                            textShadow: '0 0 40px rgba(255,255,255,0.2), 0 10px 40px rgba(0,0,0,0.8)',
                             animation: 'fadeInUp 0.8s ease-out'
                         }}>
                             {game.phase === GamePhase.VICTORY ? 'CHAMPION! 🏆' : 'GAME OVER 💀'}
@@ -766,30 +769,28 @@ function App() {
                             fontSize: 'min(1.8rem, 5vw)',
                             fontWeight: 'bold',
                             color: '#fff',
-                            letterSpacing: '2px',
-                            background: 'rgba(255,255,255,0.1)',
-                            padding: '8px 30px',
-                            borderRadius: '30px',
-                            animation: 'fadeInUp 1s ease-out',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+                            letterSpacing: '3px',
+                            background: 'rgba(255,255,255,0.15)',
+                            padding: '10px 40px',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '50px',
+                            boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                            animation: 'fadeInUp 1s ease-out'
                         }}>
-                            {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '遺憾！下次再努力吧'}
+                            {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '大隱於市，下次再戰'}
                         </div>
                     </div>
 
-                    {/* Operational Area - Positioned precisely at the Shop Area level */}
+                    {/* Operational Area - Fixed at bottom of screen, below EVERYTHING */}
                     <div style={{
                         position: 'absolute',
-                        bottom: '80px', // Adjusted to match visual shop area
-                        color: '#eee',
+                        bottom: '40px', // Real bottom of the window
+                        color: '#aaa',
                         fontSize: '1.2rem',
-                        letterSpacing: '1px',
+                        letterSpacing: '2px',
                         animation: 'pulse 2s infinite',
-                        background: 'rgba(0,0,0,0.4)',
-                        padding: '10px 25px',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '20px',
-                        backdropFilter: 'blur(4px)'
+                        borderBottom: '1px solid rgba(255,255,255,0.2)',
+                        paddingBottom: '5px'
                     }}>
                         [ 點擊任意處重新開始 ]
                     </div>
