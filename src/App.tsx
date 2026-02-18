@@ -832,12 +832,6 @@ function App() {
                             {/* Render Locked Slots (up to 7 total) */}
                             {Array.from({ length: 7 - game.shop.slots.length }).map((_, i) => {
                                 const slotIndex = game.shop.slots.length + i;
-                                let unlockTurn = 0;
-                                if (slotIndex === 4) unlockTurn = 3;
-                                else if (slotIndex === 5) unlockTurn = 6;
-                                else if (slotIndex === 6) unlockTurn = 9;
-
-                                const turnsLeft = unlockTurn - game.turn;
 
                                 return (
                                     <div key={`locked-${slotIndex}`} className="slot-placeholder" style={{
