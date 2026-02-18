@@ -853,14 +853,6 @@ function App() {
                                             fontWeight: 'bold',
                                             marginTop: '-10px'
                                         }}>×</div>
-                                        <div style={{
-                                            fontSize: '0.8rem',
-                                            color: 'rgba(255,255,255,0.35)',
-                                            whiteSpace: 'nowrap',
-                                            marginTop: '10px'
-                                        }}>
-                                            {turnsLeft} 回合後解鎖
-                                        </div>
                                     </div>
                                 );
                             })}

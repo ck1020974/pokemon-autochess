@@ -76,11 +76,14 @@ h3 {
 
 .board-teams-horizontal {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  /* Changed from space-between to cluster them around VS */
   align-items: flex-end;
   min-width: fit-content;
   /* Ensure background stretches to content */
   width: 100%;
+  gap: 15px;
+  /* Controlled gap between teams and VS */
 }
 
 .board-side {
@@ -95,28 +98,28 @@ h3 {
 .board-side.player {
   flex-direction: row-reverse;
   justify-content: flex-start;
-  padding-right: 80px;
+  padding-right: 30px;
+  /* Reduced from 80px */
 }
 
 /* Enemy Side (Right) - Adjusted Spacing (50px to move left) */
 .board-side.enemy {
   flex-direction: row;
   justify-content: flex-start;
-  padding-left: 50px;
+  padding-left: 0px;
+  /* Moved further left from 20px */
 }
 
 /* VS Badge */
 .board-vs {
-  position: absolute;
-  left: 50%;
-  bottom: 50px;
-  transform: translateX(-50%);
   font-size: 2.5rem;
   font-weight: 900;
   color: rgba(255, 255, 255, 0.1);
   z-index: 0;
   pointer-events: none;
   text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  margin-bottom: 50px;
+  flex-shrink: 0;
 }
 
 .battle-controls-container {
@@ -310,8 +313,23 @@ h3 {
 
 .shop-slots {
   display: flex;
-  gap: 32px;
+  gap: 12px;
+  /* Controlled spacing for shop */
   align-items: flex-end;
+}
+
+/* Shop Specific Overrides to reduce crowding */
+.shop-slots .unit-card,
+.shop-slots .slot-placeholder {
+  width: 120px;
+  height: 140px;
+  margin: 0;
+  /* No overlap in shop */
+}
+
+.shop-slots .unit-image {
+  width: 90px;
+  height: 90px;
 }
 
 /* --- Minimal Card (Character) --- */
@@ -450,7 +468,8 @@ h3 {
 
 /* Floor Marker */
 .floor-marker {
-  width: 90px;
+  width: 70px;
+  /* Reduced from 90px */
   height: 22px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
