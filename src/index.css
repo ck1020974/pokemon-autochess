@@ -911,7 +911,7 @@ h3 {
   }
 
   .shop-controls {
-    width: 75px;
+    width: 77px;
     padding-right: 0px;
     gap: 2px;
   }
@@ -935,7 +935,7 @@ h3 {
   }
 
   .shop-slots-area {
-    padding-left: 70px;
+    padding-left: 68px;
     position: relative;
   }
 
@@ -955,8 +955,8 @@ h3 {
   .reroll-icon-btn {
     font-size: 1.5rem !important;
     top: -10px !important;
-    left: 5px !important;
-    /* Card starts at 70px, button at 5px = 65px gap, all right of divider */
+    left: 4px !important;
+    /* Card starts at 68px, button at 4px = 64px gap */
   }
 
   /* Selection glow tweak for mobile: narrower width and reduced height */
@@ -1027,10 +1027,10 @@ h3 {
     height: 35px;
   }
 
-  /* Board Synergies Tooltip - Move down to avoid header blocking */
+  /* Board Synergies Tooltip - Move to the right side, slightly lower */
   .board-synergies .synergy-tooltip {
-    left: 0 !important;
-    top: 130% !important;
+    left: 110% !important;
+    top: 10px !important;
     transform: none !important;
     max-width: 180px !important;
   }
