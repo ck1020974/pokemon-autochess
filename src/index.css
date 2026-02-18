@@ -343,8 +343,8 @@ h3 {
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
   animation: unit-appear 0.4s cubic-bezier(0.2, 0, 0, 1);
-  margin: 0 -28px;
-  /* Further tightened as requested for a better formation sense */
+  margin: 0 -24px;
+  /* Fixed mid-point overlap (-24px) for perfect阵型 density */
 }
 
 .unit-card:hover {
@@ -485,7 +485,7 @@ h3 {
   justify-content: center;
   align-items: flex-end;
   position: relative;
-  margin: 0 -28px;
+  margin: 0 -24px;
   /* Matched with unit-card */
 }
 
@@ -882,12 +882,13 @@ h3 {
 
   /* 3. Detail Panel Adjustments */
   .detail-panel {
-    width: 95vw;
-    left: 2.5vw;
-    right: 2.5vw;
-    bottom: 5px;
-    padding: 10px;
-    gap: 10px;
+    width: 85vw !important;
+    /* Narrowed from 95vw */
+    left: 7.5vw !important;
+    /* Centered with 85vw */
+    right: 7.5vw !important;
+    bottom: 10px !important;
+    padding: 8px !important;
   }
 
   .detail-image {
@@ -924,8 +925,8 @@ h3 {
   .slot-placeholder {
     width: 65px;
     height: 80px;
-    margin: 0 -10px;
-    /* Smaller overlap for small scales */
+    margin: 0 -8px !important;
+    /* Relaxed from -28px to -8px for small screens */
   }
 
   .unit-image,
@@ -971,10 +972,11 @@ h3 {
 /* --- Visual Selection Highlight --- */
 .unit-card.is-selected {
   outline: 3px solid #60a5fa;
-  outline-offset: 0px;
-  /* Tightened outline from 4px */
+  outline-offset: -2px;
+  /* Inward offset for a tighter, more precise fit */
   box-shadow: 0 0 15px rgba(96, 165, 250, 0.6);
   z-index: 100;
+  border-radius: 12px;
 }
 
 .slot-placeholder.is-target-eligible {
