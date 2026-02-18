@@ -810,7 +810,7 @@ export class BattleSimulator {
         if (sourceState.isLethalStrike) {
             sourceState.isLethalStrike = false; // Consume it
             amount = 99;
-            this.log(` 勾魂眼帶走了 ${target.name} `);
+            this.log(` 大蔥鴨發動致命一擊 ${target.name} `);
         }
 
         // Diglett: Chance to dodge (only basic attacks, not skills; Pinsir bypasses)
@@ -1009,7 +1009,7 @@ export class BattleSimulator {
         // We count only units with HP > 0.
         const livingUnits = team.filter(u => u && u.stats.hp > 0).length;
         if (livingUnits >= 5) {
-            this.log(`戰場已滿，無法呼叫 ${newUnit.name}！ (存活: ${livingUnits}/5)`);
+            this.log(`戰場已滿，無法召喚 ${newUnit.name}！ (存活: ${livingUnits}/5)`);
             return;
         }
 
@@ -1046,14 +1046,14 @@ export class BattleSimulator {
         this.registerUnitAbilities(newUnit);
 
         await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
-        this.log(`${newUnit.name} 進入了戰場！`);
+        this.log(`${newUnit.name} 加入了戰場！`);
         await this.delay(50);
         const el = document.getElementById(newUnit.id);
         if (el) el.classList.add('spawn-anim');
     }
 
     private async notifySkill(unit: Unit, message: string) {
-        const fullMsg = `【技能】${unit.name} ${message}！`;
+        const fullMsg = `${unit.name} ${message}！`;
         this.log(fullMsg);
         if (this.onUpdate) this.onUpdate();
         await this.delay(200); // 0.2s pause for visual feedback
