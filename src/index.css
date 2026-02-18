@@ -82,8 +82,8 @@ h3 {
   min-width: fit-content;
   /* Ensure background stretches to content */
   width: 100%;
-  gap: 40px;
-  /* Reduced from 80px to bring teams closer and align with shop */
+  gap: 50px;
+  /* Balanced gap to align player backline with shop controls */
 }
 
 .board-side {
@@ -106,7 +106,7 @@ h3 {
 .board-side.enemy {
   flex-direction: row;
   justify-content: flex-start;
-  padding-left: 20px;
+  padding-left: 0px;
 }
 
 /* VS Badge */
@@ -312,29 +312,29 @@ h3 {
 
 .shop-slots {
   display: flex;
-  gap: 2px;
-  /* Slight gap to avoid sticking, while keeping it tight */
+  gap: 4px;
+  /* Fixed gap for predictability */
   align-items: flex-end;
 }
 
 /* Shop Specific Overrides to reduce crowding */
 .shop-slots .unit-card,
 .shop-slots .slot-placeholder {
-  width: clamp(80px, 9vw, 120px);
-  height: clamp(95px, 10.5vw, 140px);
+  width: 115px;
+  height: 135px;
   margin: 0;
   /* No overlap in shop */
 }
 
 .shop-slots .unit-image {
-  width: clamp(60px, 6.5vw, 90px);
-  height: clamp(60px, 6.5vw, 90px);
+  width: 85px;
+  height: 85px;
 }
 
 /* --- Minimal Card (Character) --- */
 .unit-card {
-  width: clamp(90px, 10vw, 135px);
-  height: clamp(105px, 11.5vw, 155px);
+  width: 130px;
+  height: 150px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -343,7 +343,8 @@ h3 {
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
   animation: unit-appear 0.4s cubic-bezier(0.2, 0, 0, 1);
-  margin: 0 clamp(-12px, -0.8vw, -6px);
+  margin: 0 -20px;
+  /* Overlap set back to -20px as requested */
 }
 
 .unit-card:hover {
@@ -392,8 +393,8 @@ h3 {
 /* No need to unflip stats or lock, since parent is not flipped */
 
 .unit-image {
-  width: clamp(70px, 7.5vw, 105px);
-  height: clamp(70px, 7.5vw, 105px);
+  width: 100px;
+  height: 100px;
   object-fit: contain;
   filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.5));
   transition: all 0.2s;
@@ -476,16 +477,16 @@ h3 {
 }
 
 .slot-placeholder {
-  width: clamp(90px, 10vw, 135px);
-  /* Unified with .unit-card clamp */
-  height: clamp(105px, 11.5vw, 155px);
-  /* Unified with .unit-card clamp */
+  width: 130px;
+  /* Unified with .unit-card */
+  height: 150px;
+  /* Unified with .unit-card */
   display: flex;
   justify-content: center;
   align-items: flex-end;
   position: relative;
-  margin: 0 clamp(-12px, -0.8vw, -6px);
-  /* Matched with unit-card (-10px equivalent) */
+  margin: 0 -20px;
+  /* Matched with unit-card (-20px) */
 }
 
 /* --- Premium Buttons --- */
@@ -918,23 +919,25 @@ h3 {
 /* Specific fix for VERY short landscape screens */
 @media (max-height: 380px) {
 
+  /* Step-based scaling for mobile landscape */
   .unit-card,
   .slot-placeholder {
     width: 65px;
     height: 80px;
+    margin: 0 -10px;
+    /* Smaller overlap for small scales */
   }
 
   .unit-image,
   .shop-slots .unit-image {
-    width: 55px;
-    height: 55px;
+    width: 50px;
+    height: 50px;
   }
 
-  /* Ensure shop units also scale down */
   .shop-slots .unit-card,
   .shop-slots .slot-placeholder {
-    width: 65px;
-    height: 80px;
+    width: 60px;
+    height: 75px;
     margin: 0 1px;
   }
 
