@@ -730,19 +730,61 @@ function App() {
             {(game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER) && (
                 <div
                     className="battle-result-overlay"
-                    style={{ background: 'rgba(0,0,0,0.85)', zIndex: 2000, flexDirection: 'column', gap: '30px', cursor: 'pointer' }}
+                    style={{
+                        background: 'rgba(0,0,0,0.7)',
+                        backdropFilter: 'blur(8px)',
+                        zIndex: 2000,
+                        flexDirection: 'column',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
                     onClick={handleRestart}
                 >
-                    <div className="result-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
-                        <div className="result-title" style={{ fontSize: '4rem', margin: 0, textShadow: '0 0 20px rgba(0,0,0,0.8)' }}>
+                    {/* Main Message - Lowered to align with team area */}
+                    <div className="result-content" style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '20px',
+                        marginTop: '5vh' // Shifting down slightly
+                    }}>
+                        <div className="result-title" style={{
+                            fontSize: 'min(5rem, 12vw)',
+                            margin: 0,
+                            textShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                            animation: 'fadeInUp 0.8s ease-out'
+                        }}>
                             {game.phase === GamePhase.VICTORY ? 'CHAMPION! 🏆' : 'GAME OVER 💀'}
                         </div>
-                        <div className="result-subtitle" style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#e5e7eb', letterSpacing: '1px' }}>
-                            {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '再接再厲！'}
+                        <div className="result-subtitle" style={{
+                            fontSize: 'min(2rem, 5vw)',
+                            fontWeight: 'bold',
+                            color: '#fff',
+                            letterSpacing: '2px',
+                            background: 'rgba(255,255,255,0.1)',
+                            padding: '10px 30px',
+                            borderRadius: '30px',
+                            animation: 'fadeInUp 1s ease-out'
+                        }}>
+                            {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '遺憾！下次再努力吧'}
                         </div>
-                        <div style={{ marginTop: '20px', color: '#aaa', fontSize: '1.2rem', animation: 'pulse 1.5s infinite' }}>
-                            [ 點擊任意處重新開始 ]
-                        </div>
+                    </div>
+
+                    {/* Operational Area - Decoupled to bottom */}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: '10%',
+                        color: '#ddd',
+                        fontSize: '1.1rem',
+                        letterSpacing: '1px',
+                        animation: 'pulse 2s infinite',
+                        background: 'rgba(0,0,0,0.5)',
+                        padding: '8px 20px',
+                        borderRadius: '20px'
+                    }}>
+                        [ 點擊任意處重新開始 ]
                     </div>
                 </div>
             )}
