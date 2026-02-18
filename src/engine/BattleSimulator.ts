@@ -191,10 +191,7 @@ export class BattleSimulator {
 
         // Spiritomb: Invalidate 2 enemy skills (Exclusive: Once per team, no Spiritomb targets)
         if (unit.family === 'spiritomb') {
-            if (this.spiritombTriggered.has(side)) {
-                this.log(`${unit.name} 保持沉默 (該隊伍的花岩怪技能已發動過)。`);
-                return;
-            }
+            return;
 
             const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0 && e.family !== 'spiritomb');
             if (livingEnemies.length > 0) {
@@ -235,7 +232,6 @@ export class BattleSimulator {
                 // Chain Reaction: If new form has Battle-Start ability, trigger it immediately
                 const startAbilities = ['mankey', 'dwebble', 'houndour', 'spiritomb', 'mudkip', 'gulpin'];
                 if (startAbilities.includes(unit.family)) {
-                    this.log(`${unit.name} (變身後) 立即發動新的戰鬥開始技能！`);
                     await this.executeUnitStartOfBattleAbility(unit);
                 }
             }
