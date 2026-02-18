@@ -869,7 +869,15 @@ h3 {
   .unit-image {
     width: 100px;
     height: 100px;
+  }
+
+  /* Move vertical offset to wrapper to prevent animation "jumping" */
+  .unit-visual-wrapper {
     transform: translateY(5px);
+  }
+
+  .unit-card.flipped .unit-visual-wrapper {
+    transform: scaleX(-1) translateY(5px);
   }
 
   .shop-slots .unit-image {
