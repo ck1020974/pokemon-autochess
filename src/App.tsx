@@ -175,7 +175,7 @@ function App() {
     const update = useForceUpdate();
 
     useEffect(() => {
-        console.log("Pokemon AutoChess v4.5 - Visual Delay & UI Sync");
+        console.log("Pokemon AutoChess v4.6 - Localized & Layout Sync");
     }, []);
 
     const handleRestart = () => {
@@ -746,48 +746,50 @@ function App() {
                     }}
                     onClick={handleRestart}
                 >
-                    {/* Main Message - Lowered to align with team area */}
+                    {/* Main Message - Positioned over the battlefield centrally */}
                     <div className="result-content" style={{
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '10px',
-                        marginTop: '2vh'
+                        gap: '15px',
+                        transform: 'translateY(-20px)' // Fine-tune vertical center
                     }}>
                         <div className="result-title" style={{
                             fontSize: 'min(5rem, 12vw)',
                             margin: 0,
-                            textShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                            textShadow: '0 10px 40px rgba(0,0,0,0.8)',
                             animation: 'fadeInUp 0.8s ease-out'
                         }}>
                             {game.phase === GamePhase.VICTORY ? 'CHAMPION! 🏆' : 'GAME OVER 💀'}
                         </div>
                         <div className="result-subtitle" style={{
-                            fontSize: 'min(2rem, 5vw)',
+                            fontSize: 'min(1.8rem, 5vw)',
                             fontWeight: 'bold',
                             color: '#fff',
                             letterSpacing: '2px',
                             background: 'rgba(255,255,255,0.1)',
-                            padding: '10px 30px',
+                            padding: '8px 30px',
                             borderRadius: '30px',
-                            animation: 'fadeInUp 1s ease-out'
+                            animation: 'fadeInUp 1s ease-out',
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
                         }}>
                             {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '遺憾！下次再努力吧'}
                         </div>
                     </div>
 
-                    {/* Operational Area - Decoupled to bottom */}
+                    {/* Operational Area - Positioned precisely at the Shop Area level */}
                     <div style={{
                         position: 'absolute',
-                        bottom: '50px',
-                        color: '#bbb',
-                        fontSize: '1rem',
+                        bottom: '80px', // Adjusted to match visual shop area
+                        color: '#eee',
+                        fontSize: '1.2rem',
                         letterSpacing: '1px',
                         animation: 'pulse 2s infinite',
-                        background: 'rgba(255,255,255,0.05)',
-                        padding: '6px 15px',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '15px'
+                        background: 'rgba(0,0,0,0.4)',
+                        padding: '10px 25px',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '20px',
+                        backdropFilter: 'blur(4px)'
                     }}>
                         [ 點擊任意處重新開始 ]
                     </div>

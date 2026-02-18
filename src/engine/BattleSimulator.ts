@@ -333,11 +333,20 @@ export class BattleSimulator {
         if (permanentTarget) permanentTarget.addGrowth(hp, atk);
 
         if (sourceName) {
-            let msg = `${unit.name} gains `;
-            if (hp > 0 && atk > 0) msg += `+${hp}/+${atk}`;
-            else if (hp > 0) msg += `+${hp} HP`;
-            else msg += `+${atk} Atk`;
-            msg += ` (${sourceName})`;
+            const translatedSource = sourceName === 'Triplets' ? '三胞胎' :
+                sourceName === 'Starter' ? '御三家' :
+                    sourceName === 'Water' ? '潮汐' :
+                        sourceName === 'Claw' ? '尖爪' :
+                            sourceName === 'Swallow' ? '吞噬' :
+                                sourceName === 'Mudkip' ? '水躍魚' :
+                                    sourceName === 'Onix' ? '大岩蛇' :
+                                        sourceName === 'Snover' ? '雪笠怪' : sourceName;
+
+            let msg = `${unit.name} `;
+            if (hp > 0 && atk > 0) msg += `提升了 ${hp}/${atk}`;
+            else if (hp > 0) msg += `提升了 ${hp} 生命`;
+            else msg += `提升了 ${atk} 攻擊`;
+            msg += ` (${translatedSource})！`;
             this.log(msg);
         }
 
@@ -349,17 +358,21 @@ export class BattleSimulator {
                 permanentTarget.stats.attack += 2;
                 permanentTarget.capStats();
             }
-            this.log(`${unit.name} gains +2 Atk from Claw!`);
+            this.log(`${unit.name} 觸發了尖爪效果，額外提升 2 點攻擊！`);
         }
     }
 
     private buffAttack(unit: Unit, amount: number, sourceName: string) {
         if (amount < 0 && unit.family === 'sneasel') {
-            this.log(`${unit.name} resists the attack reduction!`);
+            this.log(`${unit.name} 抵抗了攻擊降低效果！`);
             return;
         }
         unit.addBuff(amount);
-        this.log(`${unit.name} gains ${amount >= 0 ? '+' : ''}${amount} Atk (${sourceName})`);
+        const translatedSource = sourceName === 'Fire' ? '燃燒' :
+            sourceName === 'Angry' ? '憤怒' :
+                sourceName === 'Ghost' ? '暗影' :
+                    sourceName === 'Mankey' ? '猴怪' : sourceName;
+        this.log(`${unit.name} ${amount >= 0 ? '提升' : '降低'}了 ${Math.abs(amount)} 攻擊 (${translatedSource})！`);
     }
 
     private getTeams(unit: Unit) {
@@ -417,7 +430,7 @@ export class BattleSimulator {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0 && myTeam[idx - 1] === e.source && e.target) {
                     await this.delay(150);
-                    this.log(`${unit.name} pursuits!`);
+                    this.log(`${unit.name} 進行了追擊！`);
                     await this.dealDamage(unit, e.target, 2 * unit.level);
                 }
             });
@@ -542,7 +555,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
                     const amount = 2 * unit.level;
-                    this.growUnit(unit, amount, 0, 'Fuecoco');
+                    this.growUnit(unit, amount, 0, '呆火鱷技能');
                 }
             });
         }
@@ -648,7 +661,7 @@ export class BattleSimulator {
                         state.mimikyuGuardsUsed = used + 1;
                         this.unitStates.set(unit, state);
                         e.context.amount = 0; // Nullify damage
-                        this.log(`${unit.name}'s disguise protects it! (${state.mimikyuGuardsUsed}/${maxGuards})`);
+                        this.log(`${unit.name} 的畫皮抵擋了傷害！ (${state.mimikyuGuardsUsed}/${maxGuards})`);
                     }
                 }
             });
@@ -695,7 +708,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
                     const buff = [0, 3, 5, 10][unit.level] || 3;
-                    this.growUnit(unit, buff, buff, 'Sprigatito');
+                    this.growUnit(unit, buff, buff, '新葉喵技能');
                 }
             });
         }
@@ -770,7 +783,7 @@ export class BattleSimulator {
 
         // Snover: Knockback
         if (attacker.family === 'snover' && !this.unitStates.get(attacker)?.isSilenced) {
-            this.growUnit(attacker, 0, 1, 'Snover');
+            this.growUnit(attacker, 0, 1, attacker.name);
             if (defender.stats.hp > 0) {
                 const team = this.playerTeam.includes(defender) ? this.playerTeam : this.enemyTeam;
                 const idx = team.indexOf(defender);
@@ -805,7 +818,7 @@ export class BattleSimulator {
         if (sourceState.isLethalStrike) {
             sourceState.isLethalStrike = false; // Consume it
             amount = 99;
-            this.log(` ${target.name} 被一擊擊殺了！`);
+            this.log(`致命一擊！ ${target.name} 被擊倒了！`);
         }
 
         // Diglett: Chance to dodge (only basic attacks, not skills; Pinsir bypasses)
@@ -918,8 +931,8 @@ export class BattleSimulator {
             // Charmander family: Stats on kill (Temporary)
             if (killer.family === 'charmander') {
                 const buff = killer.level;
-                if (Math.random() < 0.5) this.growUnit(killer, 0, buff, 'Charmander');
-                else this.growUnit(killer, buff, 0, 'Charmander');
+                if (Math.random() < 0.5) this.growUnit(killer, 0, buff, '小火龍技能');
+                else this.growUnit(killer, buff, 0, '小火龍技能');
             }
 
             // Cyndaquil family: Atk and HP on kill (Temporary)
@@ -930,14 +943,14 @@ export class BattleSimulator {
                 if (used < maxTimes) {
                     kState.cyndaquilKills = used + 1;
                     this.unitStates.set(killer, kState);
-                    this.growUnit(killer, 3, 2, 'Cyndaquil');
+                    this.growUnit(killer, 3, 2, '火球鼠技能');
                 }
             }
 
             // Quaxly family: Atk on kill (Temporary)
             if (killer.family === 'quaxly') {
                 const buff = [0, 3, 5, 10][killer.level] || 3;
-                this.growUnit(killer, 0, buff, 'Quaxly');
+                this.growUnit(killer, 0, buff, '潤水鴨技能');
             }
         }
 
