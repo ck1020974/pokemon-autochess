@@ -883,15 +883,14 @@ export class BattleSimulator {
                 this.growUnit(killer, 0, 3, '狃拉技能', original);
             }
 
-            // Charmander family: Stats on kill
+            // Charmander family: Stats on kill (Temporary)
             if (killer.family === 'charmander') {
                 const buff = killer.level;
-                const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                if (Math.random() < 0.5) this.growUnit(killer, 0, buff, 'Charmander', original);
-                else this.growUnit(killer, buff, 0, 'Charmander', original);
+                if (Math.random() < 0.5) this.growUnit(killer, 0, buff, 'Charmander');
+                else this.growUnit(killer, buff, 0, 'Charmander');
             }
 
-            // Cyndaquil family: Atk and HP on kill
+            // Cyndaquil family: Atk and HP on kill (Temporary)
             if (killer.family === 'cyndaquil') {
                 const kState = this.unitStates.get(killer) || {};
                 const maxTimes = killer.level;
@@ -899,16 +898,14 @@ export class BattleSimulator {
                 if (used < maxTimes) {
                     kState.cyndaquilKills = used + 1;
                     this.unitStates.set(killer, kState);
-                    const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                    this.growUnit(killer, 3, 2, 'Cyndaquil', original);
+                    this.growUnit(killer, 3, 2, 'Cyndaquil');
                 }
             }
 
-            // Quaxly family: Atk on kill
+            // Quaxly family: Atk on kill (Temporary)
             if (killer.family === 'quaxly') {
                 const buff = [0, 3, 5, 10][killer.level] || 3;
-                const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                this.growUnit(killer, 0, buff, 'Quaxly', original);
+                this.growUnit(killer, 0, buff, 'Quaxly');
             }
         }
 

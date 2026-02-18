@@ -584,9 +584,9 @@ export class HeadlessBattleSimulator {
             if (killer.family === 'charmander') {
                 const buff = killer.level;
                 if (Math.random() < 0.5) {
-                    this.growUnit(killer, 0, buff, original);
+                    this.growUnit(killer, 0, buff);
                 } else {
-                    this.growUnit(killer, buff, 0, original);
+                    this.growUnit(killer, buff, 0);
                 }
             }
             if (killer.family === 'cyndaquil') {
@@ -594,12 +594,12 @@ export class HeadlessBattleSimulator {
                 if ((kState.cyndaquilKills || 0) < killer.level) {
                     kState.cyndaquilKills = (kState.cyndaquilKills || 0) + 1;
                     this.unitStates.set(killer, kState);
-                    this.growUnit(killer, 3, 2, original);
+                    this.growUnit(killer, 3, 2);
                 }
             }
             if (killer.family === 'quaxly') {
                 const buff = [0, 3, 5, 10][killer.level] || 3;
-                this.growUnit(killer, 0, buff, original);
+                this.growUnit(killer, 0, buff);
             }
         }
         this.compactTeams();
