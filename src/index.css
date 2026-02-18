@@ -82,8 +82,8 @@ h3 {
   min-width: fit-content;
   /* Ensure background stretches to content */
   width: 100%;
-  gap: 15px;
-  /* Controlled gap between teams and VS */
+  gap: 25px;
+  /* Increased gap to maintain breathing room around VS */
 }
 
 .board-side {
@@ -98,8 +98,8 @@ h3 {
 .board-side.player {
   flex-direction: row-reverse;
   justify-content: flex-start;
-  padding-right: 30px;
-  /* Reduced from 80px */
+  padding-right: 0px;
+  /* Reduced to 0 for symmetry with enemy */
 }
 
 /* Enemy Side (Right) - Adjusted Spacing (50px to move left) */
@@ -313,8 +313,8 @@ h3 {
 
 .shop-slots {
   display: flex;
-  gap: 12px;
-  /* Controlled spacing for shop */
+  gap: 4px;
+  /* Decreased spacing for shop */
   align-items: flex-end;
 }
 
@@ -346,8 +346,8 @@ h3 {
   cursor: pointer;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
   animation: unit-appear 0.4s cubic-bezier(0.2, 0, 0, 1);
-  margin: 0 -22px;
-  /* Increased overlap from -8px */
+  margin: 0 -32px;
+  /* Decreased spacing by increasing overlap from -22px */
 }
 
 .unit-card:hover {
@@ -468,8 +468,8 @@ h3 {
 
 /* Floor Marker */
 .floor-marker {
-  width: 55px;
-  /* Reduced to 55px */
+  width: 65px;
+  /* Adjusted to 65px */
   height: 22px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
