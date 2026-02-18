@@ -139,7 +139,7 @@ export class BattleSimulator {
                     if (front) {
                         const amount = [0, 2, 5][unit.level] || 2;
                         this.buffAttack(front, amount, 'Mankey');
-                        await this.notifySkill(unit, `提升了 ${front.name} 的攻擊力`);
+                        await this.notifySkill(unit, `提升了 ${front.name} 的攻擊`);
                         await this.delay(200);
                     }
                 }
@@ -340,8 +340,8 @@ export class BattleSimulator {
 
             let msg = `${unit.name} `;
             if (hp > 0 && atk > 0) msg += `增加了 ${hp}/${atk} 屬性`;
-            else if (hp > 0) msg += `增加了 ${hp} 生命值`;
-            else msg += `增加了 ${atk} 攻擊力`;
+            else if (hp > 0) msg += `增加了 ${hp} 生命`;
+            else msg += `增加了 ${atk} 攻擊`;
             msg += ` (${translatedSource})！`;
             this.log(msg);
         }
@@ -522,7 +522,7 @@ export class BattleSimulator {
                         this.buffAttack(unit, currentAtk, 'Heracross');
                         state.heracrossEnraged = true;
                         this.unitStates.set(unit, state);
-                        this.log(`${unit.name} 進入憤怒狀態！攻擊力翻倍！`);
+                        this.log(`${unit.name} 攻擊翻倍！`);
                     }
                 }
             });
@@ -532,7 +532,7 @@ export class BattleSimulator {
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    await this.notifySkill(unit, '提升了生命值');
+                    await this.notifySkill(unit, '提升了生命');
                     this.growUnit(unit, 2, 0, 'Onix');
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                     if (original) original.addGrowth(2, 0);
@@ -667,7 +667,7 @@ export class BattleSimulator {
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
                 if (e.source && mySide === sSide && e.source !== unit) {
                     const buff = [0, 1, 2, 3][unit.level] || 1;
-                    await this.notifySkill(unit, `激勵了召喚物 ${e.source.name}，屬性 +${buff}/+${buff}`);
+                    await this.notifySkill(unit, `激勵了 ${e.source.name} + ${buff} 與 ${buff}`);
                     this.growUnit(e.source, buff, buff, '菊草葉的激勵');
                 }
             });
@@ -722,7 +722,7 @@ export class BattleSimulator {
         if (attacker.family === 'kangaskhan' && (defender.templateId !== defender.family) && !this.unitStates.get(attacker)?.isSilenced) {
             await Promise.all(attackPromises); // Wait for the first hit
             if (defender.stats.hp > 0) {
-                await this.notifySkill(attacker, '發動了連擊');
+                await this.notifySkill(attacker, '發動了第二次攻擊');
                 attackPromises.push(this.dealDamage(attacker, defender, dmg, false));
             }
         }
@@ -736,7 +736,7 @@ export class BattleSimulator {
                 const living = opTeam.filter(u => u && u.stats.hp > 0);
                 if (living.length > 0) {
                     const target = living[Math.floor(Math.random() * living.length)];
-                    this.log(`${attacker.name} 發動二連擊，擊中了 ${target.name}！`);
+                    this.log(`${attacker.name} 對 ${target.name}！`)'發動了二連擊';
                     attackPromises.push(this.dealDamage(attacker, target, dmg));
                 }
             }
@@ -751,7 +751,7 @@ export class BattleSimulator {
                 // Priority to other enemies, but hit same if only 1 enemy total
                 const others = liveEnemies.filter(u => u !== defender);
                 const r = others.length > 0 ? others[Math.floor(Math.random() * others.length)] : defender;
-                this.log(`${attacker.name} 揮擊了 ${r.name}！`);
+                this.log(`${attacker.name} 同時對 ${r.name}！` '進行了攻擊');
                 attackPromises.push(this.dealDamage(attacker, r, dmg));
             }
         }
@@ -765,7 +765,7 @@ export class BattleSimulator {
                 const neighbor = opTeam[idx + 1];
                 if (neighbor && neighbor.stats.hp > 0) {
                     const splashDmg = [0, 2, 4, 6][attacker.level] || 2;
-                    await this.notifySkill(attacker, `波及到了 ${neighbor.name}`);
+                    await this.notifySkill(attacker, `對 ${neighbor.name} 造成了 ${splashDmg} 傷害`);
                     attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
                 }
             }
@@ -810,7 +810,7 @@ export class BattleSimulator {
         if (sourceState.isLethalStrike) {
             sourceState.isLethalStrike = false; // Consume it
             amount = 99;
-            this.log(`致命一擊！ ${target.name} 被擊倒了！`);
+            this.log(` 勾魂眼帶走了 ${target.name} `);
         }
 
         // Diglett: Chance to dodge (only basic attacks, not skills; Pinsir bypasses)
@@ -843,7 +843,7 @@ export class BattleSimulator {
             // Squirtle: Flat reduction
             if (target.family === 'squirtle' && amount > 0) amount = Math.max(1, amount - target.level);
         } else if (source) {
-            this.log(`${source.name} 穿透了防禦！`);
+            this.log(`${source.name} 穿透了一切！`);
         }
 
         target.stats.hp -= amount;

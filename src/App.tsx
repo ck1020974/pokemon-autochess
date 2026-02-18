@@ -723,7 +723,7 @@ function App() {
                                 battleResult === 'LOSS' ? 'DEFEAT ❌' : 'DRAW 🤝'}
                         </div>
                         {battleResult === 'WIN' && (game.wins === 8 || game.wins === 12) && (
-                            <div className="result-subtitle" style={{ fontSize: '1.5rem', color: '#ffffffff', marginBottom: '20px' }}>增加一點生命值 ❤️</div>
+                            <div className="result-subtitle" style={{ fontSize: '1.5rem', color: '#ffffffff', marginBottom: '20px' }}>增加一點生命 ❤️</div>
                         )}
                         <div className="result-subtitle">點擊任意處繼續</div>
                     </div>
@@ -777,7 +777,7 @@ function App() {
                             boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
                             animation: 'fadeInUp 1s ease-out'
                         }}>
-                            {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '大隱於市，下次再戰'}
+                            {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '眼前變得一片漆黑...'}
                         </div>
                     </div>
 
