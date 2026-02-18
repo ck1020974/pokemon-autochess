@@ -185,12 +185,17 @@ export class GameLoop {
      * Buy unit. 
      * Handles target logic and switches image to Battle Mode.
      */
-    public buyUnit(shopIndex: number, targetIndex?: number): boolean {
+    /**
+     * Buy unit. 
+     * Returns the index (0-4) of the slot where the unit ended up.
+     * Returns null if purchase failed.
+     */
+    public buyUnit(shopIndex: number, targetIndex?: number): number | null {
         const cost = 3;
-        if (this.gold < cost) return false;
+        if (this.gold < cost) return null;
 
         const shopUnit = this.shop.slots[shopIndex];
-        if (!shopUnit) return false;
+        if (!shopUnit) return null;
 
         // Helper to finalize purchase (Switch Image)
         const finalizePurchase = (unit: Unit) => {
@@ -202,7 +207,7 @@ export class GameLoop {
 
         // 1. Target Specified (Drag to Buy)
         if (targetIndex !== undefined) {
-            if (targetIndex < 0 || targetIndex >= this.playerTeam.length) return false;
+            if (targetIndex < 0 || targetIndex >= this.playerTeam.length) return null;
 
             const targetUnit = this.playerTeam[targetIndex];
 
@@ -212,29 +217,26 @@ export class GameLoop {
                 const boughtUnit = this.shop.buy(shopIndex);
                 if (boughtUnit) {
                     this.playerTeam[targetIndex] = finalizePurchase(boughtUnit);
-                    return true;
+                    return targetIndex;
                 }
-                return false;
+                return null;
             }
 
             // B. Target Same Family AND Same Name -> Merge
-            // This allows Non-Evolving units (Kangaskhan Lv1 + Lv2) to merge because they share Name '袋獸'.
-            // Matches User Request: "Only Non-Evolving type characters can merge like this".
-            // Prevents Bulbasaur (Lv1) merging with Ivysaur (Lv2) because Names differ.
             if (targetUnit.family === shopUnit.family && targetUnit.name === shopUnit.name) {
                 // Check Max Level
-                if (targetUnit.level >= 3) return false;
+                if (targetUnit.level >= 3) return null;
 
                 this.gold -= cost;
                 const boughtUnit = this.shop.buy(shopIndex);
                 if (boughtUnit) {
                     this.mergeUnits(targetUnit, boughtUnit);
-                    return true;
+                    return targetIndex;
                 }
-                return false;
+                return null;
             }
 
-            return false;
+            return null;
         }
 
         // 2. No Target (Click Buy)
@@ -246,65 +248,53 @@ export class GameLoop {
             const boughtUnit = this.shop.buy(shopIndex);
             if (boughtUnit) {
                 this.playerTeam[emptySlotIndex] = finalizePurchase(boughtUnit);
-                return true;
+                return emptySlotIndex;
             }
         }
         // B. If Full -> Check Auto-Merge
         else {
             // Find merge target by Family AND Name
-            const mergeTarget = this.playerTeam.find(u => u && u.family === shopUnit.family && u.name === shopUnit.name && u.level < 3);
-            if (mergeTarget) {
-                this.gold -= cost;
-                const boughtUnit = this.shop.buy(shopIndex);
-                if (boughtUnit) {
-                    this.mergeUnits(mergeTarget, boughtUnit);
-                    return true;
+            const mergeIdx = this.playerTeam.findIndex(u => u && u.family === shopUnit.family && u.name === shopUnit.name && u.level < 3);
+            if (mergeIdx !== -1) {
+                const mergeTarget = this.playerTeam[mergeIdx];
+                if (mergeTarget) {
+                    this.gold -= cost;
+                    const boughtUnit = this.shop.buy(shopIndex);
+                    if (boughtUnit) {
+                        this.mergeUnits(mergeTarget, boughtUnit);
+                        return mergeIdx;
+                    }
                 }
             }
 
             // C. Special: Triple Buy -> Evolve -> Merge into Board Evolved Unit
-            // Scenario: Shop has 3 Copies (e.g. Charmander). Board has Evolved Form (e.g. Charmeleon).
-            // Action: Pay 9g, consume 3 Charmanders, merge 1 Charmeleon into Board Charmeleon.
             const copiesIndices: number[] = [];
             this.shop.slots.forEach((u, i) => {
                 if (u && u.templateId === shopUnit.templateId) copiesIndices.push(i);
             });
 
             if (copiesIndices.length >= 3 && this.gold >= cost * 3 && shopUnit.evolveId) {
-                // Check for Evolved Target on Board
-                const evolveTarget = this.playerTeam.find(u => u && u.templateId === shopUnit.evolveId && u.level < 3);
-
-                if (evolveTarget) {
-                    // Start Transaction
-                    this.gold -= cost * 3;
-
-                    // Consume Shop Slots
-                    const indicesToBuy = copiesIndices.slice(0, 3);
-                    indicesToBuy.forEach(idx => this.shop.buy(idx)); // Allow buy to clear slot
-
-                    // Create Evolved Unit (Virtual)
-                    // We assume 3 Base = 1 Evolved (Exp 1).
-                    // We need to construct it properly to get correct stats (Level 1 Evolved).
-                    // Or just use template base stats?
-                    // Evolving 3 bases gives: Base Unit -> Evolved. Stats might carry over?
-                    // Standard evolution: keeps accumulated stats.
-                    // Here, we buy fresh ones. 
-                    // Let's create a fresh Evolved Unit from Template.
-                    const evolvedTemplate = UNIT_TEMPLATES[shopUnit.evolveId];
-                    if (evolvedTemplate) {
-                        const virtualUnit = new Unit(evolvedTemplate);
-                        virtualUnit.exp = 3; // 3 bases = 3 exp worth
-                        this.mergeUnits(evolveTarget, virtualUnit);
-
-                        // Check if there's another matching unit on board to continue merging
-                        this.checkChainMerges(evolveTarget);
-                        return true;
+                const targetIdx = this.playerTeam.findIndex(u => u && u.templateId === shopUnit.evolveId && u.level < 3);
+                if (targetIdx !== -1) {
+                    const evolveTarget = this.playerTeam[targetIdx];
+                    if (evolveTarget) {
+                        this.gold -= cost * 3;
+                        const indicesToBuy = copiesIndices.slice(0, 3);
+                        indicesToBuy.forEach(idx => this.shop.buy(idx));
+                        const evolvedTemplate = UNIT_TEMPLATES[shopUnit.evolveId];
+                        if (evolvedTemplate) {
+                            const virtualUnit = new Unit(evolvedTemplate);
+                            virtualUnit.exp = 3;
+                            this.mergeUnits(evolveTarget, virtualUnit);
+                            this.checkChainMerges(evolveTarget);
+                            return targetIdx;
+                        }
                     }
                 }
             }
         }
 
-        return false;
+        return null;
     }
 
     private checkChainMerges(unit: Unit) {

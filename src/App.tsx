@@ -555,7 +555,13 @@ function App() {
     const handleReroll = () => { game.reroll(); update(); };
     const handleBuy = () => {
         if (selected && selected.source === 'SHOP') {
-            if (game.buyUnit(selected.index)) {
+            const shopUnit = game.shop.slots[selected.index];
+            const targetIdx = game.buyUnit(selected.index);
+            if (shopUnit && targetIdx !== null) {
+                const targetUnit = game.playerTeam[targetIdx];
+                if (targetUnit && targetUnit.level > shopUnit.level) {
+                    triggerEvolutionEffect(targetUnit);
+                }
                 setSelected(null);
                 update();
             }
@@ -606,8 +612,9 @@ function App() {
                 } else if (sourceLoc === 'SHOP') {
                     // Try to Buy or Synthesize from Shop
                     const shopUnit = game.shop.slots[sourceIndex];
-                    if (shopUnit && game.buyUnit(sourceIndex, index)) {
-                        const targetUnit = game.playerTeam[index];
+                    const targetIdx = game.buyUnit(sourceIndex, index);
+                    if (shopUnit && targetIdx !== null) {
+                        const targetUnit = game.playerTeam[targetIdx];
                         if (targetUnit && targetUnit.level > shopUnit.level) {
                             triggerEvolutionEffect(targetUnit);
                         }
@@ -667,8 +674,9 @@ function App() {
                 }
             } else if (source === 'SHOP') {
                 const shopUnit = game.shop.slots[sourceIndex];
-                if (shopUnit && game.buyUnit(sourceIndex, targetIndex)) {
-                    const targetUnit = game.playerTeam[targetIndex];
+                const targetIdx = game.buyUnit(sourceIndex, targetIndex);
+                if (shopUnit && targetIdx !== null) {
+                    const targetUnit = game.playerTeam[targetIdx];
                     if (targetUnit && targetUnit.level > shopUnit.level) {
                         triggerEvolutionEffect(targetUnit);
                     }

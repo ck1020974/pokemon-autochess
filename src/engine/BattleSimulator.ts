@@ -332,7 +332,13 @@ export class BattleSimulator {
     }
 
     private getTeams(unit: Unit) {
-        const isPlayer = this.playerTeam.includes(unit);
+        // Use includes first, then fall back to initialPlayerSet for dead/removed units
+        const inPlayer = this.playerTeam.includes(unit);
+        const inEnemy = this.enemyTeam.includes(unit);
+        let isPlayer: boolean;
+        if (inPlayer) isPlayer = true;
+        else if (inEnemy) isPlayer = false;
+        else isPlayer = this.initialPlayerSet.has(unit); // Fallback for removed units
         const myTeam = isPlayer ? this.playerTeam : this.enemyTeam;
         const opTeam = isPlayer ? this.enemyTeam : this.playerTeam;
         const side = isPlayer ? 'player' : 'enemy';
@@ -515,7 +521,11 @@ export class BattleSimulator {
                 if (e.source === unit) {
                     const { myTeam } = this.getTeams(unit);
                     let idx = myTeam.indexOf(unit);
-                    if (idx === -1) return;
+                    // If unit already removed from array (e.g. by AOE chain), find a fallback slot
+                    if (idx === -1) {
+                        idx = myTeam.findIndex(u => !u || u.stats.hp <= 0);
+                        if (idx === -1) idx = 0; // Last resort: put at front
+                    }
 
                     const count = unit.level; // 1, 2, 3 based on level/star
                     await this.notifySkill(unit, '種子機關槍', `召喚了 ${count} 隻小樹苗`);
