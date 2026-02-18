@@ -63,18 +63,27 @@ h3 {
 /* --- Split Board Layout --- */
 .board-container {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  flex-direction: column;
   position: relative;
-  min-height: 200px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: var(--border-radius-lg);
   padding: 20px;
   margin-bottom: 5px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+
+.board-teams-horizontal {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  min-width: fit-content;
+  /* Ensure background stretches to content */
+  width: 100%;
 }
 
 .board-side {
-  flex: 1;
   display: flex;
   gap: 0px;
   padding: 10px 0;
@@ -255,11 +264,13 @@ h3 {
 .shop-container {
   display: flex;
   gap: 15px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: var(--border-radius-lg);
-  padding: 10px 15px;
+  padding: 15px;
   align-items: center;
-  height: 150px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
 }
 
 /* Left Controls */
@@ -271,7 +282,7 @@ h3 {
   gap: 8px;
   padding-right: 15px;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
-  height: 100%;
+  flex-shrink: 0;
 }
 
 .shop-info-row {
@@ -805,6 +816,11 @@ h3 {
     height: 70px;
   }
 
+  .board-container,
+  .shop-container {
+    padding: 10px 5px;
+  }
+
   .floor-marker {
     width: 60px;
     height: 15px;
@@ -818,7 +834,6 @@ h3 {
   }
 
   .shop-container {
-    padding: 10px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     width: 100%;

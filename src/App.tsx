@@ -655,55 +655,59 @@ function App() {
                     </div>
                 )}
 
-                {/* Left Side: Player Team - NO FLIP */}
-                <div className="board-side player">
-                    {Array.from({ length: 5 }).map((_, i) => {
-                        /* Safe access: displayPlayerTeam might be smaller than 5 if units died in simulator. 
-                           If undefined or null, we render empty placeholder. */
-                        const unit = displayPlayerTeam?.[i] || null;
-                        const isInteractive = game.phase === GamePhase.SHOP;
-                        return (
-                            <div
-                                key={unit ? unit.id : `empty-${i}`} // Use stable ID to prevent class inheritance
-                                id={unit ? `unit-wrapper-${unit.id}` : undefined}
-                                className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''}`}
-                                onDragOver={isInteractive ? onDragOver : undefined}
-                                onDrop={isInteractive ? (e) => onDrop(e, i) : undefined}
-                                onClick={!unit ? () => handleSelect(null, i, 'BOARD') : undefined}
-                            >
-                                <UnitCard
-                                    unit={unit}
-                                    onClick={() => handleSelect(unit, i, 'BOARD')}
-                                    draggable={isInteractive && !!unit}
-                                    onDragStart={(e: React.DragEvent) => onDragStart(e, i, 'BOARD')}
-                                    isInteractive={isInteractive}
-                                    isSelected={selected?.unit === unit && selected?.source === 'BOARD'}
-                                    silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
-                                />
-                            </div>
-                        );
-                    })}
-                </div>
+            <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => setSelected(null)}>
+                {/* Board header/synergies would go here if any */}
+                <div className="board-teams-horizontal">
+                    {/* Left Side: Player Team - NO FLIP */}
+                    <div className="board-side player">
+                        {Array.from({ length: 5 }).map((_, i) => {
+                            const unit = displayPlayerTeam?.[i] || null;
+                            const isInteractive = game.phase === GamePhase.SHOP;
+                            return (
+                                <div
+                                    key={unit ? unit.id : `empty-${i}`} // Use stable ID to prevent class inheritance
+                                    id={unit ? `unit-wrapper-${unit.id}` : undefined}
+                                    className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''}`}
+                                    onDragOver={isInteractive ? onDragOver : undefined}
+                                    onDrop={isInteractive ? (e) => onDrop(e, i) : undefined}
+                                    onClick={!unit ? () => handleSelect(null, i, 'BOARD') : undefined}
+                                >
+                                    <UnitCard
+                                        unit={unit}
+                                        onClick={() => handleSelect(unit, i, 'BOARD')}
+                                        draggable={isInteractive && !!unit}
+                                        onDragStart={(e: React.DragEvent) => onDragStart(e, i, 'BOARD')}
+                                        isInteractive={isInteractive}
+                                        isSelected={selected?.unit === unit && selected?.source === 'BOARD'}
+                                        silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
 
-                {/* Right Side: Enemy Team - FLIPPED */}
-                <div className="board-side enemy">
-                    {Array.from({ length: 5 }).map((_, i) => {
-                        const unit = displayEnemyTeam?.[i] || null;
-                        return (
-                            <div
-                                key={unit ? unit.id : `empty-${i}`} // Use stable ID
-                                id={unit ? `unit-wrapper-${unit.id}` : undefined}
-                                className="unit-wrapper"
-                            >
-                                <UnitCard
-                                    unit={unit}
-                                    onClick={() => handleSelect(unit, i, 'ENEMY')}
-                                    flipped={true} /* Enemy faces Left */
-                                    silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
-                                />
-                            </div>
-                        );
-                    })}
+                    <div className="board-vs">VS</div>
+
+                    {/* Right Side: Enemy Team - FLIPPED */}
+                    <div className="board-side enemy">
+                        {Array.from({ length: 5 }).map((_, i) => {
+                            const unit = displayEnemyTeam?.[i] || null;
+                            return (
+                                <div
+                                    key={unit ? unit.id : `empty-${i}`} // Use stable ID
+                                    id={unit ? `unit-wrapper-${unit.id}` : undefined}
+                                    className="unit-wrapper"
+                                >
+                                    <UnitCard
+                                        unit={unit}
+                                        onClick={() => handleSelect(unit, i, 'ENEMY')}
+                                        flipped={true} /* Enemy faces Left */
+                                        silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
 
