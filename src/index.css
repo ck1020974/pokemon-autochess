@@ -850,19 +850,19 @@ h3 {
   }
 
   .board-side {
-    min-height: 100px;
+    min-height: 120px;
   }
 
   .unit-card,
   .slot-placeholder {
-    width: 75px;
-    height: 90px;
-    margin: 0 -4px;
+    width: 82px;
+    height: 105px;
+    margin: 0 -6px;
   }
 
   .unit-image {
-    width: 70px;
-    height: 70px;
+    width: 78px;
+    height: 78px;
   }
 
   .floor-marker {
@@ -917,20 +917,13 @@ h3 {
   }
 
   .shop-slots {
-    gap: 6px;
+    gap: 12px;
   }
 
-  /* Shop cards smaller on mobile */
+  /* Removed shop-specific scaling to keep them same size as team area */
   .shop-slots .unit-card,
   .shop-slots .slot-placeholder {
-    width: 55px !important;
-    height: 70px !important;
     margin: 0 !important;
-  }
-
-  .shop-slots .unit-image {
-    width: 50px !important;
-    height: 50px !important;
   }
 
   .reroll-icon-btn {
