@@ -760,140 +760,161 @@ h3 {
   animation: hurt 0.15s ease-out;
 }
 
-/* --- Mobile Responsiveness --- */
-@media (max-width: 850px) {
+/* --- Mobile Responsiveness (Optimized for Landscape) --- */
+@media (max-width: 950px) or (max-height: 500px) {
   #root {
-    padding: 10px 5px;
+    padding: 5px;
   }
 
   .header {
-    font-size: 0.8rem;
-    gap: 8px;
-    padding: 10px 5px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .header span {
-    white-space: nowrap;
+    font-size: 0.75rem;
+    gap: 10px;
+    padding: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .game-container {
-    gap: 15px;
+    gap: 10px;
   }
 
+  /* 1. Scale down Board Section */
   .board-container {
-    padding: 10px 5px;
-    min-height: 140px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    justify-content: flex-start;
+    padding: 10px;
+    min-height: auto;
   }
 
   .board-side {
-    min-height: 120px;
-    flex: none;
-    /* Allow horizontal expansion if needed */
-  }
-
-  .board-side.player {
-    padding-right: 20px;
-  }
-
-  .board-side.enemy {
-    padding-left: 20px;
+    min-height: 100px;
   }
 
   .unit-card,
   .slot-placeholder {
-    width: 80px;
-    height: 100px;
-    margin: 0 -4px;
+    width: 75px;
+    /* Scaled down from 115px */
+    height: 90px;
+    /* Scaled down from 140px */
+    margin: 0 -6px;
   }
 
   .unit-image {
+    width: 65px;
+    height: 65px;
+  }
+
+  .floor-marker {
+    width: 55px;
+    height: 12px;
+    bottom: 12px;
+  }
+
+  .unit-stats {
+    font-size: 0.65rem;
+    padding: 1px 4px;
+    margin-top: -6px;
+    border-radius: 6px;
+  }
+
+  .board-vs {
+    font-size: 1.2rem;
+    bottom: 25px;
+  }
+
+  /* 2. Scale down Shop Section */
+  .shop-container {
+    padding: 8px 12px;
+  }
+
+  .shop-controls {
+    width: 100px;
+    padding-right: 10px;
+    gap: 4px;
+  }
+
+  .tier-text {
+    font-size: 0.75rem !important;
+  }
+
+  .btn-premium {
+    padding: 6px;
+    font-size: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .btn-battle {
+    height: 35px !important;
+    width: 80px !important;
+  }
+
+  .shop-slots-area {
+    padding-left: 15px;
+  }
+
+  .shop-slots {
+    gap: 10px;
+  }
+
+  .reroll-icon-btn {
+    font-size: 1.5rem !important;
+    top: -10px !important;
+  }
+
+  /* 3. Detail Panel Adjustments */
+  .detail-panel {
+    width: 95vw;
+    left: 2.5vw;
+    right: 2.5vw;
+    bottom: 5px;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .detail-image {
     width: 70px;
     height: 70px;
   }
 
-  .board-container,
-  .shop-container {
-    padding: 10px 5px;
-  }
-
-  .floor-marker {
-    width: 60px;
-    height: 15px;
-    bottom: 15px;
-  }
-
-  .unit-stats {
-    font-size: 0.7rem;
-    padding: 2px 5px;
-    margin-top: -8px;
-  }
-
-  .shop-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    box-sizing: border-box;
-    height: auto;
-    min-height: 120px;
-  }
-
-  .shop-slots-area {
-    padding-left: 10px;
-    flex: none;
-  }
-
-  .shop-slots {
-    gap: 12px;
-    padding-right: 20px;
-    /* Space for the last card shadow */
-  }
-
-  .shop-controls {
-    min-width: 110px;
-    padding-right: 15px;
-  }
-
-  .btn-premium {
-    padding: 8px;
-    font-size: 0.8rem;
-    border-radius: 12px;
-  }
-
-  .shop-level-text {
-    font-size: 0.8rem;
-    top: -22px;
-  }
-
-  .detail-panel {
-    width: calc(100% - 20px);
-    right: 10px;
-    left: 10px;
-    bottom: 10px;
-    padding: 12px;
-    box-sizing: border-box;
-  }
-
-  .detail-image {
-    width: 80px;
-    height: 80px;
-  }
-
   .detail-left {
-    width: 80px;
+    width: 90px;
   }
 
-  .board-vs {
-    font-size: 1.5rem;
-    bottom: 30px;
+  .detail-name {
+    font-size: 1.1rem !important;
+  }
+
+  .btn-premium.btn-reroll,
+  .btn-premium.btn-battle {
+    height: 28px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .detail-desc {
+    font-size: 0.8rem;
+    max-height: 80px;
+    overflow-y: auto;
   }
 }
 
-/* --- Visual Selection Highlight (For Mobile DND Fallback) --- */
+/* Specific fix for VERY short landscape screens */
+@media (max-height: 380px) {
+
+  .unit-card,
+  .slot-placeholder {
+    width: 65px;
+    height: 80px;
+  }
+
+  .unit-image {
+    width: 55px;
+    height: 55px;
+  }
+
+  .header {
+    display: none;
+    /* Hide header on extremely short screens to save space */
+  }
+}
+
+/* --- Visual Selection Highlight --- */
 .unit-card.is-selected {
   outline: 3px solid #60a5fa;
   outline-offset: 4px;
