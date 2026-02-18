@@ -833,7 +833,7 @@ h3 {
   }
 
   .header {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     gap: 10px;
     padding: 5px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -856,11 +856,8 @@ h3 {
   .unit-card,
   .slot-placeholder {
     width: 75px;
-    /* Scaled down from 105px */
     height: 90px;
-    /* Scaled down from 120px */
-    margin: 0 2px;
-    /* Positive margin for breathing room on mobile */
+    margin: 0 4px;
   }
 
   .unit-image {
@@ -908,8 +905,11 @@ h3 {
   }
 
   .btn-battle {
-    height: 35px !important;
-    width: 80px !important;
+    height: 50px !important;
+    width: 50px !important;
+    border-radius: 12px !important;
+    font-size: 1.2rem !important;
+    padding: 0 !important;
   }
 
   .shop-slots-area {
@@ -917,7 +917,7 @@ h3 {
   }
 
   .shop-slots {
-    gap: 10px;
+    gap: 12px;
   }
 
   .reroll-icon-btn {
@@ -925,40 +925,50 @@ h3 {
     top: -10px !important;
   }
 
-  /* 3. Detail Panel Adjustments */
+  /* 3. Detail Panel - Right-bottom like desktop */
   .detail-panel {
-    width: 85vw !important;
-    /* Narrowed from 95vw */
-    left: 7.5vw !important;
-    /* Centered with 85vw */
-    right: 7.5vw !important;
+    width: 280px !important;
+    left: auto !important;
+    right: 10px !important;
     bottom: 10px !important;
-    padding: 8px !important;
+    padding: 10px !important;
   }
 
   .detail-image {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
   }
 
   .detail-left {
-    width: 90px;
+    width: 70px;
   }
 
   .detail-name {
-    font-size: 1.1rem !important;
+    font-size: 0.9rem !important;
   }
 
-  .btn-premium.btn-reroll,
-  .btn-premium.btn-battle {
+  .btn-premium.btn-reroll {
     height: 28px !important;
     font-size: 0.85rem !important;
   }
 
   .detail-desc {
-    font-size: 0.8rem;
-    max-height: 80px;
+    font-size: 0.75rem;
+    max-height: 60px;
     overflow-y: auto;
+  }
+
+  .detail-content {
+    gap: 8px;
+  }
+
+  .detail-stats-row {
+    padding: 5px;
+    font-size: 0.8rem;
+  }
+
+  .detail-footer {
+    height: 35px;
   }
 }
 
