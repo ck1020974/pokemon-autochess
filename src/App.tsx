@@ -491,19 +491,48 @@ function App() {
     };
 
     const handleSelect = (unit: Unit | null, index: number, source: 'SHOP' | 'BOARD' | 'ENEMY') => {
+        // Fallback for mobile DND: Click to Select, Click to Target
+        if (game.phase === GamePhase.SHOP) {
+            if (selected && (source === 'BOARD')) {
+                // We have something selected and clicked a board slot -> TARGET
+                const { index: sourceIndex, source: sourceLoc } = selected;
+
+                if (sourceLoc === 'BOARD') {
+                    if (sourceIndex !== index) {
+                        game.moveUnit(sourceIndex, index);
+                        setSelected(null);
+                        update();
+                        return;
+                    }
+                } else if (sourceLoc === 'SHOP') {
+                    if (game.buyUnit(sourceIndex, index)) {
+                        setSelected(null);
+                        update();
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Standard selection for detail panel
         if (unit) {
-            setSelected({ unit, index, source });
+            if (selected && selected.unit === unit && selected.source === source && selected.index === index) {
+                setSelected(null);
+            } else {
+                setSelected({ unit, index, source });
+            }
+        } else {
+            setSelected(null);
         }
     };
 
     // Drag Handlers
     const onDragStart = (e: React.DragEvent, index: number, source: 'SHOP' | 'BOARD') => {
         setDraggedItem({ index, source });
-
         e.dataTransfer.effectAllowed = "move";
-
-        // Close detail panel on drag
-        setSelected(null);
+        // Sync selected with dragged for visual consistency
+        const unit = source === 'SHOP' ? game.shopUnits[index].unit : game.playerTeam[index];
+        if (unit) setSelected({ unit, index, source });
     };
 
     const onDragOver = (e: React.DragEvent) => {
@@ -514,23 +543,24 @@ function App() {
     const onDrop = (e: React.DragEvent, targetIndex: number) => {
         e.preventDefault();
 
-        if (draggedItem) {
-            const { index: sourceIndex, source } = draggedItem;
+        const sourceItem = draggedItem || (selected?.source !== 'ENEMY' ? selected : null);
+
+        if (sourceItem) {
+            const { index: sourceIndex, source } = sourceItem;
 
             if (source === 'BOARD') {
-                // Move: Board -> Board
                 if (sourceIndex !== targetIndex) {
                     game.moveUnit(sourceIndex, targetIndex);
                     update();
                 }
             } else if (source === 'SHOP') {
-                // Buy: Shop -> Board (Buy and/or Merge)
                 if (game.buyUnit(sourceIndex, targetIndex)) {
                     update();
                 }
             }
         }
         setDraggedItem(null);
+        setSelected(null);
     };
 
     const displayPlayerTeam = game.phase === GamePhase.BATTLE ? simulatorRef.current?.playerTeam : game.playerTeam;
@@ -636,9 +666,10 @@ function App() {
                             <div
                                 key={unit ? unit.id : `empty-${i}`} // Use stable ID to prevent class inheritance
                                 id={unit ? `unit-wrapper-${unit.id}` : undefined}
-                                className="unit-wrapper" // Ensure base class exists
+                                className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''}`}
                                 onDragOver={isInteractive ? onDragOver : undefined}
                                 onDrop={isInteractive ? (e) => onDrop(e, i) : undefined}
+                                onClick={!unit ? () => handleSelect(null, i, 'BOARD') : undefined}
                             >
                                 <UnitCard
                                     unit={unit}
@@ -646,6 +677,7 @@ function App() {
                                     draggable={isInteractive && !!unit}
                                     onDragStart={(e: React.DragEvent) => onDragStart(e, i, 'BOARD')}
                                     isInteractive={isInteractive}
+                                    isSelected={selected?.unit === unit && selected?.source === 'BOARD'}
                                     silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
                                 />
                             </div>
@@ -918,10 +950,10 @@ function App() {
 }
 
 // UnitCard with Direct Lock & Silence Support
-function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced }: any) {
+function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, isSelected }: any) {
     if (!unit || unit.stats.hp <= 0) {
         return (
-            <div className="slot-placeholder" onDragOver={draggable ? undefined : undefined}>
+            <div className="slot-placeholder">
                 <div className="floor-marker"></div>
             </div>
         );
@@ -930,7 +962,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
     return (
         <div
             id={unit.id}
-            className={`unit-card ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''}`}
+            className={`unit-card ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${isSelected ? 'is-selected' : ''}`}
             onClick={(e) => { e.stopPropagation(); onClick(); }}
             draggable={draggable}
             onDragStart={onDragStart}

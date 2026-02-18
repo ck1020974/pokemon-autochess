@@ -748,3 +748,146 @@ h3 {
 .hurt-anim .unit-image {
   animation: hurt 0.15s ease-out;
 }
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 850px) {
+  #root {
+    padding: 10px 5px;
+  }
+
+  .header {
+    font-size: 0.8rem;
+    gap: 8px;
+    padding: 10px 5px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .header span {
+    white-space: nowrap;
+  }
+
+  .game-container {
+    gap: 15px;
+  }
+
+  .board-container {
+    padding: 10px 5px;
+    min-height: 140px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+  }
+
+  .board-side {
+    min-height: 120px;
+    flex: none;
+    /* Allow horizontal expansion if needed */
+  }
+
+  .board-side.player {
+    padding-right: 20px;
+  }
+
+  .board-side.enemy {
+    padding-left: 20px;
+  }
+
+  .unit-card,
+  .slot-placeholder {
+    width: 80px;
+    height: 100px;
+    margin: 0 -4px;
+  }
+
+  .unit-image {
+    width: 70px;
+    height: 70px;
+  }
+
+  .floor-marker {
+    width: 60px;
+    height: 15px;
+    bottom: 15px;
+  }
+
+  .unit-stats {
+    font-size: 0.7rem;
+    padding: 2px 5px;
+    margin-top: -8px;
+  }
+
+  .shop-container {
+    padding: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    box-sizing: border-box;
+    height: auto;
+    min-height: 120px;
+  }
+
+  .shop-slots-area {
+    padding-left: 10px;
+    flex: none;
+  }
+
+  .shop-slots {
+    gap: 12px;
+    padding-right: 20px;
+    /* Space for the last card shadow */
+  }
+
+  .shop-controls {
+    min-width: 110px;
+    padding-right: 15px;
+  }
+
+  .btn-premium {
+    padding: 8px;
+    font-size: 0.8rem;
+    border-radius: 12px;
+  }
+
+  .shop-level-text {
+    font-size: 0.8rem;
+    top: -22px;
+  }
+
+  .detail-panel {
+    width: calc(100% - 20px);
+    right: 10px;
+    left: 10px;
+    bottom: 10px;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+
+  .detail-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .detail-left {
+    width: 80px;
+  }
+
+  .board-vs {
+    font-size: 1.5rem;
+    bottom: 30px;
+  }
+}
+
+/* --- Visual Selection Highlight (For Mobile DND Fallback) --- */
+.unit-card.is-selected {
+  outline: 3px solid #60a5fa;
+  outline-offset: 4px;
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.6);
+  z-index: 100;
+}
+
+.slot-placeholder.is-target-eligible {
+  background: rgba(96, 165, 250, 0.2);
+  border: 2px dashed #60a5fa;
+  border-radius: 12px;
+}
