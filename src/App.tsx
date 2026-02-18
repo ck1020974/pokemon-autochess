@@ -35,7 +35,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
     return (
         <div
             id={unit.id}
-            className={`unit-card ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${isSelected ? 'is-selected' : ''}`}
+            className={`unit-card ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${isSelected ? 'is-selected' : ''} ${unit.isMergeable ? 'is-mergeable' : ''}`}
             onClick={(e) => { e.stopPropagation(); onClick(); }}
             draggable={draggable}
             onDragStart={onDragStart}
@@ -838,18 +838,23 @@ function App() {
 
                         <div className="shop-slots">
                             {/* Render Active Slots */}
-                            {game.shop.slots.map((unit: Unit | null, i: number) => (
-                                <UnitCard
-                                    key={i}
-                                    unit={unit}
-                                    onClick={() => handleSelect(unit, i, 'SHOP')}
-                                    frozen={game.shop.frozen[i]}
-                                    isInteractive={true}
-                                    draggable={!!unit && game.gold >= 3}
-                                    onDragStart={(e: React.DragEvent) => onDragStart(e, i, 'SHOP')}
-                                    onToggleFreeze={() => handleFreezeToggle(i)}
-                                />
-                            ))}
+                            {game.shop.slots.map((unit: Unit | null, i: number) => {
+                                if (unit) {
+                                    (unit as any).isMergeable = game.playerTeam.some(u => u && u.family === unit.family && u.level === unit.level);
+                                }
+                                return (
+                                    <UnitCard
+                                        key={i}
+                                        unit={unit}
+                                        onClick={() => handleSelect(unit, i, 'SHOP')}
+                                        frozen={game.shop.frozen[i]}
+                                        isInteractive={true}
+                                        draggable={!!unit && game.gold >= 3}
+                                        onDragStart={(e: React.DragEvent) => onDragStart(e, i, 'SHOP')}
+                                        onToggleFreeze={() => handleFreezeToggle(i)}
+                                    />
+                                );
+                            })}
 
                             {/* Render Locked Slots (up to 7 total) */}
                             {Array.from({ length: 7 - game.shop.slots.length }).map((_, i) => {
