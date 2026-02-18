@@ -290,19 +290,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'rattata', name: '小拉達', tier: 1, family: 'rattata',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/小拉達00.webp', battleImageUrl: 'assets/小拉達01.webp',
-        description: '死亡後召喚 2 隻 1/1 迷你拉達。', synergies: ['Normal'], evolveId: 'raticate'
+        description: '死亡後召喚 2 隻 1/1 小老鼠。', synergies: ['Normal'], evolveId: 'raticate'
     },
     raticate: {
         id: 'raticate', name: '拉達', tier: 1, family: 'rattata',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/拉達00.webp', battleImageUrl: 'assets/拉達01.webp',
-        description: '死亡後召喚 2 隻 2/2 迷你拉達。', synergies: ['Normal'], evolveId: 'raticate_final', isHiddenFromShop: true
+        description: '死亡後召喚 2 隻 2/2 小老鼠。', synergies: ['Normal'], evolveId: 'raticate_final', isHiddenFromShop: true
     },
     raticate_final: {
         id: 'raticate_final', name: '拉達', tier: 1, family: 'rattata',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/拉達00.webp', battleImageUrl: 'assets/拉達01.webp',
-        description: '死亡後召喚 2 隻 3/3 迷你拉達。', synergies: ['Normal'], isHiddenFromShop: true
+        description: '死亡後召喚 2 隻 3/3 小老鼠。', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 16. Diglett
@@ -653,7 +653,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         description: '妙蛙種子的身分。', synergies: ['Grass'], isHiddenFromShop: true
     },
     mouse: {
-        id: 'mouse', name: '迷你拉達', tier: 1, family: 'rattata',
+        id: 'mouse', name: '小老鼠', tier: 1, family: 'rattata',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/小拉達00.webp', battleImageUrl: 'assets/小拉達01.webp',
         description: '小拉達的分身。', synergies: ['Normal'], isHiddenFromShop: true

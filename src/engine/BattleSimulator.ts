@@ -120,14 +120,14 @@ export class BattleSimulator {
 
         const s = this.unitStates.get(unit);
         if (s?.isSilenced) {
-            this.log(`${unit.name} 被沉默了，無法發動戰鬥開始技能！`);
+            this.log(`${unit.name} 被沉默了，無法發動技能！`);
             return;
         }
 
         // Mankey Family: Atk buff at start
         if (unit.family === 'mankey') {
             if (unit.level >= 3) {
-                await this.notifySkill(unit, `激勵了全體友軍，基礎攻擊 +5`);
+                await this.notifySkill(unit, `激勵了友軍，全體攻擊 +5`);
                 myTeam.filter(u => u && u.stats.hp > 0).forEach(u => {
                     this.buffAttack(u, 5, 'Mankey');
                 });
@@ -149,7 +149,7 @@ export class BattleSimulator {
         // Dwebble Family: HP buff at start
         if (unit.family === 'dwebble') {
             if (unit.level >= 3) {
-                await this.notifySkill(unit, `加固了全體友軍，最大生命 +5`);
+                await this.notifySkill(unit, `團結了友軍，全體生命 +5`);
                 myTeam.filter(u => u && u.stats.hp > 0).forEach(u => {
                     this.growUnit(u, 5, 0, 'Dwebble');
                 });
@@ -161,7 +161,7 @@ export class BattleSimulator {
                     if (front) {
                         const amount = [0, 2, 5][unit.level] || 2;
                         this.growUnit(front, amount, 0, 'Dwebble');
-                        await this.notifySkill(unit, `提升了 ${front.name} 的生命值`);
+                        await this.notifySkill(unit, `提升了 ${front.name} 的生命`);
                         await this.delay(200);
                     }
                 }
@@ -181,7 +181,7 @@ export class BattleSimulator {
                     for (const e of livingEnemies) {
                         if (e.stats.hp < target.stats.hp) target = e;
                     }
-                    await this.notifySkill(unit, `對 ${target.name} 發射了火花`);
+                    await this.notifySkill(unit, `對 ${target.name} 發射了火焰`);
                     await this.dealDamage(unit, target, 4, true);
                     // Wait for death effects/compaction to settle before next fire breath
                     await this.delay(50);
@@ -296,7 +296,7 @@ export class BattleSimulator {
         if (team.length === 0) return;
         if (this.getSynergyCountForUnit(team[0], 'Triplets') >= 3) {
             team.filter(u => u && u.synergies.includes('Triplets')).forEach(u => {
-                this.growUnit(u, 4, 4, 'Triplets');
+                this.growUnit(u, 3, 3, 'Triplets');
             });
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
@@ -316,7 +316,7 @@ export class BattleSimulator {
 
                 // User Request: 33% of lifetime Max HP
                 const dmg = Math.ceil(target.stats.maxHp * 0.33);
-                this.log(`冰雹效果：${target.name} 受到 ${dmg} 點傷害 (血量 33%)！`);
+                this.log(`${target.name} 受到 ${dmg} 點傷害 (血量 33%)！`);
                 await this.dealDamage(null, target, dmg, true);
                 await this.delay(100);
             }
@@ -339,9 +339,9 @@ export class BattleSimulator {
                                         sourceName === 'Snover' ? '雪笠怪' : sourceName;
 
             let msg = `${unit.name} `;
-            if (hp > 0 && atk > 0) msg += `提升了 ${hp}/${atk}`;
-            else if (hp > 0) msg += `提升了 ${hp} 生命`;
-            else msg += `提升了 ${atk} 攻擊`;
+            if (hp > 0 && atk > 0) msg += `增加了 ${hp}/${atk} 屬性`;
+            else if (hp > 0) msg += `增加了 ${hp} 生命值`;
+            else msg += `增加了 ${atk} 攻擊力`;
             msg += ` (${translatedSource})！`;
             this.log(msg);
         }
@@ -354,15 +354,11 @@ export class BattleSimulator {
                 permanentTarget.stats.attack += 2;
                 permanentTarget.capStats();
             }
-            this.log(`${unit.name} 觸發了尖爪效果，額外提升 2 點攻擊！`);
+            this.log(`${unit.name} 額外提升 2 點攻擊！`);
         }
     }
 
     private buffAttack(unit: Unit, amount: number, sourceName: string) {
-        if (amount < 0 && unit.family === 'sneasel') {
-            this.log(`${unit.name} 抵抗了攻擊降低效果！`);
-            return;
-        }
         unit.addBuff(amount);
         const translatedSource = sourceName === 'Fire' ? '燃燒' :
             sourceName === 'Angry' ? '憤怒' :
@@ -510,7 +506,7 @@ export class BattleSimulator {
                     if (!state.isLethalStrike) {
                         state.isLethalStrike = true;
                         this.unitStates.set(unit, state);
-                        this.log(`${unit.name} 準備進行致命一擊！`);
+                        this.log(`${unit.name} 發動了致命一擊！`);
                     }
                 }
             });
@@ -570,7 +566,7 @@ export class BattleSimulator {
                     }
 
                     const count = unit.level; // 1, 2, 3 based on level/star
-                    await this.notifySkill(unit, `召喚了 ${count} 隻小樹苗`);
+                    await this.notifySkill(unit, `召喚了 ${count} 隻小種子`);
                     await this.delay(200);
                     for (let i = 0; i < count; i++) {
                         // Re-fetch team reference (compactTeams may replace the array object)
@@ -595,7 +591,7 @@ export class BattleSimulator {
                         if (deathIdx === -1) deathIdx = 0;
                     }
 
-                    await this.notifySkill(unit, '召喚了同伴');
+                    await this.notifySkill(unit, '召喚了小老鼠');
                     await this.delay(200);
                     const stats = [0, 1, 2, 3][unit.level] || 1;
                     for (let i = 0; i < 2; i++) {
@@ -616,7 +612,7 @@ export class BattleSimulator {
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[Math.floor(Math.random() * living.length)];
-                        await this.notifySkill(unit, `對 ${target.name} 下了詛咒`);
+                        await this.notifySkill(unit, `對 ${target.name} 降下了詛咒`);
                         await this.delay(400);
                         const dmg = [0, 2, 5, 99][unit.level] || 2;
                         await this.dealDamage(unit, target, dmg, true);
@@ -657,7 +653,7 @@ export class BattleSimulator {
                         state.mimikyuGuardsUsed = used + 1;
                         this.unitStates.set(unit, state);
                         e.context.amount = 0; // Nullify damage
-                        this.log(`${unit.name} 的畫皮抵擋了傷害！ (${state.mimikyuGuardsUsed}/${maxGuards})`);
+                        this.log(`${unit.name} 抵擋了傷害！ (${state.mimikyuGuardsUsed}/${maxGuards})`);
                     }
                 }
             });
