@@ -10,19 +10,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'bulbasaur', name: '妙蛙種子', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/妙蛙種子00.webp', battleImageUrl: 'assets/妙蛙種子01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], evolveId: 'ivysaur'
+        description: '死亡後召喚 1 隻 1/1 小種子。', synergies: ['Starter', 'Grass'], evolveId: 'ivysaur'
     },
     ivysaur: {
         id: 'ivysaur', name: '妙蛙草', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/妙蛙草00.webp', battleImageUrl: 'assets/妙蛙草01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], evolveId: 'venusaur', isHiddenFromShop: true
+        description: '死亡後召喚 2 隻 1/1 小種子。', synergies: ['Starter', 'Grass'], evolveId: 'venusaur', isHiddenFromShop: true
     },
     venusaur: {
         id: 'venusaur', name: '妙蛙花', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/妙蛙花00.webp', battleImageUrl: 'assets/妙蛙花01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '死亡後召喚 3 隻 1/1 小種子。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 2. Charmander
@@ -30,19 +30,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'charmander', name: '小火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/小火龍00.webp', battleImageUrl: 'assets/小火龍01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
+        description: '擊殺敵方後隨機獲得 +1 攻擊 或 生命。', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
     },
     charmeleon: {
         id: 'charmeleon', name: '火恐龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/火恐龍00.webp', battleImageUrl: 'assets/火恐龍01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
+        description: '擊殺敵方後隨機獲得 +2 攻擊 或 生命。', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
     },
     charizard: {
         id: 'charizard', name: '噴火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/噴火龍00.webp', battleImageUrl: 'assets/噴火龍01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '擊殺敵方後隨機獲得 +3 攻擊 或 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 3. Squirtle
@@ -50,19 +50,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'squirtle', name: '傑尼龜', tier: 1, family: 'squirtle',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/傑尼龜00.webp', battleImageUrl: 'assets/傑尼龜01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], evolveId: 'wartortle'
+        description: '受到的傷害減少 1 (最低為 1)。', synergies: ['Starter', 'Water'], evolveId: 'wartortle'
     },
     wartortle: {
         id: 'wartortle', name: '卡咪龜', tier: 1, family: 'squirtle',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/卡咪龜00.webp', battleImageUrl: 'assets/卡咪龜01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], evolveId: 'blastoise', isHiddenFromShop: true
+        description: '受到的傷害減少 2 (最低為 1)。', synergies: ['Starter', 'Water'], evolveId: 'blastoise', isHiddenFromShop: true
     },
     blastoise: {
         id: 'blastoise', name: '水箭龜', tier: 1, family: 'squirtle',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/水箭龜00.webp', battleImageUrl: 'assets/水箭龜01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '受到的傷害減少 3 (最低為 1)。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 4. Gastly
@@ -90,19 +90,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'chikorita', name: '菊草葉', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/菊草葉00.webp', battleImageUrl: 'assets/菊草葉01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], evolveId: 'bayleef'
+        description: '友軍召喚物 +1 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'bayleef'
     },
     bayleef: {
         id: 'bayleef', name: '月桂葉', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/月桂葉00.webp', battleImageUrl: 'assets/月桂葉01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
+        description: '友軍召喚物 +2 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
     },
     meganium: {
         id: 'meganium', name: '大竺葵', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/大竺葵00.webp', battleImageUrl: 'assets/大竺葵01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '友軍召喚物 +3 攻擊 與 生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 6. Cyndaquil
@@ -110,19 +110,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'cyndaquil', name: '火球鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火球鼠00.webp', battleImageUrl: 'assets/火球鼠01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
+        description: '擊殺後獲得 +2 攻擊 與 +3 生命 (每場戰鬥最多 1 次)。', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
     },
     quilava: {
         id: 'quilava', name: '火岩鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火岩鼠00.webp', battleImageUrl: 'assets/火岩鼠01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
+        description: '擊殺後獲得 +2 攻擊 與 +3 生命 (每場戰鬥最多 2 次)。', synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
     },
     typhlosion: {
         id: 'typhlosion', name: '火爆獸', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火爆獸00.webp', battleImageUrl: 'assets/火爆獸01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '擊殺後獲得 +2 攻擊 與 +3 生命 (每場戰鬥最多 3 次)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 7. Totodile
@@ -130,19 +130,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'totodile', name: '小鋸鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/小鋸鱷00.webp', battleImageUrl: 'assets/小鋸鱷01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], evolveId: 'croconaw'
+        description: '攻擊時，同時對後排敵人造成 2 傷害。', synergies: ['Starter', 'Water'], evolveId: 'croconaw'
     },
     croconaw: {
         id: 'croconaw', name: '藍鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/藍鱷00.webp', battleImageUrl: 'assets/藍鱷01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
+        description: '攻擊時，同時對後排敵人造成 4 傷害。', synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
     },
     feraligatr: {
         id: 'feraligatr', name: '大力鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/大力鱷00.webp', battleImageUrl: 'assets/大力鱷01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '攻擊時，同時對後排敵人造成 6 傷害。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 8. Igglybuff (New)
@@ -170,19 +170,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'treecko', name: '木守宮', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/木守宮00.webp', battleImageUrl: 'assets/木守宮01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], evolveId: 'grovyle'
+        description: '召喚友軍後對首位敵方造成 2 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'grovyle'
     },
     grovyle: {
         id: 'grovyle', name: '森林蜥蜴', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/森林蜥蜴00.webp', battleImageUrl: 'assets/森林蜥蜴01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], evolveId: 'sceptile', isHiddenFromShop: true
+        description: '召喚友軍後對首位敵方造成 4 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'sceptile', isHiddenFromShop: true
     },
     sceptile: {
         id: 'sceptile', name: '蜥蜴王', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/蜥蜴王00.webp', battleImageUrl: 'assets/蜥蜴王01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '召喚友軍後對首位敵方造成 6 傷害。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 10. Torchic
@@ -190,19 +190,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'torchic', name: '火稚雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/火稚雞00.webp', battleImageUrl: 'assets/火稚雞01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], evolveId: 'combusken'
+        description: '前方友軍攻擊時，對目標造成 2 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'combusken'
     },
     combusken: {
         id: 'combusken', name: '力壯雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/力壯雞00.webp', battleImageUrl: 'assets/力壯雞01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], evolveId: 'blaziken', isHiddenFromShop: true
+        description: '前方友軍攻擊時，對目標造成 4 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'blaziken', isHiddenFromShop: true
     },
     blaziken: {
         id: 'blaziken', name: '火焰雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/火焰雞00.webp', battleImageUrl: 'assets/火焰雞01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '前方友軍攻擊時，對目標造成 6 傷害。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 11. Mudkip
@@ -210,19 +210,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'mudkip', name: '水躍魚', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/水躍魚00.webp', battleImageUrl: 'assets/水躍魚01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
+        description: '戰鬥開始時，前方友軍增加 3 生命 與 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
     },
     marshtomp: {
         id: 'marshtomp', name: '沼躍魚', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/沼躍魚00.webp', battleImageUrl: 'assets/沼躍魚01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍增加 5 生命 與 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
     },
     swampert: {
         id: 'swampert', name: '巨沼怪', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/巨沼怪00.webp', battleImageUrl: 'assets/巨沼怪01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍增加 10 生命 與 攻擊。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 12. Sprigatito
@@ -230,19 +230,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'sprigatito', name: '新葉喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/新葉喵00.webp', battleImageUrl: 'assets/新葉喵01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], evolveId: 'floragato'
+        description: '召喚友軍後，自身獲得 +3 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'floragato'
     },
     floragato: {
         id: 'floragato', name: '蒂蕾喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/蒂蕾喵00.webp', battleImageUrl: 'assets/蒂蕾喵01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
+        description: '召喚友軍後，自身獲得 +5 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
     },
     meowscarada: {
         id: 'meowscarada', name: '魔幻假面喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/魔幻假面喵00.webp', battleImageUrl: 'assets/魔幻假面喵01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '召喚友軍後，自身獲得 +10 攻擊 與 生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 13. Fuecoco
@@ -250,19 +250,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'fuecoco', name: '呆火鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/呆火鱷00.webp', battleImageUrl: 'assets/呆火鱷01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], evolveId: 'crocalor'
+        description: '友軍死亡後，自身獲得 +3 生命。', synergies: ['Starter', 'Fire'], evolveId: 'crocalor'
     },
     crocalor: {
         id: 'crocalor', name: '炙燙鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/炙燙鱷00.webp', battleImageUrl: 'assets/炙燙鱷01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
+        description: '友軍死亡後，自身獲得 +5 生命。', synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
     },
     skeledirge: {
         id: 'skeledirge', name: '骨紋巨聲鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/骨紋巨聲鱷00.webp', battleImageUrl: 'assets/骨紋巨聲鱷01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '友軍死亡後，自身獲得 +10 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 14. Quaxly
@@ -270,19 +270,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'quaxly', name: '潤水鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/潤水鴨00.webp', battleImageUrl: 'assets/潤水鴨01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
+        description: '擊殺敵方後，自身獲得 +3 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
     },
     quaxwell: {
         id: 'quaxwell', name: '湧躍鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/湧躍鴨00.webp', battleImageUrl: 'assets/湧躍鴨01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
+        description: '擊殺敵方後，自身獲得 +5 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
     },
     quaquaval: {
         id: 'quaquaval', name: '狂歡浪舞鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/狂歡浪舞鴨00.webp', battleImageUrl: 'assets/狂歡浪舞鴨01.webp',
-        description: '戰鬥開始時獲得 +1 攻擊 與 生命', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '擊殺敵方後，自身獲得 +10 攻擊。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 15. Rattata (Loop same name for stage 3)

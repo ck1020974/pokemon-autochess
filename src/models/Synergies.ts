@@ -10,7 +10,7 @@ export interface SynergyConfig {
 
 export const SYNERGIES: Record<string, SynergyConfig> = {
     // --- Attributes ---
-    'Starter': { id: 'Starter', name: '御三家', icon: '🌟', description: '[3] 戰鬥開始時獲得 +1 攻擊 與 生命', tiers: [3], color: '#fbbf24' },
+    'Starter': { id: 'Starter', name: '御三家', icon: '🌟', description: '[3] 戰鬥開始時 +1 攻擊 與 生命', tiers: [3], color: '#fbbf24' },
     'Grass': { id: 'Grass', name: '吸取', icon: '🌿', description: '[2/3/4] 攻擊後回復 2/3/4 生命', tiers: [2, 3, 4], color: '#4ade80' },
     'Water': { id: 'Water', name: '潮汐', icon: '💧', description: '[2/3/4] 攻擊前獲得 +1/+2/+4 生命', tiers: [2, 3, 4], color: '#60a5fa' },
     'Fire': { id: 'Fire', name: '燃燒', icon: '🔥', description: '[2/3/4] 攻擊前獲得 +1/+2/+4 攻擊', tiers: [2, 3, 4], color: '#ef4444' },
