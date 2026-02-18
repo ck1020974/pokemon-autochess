@@ -855,14 +855,14 @@ h3 {
 
   .unit-card,
   .slot-placeholder {
-    width: 60px;
-    height: 80px;
-    margin: 0 -2px;
+    width: 75px;
+    height: 90px;
+    margin: 0 -4px;
   }
 
   .unit-image {
-    width: 55px;
-    height: 55px;
+    width: 70px;
+    height: 70px;
   }
 
   .floor-marker {
@@ -913,11 +913,24 @@ h3 {
   }
 
   .shop-slots-area {
-    padding-left: 15px;
+    padding-left: 10px;
   }
 
   .shop-slots {
-    gap: 6px;
+    gap: 2px;
+  }
+
+  /* Shop cards smaller on mobile */
+  .shop-slots .unit-card,
+  .shop-slots .slot-placeholder {
+    width: 55px !important;
+    height: 70px !important;
+    margin: 0 !important;
+  }
+
+  .shop-slots .unit-image {
+    width: 50px !important;
+    height: 50px !important;
   }
 
   .reroll-icon-btn {
@@ -927,10 +940,10 @@ h3 {
 
   /* 3. Detail Panel - Right-bottom like desktop */
   .detail-panel {
-    width: 420px !important;
+    width: 360px !important;
     left: auto !important;
-    right: 10px !important;
-    bottom: 10px !important;
+    right: 20px !important;
+    bottom: 20px !important;
     padding: 12px !important;
   }
 
