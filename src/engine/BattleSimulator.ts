@@ -124,28 +124,46 @@ export class BattleSimulator {
             return;
         }
 
-        // Mankey: Front Ally +2/5/10 Atk
+        // Mankey Family: Atk buff at start
         if (unit.family === 'mankey') {
-            const idx = myTeam.indexOf(unit);
-            if (idx > 0) {
-                const front = myTeam[idx - 1];
-                if (front) {
-                    const amount = [0, 2, 5, 10][unit.level] || 2;
-                    this.buffAttack(front, amount, 'Mankey');
-                    await this.notifySkill(unit, `提升了 ${front.name} 的攻擊力`);
+            if (unit.level >= 3) {
+                // Lv3: All allies +5 Atk
+                await this.notifySkill(unit, `激勵了全體友軍，基礎攻擊 +5`);
+                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => {
+                    this.buffAttack(u, 5, 'Mankey');
+                });
+            } else {
+                // Lv1/2: Front ally +2/+5 Atk
+                const idx = myTeam.indexOf(unit);
+                if (idx > 0) {
+                    const front = myTeam[idx - 1];
+                    if (front) {
+                        const amount = [0, 2, 5][unit.level] || 2;
+                        this.buffAttack(front, amount, 'Mankey');
+                        await this.notifySkill(unit, `提升了 ${front.name} 的攻擊力`);
+                    }
                 }
             }
         }
 
-        // Dwebble: Front Ally +2/5/10 HP
+        // Dwebble Family: HP buff at start
         if (unit.family === 'dwebble') {
-            const idx = myTeam.indexOf(unit);
-            if (idx > 0) {
-                const front = myTeam[idx - 1];
-                if (front) {
-                    const amount = [0, 2, 5, 10][unit.level] || 2;
-                    this.growUnit(front, amount, 0, 'Dwebble');
-                    await this.notifySkill(unit, `提升了 ${front.name} 的生命值`);
+            if (unit.level >= 3) {
+                // Lv3: All allies +5 HP
+                await this.notifySkill(unit, `加固了全體友軍，最大生命 +5`);
+                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => {
+                    this.growUnit(u, 5, 0, 'Dwebble');
+                });
+            } else {
+                // Lv1/2: Front ally +2/+5 HP
+                const idx = myTeam.indexOf(unit);
+                if (idx > 0) {
+                    const front = myTeam[idx - 1];
+                    if (front) {
+                        const amount = [0, 2, 5][unit.level] || 2;
+                        this.growUnit(front, amount, 0, 'Dwebble');
+                        await this.notifySkill(unit, `提升了 ${front.name} 的生命值`);
+                    }
                 }
             }
         }
@@ -296,8 +314,10 @@ export class BattleSimulator {
                 // If it's a Snow member, it's immune to the synergy dmg
                 if (target.synergies.includes('Snow')) continue;
 
-                this.log(`下雪效果：${target.name} 受到 5 點傷害！`);
-                await this.dealDamage(null, target, 5, true);
+                // User Request: 33% of lifetime Max HP
+                const dmg = Math.ceil(target.stats.maxHp * 0.33);
+                this.log(`下雪效果：${target.name} 受到 ${dmg} 點傷害 (血量 33%)！`);
+                await this.dealDamage(null, target, dmg, true);
             }
         }
     }
@@ -579,7 +599,7 @@ export class BattleSimulator {
                     if (living.length > 0) {
                         const target = living[Math.floor(Math.random() * living.length)];
                         await this.notifySkill(unit, `對 ${target.name} 下了詛咒`);
-                        const dmg = [0, 2, 5, 10][unit.level] || 2;
+                        const dmg = [0, 2, 5, 99][unit.level] || 2;
                         await this.dealDamage(unit, target, dmg, true);
                     }
                 }

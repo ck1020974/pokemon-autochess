@@ -82,17 +82,25 @@ export class HeadlessBattleSimulator {
         if (s?.isSilenced) return;
 
         if (unit.family === 'mankey') {
-            const idx = myTeam.indexOf(unit);
-            if (idx > 0) {
-                const front = myTeam[idx - 1];
-                if (front) this.buffAttack(front, [0, 2, 5, 10][unit.level] || 2);
+            if (unit.level >= 3) {
+                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.buffAttack(u, 5));
+            } else {
+                const idx = myTeam.indexOf(unit);
+                if (idx > 0) {
+                    const front = myTeam[idx - 1];
+                    if (front) this.buffAttack(front, [0, 2, 5][unit.level] || 2);
+                }
             }
         }
         if (unit.family === 'dwebble') {
-            const idx = myTeam.indexOf(unit);
-            if (idx > 0) {
-                const front = myTeam[idx - 1];
-                if (front) this.growUnit(front, [0, 2, 5, 10][unit.level] || 2, 0);
+            if (unit.level >= 3) {
+                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.growUnit(u, 5, 0));
+            } else {
+                const idx = myTeam.indexOf(unit);
+                if (idx > 0) {
+                    const front = myTeam[idx - 1];
+                    if (front) this.growUnit(front, [0, 2, 5][unit.level] || 2, 0);
+                }
             }
         }
         if (unit.family === 'houndour') {
@@ -191,7 +199,8 @@ export class HeadlessBattleSimulator {
             const allUnits = [...myTeam, ...opTeam].filter(u => u !== null && u.stats.hp > 0);
             for (const target of allUnits) {
                 if (target.synergies.includes('Snow')) continue;
-                await this.dealDamage(null, target, 5, true);
+                const dmg = Math.ceil(target.stats.maxHp * 0.33);
+                await this.dealDamage(null, target, dmg, true);
             }
         }
     }
@@ -368,7 +377,7 @@ export class HeadlessBattleSimulator {
                 const living = opTeam.filter(u => u && u.stats.hp > 0);
                 if (living.length > 0) {
                     const target = living[Math.floor(Math.random() * living.length)];
-                    await this.dealDamage(unit, target, [0, 2, 5, 10][unit.level] || 2, true);
+                    await this.dealDamage(unit, target, [0, 2, 5, 99][unit.level] || 2, true);
                 }
             });
         }
