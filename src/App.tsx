@@ -480,7 +480,12 @@ function App() {
             setInitialEnemyTeam([...enemyTeam]);
 
             simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam);
-            simulatorRef.current.onUpdate = () => setBattleTick((t: number) => t + 1);
+            simulatorRef.current.onUpdate = () => {
+                if (simulatorRef.current) {
+                    setLogs([...simulatorRef.current.logs]);
+                }
+                setBattleTick((t: number) => t + 1);
+            };
             setLogs([]);
 
             const runBattleLoop = async () => {
@@ -992,8 +997,16 @@ function App() {
                 game.phase === GamePhase.BATTLE && (
                     <div style={{ position: 'relative', height: '150px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                         {/* 1. Battle Log */}
-                        <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5 }}>
-                            {logs.length > 0 ? logs[logs.length - 1].message : '戰鬥進行中...'}
+                        <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5, minHeight: '3em', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            {logs.length > 0 ? (
+                                logs.slice(-3).map((log, i) => (
+                                    <div key={i} style={{ opacity: i === 2 ? 1 : (i === 1 ? 0.6 : 0.3) }}>
+                                        {log.message}
+                                    </div>
+                                ))
+                            ) : (
+                                <div>戰鬥進行中...</div>
+                            )}
                         </div>
 
                         {/* 3. Battle Controls (Bottom) */}

@@ -708,7 +708,9 @@ export class BattleSimulator {
 
     public async performAttack(attacker: Unit, defender: Unit) {
         if (attacker.stats.hp <= 0 || defender.stats.hp <= 0) return;
-        this.log(`${attacker.name} 攻擊了 ${defender.name}！`);
+        // Ordinary attack log removed per design request to reduce clutter
+        // this.log(`${attacker.name} 攻擊了 ${defender.name}！`);
+        await this.delay(100);
 
         await this.eventBus.emit({ type: 'BEFORE_ATTACK', source: attacker, target: defender, context: {} });
 
@@ -847,8 +849,9 @@ export class BattleSimulator {
         }
 
         target.stats.hp -= amount;
-        this.log(`${target.name} 受到 ${amount} 點傷害！`);
-        if (this.onUpdate) this.onUpdate();
+        if (isSkillDamage) {
+            this.log(`${target.name} 受到 ${amount} 點傷害！`);
+        }
 
         // Hard: Death block (Synergy check)
         // Pinsir and Sableye-Revenge ignore Hard!
@@ -1055,12 +1058,12 @@ export class BattleSimulator {
     private async notifySkill(unit: Unit, message: string) {
         const fullMsg = `${unit.name} ${message}！`;
         this.log(fullMsg);
-        if (this.onUpdate) this.onUpdate();
         await this.delay(200); // 0.2s pause for visual feedback
     }
 
     private log(message: string) {
         this.logs.push({ message, turn: this.turnCount });
+        if (this.onUpdate) this.onUpdate();
     }
 
     private async playAnimation(unit: Unit, anim: string, duration: number) {
