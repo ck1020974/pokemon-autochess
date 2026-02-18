@@ -519,19 +519,20 @@ export class BattleSimulator {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source === unit) {
+                    // Capture death position ONCE before any spawning
+                    const { myTeam: initialTeam } = this.getTeams(unit);
+                    let deathIdx = initialTeam.indexOf(unit);
+                    if (deathIdx === -1) {
+                        deathIdx = initialTeam.findIndex(u => !u || u.stats.hp <= 0);
+                        if (deathIdx === -1) deathIdx = 0;
+                    }
+
                     const count = unit.level; // 1, 2, 3 based on level/star
                     await this.notifySkill(unit, '種子機關槍', `召喚了 ${count} 隻小樹苗`);
                     for (let i = 0; i < count; i++) {
-                        // Re-fetch team each iteration: compactTeams() may replace the array reference
+                        // Re-fetch team reference (compactTeams may replace the array object)
                         const { myTeam: currentTeam } = this.getTeams(unit);
-                        // Find where to insert: prefer the dead unit's original slot if still available
-                        let spawnIdx = currentTeam.indexOf(unit);
-                        if (spawnIdx === -1) {
-                            // Unit already removed/compacted; find a null/dead slot
-                            spawnIdx = currentTeam.findIndex(u => !u || u.stats.hp <= 0);
-                            if (spawnIdx === -1) spawnIdx = currentTeam.length;
-                        }
-                        await this.spawnUnit(currentTeam, spawnIdx, 'sprout', 1, 1, 1, true);
+                        await this.spawnUnit(currentTeam, deathIdx + i, 'sprout', 1, 1, 1, true);
                     }
                     await this.compactTeams();
                 }
@@ -543,16 +544,19 @@ export class BattleSimulator {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source === unit) {
+                    // Capture death position ONCE
+                    const { myTeam: initialTeam } = this.getTeams(unit);
+                    let deathIdx = initialTeam.indexOf(unit);
+                    if (deathIdx === -1) {
+                        deathIdx = initialTeam.findIndex(u => !u || u.stats.hp <= 0);
+                        if (deathIdx === -1) deathIdx = 0;
+                    }
+
                     await this.notifySkill(unit, '求救', '召喚了同伴');
                     const stats = [0, 1, 2, 3][unit.level] || 1;
                     for (let i = 0; i < 2; i++) {
                         const { myTeam: currentTeam } = this.getTeams(unit);
-                        let spawnIdx = currentTeam.indexOf(unit);
-                        if (spawnIdx === -1) {
-                            spawnIdx = currentTeam.findIndex(u => !u || u.stats.hp <= 0);
-                            if (spawnIdx === -1) spawnIdx = currentTeam.length;
-                        }
-                        await this.spawnUnit(currentTeam, spawnIdx, 'mouse', 1, stats, stats, true);
+                        await this.spawnUnit(currentTeam, deathIdx + i, 'mouse', 1, stats, stats, true);
                     }
                     await this.compactTeams();
                 }
