@@ -619,12 +619,14 @@ export class BattleSimulator {
 
         // Chikorita Family: Buff Summons
         if (unit.family === 'chikorita') {
-            this.eventBus.on('ON_FRIEND_SUMMONED', (e) => {
+            this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
-                const { myTeam } = this.getTeams(unit);
-                if (e.source && myTeam.includes(e.source) && e.source !== unit) {
+                const { side: mySide } = this.getTeams(unit);
+                const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
+                if (e.source && mySide === sSide && e.source !== unit) {
                     const buff = [0, 1, 2, 3][unit.level] || 1;
-                    this.growUnit(e.source, buff, buff, 'Chikorita');
+                    await this.notifySkill(unit, `激勵了召喚物 ${e.source.name}，屬性 +${buff}/+${buff}`);
+                    this.growUnit(e.source, buff, buff, '菊草葉的激勵');
                 }
             });
         }
@@ -633,13 +635,15 @@ export class BattleSimulator {
         if (unit.family === 'treecko') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
-                const { myTeam, opTeam } = this.getTeams(unit);
-                if (e.source && myTeam.includes(e.source) && e.source !== unit) {
+                const { side: mySide, opTeam } = this.getTeams(unit);
+                const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
+
+                if (e.source && mySide === sSide && e.source !== unit) {
                     const dmg = [0, 2, 4, 6][unit.level] || 2;
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
-                        const target = living[0]; // Target the FIRST living enemy
-                        this.log(`${unit.name} 對 ${target.name} 造成了 ${dmg} 點召喚連動傷害！`);
+                        const target = living[0];
+                        await this.notifySkill(unit, `與 ${e.source.name} 連動，對 ${target.name} 造成了 ${dmg} 傷害`);
                         await this.dealDamage(unit, target, dmg, true);
                     }
                 }
@@ -1004,10 +1008,10 @@ export class BattleSimulator {
     }
 
     private async notifySkill(unit: Unit, message: string) {
-        const fullMsg = `${unit.name} ${message}！`;
+        const fullMsg = `【技能】${unit.name} ${message}！`;
         this.log(fullMsg);
         if (this.onUpdate) this.onUpdate();
-        await this.delay(100); // 0.1s pause for better feedback
+        await this.delay(200); // 0.2s pause for visual feedback
     }
 
     private log(message: string) {
