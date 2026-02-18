@@ -1,4 +1,4 @@
-
+import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { GameLoop, GamePhase } from './engine/GameLoop';
@@ -8,10 +8,119 @@ import type { BattleLog } from './engine/BattleSimulator';
 import { UNIT_TEMPLATES } from './models/UnitFactory';
 import { SYNERGIES } from './models/Synergies';
 
+// --- Types ---
+interface SelectedUnitState {
+    unit: Unit;
+    index: number;
+    source: 'SHOP' | 'BOARD' | 'ENEMY';
+}
+
+interface DraggedItemState {
+    index: number;
+    source: 'SHOP' | 'BOARD';
+}
+
+// --- Helper Components ---
+
+// UnitCard with Direct Lock & Silence Support
+function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, isSelected }: any) {
+    if (!unit || unit.stats.hp <= 0) {
+        return (
+            <div className="slot-placeholder">
+                <div className="floor-marker"></div>
+            </div>
+        );
+    }
+
+    return (
+        <div
+            id={unit.id}
+            className={`unit-card ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${isSelected ? 'is-selected' : ''}`}
+            onClick={(e) => { e.stopPropagation(); onClick(); }}
+            draggable={draggable}
+            onDragStart={onDragStart}
+            style={{
+                cursor: isInteractive ? 'pointer' : 'default',
+                viewTransitionName: `unit-${unit.id}` as any
+            }}
+        >
+            <div className="floor-marker"></div>
+
+            {/* Silence Visual Overlay */}
+            {silenced && (
+                <>
+                    <div className="silence-lock-badge" title="技能已被封印"> 🈲 </div>
+                    <div className="silence-overlay" />
+                </>
+            )}
+
+            {/* Direct Lock Icon Button (Only if onToggleFreeze provided) */}
+            {onToggleFreeze && (
+                <div
+                    className={`card-lock-overlay ${frozen ? 'locked' : ''}`}
+                    onClick={(e) => { e.stopPropagation(); onToggleFreeze(); }}
+                    title={frozen ? "解除鎖定" : "鎖定角色"}
+                >
+                    {frozen ? '🔒' : '🔓'}
+                </div>
+            )}
+
+            <div className="unit-visual-wrapper">
+                <img
+                    src={unit.imageUrl}
+                    className="unit-image"
+                    alt="unit"
+                />
+            </div>
+
+            <div className="unit-stats">
+                <span className="stat-atk">{unit.stats.attack}</span>
+                <span className="stat-hp">{unit.stats.hp}</span>
+            </div>
+        </div>
+    );
+}
+
+// Synergy Icon Component
+function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies }: any) {
+    let activeDesc = synergy.description;
+    const isActive = count !== undefined && count >= synergy.tiers[0];
+    const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
+
+    return (
+        <div className="synergy-icon" style={style}>
+            {synergy.icon}
+            {showCount && count !== undefined && <span style={{ position: 'absolute', bottom: -5, right: -5, fontSize: '0.7rem', background: '#000', borderRadius: '50%', padding: '0 4px', border: '1px solid #333', color: '#fff' }}>{count}</span>}
+            <div className="synergy-tooltip">
+                <div style={{ fontWeight: 'bold', color: isActive ? synergy.color : '#aaa', marginBottom: '4px' }}>
+                    {synergy.icon} {synergy.name} {count !== undefined ? `(${count})` : ''}
+                </div>
+                <div style={{ marginBottom: '8px' }}>{activeDesc}</div>
+                {/* Unit thumbnails */}
+                {units && units.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '4px' }}>
+                        {units.map((u: any) => {
+                            const isUnitActive = activeFamilies?.has(u.family) || false;
+                            const unitStyle: React.CSSProperties = {
+                                width: '24px', height: '24px', objectFit: 'contain',
+                                borderRadius: '4px', background: 'rgba(0,0,0,0.3)',
+                                filter: isUnitActive ? 'none' : 'grayscale(1) brightness(0.5)',
+                                opacity: isUnitActive ? 1 : 0.5,
+                                border: 'none'
+                            };
+                            return <img key={u.id} src={u.imageUrl} alt={u.name} title={u.name} style={unitStyle} />;
+                        })}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 // Helper to force update
 function useForceUpdate() {
     const [, setTick] = useState(0);
-    return () => setTick(t => t + 1);
+    return () => setTick((t: number) => t + 1);
 }
 
 // Helper to calculate active synergies
@@ -58,54 +167,7 @@ function getSynergyStatus(team: (Unit | null)[]) {
     });
 }
 
-// Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies }: { synergy: any, count?: number, showCount?: boolean, units?: any[], activeFamilies?: Set<string> }) {
-    let activeDesc = synergy.description;
-    const isActive = count !== undefined && count >= synergy.tiers[0];
-    const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
 
-    return (
-        <div className="synergy-icon" style={style}>
-            {synergy.icon}
-            {showCount && count !== undefined && <span style={{ position: 'absolute', bottom: -5, right: -5, fontSize: '0.7rem', background: '#000', borderRadius: '50%', padding: '0 4px', border: '1px solid #333', color: '#fff' }}>{count}</span>}
-            <div className="synergy-tooltip">
-                <div style={{ fontWeight: 'bold', color: isActive ? synergy.color : '#aaa', marginBottom: '4px' }}>
-                    {synergy.icon} {synergy.name} {count !== undefined ? `(${count})` : ''}
-                </div>
-                <div style={{ marginBottom: '8px' }}>{activeDesc}</div>
-                {/* Unit thumbnails */}
-                {units && units.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '4px' }}>
-                        {units.map((u: any) => {
-                            const isUnitActive = activeFamilies?.has(u.family) || false;
-                            const unitStyle: React.CSSProperties = {
-                                width: '24px', height: '24px', objectFit: 'contain',
-                                borderRadius: '4px', background: 'rgba(0,0,0,0.3)',
-                                filter: isUnitActive ? 'none' : 'grayscale(1) brightness(0.5)',
-                                opacity: isUnitActive ? 1 : 0.5,
-                                border: 'none'
-                            };
-                            return <img key={u.id} src={u.imageUrl} alt={u.name} title={u.name} style={unitStyle} />;
-                        })}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-}
-
-// Modal State Interface
-interface SelectedUnitState {
-    unit: Unit;
-    index: number;
-    source: 'SHOP' | 'BOARD' | 'ENEMY';
-}
-
-// Drag State Interface
-interface DraggedItemState {
-    index: number;
-    source: 'SHOP' | 'BOARD';
-}
 
 function App() {
     const gameRef = useRef<GameLoop>(new GameLoop());
@@ -167,7 +229,7 @@ function App() {
         let timer: any;
         if (game.phase === GamePhase.BATTLE && !battleResult && !isPaused) {
             timer = setInterval(() => {
-                setBattleElapsedSeconds(s => s + 1);
+                setBattleElapsedSeconds((s: number) => s + 1);
             }, 1000);
         }
         return () => clearInterval(timer);
@@ -383,7 +445,7 @@ function App() {
             setInitialEnemyTeam([...enemyTeam]);
 
             simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam);
-            simulatorRef.current.onUpdate = () => setBattleTick(t => t + 1);
+            simulatorRef.current.onUpdate = () => setBattleTick((t: number) => t + 1);
             setLogs([]);
 
             const runBattleLoop = async () => {
@@ -396,7 +458,7 @@ function App() {
                 try {
                     const keepGoing = await simulatorRef.current.simulateStep();
                     setLogs([...simulatorRef.current.logs]);
-                    setBattleTick(t => t + 1);
+                    setBattleTick((t: number) => t + 1);
 
                     if (!keepGoing) {
                         if (interval) clearInterval(interval);
@@ -491,13 +553,14 @@ function App() {
     };
 
     const handleSelect = (unit: Unit | null, index: number, source: 'SHOP' | 'BOARD' | 'ENEMY') => {
-        // Fallback for mobile DND: Click to Select, Click to Target
-        if (game.phase === GamePhase.SHOP) {
-            if (selected && (source === 'BOARD')) {
-                // We have something selected and clicked a board slot -> TARGET
-                const { index: sourceIndex, source: sourceLoc } = selected;
+        // --- Fallback for mobile/touch: Click Source -> Click Target ---
+        if (game.phase === GamePhase.SHOP && selected) {
+            const { index: sourceIndex, source: sourceLoc } = selected;
 
+            // If we click a valid target location (the Board) while holding something
+            if (source === 'BOARD') {
                 if (sourceLoc === 'BOARD') {
+                    // Try to Move or Synthesize (Move logic usually handles synthesis in engine)
                     if (sourceIndex !== index) {
                         game.moveUnit(sourceIndex, index);
                         setSelected(null);
@@ -505,6 +568,7 @@ function App() {
                         return;
                     }
                 } else if (sourceLoc === 'SHOP') {
+                    // Try to Buy or Synthesize from Shop
                     if (game.buyUnit(sourceIndex, index)) {
                         setSelected(null);
                         update();
@@ -514,14 +578,16 @@ function App() {
             }
         }
 
-        // Standard selection for detail panel
+        // --- Standard selection behavior (Details panel or initial selection) ---
         if (unit) {
+            // Toggle selection if clicking the same unit
             if (selected && selected.unit === unit && selected.source === source && selected.index === index) {
                 setSelected(null);
             } else {
                 setSelected({ unit, index, source });
             }
         } else {
+            // Clicking empty slot
             setSelected(null);
         }
     };
@@ -622,31 +688,15 @@ function App() {
                 </div>
             )}
 
-            {/* Main Board Area */}
-            <div className="board-container">
-                <div className="board-vs">VS</div>
-
-                {/* Timeout Countdown (Top Position - Large) */}
-                {game.phase === GamePhase.BATTLE && !battleResult && (() => {
-                    const remaining = Math.max(0, 60 - battleElapsedSeconds);
-                    if (battleElapsedSeconds >= 30) {
-                        return (
-                            <div className="battle-timeout-overlay" style={{ top: '5%', bottom: 'auto' }}>
-                                <div className="timeout-countdown">{remaining}</div>
-                            </div>
-                        );
-                    }
-                    return null;
-                })()}
-
+            <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => setSelected(null)}>
+                {/* 1. Synergies (Player) */}
                 <div className="board-synergies">
                     {synergyStatus.map(syn => (
                         <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeFamilies={syn.activeFamilies} />
                     ))}
                 </div>
 
-                {/* Enemy Synergies (Top-Right) */}
-                {/* Use Initial Enemy Team if available (persists), else displayEnemyTeam (fallback) */}
+                {/* 2. Synergies (Enemy) */}
                 {(initialEnemyTeam.length > 0 || displayEnemyTeam) && (
                     <div className="board-synergies" style={{ left: 'auto', right: '10px', flexDirection: 'row-reverse' }}>
                         {getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || [])).map(syn => (
@@ -655,22 +705,34 @@ function App() {
                     </div>
                 )}
 
-            <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => setSelected(null)}>
-                {/* Board header/synergies would go here if any */}
+                {/* 3. Timeout Countdown */}
+                {game.phase === GamePhase.BATTLE && !battleResult && battleElapsedSeconds >= 30 && (
+                    <div className="battle-timeout-overlay" style={{ top: '5%', bottom: 'auto' }}>
+                        <div className="timeout-countdown">{Math.max(0, 60 - battleElapsedSeconds)}</div>
+                    </div>
+                )}
+
+                {/* 4. Units Area */}
                 <div className="board-teams-horizontal">
-                    {/* Left Side: Player Team - NO FLIP */}
+                    <div className="board-vs">VS</div>
+
+                    {/* Left Side: Player Team */}
                     <div className="board-side player">
                         {Array.from({ length: 5 }).map((_, i) => {
                             const unit = displayPlayerTeam?.[i] || null;
                             const isInteractive = game.phase === GamePhase.SHOP;
                             return (
                                 <div
-                                    key={unit ? unit.id : `empty-${i}`} // Use stable ID to prevent class inheritance
-                                    id={unit ? `unit-wrapper-${unit.id}` : undefined}
+                                    key={unit ? unit.id : `empty-${i}`}
                                     className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''}`}
                                     onDragOver={isInteractive ? onDragOver : undefined}
                                     onDrop={isInteractive ? (e) => onDrop(e, i) : undefined}
-                                    onClick={!unit ? () => handleSelect(null, i, 'BOARD') : undefined}
+                                    onClick={(e) => {
+                                        if (isInteractive && selected) {
+                                            e.stopPropagation();
+                                            handleSelect(unit, i, 'BOARD');
+                                        }
+                                    }}
                                 >
                                     <UnitCard
                                         unit={unit}
@@ -686,22 +748,16 @@ function App() {
                         })}
                     </div>
 
-                    <div className="board-vs">VS</div>
-
-                    {/* Right Side: Enemy Team - FLIPPED */}
+                    {/* Right Side: Enemy Team (Flipped) */}
                     <div className="board-side enemy">
                         {Array.from({ length: 5 }).map((_, i) => {
                             const unit = displayEnemyTeam?.[i] || null;
                             return (
-                                <div
-                                    key={unit ? unit.id : `empty-${i}`} // Use stable ID
-                                    id={unit ? `unit-wrapper-${unit.id}` : undefined}
-                                    className="unit-wrapper"
-                                >
+                                <div key={unit ? unit.id : `empty-${i}`} className="unit-wrapper">
                                     <UnitCard
                                         unit={unit}
                                         onClick={() => handleSelect(unit, i, 'ENEMY')}
-                                        flipped={true} /* Enemy faces Left */
+                                        flipped={true}
                                         silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
                                     />
                                 </div>
@@ -760,7 +816,7 @@ function App() {
 
                         <div className="shop-slots">
                             {/* Render Active Slots */}
-                            {game.shop.slots.map((unit, i) => (
+                            {game.shop.slots.map((unit: Unit | null, i: number) => (
                                 <UnitCard
                                     key={i}
                                     unit={unit}
@@ -931,7 +987,7 @@ function App() {
 
                                     {/* Synergies */}
                                     <div style={{ display: 'flex', gap: '4px' }}>
-                                        {selected.unit.synergies.map(synId => {
+                                        {selected.unit.synergies.map((synId: string) => {
                                             const syn = SYNERGIES[synId];
                                             if (!syn) return null;
                                             return <SynergyIcon key={synId} synergy={syn} showCount={false} />;
@@ -949,65 +1005,6 @@ function App() {
                     </div>
                 )
             }
-        </div >
-    );
-}
-
-// UnitCard with Direct Lock & Silence Support
-function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, isSelected }: any) {
-    if (!unit || unit.stats.hp <= 0) {
-        return (
-            <div className="slot-placeholder">
-                <div className="floor-marker"></div>
-            </div>
-        );
-    }
-
-    return (
-        <div
-            id={unit.id}
-            className={`unit-card ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${isSelected ? 'is-selected' : ''}`}
-            onClick={(e) => { e.stopPropagation(); onClick(); }}
-            draggable={draggable}
-            onDragStart={onDragStart}
-            style={{
-                cursor: isInteractive ? 'pointer' : 'default',
-                viewTransitionName: `unit-${unit.id}` as any
-            }}
-        >
-            <div className="floor-marker"></div>
-
-            {/* Silence Visual Overlay (Proposal 1) */}
-            {silenced && (
-                <>
-                    <div className="silence-lock-badge" title="技能已被封印"> 🈲 </div>
-                    <div className="silence-overlay" />
-                </>
-            )}
-
-            {/* Direct Lock Icon Button (Only if onToggleFreeze provided) */}
-            {onToggleFreeze && (
-                <div
-                    className={`card-lock-overlay ${frozen ? 'locked' : ''}`}
-                    onClick={(e) => { e.stopPropagation(); onToggleFreeze(); }}
-                    title={frozen ? "解除鎖定" : "鎖定角色"}
-                >
-                    {frozen ? '🔒' : '🔓'}
-                </div>
-            )}
-
-            <div className="unit-visual-wrapper">
-                <img
-                    src={unit.imageUrl}
-                    className="unit-image"
-                    alt="unit"
-                />
-            </div>
-
-            <div className="unit-stats">
-                <span className="stat-atk">{unit.stats.attack}</span>
-                <span className="stat-hp">{unit.stats.hp}</span>
-            </div>
         </div>
     );
 }
