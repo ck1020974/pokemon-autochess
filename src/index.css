@@ -399,6 +399,12 @@ h3 {
   z-index: 10;
 }
 
+/* Prevent lock button from floating up with the card */
+.unit-card:hover .card-lock-overlay,
+.unit-card.is-selected .card-lock-overlay {
+  transform: translateY(5px);
+}
+
 .reroll-icon-btn:hover {
   color: white !important;
   transform: scale(1.1);
@@ -927,14 +933,12 @@ h3 {
 
   .shop-slots .unit-card,
   .shop-slots .slot-placeholder {
+    width: 75px !important;
+    height: 90px !important;
     margin: 0 -5px !important;
   }
 
   /* Removed shop-specific scaling to keep them same size as team area */
-  .shop-slots .unit-card,
-  .shop-slots .slot-placeholder {
-    margin: 0 !important;
-  }
 
   .reroll-icon-btn {
     font-size: 1.5rem !important;
