@@ -40,7 +40,7 @@ export class GameLoop {
             if (u.family === 'meowth') {
                 const amount = [0, 1, 3, 5][u.level] || 1;
                 this.gold += amount;
-                console.log(`${u.name} grants ${amount} gold!`);
+                console.log(`${u.name} 產生了 ${amount} 金幣！`);
             }
         });
 
@@ -144,12 +144,12 @@ export class GameLoop {
             this.wins++;
             if (this.wins === 8) {
                 this.lives++;
-                console.log("Badge Earned (Win 8): +1 Life");
+                console.log("獲得勳章 (8 勝)：+1 生命");
             }
             // Elite Four Defeated at Win 12
             if (this.wins === 12) {
                 this.lives++;
-                console.log("Elite Four Defeated (Win 12): +1 Life");
+                console.log("擊敗四天王 (12 勝)：+1 生命");
             }
             if (this.wins >= 13) {
                 this.phase = GamePhase.VICTORY;

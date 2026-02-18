@@ -479,7 +479,8 @@ export class HeadlessBattleSimulator {
             const { opTeam } = this.getTeams(attacker);
             const idx = opTeam.indexOf(defender);
             if (idx !== -1 && idx < opTeam.length - 1 && opTeam[idx + 1] && opTeam[idx + 1]!.stats.hp > 0) {
-                promises.push(this.dealDamage(attacker, opTeam[idx + 1]!, Math.floor(dmg * 0.5), true));
+                const splashDmg = [0, 2, 4, 6][attacker.level] || 2;
+                promises.push(this.dealDamage(attacker, opTeam[idx + 1]!, splashDmg, true));
             }
         }
         await Promise.all(promises);
@@ -519,9 +520,9 @@ export class HeadlessBattleSimulator {
             if (Math.random() < ([0, 0.25, 0.33, 0.5][target.level] || 0.25)) return;
         }
         if (!isBypassing) {
+            // Squirtle: Flat reduction (1/2/3 based on level)
             if (target.family === 'squirtle' && !targetState.isSilenced) {
-                const reduction = [0, 1, 3, 5][target.level] || 0;
-                if (reduction > 0) amount = Math.max(1, amount - reduction);
+                amount = Math.max(1, amount - target.level);
             }
         }
         const hurtContext = { source, amount };
@@ -534,7 +535,6 @@ export class HeadlessBattleSimulator {
         }
         if (!isBypassing) {
             if (this.getSynergyCountForUnit(target, 'Slow') >= 2 && target.synergies.includes('Slow')) amount = Math.max(1, Math.ceil(amount * 2 / 3));
-            if (target.family === 'squirtle' && amount > 0) amount = Math.max(1, amount - target.level);
         }
         target.stats.hp -= amount;
         if (target.stats.hp <= 0 && !isBypassing && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2 && !targetState.hardUsed) {
@@ -644,7 +644,7 @@ export class HeadlessBattleSimulator {
         if (!pFront || !eFront) return false;
         this.turnCount++;
         await Promise.all([this.performAttack(pFront, eFront), this.performAttack(eFront, pFront)]);
-        this.compactTeams();
+        await this.compactTeams();
         return this.playerTeam.some(u => u !== null && u.stats.hp > 0) && this.enemyTeam.some(u => u !== null && u.stats.hp > 0);
     }
 

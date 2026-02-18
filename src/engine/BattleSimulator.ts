@@ -120,7 +120,7 @@ export class BattleSimulator {
 
         const s = this.unitStates.get(unit);
         if (s?.isSilenced) {
-            this.log(`${unit.name} is silenced and cannot use start-of-battle abilities!`);
+            this.log(`${unit.name} 被沉默了，無法發動戰鬥開始技能！`);
             return;
         }
 
@@ -174,7 +174,7 @@ export class BattleSimulator {
         // Spiritomb: Invalidate 2 enemy skills (Exclusive: Once per team, no Spiritomb targets)
         if (unit.family === 'spiritomb') {
             if (this.spiritombTriggered.has(side)) {
-                this.log(`${unit.name} stays silent (Team Spiritomb already triggered).`);
+                this.log(`${unit.name} 保持沉默 (該隊伍的花岩怪技能已發動過)。`);
                 return;
             }
 
@@ -186,7 +186,7 @@ export class BattleSimulator {
                     const tState = this.unitStates.get(t) || {};
                     tState.isSilenced = true;
                     this.unitStates.set(t, tState);
-                    this.log(`${unit.name} silences ${t.name}!`);
+                    this.log(`${unit.name} 封印了 ${t.name} 的技能！`);
                 }
                 this.spiritombTriggered.add(side);
             }
@@ -215,7 +215,7 @@ export class BattleSimulator {
                 // Chain Reaction: If new form has Battle-Start ability, trigger it immediately
                 const startAbilities = ['mankey', 'dwebble', 'houndour', 'spiritomb', 'mudkip', 'gulpin'];
                 if (startAbilities.includes(unit.family)) {
-                    this.log(`${unit.name} (Transformed) triggers its new start-of-battle ability!`);
+                    this.log(`${unit.name} (變身後) 立即發動新的戰鬥開始技能！`);
                     await this.executeUnitStartOfBattleAbility(unit);
                 }
             }
@@ -432,9 +432,8 @@ export class BattleSimulator {
 
                         const idx = myTeam.indexOf(unit);
                         if (idx !== -1 && idx < myTeam.length - 1) {
-                            myTeam.splice(idx, 1);
                             myTeam.push(unit);
-                            this.log(`${unit.name} retreats to the back!`);
+                            this.log(`${unit.name} 撤退到了後排！`);
                             await this.compactTeams();
                             await this.eventBus.emit({ type: 'ON_MOVE', source: unit, context: {} });
                         }
@@ -453,7 +452,7 @@ export class BattleSimulator {
                         this.heal(unit, amount);
                         state.slowpokeHealUsed = true;
                         this.unitStates.set(unit, state);
-                        this.log(`${unit.name} regenerates (+${amount} HP)!`);
+                        this.log(`${unit.name} 發動了再生 (+${amount} HP)！`);
                     }
                 }
             });
@@ -468,7 +467,7 @@ export class BattleSimulator {
                     if (!state.isLethalStrike) {
                         state.isLethalStrike = true;
                         this.unitStates.set(unit, state);
-                        this.log(`${unit.name} prepares a lethal strike!`);
+                        this.log(`${unit.name} 準備進行致命一擊！`);
                     }
                 }
             });
@@ -640,7 +639,7 @@ export class BattleSimulator {
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[0]; // Target the FIRST living enemy
-                        this.log(`${unit.name} strikes ${target.name} for summon! (Damage: ${dmg})`);
+                        this.log(`${unit.name} 對 ${target.name} 造成了 ${dmg} 點召喚連動傷害！`);
                         await this.dealDamage(unit, target, dmg, true);
                     }
                 }
@@ -662,7 +661,7 @@ export class BattleSimulator {
 
     public async performAttack(attacker: Unit, defender: Unit) {
         if (attacker.stats.hp <= 0 || defender.stats.hp <= 0) return;
-        this.log(`${attacker.name} attacks ${defender.name}!`);
+        this.log(`${attacker.name} 攻擊了 ${defender.name}！`);
 
         await this.eventBus.emit({ type: 'BEFORE_ATTACK', source: attacker, target: defender, context: {} });
 
@@ -690,7 +689,7 @@ export class BattleSimulator {
                 const living = opTeam.filter(u => u && u.stats.hp > 0);
                 if (living.length > 0) {
                     const target = living[Math.floor(Math.random() * living.length)];
-                    this.log(`${attacker.name} double hits ${target.name}!`);
+                    this.log(`${attacker.name} 發動二連擊，擊中了 ${target.name}！`);
                     attackPromises.push(this.dealDamage(attacker, target, dmg));
                 }
             }
@@ -703,12 +702,12 @@ export class BattleSimulator {
             const others = opTeam.filter(u => u && u !== defender && u.stats.hp > 0);
             if (others.length > 0) {
                 const r = others[Math.floor(Math.random() * others.length)];
-                this.log(`${attacker.name} swipes at ${r.name}!`);
+                this.log(`${attacker.name} 揮擊了 ${r.name}！`);
                 attackPromises.push(this.dealDamage(attacker, r, dmg));
             }
         }
 
-        // Totodile: Splash to neighbor
+        // Totodile: Splash to neighbor (Fixed 2, 4, 6 dmg)
         if (attacker.family === 'totodile' && !this.unitStates.get(attacker)?.isSilenced) {
             const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
             const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
@@ -716,7 +715,7 @@ export class BattleSimulator {
             if (idx !== -1 && idx < opTeam.length - 1) {
                 const neighbor = opTeam[idx + 1];
                 if (neighbor && neighbor.stats.hp > 0) {
-                    const splashDmg = Math.floor(dmg * 0.5);
+                    const splashDmg = [0, 2, 4, 6][attacker.level] || 2;
                     await this.notifySkill(attacker, '水之波動', `波及到了 ${neighbor.name}`);
                     attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
                 }
@@ -761,14 +760,14 @@ export class BattleSimulator {
         if (sourceState.isLethalStrike) {
             sourceState.isLethalStrike = false; // Consume it
             amount = 99;
-            this.log(`Critical Hit! ${target.name} is eliminated!`);
+            this.log(`致命一擊！ ${target.name} 被擊倒了！`);
         }
 
         // Diglett: Chance to dodge (only basic attacks, not skills; Pinsir bypasses)
         if (target.family === 'diglett' && !targetState.isSilenced && !isSkillDamage && !isBypassing) {
             const dodgeChance = [0, 0.25, 0.33, 0.5][target.level] || 0.25;
             if (Math.random() < dodgeChance) {
-                this.log(`${target.name} dodged!`);
+                this.log(`${target.name} 躲開了攻擊！`);
                 if (this.onUpdate) this.onUpdate();
                 return;
             }
@@ -794,11 +793,11 @@ export class BattleSimulator {
             // Squirtle: Flat reduction
             if (target.family === 'squirtle' && amount > 0) amount = Math.max(1, amount - target.level);
         } else if (source) {
-            this.log(`${source.name} penetrates defense!`);
+            this.log(`${source.name} 穿透了防禦！`);
         }
 
         target.stats.hp -= amount;
-        this.log(`${target.name} takes ${amount} damage!`);
+        this.log(`${target.name} 受到 ${amount} 點傷害！`);
         if (this.onUpdate) this.onUpdate();
 
         // Hard: Death block (Synergy check)
@@ -807,7 +806,7 @@ export class BattleSimulator {
             target.stats.hp = 1;
             targetState.hardUsed = true;
             this.unitStates.set(target, targetState);
-            this.log(`${target.name} survives via Hard!`);
+            this.log(`${target.name} 挺住了攻擊 (硬殼)！`);
         }
 
         if (target.stats.hp <= 0) {
@@ -961,7 +960,7 @@ export class BattleSimulator {
         // We count only units with HP > 0.
         const livingUnits = team.filter(u => u && u.stats.hp > 0).length;
         if (livingUnits >= 5) {
-            this.log(`No room on the field for ${newUnit.name}! (Living: ${livingUnits}/5)`);
+            this.log(`戰場已滿，無法呼叫 ${newUnit.name}！ (存活: ${livingUnits}/5)`);
             return;
         }
 
@@ -998,8 +997,7 @@ export class BattleSimulator {
         this.registerUnitAbilities(newUnit);
 
         await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
-
-        this.log(`${newUnit.name} entered the field!`);
+        this.log(`${newUnit.name} 進入了戰場！`);
         await this.delay(50);
         const el = document.getElementById(newUnit.id);
         if (el) el.classList.add('spawn-anim');
