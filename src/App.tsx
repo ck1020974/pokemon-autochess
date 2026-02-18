@@ -834,9 +834,8 @@ function App() {
                     {/* Left Controls: Compact & Side-by-Side */}
                     <div className="shop-controls" style={{ width: '100px', paddingRight: '10px' }}>
                         {/* Row 1: Shop Level Text - Higher and Better Color */}
-                        <div className="shop-info-row" style={{ justifyContent: 'center', marginBottom: '0px', marginTop: '-15px', position: 'relative' }}>
+                        <div className="shop-info-row" style={{ justifyContent: 'center', marginBottom: '0px', marginTop: '-15px' }}>
                             <span className="tier-text" style={{ color: '#e2e8f0', fontSize: '1rem', opacity: 0.9 }}>商店 Lv.{game.shop.getTier(game.turn)}</span>
-                            <div style={{ position: 'absolute', top: '-15px', right: '-10px', fontSize: '0.6rem', color: '#555' }}>v1.7</div>
                         </div>
 
                         {/* Row 2: Battle Button - Centered and Slimmer */}
@@ -994,7 +993,7 @@ function App() {
 
                             {/* Left Column: Image + Actions */}
                             <div className="detail-left" style={{ width: '140px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-                                <img src={selected.unit.imageUrl} className="detail-image" alt={selected.unit.name} style={{ width: '105px', height: '105px', objectFit: 'contain' }} />
+                                <img src={UNIT_TEMPLATES[selected.unit.templateId].imageUrl} className="detail-image" alt={selected.unit.name} style={{ width: '105px', height: '105px', objectFit: 'contain' }} />
 
                                 {/* Action Buttons (Buy/Sell) */}
                                 {selected.source === 'SHOP' && (

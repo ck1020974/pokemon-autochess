@@ -855,9 +855,9 @@ h3 {
 
   .unit-card,
   .slot-placeholder {
-    width: 86px;
-    height: 115px;
-    margin: 0 -8px;
+    width: 90px;
+    height: 120px;
+    margin: 0 -15px;
   }
 
   .unit-image {
@@ -917,7 +917,7 @@ h3 {
   }
 
   .shop-slots {
-    gap: 8px;
+    gap: 4px;
   }
 
   /* Removed shop-specific scaling to keep them same size as team area */
@@ -941,16 +941,16 @@ h3 {
   }
 
   .detail-image {
-    width: 65px !important;
-    height: 65px !important;
+    width: 60px !important;
+    height: 60px !important;
   }
 
   .detail-left {
-    width: 85px !important;
+    width: 80px !important;
   }
 
   .detail-name {
-    font-size: 0.9rem !important;
+    font-size: 1.1rem !important;
   }
 
   .btn-premium.btn-reroll {
