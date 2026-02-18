@@ -323,10 +323,15 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const s = this.unitStates.get(unit);
                 if (s?.isSilenced || e.source !== unit) return;
-                const { myTeam } = this.getTeams(unit);
-                let idx = myTeam.indexOf(unit);
-                if (idx === -1) return;
-                for (let i = 0; i < unit.level; i++) await this.spawnUnit(myTeam, idx + i, 'sprout', 1, 1, 1, true);
+                for (let i = 0; i < unit.level; i++) {
+                    const { myTeam: currentTeam } = this.getTeams(unit);
+                    let spawnIdx = currentTeam.indexOf(unit);
+                    if (spawnIdx === -1) {
+                        spawnIdx = currentTeam.findIndex(u => !u || u.stats.hp <= 0);
+                        if (spawnIdx === -1) spawnIdx = currentTeam.length;
+                    }
+                    await this.spawnUnit(currentTeam, spawnIdx, 'sprout', 1, 1, 1, true);
+                }
                 this.compactTeams();
             });
         }
@@ -334,11 +339,16 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const s = this.unitStates.get(unit);
                 if (s?.isSilenced || e.source !== unit) return;
-                const { myTeam } = this.getTeams(unit);
-                let idx = myTeam.indexOf(unit);
-                if (idx === -1) return;
                 const stats = [0, 1, 2, 3][unit.level] || 1;
-                for (let i = 0; i < 2; i++) await this.spawnUnit(myTeam, idx + i, 'mouse', 1, stats, stats, true);
+                for (let i = 0; i < 2; i++) {
+                    const { myTeam: currentTeam } = this.getTeams(unit);
+                    let spawnIdx = currentTeam.indexOf(unit);
+                    if (spawnIdx === -1) {
+                        spawnIdx = currentTeam.findIndex(u => !u || u.stats.hp <= 0);
+                        if (spawnIdx === -1) spawnIdx = currentTeam.length;
+                    }
+                    await this.spawnUnit(currentTeam, spawnIdx, 'mouse', 1, stats, stats, true);
+                }
                 this.compactTeams();
             });
         }

@@ -519,18 +519,19 @@ export class BattleSimulator {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source === unit) {
-                    const { myTeam } = this.getTeams(unit);
-                    let idx = myTeam.indexOf(unit);
-                    // If unit already removed from array (e.g. by AOE chain), find a fallback slot
-                    if (idx === -1) {
-                        idx = myTeam.findIndex(u => !u || u.stats.hp <= 0);
-                        if (idx === -1) idx = 0; // Last resort: put at front
-                    }
-
                     const count = unit.level; // 1, 2, 3 based on level/star
                     await this.notifySkill(unit, '種子機關槍', `召喚了 ${count} 隻小樹苗`);
                     for (let i = 0; i < count; i++) {
-                        await this.spawnUnit(myTeam, idx + i, 'sprout', 1, 1, 1, true);
+                        // Re-fetch team each iteration: compactTeams() may replace the array reference
+                        const { myTeam: currentTeam } = this.getTeams(unit);
+                        // Find where to insert: prefer the dead unit's original slot if still available
+                        let spawnIdx = currentTeam.indexOf(unit);
+                        if (spawnIdx === -1) {
+                            // Unit already removed/compacted; find a null/dead slot
+                            spawnIdx = currentTeam.findIndex(u => !u || u.stats.hp <= 0);
+                            if (spawnIdx === -1) spawnIdx = currentTeam.length;
+                        }
+                        await this.spawnUnit(currentTeam, spawnIdx, 'sprout', 1, 1, 1, true);
                     }
                     await this.compactTeams();
                 }
@@ -542,13 +543,16 @@ export class BattleSimulator {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source === unit) {
-                    const { myTeam } = this.getTeams(unit);
-                    let idx = myTeam.indexOf(unit);
-                    if (idx === -1) return;
                     await this.notifySkill(unit, '求救', '召喚了同伴');
                     const stats = [0, 1, 2, 3][unit.level] || 1;
                     for (let i = 0; i < 2; i++) {
-                        await this.spawnUnit(myTeam, idx + i, 'mouse', 1, stats, stats, true);
+                        const { myTeam: currentTeam } = this.getTeams(unit);
+                        let spawnIdx = currentTeam.indexOf(unit);
+                        if (spawnIdx === -1) {
+                            spawnIdx = currentTeam.findIndex(u => !u || u.stats.hp <= 0);
+                            if (spawnIdx === -1) spawnIdx = currentTeam.length;
+                        }
+                        await this.spawnUnit(currentTeam, spawnIdx, 'mouse', 1, stats, stats, true);
                     }
                     await this.compactTeams();
                 }
