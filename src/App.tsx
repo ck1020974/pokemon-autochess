@@ -998,21 +998,17 @@ function App() {
                                 {/* Action Buttons (Buy/Sell) */}
                                 {selected.source === 'SHOP' && (
                                     <button className="btn-premium btn-reroll" style={{
-                                        height: '32px', fontSize: '1rem',
-                                        marginTop: '10px',
                                         background: 'linear-gradient(to bottom, #10b981, #059669)',
-                                        border: '1px solid #10b981', color: 'white', width: '85%',
+                                        border: '1px solid #10b981', color: 'white', width: '90%',
                                         display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px'
                                     }} onClick={handleBuy}>
                                         <span>購買 $3</span>
                                     </button>
                                 )}
                                 {selected.source === 'BOARD' && game.phase === GamePhase.SHOP && (
-                                    <button className="btn-premium btn-sell-action" style={{
-                                        height: '32px', fontSize: '1rem',
-                                        marginTop: '10px',
+                                    <button className="btn-premium btn-reroll" style={{
                                         background: 'linear-gradient(to bottom, #ef4444, #dc2626)',
-                                        border: '1px solid #ef4444', width: '85%',
+                                        border: '1px solid #ef4444', width: '90%',
                                         display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px'
                                     }} onClick={handleSell}>
                                         <span>出售 $1</span>
