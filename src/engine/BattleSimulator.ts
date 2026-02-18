@@ -278,7 +278,7 @@ export class BattleSimulator {
         if (team.length === 0) return;
         if (this.getSynergyCountForUnit(team[0], 'Triplets') >= 3) {
             team.filter(u => u && u.synergies.includes('Triplets')).forEach(u => {
-                this.growUnit(u, 2, 2, 'Triplets');
+                this.growUnit(u, 4, 4, 'Triplets');
             });
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {

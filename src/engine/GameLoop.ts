@@ -120,8 +120,8 @@ export class GameLoop {
         const beetleCount = getUniqueCount(beetleUnits);
         if (beetleCount >= 2) {
             beetleUnits.forEach(u => {
-                applyBuff(u, 2, 'hp', 'Beetle');
-                applyBuff(u, 2, 'atk', 'Beetle');
+                if (Math.random() < 0.5) applyBuff(u, 2, 'atk', 'Beetle');
+                else applyBuff(u, 2, 'hp', 'Beetle');
             });
         }
 

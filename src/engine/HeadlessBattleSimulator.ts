@@ -181,7 +181,7 @@ export class HeadlessBattleSimulator {
     private async applyBattleStartSynergies(team: Unit[]) {
         if (team.length === 0) return;
         if (this.getSynergyCountForUnit(team[0], 'Triplets') >= 3) {
-            team.filter(u => u && u.synergies.includes('Triplets')).forEach(u => this.growUnit(u, 2, 2));
+            team.filter(u => u && u.synergies.includes('Triplets')).forEach(u => this.growUnit(u, 4, 4));
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
             team.filter(u => u && u.synergies.includes('Starter')).forEach(u => this.growUnit(u, 1, 1));
