@@ -855,19 +855,19 @@ h3 {
 
   .unit-card,
   .slot-placeholder {
-    width: 75px;
-    height: 90px;
-    margin: 0 4px;
+    width: 60px;
+    height: 80px;
+    margin: 0 -2px;
   }
 
   .unit-image {
-    width: 65px;
-    height: 65px;
+    width: 55px;
+    height: 55px;
   }
 
   .floor-marker {
-    width: 55px;
-    height: 12px;
+    width: 45px;
+    height: 10px;
     bottom: 12px;
   }
 
@@ -917,7 +917,7 @@ h3 {
   }
 
   .shop-slots {
-    gap: 12px;
+    gap: 6px;
   }
 
   .reroll-icon-btn {
@@ -927,11 +927,11 @@ h3 {
 
   /* 3. Detail Panel - Right-bottom like desktop */
   .detail-panel {
-    width: 280px !important;
+    width: 420px !important;
     left: auto !important;
     right: 10px !important;
     bottom: 10px !important;
-    padding: 10px !important;
+    padding: 12px !important;
   }
 
   .detail-image {
