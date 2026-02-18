@@ -771,10 +771,10 @@ function App() {
             {game.phase === GamePhase.SHOP && (
                 <div className="shop-container">
                     {/* Left Controls: Compact & Side-by-Side */}
-                    <div className="shop-controls" style={{ width: '160px', paddingRight: '10px' }}>
+                    <div className="shop-controls" style={{ width: '100px', paddingRight: '10px' }}>
                         {/* Row 1: Shop Level Text - Higher and Better Color */}
                         <div className="shop-info-row" style={{ justifyContent: 'center', marginBottom: '0px', marginTop: '-15px' }}>
-                            <span className="tier-text" style={{ color: '#e2e8f0', fontSize: '1rem', opacity: 0.9 }}>商店等級 Lv.{game.shop.getTier(game.turn)}</span>
+                            <span className="tier-text" style={{ color: '#e2e8f0', fontSize: '1rem', opacity: 0.9 }}>商店 Lv.{game.shop.getTier(game.turn)}</span>
                         </div>
 
                         {/* Row 2: Battle Button - Centered and Slimmer */}
@@ -782,9 +782,9 @@ function App() {
                             <button
                                 className="btn-premium btn-battle"
                                 onClick={handleStartBattle}
-                                style={{ height: '45px', width: '100px' }}
+                                style={{ height: '50px', width: '60px' }}
                             >
-                                <span style={{ fontSize: '1.2rem' }}>⚔️ 開戰</span>
+                                <span style={{ fontSize: '1.5rem' }}>⚔️</span>
                             </button>
                         </div>
                     </div>
