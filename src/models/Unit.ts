@@ -1,0 +1,138 @@
+
+export interface UnitStats {
+  hp: number;
+  maxHp: number;
+  attack: number;
+}
+
+export type UnitTier = 1 | 2 | 3 | 4 | 5 | 6;
+
+export interface UnitTemplate {
+  id: string; // e.g., 'bulbasaur'
+  name: string;
+  tier: UnitTier;
+  baseStats: UnitStats;
+  imageUrl: string;
+  battleImageUrl?: string; // New field
+  evolveId?: string; // ID of the unit this evolves into
+  description: string;
+  synergies: string[]; // e.g., ['Starter', 'Normal']
+  isHiddenFromShop?: boolean; // If true, this unit cannot appear in the shop
+  family?: string; // Family ID for synergy grouping
+}
+
+export class Unit {
+  public id: string; // Instance ID
+  public templateId: string;
+  public name: string;
+  public level: number = 1;
+  public exp: number = 1;
+  public stats: UnitStats;
+  public tier: UnitTier;
+  public imageUrl: string;
+  public battleImageUrl?: string; // New field
+  public evolveId?: string;
+  public synergies: string[];
+  public family: string;
+
+  constructor(template: UnitTemplate) {
+    this.id = crypto.randomUUID();
+    this.templateId = template.id;
+    this.name = template.name;
+    this.tier = template.tier;
+    this.stats = { ...template.baseStats };
+    this.imageUrl = template.imageUrl;
+    this.battleImageUrl = template.battleImageUrl;
+    this.evolveId = template.evolveId;
+    this.synergies = template.synergies || [];
+    this.family = template.family || template.id;
+    this._descriptionTemplate = template.description;
+  }
+
+  private _descriptionTemplate: string;
+
+  public get description(): string {
+    let desc = this._descriptionTemplate;
+
+    // 1. Replace "N*Lv" with calculated value
+    desc = desc.replace(/(\d+)\*Lv/g, (_, n) => (parseInt(n) * this.level).toString());
+
+    // 2. Replace remaining "Lv" with current level
+    desc = desc.replace(/Lv/g, this.level.toString());
+
+    // 3. Remove brackets [] from tags
+    desc = desc.replace(/\[(.*?)\]/g, '$1');
+
+    return desc;
+  }
+
+  public set description(value: string) {
+    this._descriptionTemplate = value;
+  }
+
+
+  // Max stats according to rules: 50/50
+  public capStats() {
+    // 1. Cap Max Values
+    if (this.stats.maxHp > 50) this.stats.maxHp = 50;
+    if (this.stats.attack > 50) this.stats.attack = 50;
+
+    // 2. Cap Current HP to Max HP (and 50 implicit)
+    if (this.stats.hp > this.stats.maxHp) this.stats.hp = this.stats.maxHp;
+  }
+
+  // Helper for Permanent/Temporary Growth (MaxHP + HP + Atk)
+  public addGrowth(hp: number, attack: number) {
+    // Growth logic: Increases both MaxHP and current HP
+    // If unit is at 50/50 Max, it stays at 50/50.
+    // If unit is at 40/50 (damaged), addGrowth(2, 0) brings it to 42/50 (Healing).
+    this.stats.maxHp += hp;
+    this.stats.hp += hp;
+    this.stats.attack += attack;
+    this.capStats();
+  }
+
+  // Helper for Attack Buff
+  public addBuff(attack: number) {
+    this.stats.attack += attack;
+    this.capStats();
+  }
+
+  public addExp(_amount: number): boolean {
+    // Level logic handled by GameLoop merge
+    return false;
+  }
+
+  // Merge logic: Highest + (SecondHighest * 0.5) + 1
+  public static mergeStats(main: Unit, sacrifice: Unit): UnitStats {
+    // Rule: "取最高值 + (次高值 * 0.5) + 1"
+
+    // Handle HP
+    const mpHp = main.stats.maxHp;
+    const spHp = sacrifice.stats.maxHp;
+    const highestHp = Math.max(mpHp, spHp);
+    const secondHp = Math.min(mpHp, spHp);
+    const newMaxHp = Math.floor(highestHp + secondHp * 0.5 + 1);
+
+    // Handle Attack
+    const mpAtk = main.stats.attack;
+    const spAtk = sacrifice.stats.attack;
+    const highestAtk = Math.max(mpAtk, spAtk);
+    const secondAtk = Math.min(mpAtk, spAtk);
+    const newAtk = Math.floor(highestAtk + secondAtk * 0.5 + 1);
+
+    // Current HP should probably scale proportionally or just heal to full?
+    // SAP rule: Current HP increases by same amount as Max HP increase? 
+    // Or just set to new Max?
+    // Let's assume heal to full on merge for simplicity/fun, or retain damage.
+    // Retaining damage: (NewMax - OldMax) + OldCurrent.
+    // Let's set current HP to NewMax (Heal) - makes game easier/rewarding.
+    const newHp = newMaxHp;
+
+    return {
+      hp: newHp,
+      maxHp: newMaxHp,
+      attack: newAtk
+    };
+  }
+}

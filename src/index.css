@@ -1,0 +1,750 @@
+:root {
+  --bg-color: #121212;
+  --text-main: #ffffff;
+  --text-dim: #a0a0a0;
+
+  --primary-gradient: linear-gradient(135deg, #3b82f6, #2563eb);
+  --accent-gradient: linear-gradient(135deg, #f59e0b, #d97706);
+  --danger-gradient: linear-gradient(135deg, #ef4444, #dc2626);
+
+  --glass-bg: rgba(30, 30, 30, 0.6);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.05);
+
+  --border-radius-lg: 16px;
+  --border-radius-md: 12px;
+  --border-radius-sm: 8px;
+
+  --modal-bg: #1e1e1e;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-color);
+  background: radial-gradient(circle at 50% 10%, #1e293b 0%, #0f172a 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: 1200px;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+h2,
+h3 {
+  margin: 0 0 15px 0;
+  font-weight: 700;
+}
+
+/* --- Containers --- */
+.game-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* --- Split Board Layout --- */
+.board-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
+  min-height: 200px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--border-radius-lg);
+  padding: 20px;
+  margin-bottom: 5px;
+}
+
+.board-side {
+  flex: 1;
+  display: flex;
+  gap: 0px;
+  padding: 10px 0;
+  min-height: 160px;
+  align-items: flex-end;
+}
+
+/* Player Side (Left) - Balanced Spacing (80px) */
+.board-side.player {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  padding-right: 80px;
+}
+
+/* Enemy Side (Right) - Adjusted Spacing (50px to move left) */
+.board-side.enemy {
+  flex-direction: row;
+  justify-content: flex-start;
+  padding-left: 50px;
+}
+
+/* VS Badge */
+.board-vs {
+  position: absolute;
+  left: 50%;
+  bottom: 50px;
+  transform: translateX(-50%);
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+  pointer-events: none;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.battle-controls-container {
+  position: absolute;
+  left: 50%;
+  bottom: 120px;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.battle-pause-btn {
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.battle-pause-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* Battle Result Overlay */
+.battle-result-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  border-radius: var(--border-radius-lg);
+  animation: fadeIn 0.3s ease-out;
+  cursor: pointer;
+}
+
+.result-content {
+  text-align: center;
+  color: white;
+  animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.result-title {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.result-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* --- Battle Timeout Overlay --- */
+.battle-timeout-overlay {
+  position: absolute;
+  top: 5%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 80;
+  pointer-events: none;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.timeout-countdown {
+  font-size: 15rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.1);
+  line-height: 0.8;
+  margin-bottom: -20px;
+  text-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+  animation: countdown-pulse 1s infinite cubic-bezier(0.4, 0, 0.6, 1);
+  transform: translateY(-20px);
+}
+
+.timeout-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+  margin-top: -20px;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.05);
+  padding: 5px 25px;
+  border-radius: 20px;
+  backdrop-filter: blur(1px);
+}
+
+@keyframes countdown-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 0.3;
+  }
+}
+
+/* --- Shop Layout (Compact Height) --- */
+.shop-container {
+  display: flex;
+  gap: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--border-radius-lg);
+  padding: 10px 15px;
+  align-items: center;
+  height: 150px;
+}
+
+/* Left Controls */
+.shop-controls {
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding-right: 15px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  height: 100%;
+}
+
+.shop-info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.tier-text {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+/* Right Shop Slots - Aligned Left */
+.shop-slots-area {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  height: 100%;
+  align-items: center;
+  padding-left: 20px;
+}
+
+.shop-slots {
+  display: flex;
+  gap: 32px;
+  align-items: flex-end;
+}
+
+/* --- Minimal Card (Character) --- */
+.unit-card {
+  width: 115px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  animation: unit-appear 0.4s cubic-bezier(0.2, 0, 0, 1);
+  margin: 0 -8px;
+}
+
+.unit-card:hover {
+  transform: scale(1.1) translateY(-5px);
+  z-index: 10;
+}
+
+.reroll-icon-btn:hover {
+  color: white !important;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+}
+
+.reroll-icon-btn:active {
+  transform: scale(0.95);
+}
+
+@keyframes unit-appear {
+  0% {
+    transform: scale(0.8) translateY(10px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Drag & Flip Logic - REVISED: Flip Image Wrapper */
+
+/* Visual Wrapper for Flip/Transform Isolation */
+.unit-visual-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-origin: center bottom;
+}
+
+/* Flip the Wrapper instead of the Image directly */
+.unit-card.flipped .unit-visual-wrapper {
+  transform: scaleX(-1);
+}
+
+/* No need to unflip stats or lock, since parent is not flipped */
+
+.unit-image {
+  width: 105px;
+  height: 105px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.5));
+  transition: all 0.2s;
+  z-index: 2;
+}
+
+
+
+
+
+/* Special Flip Removed as requested */
+/* Logic cleaned up */
+
+
+.unit-stats {
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 3px 8px;
+  border-radius: 10px;
+  margin-top: -12px;
+  z-index: 3;
+  font-size: 0.9rem;
+  font-weight: 800;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+
+.stat-atk {
+  color: #60a5fa;
+}
+
+.stat-hp {
+  color: #fca5a5;
+}
+
+/* Direct Lock Icon on Card */
+.card-lock-overlay {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 26px;
+  height: 26px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #aaa;
+  cursor: pointer;
+  z-index: 20;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s;
+}
+
+.card-lock-overlay:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: scale(1.1);
+}
+
+.card-lock-overlay.locked {
+  color: #fff;
+  border-color: #ef4444;
+  background: #ef4444;
+}
+
+/* Floor Marker */
+.floor-marker {
+  width: 90px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+  position: absolute;
+  bottom: 22px;
+  z-index: 1;
+}
+
+.slot-placeholder {
+  width: 115px;
+  height: 140px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  position: relative;
+  margin: 0 -8px;
+}
+
+/* --- Premium Buttons --- */
+.btn-premium {
+  position: relative;
+  overflow: hidden;
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 10px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.3, 1.5, 0.6, 1);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3), 0 6px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transform: translateY(0);
+}
+
+.btn-premium:hover:not(:disabled) {
+  transform: translateY(-2px);
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.btn-premium:active:not(:disabled) {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-premium:disabled {
+  filter: grayscale(1);
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-reroll {
+  background: linear-gradient(to bottom, #fcd34d, #f59e0b);
+  border: 2px solid #fbbf24;
+  color: #78350f;
+}
+
+.btn-battle {
+  background: linear-gradient(to bottom, #60a5fa, #2563eb);
+  border: 2px solid #93c5fd;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* --- Detail Panel (Specific Grid) --- */
+.detail-panel {
+  position: fixed;
+  bottom: 80px;
+  right: 40px;
+  width: 420px;
+  background: rgba(26, 26, 26, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  animation: slideInRight 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.detail-content {
+  display: flex;
+  gap: 15px;
+}
+
+.detail-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.detail-image {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+}
+
+.detail-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.detail-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-stats-row {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.detail-desc {
+  font-size: 0.9rem;
+  color: #ccc;
+  line-height: 1.4;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 8px;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.detail-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+  height: 50px;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* --- Synergy Icons & Tooltips --- */
+.synergy-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+  /* For detail panel */
+}
+
+.board-synergies {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px;
+  z-index: 20;
+  pointer-events: none;
+  /* Let clicks pass through, but handle children pointer events? */
+}
+
+.board-synergies .synergy-icon {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px;
+  border-radius: 50%;
+  pointer-events: auto;
+  /* Enable hover */
+  width: 26.4px;
+  height: 26.4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.synergy-icon {
+  position: relative;
+  font-size: 1.2rem;
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.synergy-icon:hover {
+  transform: scale(1.2);
+}
+
+.synergy-tooltip {
+  visibility: hidden;
+  position: absolute;
+  top: 110%;
+  left: 20%;
+  transform: none;
+  background: rgba(10, 10, 10, 0.95);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  width: max-content;
+  max-width: 200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  font-weight: normal;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.synergy-icon:hover .synergy-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Detail Panel Override: Show Above (Top-Left feel) */
+.detail-panel .synergy-tooltip {
+  top: auto;
+  bottom: 120%;
+  left: auto;
+  right: -20px;
+  width: 250px;
+}
+
+/* Detail Panel Adjustment */
+.detail-synergies {
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+/* --- Battle Animations --- */
+.unit-wrapper {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.4s ease, right 0.4s ease;
+}
+
+@keyframes clash {
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(var(--clash-offset));
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes death {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes hurt {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.death-anim .unit-image {
+  animation: death 0.5s forwards ease-in;
+}
+
+.clash-anim .unit-image {
+  animation: clash 0.3s ease-out;
+}
+
+.hurt-anim .unit-image {
+  animation: hurt 0.15s ease-out;
+}
