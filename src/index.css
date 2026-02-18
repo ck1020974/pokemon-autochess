@@ -855,14 +855,19 @@ h3 {
 
   .unit-card,
   .slot-placeholder {
-    width: 90px;
-    height: 120px;
+    width: 84px;
+    height: 104px;
     margin: 0 -15px;
   }
 
   .unit-image {
-    width: 80px;
-    height: 80px;
+    width: 84px;
+    height: 84px;
+  }
+
+  .shop-slots .unit-image {
+    width: 70px;
+    height: 70px;
   }
 
   .floor-marker {
@@ -941,8 +946,8 @@ h3 {
   }
 
   .detail-image {
-    width: 60px !important;
-    height: 60px !important;
+    width: 70px !important;
+    height: 70px !important;
   }
 
   .detail-left {
