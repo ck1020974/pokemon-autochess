@@ -736,7 +736,7 @@ export class BattleSimulator {
                 const living = opTeam.filter(u => u && u.stats.hp > 0);
                 if (living.length > 0) {
                     const target = living[Math.floor(Math.random() * living.length)];
-                    this.log(`${attacker.name} 對 ${target.name}！`)'發動了二連擊';
+                    this.log(`${attacker.name} 對 ${target.name} 發動了二連擊！`);
                     attackPromises.push(this.dealDamage(attacker, target, dmg));
                 }
             }
@@ -751,7 +751,7 @@ export class BattleSimulator {
                 // Priority to other enemies, but hit same if only 1 enemy total
                 const others = liveEnemies.filter(u => u !== defender);
                 const r = others.length > 0 ? others[Math.floor(Math.random() * others.length)] : defender;
-                this.log(`${attacker.name} 同時對 ${r.name}！` '進行了攻擊');
+                this.log(`${attacker.name} 同時對 ${r.name} 進行了攻擊！`);
                 attackPromises.push(this.dealDamage(attacker, r, dmg));
             }
         }
