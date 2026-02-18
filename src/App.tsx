@@ -993,7 +993,7 @@ function App() {
 
                             {/* Left Column: Image + Actions */}
                             <div className="detail-left" style={{ width: '140px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-                                <img src={UNIT_TEMPLATES[selected.unit.templateId].imageUrl} className="detail-image" alt={selected.unit.name} style={{ width: '105px', height: '105px', objectFit: 'contain' }} />
+                                <img src={selected.unit.imageUrl} className="detail-image" alt={selected.unit.name} style={{ width: '105px', height: '105px', objectFit: 'contain' }} />
 
                                 {/* Action Buttons (Buy/Sell) */}
                                 {selected.source === 'SHOP' && (
@@ -1008,7 +1008,7 @@ function App() {
                                     </button>
                                 )}
                                 {selected.source === 'BOARD' && game.phase === GamePhase.SHOP && (
-                                    <button className="btn-premium btn-battle" style={{
+                                    <button className="btn-premium btn-sell-action" style={{
                                         height: '32px', fontSize: '1rem',
                                         marginTop: '10px',
                                         background: 'linear-gradient(to bottom, #ef4444, #dc2626)',

@@ -850,19 +850,19 @@ h3 {
   }
 
   .board-side {
-    min-height: 120px;
+    min-height: 130px;
   }
 
   .unit-card,
   .slot-placeholder {
-    width: 82px;
-    height: 105px;
-    margin: 0 -6px;
+    width: 86px;
+    height: 115px;
+    margin: 0 -8px;
   }
 
   .unit-image {
-    width: 78px;
-    height: 78px;
+    width: 80px;
+    height: 80px;
   }
 
   .floor-marker {
@@ -917,7 +917,7 @@ h3 {
   }
 
   .shop-slots {
-    gap: 12px;
+    gap: 8px;
   }
 
   /* Removed shop-specific scaling to keep them same size as team area */
@@ -941,12 +941,12 @@ h3 {
   }
 
   .detail-image {
-    width: 60px;
-    height: 60px;
+    width: 65px !important;
+    height: 65px !important;
   }
 
   .detail-left {
-    width: 70px;
+    width: 85px !important;
   }
 
   .detail-name {
