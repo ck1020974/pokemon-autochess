@@ -861,7 +861,7 @@ h3 {
 
   .unit-card,
   .slot-placeholder {
-    width: 90px;
+    width: 88px;
     height: 105px;
     margin: 0 -14px;
   }
@@ -879,7 +879,7 @@ h3 {
   .floor-marker {
     width: 45px;
     height: 10px;
-    bottom: 5px;
+    bottom: 15px;
   }
 
   .unit-stats {
@@ -897,7 +897,7 @@ h3 {
   /* 2. Scale down Shop Section */
   .shop-container {
     padding: 12px 10px;
-    min-height: 125px;
+    min-height: 140px;
   }
 
   .shop-controls {
@@ -929,14 +929,14 @@ h3 {
   }
 
   .shop-slots {
-    gap: 0;
+    gap: 6px;
   }
 
   .shop-slots .unit-card,
   .shop-slots .slot-placeholder {
     width: 75px !important;
     height: 90px !important;
-    margin: 0 0px !important;
+    margin: 0 !important;
   }
 
   /* Removed shop-specific scaling to keep them same size as team area */
@@ -944,6 +944,7 @@ h3 {
   .reroll-icon-btn {
     font-size: 1.5rem !important;
     top: -10px !important;
+    left: -35px !important;
   }
 
   /* 3. Detail Panel - Right-bottom like desktop */

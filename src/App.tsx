@@ -1008,7 +1008,7 @@ function App() {
                                 {selected.source === 'BOARD' && game.phase === GamePhase.SHOP && (
                                     <button className="btn-premium btn-reroll" style={{
                                         background: 'linear-gradient(to bottom, #ef4444, #dc2626)',
-                                        border: '1px solid #ef4444', width: '90%',
+                                        border: '1px solid #ef4444', width: '90%', color: 'white',
                                         display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px'
                                     }} onClick={handleSell}>
                                         <span>出售 $1</span>
