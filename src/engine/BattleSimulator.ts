@@ -949,27 +949,9 @@ export class BattleSimulator {
             state.isAbsoluteKill = false;
         }
 
-        await this.eventBus.emit({ type: 'AFTER_DEATH', source: unit, context: { killer } });
-
-        // Remove from team AFTER emitting AFTER_DEATH
-        // This ensures summons triggered by DEATH events can find the target unit's index in the array
-        // Remove from team AFTER emitting AFTER_DEATH
-        // This ensures summons triggered by DEATH events can find the target unit's index in the array
-        if (this.playerTeam.includes(unit)) {
-            const idx = this.playerTeam.indexOf(unit);
-            // Fix: Only clear if the slot hasn't been taken by a new summon already
-            if (this.playerTeam[idx] === unit || (this.playerTeam[idx] && this.playerTeam[idx].stats.hp <= 0)) {
-                this.playerTeam[idx] = null as any;
-            }
-        } else if (this.enemyTeam.includes(unit)) {
-            const idx = this.enemyTeam.indexOf(unit);
-            // Fix: Only clear if the slot hasn't been taken by a new summon already
-            if (this.enemyTeam[idx] === unit || (this.enemyTeam[idx] && this.enemyTeam[idx].stats.hp <= 0)) {
-                this.enemyTeam[idx] = null as any;
-            }
-        }
-
-        if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
+        // 1. Process Killer Rewards FIRST (Before unit is removed)
+        // This allows simultaneous kills to potentially save the killer (e.g. Cyndaquil)
+        if (killer && !this.unitStates.get(killer)?.isSilenced) {
             // Sneasel family: Atk on kill (Permanent)
             if (killer.family === 'sneasel') {
                 const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
@@ -1008,6 +990,27 @@ export class BattleSimulator {
             }
         }
 
+        // 2. Emit AFTER_DEATH (Fuecoco etc. triggers here)
+        await this.eventBus.emit({ type: 'AFTER_DEATH', source: unit, context: { killer } });
+
+        // 3. Final Survival Check: Did ANY skill (Fuecoco, Cyndaquil, etc.) bring this unit back to life?
+        if (unit.stats.hp > 0) {
+            this.log(`${unit.name} 奇蹟般地撐住了！`);
+            return; // ABORT DEATH
+        }
+
+        // 4. Remove from team
+        if (this.playerTeam.includes(unit)) {
+            const idx = this.playerTeam.indexOf(unit);
+            if (this.playerTeam[idx] === unit) {
+                this.playerTeam[idx] = null as any;
+            }
+        } else if (this.enemyTeam.includes(unit)) {
+            const idx = this.enemyTeam.indexOf(unit);
+            if (this.enemyTeam[idx] === unit) {
+                this.enemyTeam[idx] = null as any;
+            }
+        }
 
         // Special: If unit just died but didn't trigger immediate spawn (which uses insert:true),
         // we compact. But spawnUnit(insert:true) handles displacement correctly.
