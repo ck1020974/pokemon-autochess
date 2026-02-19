@@ -753,33 +753,43 @@ function App() {
                 }}>
                     <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                         <h1 style={{ fontSize: '3.5rem', margin: '0 0 10px 0', letterSpacing: '4px', background: 'linear-gradient(to bottom, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>POKEMON AUTOCHESS</h1>
-                        <p style={{ color: '#64748b', fontSize: '1.2rem', letterSpacing: '2px' }}>選擇您的挑戰難度</p>
                     </div>
 
-                    <div className="difficulty-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', maxWidth: '600px', width: '90%' }}>
+                    <div className="difficulty-grid" style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(4, 1fr)',
+                        gap: '15px',
+                        maxWidth: '850px',
+                        width: '95%',
+                        margin: '0 auto'
+                    }}>
                         {[
-                            { id: 'NORMAL', name: '普通', icon: normalBall, color: '#ef4444', desc: '入門體驗 (0.7x)' },
-                            { id: 'GREAT', name: '超級', icon: greatBall, color: '#3b82f6', desc: '平滑挑戰 (0.85x)' },
-                            { id: 'ULTRA', name: '高級', icon: ultraBall, color: '#eab308', desc: '標準平衡 (1.0x)' },
-                            { id: 'MASTER', name: '大師', icon: masterBall, color: '#a855f7', desc: '專家之路 (1.25x)' }
+                            { id: 'NORMAL', name: '普通', icon: normalBall, color: '#ef4444' },
+                            { id: 'GREAT', name: '超級', icon: greatBall, color: '#3b82f6' },
+                            { id: 'ULTRA', name: '高級', icon: ultraBall, color: '#eab308' },
+                            { id: 'MASTER', name: '大師', icon: masterBall, color: '#a855f7' }
                         ].map(d => (
                             <button
                                 key={d.id}
                                 className={`difficulty-btn ${isPreloading ? 'loading' : ''}`}
                                 onClick={() => !isPreloading && handleDifficultySelect(d.id as any)}
                                 style={{
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
-                                    padding: '20px', background: 'rgba(255,255,255,0.05)', border: `2px solid ${d.color}22`,
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+                                    padding: '16px 8px', background: 'rgba(255,255,255,0.05)', border: `2px solid ${d.color}22`,
                                     borderRadius: '16px', cursor: isPreloading ? 'wait' : 'pointer',
                                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    opacity: isPreloading ? 0.6 : 1
+                                    opacity: isPreloading ? 0.6 : 1,
+                                    width: '100%'
                                 }}
                             >
-                                <img src={d.icon} alt={d.name} style={{ width: '64px', height: '64px', filter: `drop-shadow(0 0 10px ${d.color}44)` }} />
-                                <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: d.color }}>{d.name}</span>
-                                <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{d.desc}</span>
+                                <img src={d.icon} alt={d.name} style={{ width: '48px', height: '48px', filter: `drop-shadow(0 0 10px ${d.color}44)` }} />
+                                <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: d.color }}>{d.name}</span>
                             </button>
                         ))}
+                    </div>
+
+                    <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                        <p style={{ color: '#64748b', fontSize: '1.1rem', letterSpacing: '2px' }}>選擇您的挑戰難度</p>
                     </div>
 
                     {isPreloading && (
