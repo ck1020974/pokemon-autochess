@@ -110,19 +110,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'cyndaquil', name: '火球鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火球鼠00.webp', battleImageUrl: 'assets/火球鼠01.webp',
-        description: '擊殺後 +2 攻擊 與 +3 生命 (每場戰鬥最多 1 次)。', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
+        description: '擊殺後 +2 攻擊 與 +3 生命 (每場 1 次)。', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
     },
     quilava: {
         id: 'quilava', name: '火岩鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火岩鼠00.webp', battleImageUrl: 'assets/火岩鼠01.webp',
-        description: '擊殺後 +2 攻擊 與 +3 生命 (每場戰鬥最多 2 次)。', synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
+        description: '擊殺後 +2 攻擊 與 +3 生命 (每場 2 次)。', synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
     },
     typhlosion: {
         id: 'typhlosion', name: '火爆獸', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火爆獸00.webp', battleImageUrl: 'assets/火爆獸01.webp',
-        description: '擊殺後 +2 攻擊 與 +3 生命 (每場戰鬥最多 3 次)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '擊殺後 +2 攻擊 與 +3 生命 (每場 3 次)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 7. Totodile
@@ -170,19 +170,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'treecko', name: '木守宮', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/木守宮00.webp', battleImageUrl: 'assets/木守宮01.webp',
-        description: '召喚友軍後對首位敵方造成 2 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'grovyle'
+        description: '召喚友軍後對首位敵方造成 3 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'grovyle'
     },
     grovyle: {
         id: 'grovyle', name: '森林蜥蜴', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/森林蜥蜴00.webp', battleImageUrl: 'assets/森林蜥蜴01.webp',
-        description: '召喚友軍後對首位敵方造成 4 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'sceptile', isHiddenFromShop: true
+        description: '召喚友軍後對首位敵方造成 5 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'sceptile', isHiddenFromShop: true
     },
     sceptile: {
         id: 'sceptile', name: '蜥蜴王', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/蜥蜴王00.webp', battleImageUrl: 'assets/蜥蜴王01.webp',
-        description: '召喚友軍後對首位敵方造成 6 傷害。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '召喚友軍後對首位敵方造成 10 傷害。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 10. Torchic
@@ -190,19 +190,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'torchic', name: '火稚雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/火稚雞00.webp', battleImageUrl: 'assets/火稚雞01.webp',
-        description: '前方友軍攻擊時，對目標造成 2 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'combusken'
+        description: '前方友軍攻擊時，對目標造成 3 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'combusken'
     },
     combusken: {
         id: 'combusken', name: '力壯雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/力壯雞00.webp', battleImageUrl: 'assets/力壯雞01.webp',
-        description: '前方友軍攻擊時，對目標造成 4 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'blaziken', isHiddenFromShop: true
+        description: '前方友軍攻擊時，對目標造成 5 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'blaziken', isHiddenFromShop: true
     },
     blaziken: {
         id: 'blaziken', name: '火焰雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/火焰雞00.webp', battleImageUrl: 'assets/火焰雞01.webp',
-        description: '前方友軍攻擊時，對目標造成 6 傷害。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '前方友軍攻擊時，對目標造成 10 傷害。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 11. Mudkip

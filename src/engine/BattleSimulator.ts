@@ -191,8 +191,6 @@ export class BattleSimulator {
 
         // Spiritomb: Invalidate 2 enemy skills (Exclusive: Once per team, no Spiritomb targets)
         if (unit.family === 'spiritomb') {
-            return;
-
             const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0 && e.family !== 'spiritomb');
             if (livingEnemies.length > 0) {
                 const targets = [...livingEnemies].sort(() => 0.5 - Math.random()).slice(0, 2);
@@ -316,7 +314,7 @@ export class BattleSimulator {
 
                 // User Request: 33% of lifetime Max HP
                 const dmg = Math.ceil(target.stats.maxHp * 0.33);
-                this.log(`${target.name} 受到 ${dmg} 點傷害 (血量 33%)！`);
+                this.log(`${target.name} 受到 ${dmg} 點傷害！`);
                 await this.dealDamage(null, target, dmg, true);
                 await this.delay(100);
             }
@@ -342,7 +340,7 @@ export class BattleSimulator {
             if (hp > 0 && atk > 0) msg += `增加了 ${hp}/${atk} 屬性`;
             else if (hp > 0) msg += `增加了 ${hp} 生命`;
             else msg += `增加了 ${atk} 攻擊`;
-            msg += ` (${translatedSource})！`;
+            msg += `！`;
             this.log(msg);
         }
 
@@ -364,7 +362,7 @@ export class BattleSimulator {
             sourceName === 'Angry' ? '憤怒' :
                 sourceName === 'Ghost' ? '暗影' :
                     sourceName === 'Mankey' ? '猴怪' : sourceName;
-        this.log(`${unit.name} ${amount >= 0 ? '提升' : '降低'}了 ${Math.abs(amount)} 攻擊 (${translatedSource})！`);
+        this.log(`${unit.name} ${amount >= 0 ? '提升' : '降低'}了 ${Math.abs(amount)} 攻擊！`);
     }
 
     private getTeams(unit: Unit) {
@@ -423,7 +421,8 @@ export class BattleSimulator {
                 if (idx > 0 && myTeam[idx - 1] === e.source && e.target) {
                     await this.delay(150);
                     this.log(`${unit.name} 進行了追擊！`);
-                    await this.dealDamage(unit, e.target, 2 * unit.level);
+                    const dmg = [0, 3, 5, 10][unit.level] || 3;
+                    await this.dealDamage(unit, e.target, dmg);
                 }
             });
         }
@@ -491,7 +490,7 @@ export class BattleSimulator {
                         this.heal(unit, amount);
                         state.slowpokeHealUsed = true;
                         this.unitStates.set(unit, state);
-                        this.log(`${unit.name} 發動了再生 (+${amount} HP)！`);
+                        this.log(`${unit.name} 發動了再生！`);
                     }
                 }
             });
@@ -653,7 +652,7 @@ export class BattleSimulator {
                         state.mimikyuGuardsUsed = used + 1;
                         this.unitStates.set(unit, state);
                         e.context.amount = 0; // Nullify damage
-                        this.log(`${unit.name} 抵擋了傷害！ (${state.mimikyuGuardsUsed}/${maxGuards})`);
+                        this.log(`${unit.name} 抵擋了傷害！`);
                     }
                 }
             });
@@ -681,7 +680,7 @@ export class BattleSimulator {
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
 
                 if (e.source && mySide === sSide && e.source !== unit) {
-                    const dmg = [0, 2, 4, 6][unit.level] || 2;
+                    const dmg = [0, 3, 5, 10][unit.level] || 3;
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[0];
