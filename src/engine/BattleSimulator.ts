@@ -239,7 +239,7 @@ export class BattleSimulator {
                 const animPromise = this.playAnimation(unit, 'morph', 500);
 
                 // 2. Log skill first so it uses original name
-                this.log(`${originalName}(${stars}) 變身成了 ${target.name}！`);
+                this.log(`${originalName}(${unit.level}) 變身成了 ${target.name}！`);
 
                 // 3. Wait for the peak of the blur (250ms)
                 await this.delay(250);
@@ -471,7 +471,7 @@ export class BattleSimulator {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.target === unit) {
                     if (this.getSynergyCountForUnit(unit, 'Angry') >= 2) {
-                        this.buffAttack(unit, 2);
+                        this.buffAttack(unit, 3);
                     }
                 }
             });
