@@ -11,9 +11,9 @@ export interface SynergyConfig {
 export const SYNERGIES: Record<string, SynergyConfig> = {
     // --- Attributes ---
     'Starter': { id: 'Starter', name: '御三家', icon: '🌟', description: '[3] 戰鬥開始時 +1 攻擊 與 生命', tiers: [3], color: '#fbbf24' },
-    'Grass': { id: 'Grass', name: '吸取', icon: '🌿', description: '[2/3/4] 攻擊後回復 2/3/4 生命', tiers: [2, 3, 4], color: '#4ade80' },
-    'Water': { id: 'Water', name: '潮汐', icon: '💧', description: '[2/3/4] 攻擊前 +1/+2/+4 生命', tiers: [2, 3, 4], color: '#60a5fa' },
-    'Fire': { id: 'Fire', name: '燃燒', icon: '🔥', description: '[2/3/4] 攻擊前 +1/+2/+4 攻擊', tiers: [2, 3, 4], color: '#ef4444' },
+    'Grass': { id: 'Grass', name: '吸取', icon: '🌿', description: '[2/3/4] 攻擊後回復 2/4/6 生命', tiers: [2, 3, 4], color: '#4ade80' },
+    'Water': { id: 'Water', name: '潮汐', icon: '💧', description: '[2/3/4] 攻擊前 +1/+3/+5 生命', tiers: [2, 3, 4], color: '#60a5fa' },
+    'Fire': { id: 'Fire', name: '燃燒', icon: '🔥', description: '[2/3/4] 攻擊前 +1/+3/+5 攻擊', tiers: [2, 3, 4], color: '#ef4444' },
     'Normal': { id: 'Normal', name: '祝福', icon: '⚪', description: '[2/3/4] 準備結束時，最前方友軍永久 +1/+3/+6 生命', tiers: [2, 3, 4], color: '#d1d5db' },
     'Ghost': { id: 'Ghost', name: '暗影', icon: '👻', description: '[2/3/4] 準備結束時，最前方友軍永久 +1/+3/+6 攻擊', tiers: [2, 3, 4], color: '#a855f7' },
 
@@ -21,7 +21,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Triplets': { id: 'Triplets', name: '三胞胎', icon: '👨‍👧‍👦', description: '[3] 戰鬥開始時， +3 攻擊 與 生命', tiers: [3], color: '#fcd34d' },
     'Angry': { id: 'Angry', name: '憤怒', icon: '💢', description: '[2] 受傷後 +3 攻擊', tiers: [2], color: '#dc2626' },
     'Slow': { id: 'Slow', name: '遲鈍', icon: '🌀', description: '[2] 所受到的傷害減少33% (最低1)', tiers: [2], color: '#f87171' },
-    'Hard': { id: 'Hard', name: '堅硬', icon: '🛡️', description: '[2] 抵擋死亡，保留 1 生命 (每場戰鬥 1 次)', tiers: [2], color: '#9ca3af' },
+    'Hard': { id: 'Hard', name: '堅硬', icon: '🛡️', description: '[2] 抵擋死亡，保留 1 生命 (每場 1 次)', tiers: [2], color: '#9ca3af' },
     'Cave': { id: 'Cave', name: '洞穴', icon: '🕳️', description: '[2] 攻擊後，移動至最後方', tiers: [2], color: '#78350f' },
     'Snow': { id: 'Snow', name: '降雪', icon: '❄️', description: '[2] 戰鬥開始時，其他角色受到生命 33% 傷害', tiers: [2], color: '#bae6fd' },
     'Claw': { id: 'Claw', name: '尖爪', icon: '🐯', description: '[2] 體質提升時，額外 +2 攻擊', tiers: [2], color: '#fca5a5' },

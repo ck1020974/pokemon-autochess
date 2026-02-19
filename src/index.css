@@ -756,7 +756,7 @@ h3 {
 .synergy-tooltip.is-enemy {
   left: auto;
   right: 110%;
-  text-align: right;
+  text-align: left;
 }
 
 .synergy-icon:hover .synergy-tooltip {
@@ -1120,7 +1120,7 @@ h3 {
   top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   z-index: 15;
   pointer-events: none;
   opacity: 0.9;
