@@ -781,26 +781,24 @@ function App() {
                         ].map(d => (
                             <button
                                 key={d.id}
-                                className={`difficulty-btn ${isPreloading ? 'loading' : ''} ${focusedDifficulty === d.id ? 'is-focused' : ''}`}
+                                className={`difficulty-btn ${focusedDifficulty === d.id ? 'is-focused' : ''}`}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDifficultyClick(d.id);
+                                    if (focusedDifficulty === d.id) {
+                                        handleDifficultySelect(d.id as any);
+                                    } else {
+                                        setFocusedDifficulty(d.id as any);
+                                    }
                                 }}
                                 style={{
                                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px',
-                                    padding: '30px 15px',
-                                    background: 'rgba(0,0,0,0.4)',
-                                    border: focusedDifficulty === d.id ? `2px solid ${d.color}` : `1px solid ${d.color}33`,
-                                    borderRadius: '24px', cursor: isPreloading ? 'wait' : 'pointer',
+                                    padding: '30px 15px', background: 'rgba(0,0,0,0.4)', border: `1px solid ${d.color}33`,
+                                    borderRadius: '24px', cursor: 'pointer',
                                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    opacity: isPreloading ? 0.6 : 1,
                                     width: '100%',
                                     minHeight: '200px',
                                     backdropFilter: 'blur(10px)',
-                                    boxShadow: focusedDifficulty === d.id
-                                        ? `0 15px 40px rgba(0,0,0,0.6), 0 0 30px ${d.color}44`
-                                        : `0 10px 30px rgba(0,0,0,0.4), inset 0 0 20px ${d.color}11`,
-                                    transform: focusedDifficulty === d.id ? 'translateY(-10px) scale(1.05)' : 'none'
+                                    boxShadow: `0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px ${d.color}11`
                                 }}
                             >
                                 <img src={d.icon} alt={d.name} style={{ width: '96px', height: '96px', filter: `drop-shadow(0 0 20px ${d.color}66)` }} />
@@ -818,15 +816,6 @@ function App() {
                             padding: '0 20px'
                         }}>選擇您的挑戰難度</p>
                     </div>
-
-                    {isPreloading && (
-                        <div style={{ width: '300px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.9rem', color: '#94a3b8', marginBottom: '8px' }}>美術資源預載入中... {Math.round((loadedCount / totalAssets) * 100)}%</div>
-                            <div style={{ height: '4px', width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                                <div style={{ height: '100%', width: `${(loadedCount / totalAssets) * 100}%`, background: '#3b82f6', transition: 'width 0.3s ease' }}></div>
-                            </div>
-                        </div>
-                    )}
                 </div>
             )}
 

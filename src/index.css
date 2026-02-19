@@ -1229,56 +1229,56 @@ h3 {
 
   /* Move title DOWN */
   .startup-header-box {
-    margin-top: 15vh !important;
+    margin-top: 22vh !important;
     margin-bottom: 0 !important;
   }
 
   /* Move footer text UP */
   .startup-footer-box {
-    margin-bottom: 15vh !important;
+    margin-bottom: 22vh !important;
     margin-top: 0 !important;
   }
 
   .startup-overlay h1 {
-    font-size: 1.4rem !important;
+    font-size: 1.3rem !important;
     letter-spacing: 2px !important;
     padding: 0 20px !important;
   }
 
   .difficulty-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-    width: 85% !important;
-    max-width: 320px !important;
+    gap: 10px !important;
+    width: 80% !important;
+    max-width: 300px !important;
     margin: 0 auto !important;
   }
 
   .difficulty-btn {
     padding: 10px 5px !important;
-    min-height: 100px !important;
-    /* Scaled down frame */
-    gap: 5px !important;
-    border-radius: 16px !important;
+    min-height: 85px !important;
+    /* Scaled down frame even more */
+    gap: 4px !important;
+    border-radius: 12px !important;
   }
 
   .difficulty-btn img {
-    width: 40px !important;
-    /* Scaled down icon */
-    height: 40px !important;
-    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.4)) !important;
+    width: 32px !important;
+    /* Extremely scaled down icon */
+    height: 32px !important;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.4)) !important;
   }
 
   .difficulty-btn span {
-    font-size: 0.85rem !important;
+    font-size: 0.75rem !important;
     /* Scaled down text */
     letter-spacing: 1px !important;
   }
 
   .startup-overlay p {
-    font-size: 0.85rem !important;
+    font-size: 0.8rem !important;
     padding: 0 20px !important;
-    letter-spacing: 1.5px !important;
-    opacity: 0.7 !important;
+    letter-spacing: 1px !important;
+    opacity: 0.6 !important;
   }
 }
 
