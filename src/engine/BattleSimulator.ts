@@ -139,7 +139,7 @@ export class BattleSimulator {
                     if (front) {
                         const amount = [0, 2, 5][unit.level] || 2;
                         this.buffAttack(front, amount);
-                        await this.notifySkill(unit, `提升了 ${front.name} 的攻擊`);
+                        await this.notifySkill(unit, `提高了 ${front.name} 的攻擊`);
                         await this.delay(200);
                     }
                 }
@@ -161,7 +161,7 @@ export class BattleSimulator {
                     if (front) {
                         const amount = [0, 2, 5][unit.level] || 2;
                         this.growUnit(front, amount, 0, 'Dwebble');
-                        await this.notifySkill(unit, `提升了 ${front.name} 的生命`);
+                        await this.notifySkill(unit, `提高了 ${front.name} 的生命`);
                         await this.delay(200);
                     }
                 }
@@ -300,7 +300,7 @@ export class BattleSimulator {
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
             team.filter(u => u && u.synergies.includes('Starter')).forEach(u => {
-                this.growUnit(u, 1, 1, 'Starter');
+                this.growUnit(u, 1, 1, '御三家');
             });
         }
 
@@ -328,13 +328,9 @@ export class BattleSimulator {
         if (permanentTarget) permanentTarget.addGrowth(hp, atk);
 
         if (sourceName) {
-            // Log moved to specific skills or silenced to reduce clutter as requested
-            // let msg = `${unit.name} `;
-            // if (hp > 0 && atk > 0) msg += `增加了 ${hp}/${atk} 屬性`;
-            // else if (hp > 0) msg += `增加了 ${hp} 生命`;
-            // else msg += `增加了 ${atk} 攻擊`;
-            // msg += `！`;
-            // this.log(msg);
+            if (hp > 0 && atk > 0) this.log(`${unit.name} 提高了 ${hp}/${atk} 屬性！`);
+            else if (hp > 0) this.log(`${unit.name} 提高了 ${hp} 生命！`);
+            else if (atk > 0) this.log(`${unit.name} 提高了 ${atk} 攻擊！`);
         }
 
         // Claw Synergy: Extra +2 Atk on any growth
@@ -345,13 +341,15 @@ export class BattleSimulator {
                 permanentTarget.stats.attack += 2;
                 permanentTarget.capStats();
             }
-            this.log(`${unit.name} 額外提升 2 點攻擊！`);
+            this.log(`${unit.name} 額外提高 2 點攻擊！`);
         }
     }
 
-    private buffAttack(unit: Unit, amount: number) {
+    private buffAttack(unit: Unit, amount: number, silent: boolean = false) {
         unit.addBuff(amount);
-        this.log(`${unit.name} ${amount >= 0 ? '提升' : '降低'}了 ${Math.abs(amount)} 攻擊！`);
+        if (!silent) {
+            this.log(`${unit.name} ${amount >= 0 ? '提高' : '降低'}了 ${Math.abs(amount)} 攻擊！`);
+        }
     }
 
     private getTeams(unit: Unit) {
@@ -380,8 +378,10 @@ export class BattleSimulator {
                 if (e.source === unit && myTeam.includes(unit)) { // Ensure unit is still in team
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
                     const heal = count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
-                    // Double-check HP again right before healing to prevent race conditions
-                    if (heal > 0 && unit.stats.hp > 0) this.heal(unit, heal);
+                    if (heal > 0 && unit.stats.hp > 0) {
+                        this.heal(unit, heal);
+                        this.log(`${unit.name} 吸取了 ${heal} 生命`);
+                    }
                 }
             });
         }
@@ -395,7 +395,7 @@ export class BattleSimulator {
                     const count = this.getSynergyCountForUnit(unit, 'Water');
                     const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (buff > 0) {
-                        this.growUnit(unit, buff, 0, 'Water');
+                        this.growUnit(unit, buff, 0, '潮汐');
                     }
                 }
             });
@@ -507,7 +507,7 @@ export class BattleSimulator {
                     const state = this.unitStates.get(unit) || {};
                     if (!state.heracrossEnraged && unit.stats.hp > 0) {
                         const currentAtk = unit.stats.attack;
-                        this.buffAttack(unit, currentAtk);
+                        this.buffAttack(unit, currentAtk, true);
                         state.heracrossEnraged = true;
                         this.unitStates.set(unit, state);
                         this.log(`${unit.name} 攻擊翻倍！`);
@@ -521,9 +521,9 @@ export class BattleSimulator {
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    await this.notifySkill(unit, '提升了生命');
+                    await this.notifySkill(unit, '提高了生命');
                     const amount = unit.level >= 3 ? 4 : 2;
-                    this.growUnit(unit, amount, 0, 'Onix');
+                    this.growUnit(unit, amount, 0, '大岩蛇');
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                     if (original) original.addGrowth(amount, 0);
                 }
