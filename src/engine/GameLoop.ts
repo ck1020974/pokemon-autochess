@@ -22,10 +22,21 @@ export class GameLoop {
     public playerTeam: (Unit | null)[] = [null, null, null, null, null];
     public savedTeam: (Unit | null)[] = []; // Store original team before battle
     public shop: Shop;
+    public difficultyMultiplier: number = 1.0;
 
     constructor() {
         this.shop = new Shop();
         this.startShopPhase();
+    }
+
+    public setDifficulty(level: 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER') {
+        const multipliers = {
+            'NORMAL': 0.7,
+            'GREAT': 0.85,
+            'ULTRA': 1.0,
+            'MASTER': 1.25
+        };
+        this.difficultyMultiplier = multipliers[level];
     }
 
     public startShopPhase() {

@@ -8,6 +8,12 @@ import type { BattleLog } from './engine/BattleSimulator';
 import { UNIT_TEMPLATES } from './models/UnitFactory';
 import { SYNERGIES } from './models/Synergies';
 
+// Difficulty Icons
+import normalBall from './assets/普通.webp';
+import greatBall from './assets/超級.webp';
+import ultraBall from './assets/高級.webp';
+import masterBall from './assets/大師.webp';
+
 // --- Types ---
 interface SelectedUnitState {
     unit: Unit;
@@ -212,6 +218,12 @@ function App() {
         }
     };
 
+    // --- Difficulty \u0026 Preloading States ---
+    const [difficulty, setDifficulty] = useState<'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER' | null>(null);
+    const [isPreloading, setIsPreloading] = useState(true);
+    const [loadedCount, setLoadedCount] = useState(0);
+    const [totalAssets, setTotalAssets] = useState(0);
+
     // Battle Paused State
     const [isPaused, setIsPaused] = useState(false);
     const isPausedRef = useRef(false);
@@ -225,22 +237,40 @@ function App() {
                 if (t.battleImageUrl) urls.add(t.battleImageUrl);
             });
 
-            const promises = Array.from(urls).map(url => {
+            const assetUrls = Array.from(urls);
+            setTotalAssets(assetUrls.length);
+            let loaded = 0;
+
+            const promises = assetUrls.map(url => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.src = url;
-                    img.onload = resolve;
-                    img.onerror = resolve; // Continue even if one fails
+                    img.onload = () => {
+                        loaded++;
+                        setLoadedCount(loaded);
+                        resolve(null);
+                    };
+                    img.onerror = () => {
+                        loaded++;
+                        setLoadedCount(loaded);
+                        resolve(null);
+                    };
                 });
             });
 
-            console.log(`[系統] 開始預載入 ${urls.size} 個美術資源...`);
+            console.log(`[系統] 開始預載入 ${assetUrls.length} 個美術資源...`);
             await Promise.all(promises);
             console.log(`[系統] 所有資源載入完成！`);
+            setIsPreloading(false);
         };
 
         preloadAllAssets();
     }, []);
+
+    const handleDifficultySelect = (lvl: 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER') => {
+        setDifficulty(lvl);
+        game.setDifficulty(lvl);
+    };
 
     const togglePause = () => {
         isPausedRef.current = !isPausedRef.current;
@@ -487,7 +517,7 @@ function App() {
             // Save initial state for UI Synergy (Before simulator modifies/removes dead units)
             setInitialEnemyTeam([...enemyTeam]);
 
-            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam);
+            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, game.difficultyMultiplier);
             simulatorRef.current.onUpdate = () => {
                 if (simulatorRef.current) {
                     setLogs([...simulatorRef.current.logs]);
@@ -713,9 +743,76 @@ function App() {
 
     return (
         <div className="game-container">
+            {/* Difficulty & Preloading Initial Screen */}
+            {(difficulty === null) && (
+                <div className="startup-overlay" style={{
+                    position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
+                    background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
+                    zIndex: 10000, display: 'flex', flexDirection: 'column',
+                    justifyContent: 'center', alignItems: 'center', gap: '40px'
+                }}>
+                    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                        <h1 style={{ fontSize: '3.5rem', margin: '0 0 10px 0', letterSpacing: '4px', background: 'linear-gradient(to bottom, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>POKEMON AUTOCHESS</h1>
+                        <p style={{ color: '#64748b', fontSize: '1.2rem', letterSpacing: '2px' }}>選擇您的挑戰難度</p>
+                    </div>
+
+                    <div className="difficulty-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', maxWidth: '600px', width: '90%' }}>
+                        {[
+                            { id: 'NORMAL', name: '普通', icon: normalBall, color: '#ef4444', desc: '入門體驗 (0.7x)' },
+                            { id: 'GREAT', name: '超級', icon: greatBall, color: '#3b82f6', desc: '平滑挑戰 (0.85x)' },
+                            { id: 'ULTRA', name: '高級', icon: ultraBall, color: '#eab308', desc: '標準平衡 (1.0x)' },
+                            { id: 'MASTER', name: '大師', icon: masterBall, color: '#a855f7', desc: '專家之路 (1.25x)' }
+                        ].map(d => (
+                            <button
+                                key={d.id}
+                                className={`difficulty-btn ${isPreloading ? 'loading' : ''}`}
+                                onClick={() => !isPreloading && handleDifficultySelect(d.id as any)}
+                                style={{
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
+                                    padding: '20px', background: 'rgba(255,255,255,0.05)', border: `2px solid ${d.color}22`,
+                                    borderRadius: '16px', cursor: isPreloading ? 'wait' : 'pointer',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    opacity: isPreloading ? 0.6 : 1
+                                }}
+                            >
+                                <img src={d.icon} alt={d.name} style={{ width: '64px', height: '64px', filter: `drop-shadow(0 0 10px ${d.color}44)` }} />
+                                <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: d.color }}>{d.name}</span>
+                                <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{d.desc}</span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {isPreloading && (
+                        <div style={{ width: '300px', textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.9rem', color: '#94a3b8', marginBottom: '8px' }}>美術資源預載入中... {Math.round((loadedCount / totalAssets) * 100)}%</div>
+                            <div style={{ height: '4px', width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${(loadedCount / totalAssets) * 100}%`, background: '#3b82f6', transition: 'width 0.3s ease' }}></div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* Header */}
             <div className="header">
-                <div style={{ display: 'flex', gap: '30px' }}>
+                <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
+                    {difficulty && (
+                        <div className={`difficulty-badge ${difficulty}`} style={{
+                            display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px',
+                            background: 'rgba(255,255,255,0.05)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)'
+                        }}>
+                            <img src={
+                                difficulty === 'NORMAL' ? normalBall :
+                                    difficulty === 'GREAT' ? greatBall :
+                                        difficulty === 'ULTRA' ? ultraBall : masterBall
+                            } alt={difficulty} style={{ width: '20px', height: '20px' }} />
+                            <span style={{ fontSize: '0.9rem', fontWeight: 'bold', opacity: 0.8 }}>{
+                                difficulty === 'NORMAL' ? '普通' :
+                                    difficulty === 'GREAT' ? '超級' :
+                                        difficulty === 'ULTRA' ? '高級' : '大師'
+                            }</span>
+                        </div>
+                    )}
                     <span>❤️ 生命: {game.lives}</span>
                     <span>💰 金幣: {game.gold}</span>
                     <span>📅 回合: {game.turn}</span>
@@ -728,87 +825,91 @@ function App() {
             </div>
 
             {/* Battle Result Overlay */}
-            {battleResult && (
-                <div className="battle-result-overlay" onClick={handleBattleResultClick}>
-                    <div className="result-content">
-                        <div className="result-title">
-                            {battleResult === 'WIN' ? 'VICTORY ⭕' :
-                                battleResult === 'LOSS' ? 'DEFEAT ❌' : 'DRAW 🤝'}
+            {
+                battleResult && (
+                    <div className="battle-result-overlay" onClick={handleBattleResultClick}>
+                        <div className="result-content">
+                            <div className="result-title">
+                                {battleResult === 'WIN' ? 'VICTORY ⭕' :
+                                    battleResult === 'LOSS' ? 'DEFEAT ❌' : 'DRAW 🤝'}
+                            </div>
+                            {battleResult === 'WIN' && (game.wins === 3 || game.wins === 7 || game.wins === 11) && (
+                                <div className="result-subtitle" style={{ fontSize: '1.5rem', color: '#ffffffff', marginBottom: '20px' }}>增加一點生命 ❤️</div>
+                            )}
+                            <div className="result-subtitle">點擊任意處繼續</div>
                         </div>
-                        {battleResult === 'WIN' && (game.wins === 3 || game.wins === 7 || game.wins === 11) && (
-                            <div className="result-subtitle" style={{ fontSize: '1.5rem', color: '#ffffffff', marginBottom: '20px' }}>增加一點生命 ❤️</div>
-                        )}
-                        <div className="result-subtitle">點擊任意處繼續</div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Game Over / Victory Overlay */}
-            {(game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER) && (
-                <div
-                    className="battle-result-overlay"
-                    style={{
-                        position: 'fixed', // Key Fix: Ignore parent height collapse
-                        top: 0, left: 0, right: 0, bottom: 0,
-                        background: 'rgba(0,0,0,0.8)',
-                        backdropFilter: 'blur(10px)',
-                        zIndex: 9999,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        cursor: 'pointer'
-                    }}
-                    onClick={handleRestart}
-                >
-                    {/* Main Message - Visual center of screen */}
-                    <div className="result-content" style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '15px',
-                        transform: 'translateY(-10%)'
-                    }}>
-                        <div className="result-title" style={{
-                            fontSize: 'min(6rem, 15vw)',
-                            margin: 0,
-                            color: '#fff',
-                            textShadow: '0 0 40px rgba(255,255,255,0.2), 0 10px 40px rgba(0,0,0,0.8)',
-                            animation: 'fadeInUp 0.8s ease-out'
+            {
+                (game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER) && (
+                    <div
+                        className="battle-result-overlay"
+                        style={{
+                            position: 'fixed', // Key Fix: Ignore parent height collapse
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            background: 'rgba(0,0,0,0.8)',
+                            backdropFilter: 'blur(10px)',
+                            zIndex: 9999,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            cursor: 'pointer'
+                        }}
+                        onClick={handleRestart}
+                    >
+                        {/* Main Message - Visual center of screen */}
+                        <div className="result-content" style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '15px',
+                            transform: 'translateY(-10%)'
                         }}>
-                            {game.phase === GamePhase.VICTORY ? 'CHAMPION! 🏆' : 'GAME OVER 💀'}
+                            <div className="result-title" style={{
+                                fontSize: 'min(6rem, 15vw)',
+                                margin: 0,
+                                color: '#fff',
+                                textShadow: '0 0 40px rgba(255,255,255,0.2), 0 10px 40px rgba(0,0,0,0.8)',
+                                animation: 'fadeInUp 0.8s ease-out'
+                            }}>
+                                {game.phase === GamePhase.VICTORY ? 'CHAMPION! 🏆' : 'GAME OVER 💀'}
+                            </div>
+                            <div className="result-subtitle" style={{
+                                fontSize: 'min(1.8rem, 5vw)',
+                                fontWeight: 'bold',
+                                color: '#fff',
+                                letterSpacing: '3px',
+                                background: 'rgba(255,255,255,0.15)',
+                                padding: '10px 40px',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '50px',
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                                animation: 'fadeInUp 1s ease-out'
+                            }}>
+                                {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '眼前變得一片漆黑...'}
+                            </div>
                         </div>
-                        <div className="result-subtitle" style={{
-                            fontSize: 'min(1.8rem, 5vw)',
-                            fontWeight: 'bold',
-                            color: '#fff',
-                            letterSpacing: '3px',
-                            background: 'rgba(255,255,255,0.15)',
-                            padding: '10px 40px',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '50px',
-                            boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                            animation: 'fadeInUp 1s ease-out'
-                        }}>
-                            {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '眼前變得一片漆黑...'}
-                        </div>
-                    </div>
 
-                    {/* Operational Area - Fixed at bottom of screen, below EVERYTHING */}
-                    <div style={{
-                        position: 'absolute',
-                        bottom: '40px', // Real bottom of the window
-                        color: '#aaa',
-                        fontSize: '1.2rem',
-                        letterSpacing: '2px',
-                        animation: 'pulse 2s infinite',
-                        borderBottom: '1px solid rgba(255,255,255,0.2)',
-                        paddingBottom: '5px'
-                    }}>
-                        [ 點擊任意處重新開始 ]
+                        {/* Operational Area - Fixed at bottom of screen, below EVERYTHING */}
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '40px', // Real bottom of the window
+                            color: '#aaa',
+                            fontSize: '1.2rem',
+                            letterSpacing: '2px',
+                            animation: 'pulse 2s infinite',
+                            borderBottom: '1px solid rgba(255,255,255,0.2)',
+                            paddingBottom: '5px'
+                        }}>
+                            [ 點擊任意處重新開始 ]
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => setSelected(null)}>
                 {/* 1. Synergies (Player) */}
@@ -891,112 +992,113 @@ function App() {
             </div>
 
             {/* Shop Area */}
-            {game.phase === GamePhase.SHOP && (
-                <div className="shop-container">
-                    {/* Left Controls: Compact & Side-by-Side */}
-                    <div className="shop-controls">
-                        {/* Row 1: Shop Level Text - Higher and Better Color */}
-                        <div className="shop-info-row" style={{ justifyContent: 'center', marginBottom: '0px', marginTop: '-15px' }}>
-                            <span className="tier-text" style={{ color: '#e2e8f0', fontSize: '1rem', opacity: 0.9 }}>商店 Lv.{game.shop.getTier(game.turn)}</span>
+            {
+                game.phase === GamePhase.SHOP && (
+                    <div className="shop-container">
+                        {/* Left Controls: Compact & Side-by-Side */}
+                        <div className="shop-controls">
+                            {/* Row 1: Shop Level Text - Higher and Better Color */}
+                            <div className="shop-info-row" style={{ justifyContent: 'center', marginBottom: '0px', marginTop: '-15px' }}>
+                                <span className="tier-text" style={{ color: '#e2e8f0', fontSize: '1rem', opacity: 0.9 }}>商店 Lv.{game.shop.getTier(game.turn)}</span>
+                            </div>
+
+                            {/* Row 2: Battle Button - Centered and Slimmer */}
+                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
+                                <button
+                                    className="btn-premium btn-battle"
+                                    onClick={handleStartBattle}
+                                    style={{ height: '50px', width: '60px' }}
+                                >
+                                    <span style={{ fontSize: '1.5rem' }}>⚔️</span>
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Row 2: Battle Button - Centered and Slimmer */}
-                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px' }}>
+                        {/* Right Shop Slots - Shifted right while button stays fixed */}
+                        <div className="shop-slots-area" style={{ position: 'relative' }}>
+                            {/* Reroll Button: Icon-only, Top-Left of Slot 1 - Moved down and left */}
                             <button
-                                className="btn-premium btn-battle"
-                                onClick={handleStartBattle}
-                                style={{ height: '50px', width: '60px' }}
+                                className={`reroll-icon-btn ${game.gold < 1 ? 'btn-disabled' : ''}`}
+                                onClick={handleReroll}
+                                disabled={game.gold < 1}
+                                style={{
+                                    position: 'absolute',
+                                    top: '-5px',
+                                    left: '-5px',
+                                    background: 'transparent',
+                                    border: 'none',
+                                    color: game.gold < 1 ? '#555' : '#aaa',
+                                    fontSize: '2rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    zIndex: 10,
+                                    padding: '5px'
+                                }}
+                                title="刷新商店 ($1)"
                             >
-                                <span style={{ fontSize: '1.5rem' }}>⚔️</span>
+                                🔄
                             </button>
-                        </div>
-                    </div>
 
-                    {/* Right Shop Slots - Shifted right while button stays fixed */}
-                    <div className="shop-slots-area" style={{ position: 'relative' }}>
-                        {/* Reroll Button: Icon-only, Top-Left of Slot 1 - Moved down and left */}
-                        <button
-                            className={`reroll-icon-btn ${game.gold < 1 ? 'btn-disabled' : ''}`}
-                            onClick={handleReroll}
-                            disabled={game.gold < 1}
-                            style={{
-                                position: 'absolute',
-                                top: '-5px',
-                                left: '-5px',
-                                background: 'transparent',
-                                border: 'none',
-                                color: game.gold < 1 ? '#555' : '#aaa',
-                                fontSize: '2rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                zIndex: 10,
-                                padding: '5px'
-                            }}
-                            title="刷新商店 ($1)"
-                        >
-                            🔄
-                        </button>
+                            <div className="shop-slots">
+                                {/* Render Active Slots */}
+                                {game.shop.slots.map((unit: Unit | null, i: number) => {
+                                    if (unit) {
+                                        (unit as any).isMergeable = game.playerTeam.some(u => u && u.family === unit.family && u.level === unit.level);
+                                    }
+                                    return (
+                                        <UnitCard
+                                            key={i}
+                                            unit={unit}
+                                            onClick={() => handleSelect(unit, i, 'SHOP')}
+                                            frozen={game.shop.frozen[i]}
+                                            isInteractive={true}
+                                            draggable={!!unit && game.gold >= 3}
+                                            onDragStart={(e: React.DragEvent) => onDragStart(e, i, 'SHOP')}
+                                            onToggleFreeze={() => handleFreezeToggle(i)}
+                                            showMergeGlow={unit && (unit as any).isMergeable}
+                                            isEvolving={unit && evolvingUnitId === unit.id}
+                                        />
+                                    );
+                                })}
 
-                        <div className="shop-slots">
-                            {/* Render Active Slots */}
-                            {game.shop.slots.map((unit: Unit | null, i: number) => {
-                                if (unit) {
-                                    (unit as any).isMergeable = game.playerTeam.some(u => u && u.family === unit.family && u.level === unit.level);
-                                }
-                                return (
-                                    <UnitCard
-                                        key={i}
-                                        unit={unit}
-                                        onClick={() => handleSelect(unit, i, 'SHOP')}
-                                        frozen={game.shop.frozen[i]}
-                                        isInteractive={true}
-                                        draggable={!!unit && game.gold >= 3}
-                                        onDragStart={(e: React.DragEvent) => onDragStart(e, i, 'SHOP')}
-                                        onToggleFreeze={() => handleFreezeToggle(i)}
-                                        showMergeGlow={unit && (unit as any).isMergeable}
-                                        isEvolving={unit && evolvingUnitId === unit.id}
-                                    />
-                                );
-                            })}
+                                {/* Render Locked Slots (up to 7 total) */}
+                                {Array.from({ length: 7 - game.shop.slots.length }).map((_, i) => {
+                                    const slotIndex = game.shop.slots.length + i;
+                                    let unlockTurn = 0;
+                                    if (slotIndex === 4) unlockTurn = 3;
+                                    else if (slotIndex === 5) unlockTurn = 6;
+                                    else if (slotIndex === 6) unlockTurn = 9;
 
-                            {/* Render Locked Slots (up to 7 total) */}
-                            {Array.from({ length: 7 - game.shop.slots.length }).map((_, i) => {
-                                const slotIndex = game.shop.slots.length + i;
-                                let unlockTurn = 0;
-                                if (slotIndex === 4) unlockTurn = 3;
-                                else if (slotIndex === 5) unlockTurn = 6;
-                                else if (slotIndex === 6) unlockTurn = 9;
+                                    const turnsLeft = unlockTurn - game.turn;
 
-                                const turnsLeft = unlockTurn - game.turn;
-
-                                return (
-                                    <div key={`locked-${slotIndex}`} className="slot-placeholder" style={{
-                                        flexDirection: 'column',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        gap: '2px' /* Tightened gap */
-                                    }}>
-                                        <div style={{
-                                            fontSize: '3.5rem', /* Reduced from 6rem */
-                                            color: 'rgba(255,255,255,0.12)',
-                                            lineHeight: 1,
-                                            fontWeight: 'bold',
-                                        }}>×</div>
-                                        {turnsLeft > 0 && (
+                                    return (
+                                        <div key={`locked-${slotIndex}`} className="slot-placeholder" style={{
+                                            flexDirection: 'column',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            gap: '2px' /* Tightened gap */
+                                        }}>
                                             <div style={{
-                                                fontSize: '0.8rem',
-                                                color: 'rgba(255,255,255,0.3)',
-                                                whiteSpace: 'nowrap',
-                                                marginTop: '5px'
-                                            }}>{turnsLeft} 回合解鎖</div>
-                                        )}
-                                    </div>
-                                );
-                            })}
+                                                fontSize: '3.5rem', /* Reduced from 6rem */
+                                                color: 'rgba(255,255,255,0.12)',
+                                                lineHeight: 1,
+                                                fontWeight: 'bold',
+                                            }}>×</div>
+                                            {turnsLeft > 0 && (
+                                                <div style={{
+                                                    fontSize: '0.8rem',
+                                                    color: 'rgba(255,255,255,0.3)',
+                                                    whiteSpace: 'nowrap',
+                                                    marginTop: '5px'
+                                                }}>{turnsLeft} 回合解鎖</div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )
+                )
             }
 
             {/* Battle Log & Timeout HUD */}
@@ -1138,7 +1240,7 @@ function App() {
                     </div>
                 )
             }
-        </div>
+        </div >
     );
 }
 

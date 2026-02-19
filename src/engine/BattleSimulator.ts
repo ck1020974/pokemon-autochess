@@ -26,11 +26,19 @@ export class BattleSimulator {
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[]) {
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0) {
         this.originalPlayerTeam = originalPlayerTeam;
         // Preserve 5-slot architecture to match UI indices exactly
         this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
-        this.enemyTeam = enemyTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
+        this.enemyTeam = enemyTeam.map(u => {
+            if (!u) return null;
+            const clone = this.cloneUnit(u);
+            // Apply Difficulty Scaling to Enemy
+            clone.stats.hp = Math.floor(clone.stats.hp * difficultyMultiplier);
+            clone.stats.maxHp = Math.floor(clone.stats.maxHp * difficultyMultiplier);
+            clone.stats.attack = Math.floor(clone.stats.attack * difficultyMultiplier);
+            return clone;
+        }) as Unit[];
         this.eventBus = new EventBus();
 
         // Register Initial Teams for Synergy Persistence
