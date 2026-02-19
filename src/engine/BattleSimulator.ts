@@ -233,7 +233,6 @@ export class BattleSimulator {
                 }
 
                 const originalName = unit.name;
-                const stars = '⭐'.repeat(unit.level);
 
                 // 1. Play animation (Start) - Don't await yet
                 const animPromise = this.playAnimation(unit, 'morph', 500);
