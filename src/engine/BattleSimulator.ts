@@ -485,16 +485,14 @@ export class BattleSimulator {
             });
         }
 
-        // Farfetch'd: First attack deals 99 damage
         if (unit.family === 'farfetchd') {
             this.eventBus.on('BEFORE_ATTACK', (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source === unit) {
                     const state = this.unitStates.get(unit) || {};
-                    if (!state.isLethalStrike) {
-                        state.isLethalStrike = true;
+                    if (!state.lethalStrikeUsed) {
+                        state.isLethalStrike = true; // Mark as ready for the next dealDamage
                         this.unitStates.set(unit, state);
-                        this.log(`${unit.name} 發動了致命一擊！`);
                     }
                 }
             });
@@ -521,9 +519,10 @@ export class BattleSimulator {
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    await this.notifySkill(unit, '提高了生命');
                     const amount = unit.level >= 3 ? 4 : 2;
-                    this.growUnit(unit, amount, 0, '大岩蛇');
+                    await this.notifySkill(unit, `移動：+${amount}生命`);
+                    this.growUnit(unit, amount, 0); // Silence generic log
+                    this.log(`${unit.name} 透過移動提高了 ${amount} 生命`);
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                     if (original) original.addGrowth(amount, 0);
                 }
@@ -537,7 +536,7 @@ export class BattleSimulator {
                         const multiplier = unit.templateId === 'onix' ? 0.5 : 1.0;
                         const reflectDmg = Math.ceil(amount * multiplier);
                         this.log(`${unit.name} 反彈了 ${reflectDmg} 傷害`);
-                        await this.dealDamage(unit, e.source, reflectDmg, true);
+                        await this.dealDamage(unit, e.source, reflectDmg, false); // Use false to silence redundant amount log
                     }
                 }
             });
@@ -569,7 +568,7 @@ export class BattleSimulator {
                     }
 
                     const count = [0, 1, 2, 5][unit.level] || 1;
-                    const seedStats = [0, 1, 2, 3][unit.level] || 1;
+                    const seedStats = [0, 0, 1, 2][unit.level]; // 0 bonus = 1/1, 1 bonus = 2/2, 2 bonus = 3/3
                     await this.notifySkill(unit, `召喚了 ${count} 隻小種子`);
                     await this.delay(200);
                     for (let i = 0; i < count; i++) {
@@ -598,7 +597,7 @@ export class BattleSimulator {
                     await this.notifySkill(unit, '召喚了小老鼠');
                     await this.delay(200);
                     const count = unit.level >= 3 ? 5 : 2;
-                    const stats = [0, 2, 3, 3][unit.level] || 2;
+                    const stats = [0, 0, 1, 2][unit.level]; // Match Bulbasaur logic: 0 bonus = 1/1
                     for (let i = 0; i < count; i++) {
                         const { myTeam: currentTeam } = this.getTeams(unit);
                         await this.spawnUnit(currentTeam, deathIdx + i, 'mouse', 1, stats, stats, true);
@@ -820,10 +819,12 @@ export class BattleSimulator {
             (source && source.family === 'sableye' && sourceState.isAbsoluteKill);
 
         // Lethal Strike (Farfetch'd)
-        if (sourceState.isLethalStrike) {
-            sourceState.isLethalStrike = false; // Consume it
+        if (sourceState.isLethalStrike && !sourceState.lethalStrikeUsed) {
+            sourceState.isLethalStrike = false;
+            sourceState.lethalStrikeUsed = true; // Mark as permanently used
             amount = 99;
-            this.log(` 大蔥鴨發動致命一擊 ${target.name} `);
+            await this.notifySkill(source!, '致命一擊');
+            this.log(`${source!.name} 對 ${target.name} 發動了致命一擊！`);
         }
 
         // Diglett: Chance to dodge (only basic attacks, not skills; Pinsir bypasses)
@@ -864,8 +865,9 @@ export class BattleSimulator {
             this.log(`${target.name} 受到 ${amount} 點傷害！`);
         }
 
-        // Hard: Death block (Synergy check)
-        // Pinsir and Sableye-Revenge ignore Hard!
+        // Emit ON_HURT for triggers (like Steelix reflection) before checking survival effects
+        await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount } });
+
         if (target.stats.hp <= 0 && !isBypassing && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2 && !targetState.hardUsed) {
             target.stats.hp = 1;
             targetState.hardUsed = true;
@@ -882,12 +884,8 @@ export class BattleSimulator {
             const isFront = myTeam[0] === target;
 
             if (!isFront) {
-                await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount } });
                 await this.playAnimation(target, 'hurt', 150);
                 await this.delay(100); // Wait 100ms after flicker
-            } else {
-                // Front row: skip anim to reduce clutter (clash is enough feedback)
-                await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount } });
             }
         }
     }
