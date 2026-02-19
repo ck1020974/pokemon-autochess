@@ -1,4 +1,5 @@
 import * as React from 'react';
+// Last updated: 2026-02-20 - Orientation Optimization Phase 4
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { GameLoop, GamePhase } from './engine/GameLoop';
