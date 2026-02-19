@@ -1219,6 +1219,105 @@ h3 {
   box-sizing: border-box !important;
 }
 
+@media (max-width: 1024px) and (orientation: portrait) {
+  .startup-header-box {
+    margin-top: 35vh !important;
+  }
+
+  .startup-footer-box {
+    margin-bottom: 35vh !important;
+  }
+}
+
+/* --- Mobile Landscape Specific Optimization --- */
+@media (orientation: landscape) and (max-height: 500px) {
+  .startup-overlay {
+    padding: 10px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 15px !important;
+  }
+
+  .startup-header-box {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    transform: translateY(5px);
+  }
+
+  .startup-footer-box {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+    transform: translateY(-5px);
+  }
+
+  .startup-overlay h1 {
+    font-size: 1rem !important;
+    letter-spacing: 2px !important;
+    margin: 0 !important;
+  }
+
+  .difficulty-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    /* One row for landscape */
+    gap: 10px !important;
+    width: 90% !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    align-items: center !important;
+  }
+
+  .difficulty-btn {
+    padding: 8px 4px !important;
+    min-height: 70px !important;
+    gap: 4px !important;
+    border-radius: 12px !important;
+  }
+
+  .difficulty-btn img {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .difficulty-btn span {
+    font-size: 0.7rem !important;
+    letter-spacing: 1px !important;
+  }
+
+  .startup-overlay p {
+    font-size: 0.7rem !important;
+    margin: 0 !important;
+    opacity: 0.6 !important;
+  }
+
+  /* Rotate Hint Animation */
+  .rotate-icon {
+    animation: rotateHint 2s infinite ease-in-out;
+  }
+}
+
+@keyframes rotateHint {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(90deg);
+  }
+
+  50% {
+    transform: rotate(90deg);
+  }
+
+  75% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
 @media (max-width: 600px) {
   .startup-overlay {
     gap: 2px !important;

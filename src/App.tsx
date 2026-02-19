@@ -220,6 +220,7 @@ function App() {
 
     // --- Difficulty & Preloading States ---
     const [difficulty, setDifficulty] = useState<'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER' | null>(null);
+    const [isPortrait, setIsPortrait] = useState(false);
 
     // Battle Paused State
     const [isPaused, setIsPaused] = useState(false);
@@ -251,6 +252,31 @@ function App() {
         };
 
         preloadAllAssets();
+    }, []);
+
+    // Orientation Detection
+    useEffect(() => {
+        const checkOrientation = () => {
+            const portrait = window.innerHeight > window.innerWidth;
+            const mobile = window.innerWidth < 1024;
+            setIsPortrait(portrait && mobile);
+        };
+
+        checkOrientation();
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+
+        // Attempt to lock landscape if supported
+        try {
+            if (screen.orientation && (screen.orientation as any).lock) {
+                (screen.orientation as any).lock('landscape').catch(() => { });
+            }
+        } catch (e) { }
+
+        return () => {
+            window.removeEventListener('resize', checkOrientation);
+            window.removeEventListener('orientationchange', checkOrientation);
+        };
     }, []);
 
     const handleDifficultySelect = (lvl: 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER') => {
@@ -730,6 +756,20 @@ function App() {
 
     return (
         <div className="game-container" onClick={() => focusedDifficulty && setFocusedDifficulty(null)}>
+            {/* Orientation Lock Overlay */}
+            {isPortrait && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
+                    background: '#020617', zIndex: 9999,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    color: '#fff', textAlign: 'center', padding: '20px'
+                }}>
+                    <div className="rotate-icon" style={{ fontSize: '4rem', marginBottom: '20px' }}>📱🔄</div>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>請旋轉手機</h2>
+                    <p style={{ color: '#94a3b8' }}>為了獲得最佳遊戲體驗，請切換至橫向模式<br />Please rotate your device to landscape</p>
+                </div>
+            )}
+
             {/* Difficulty & Preloading Initial Screen */}
             {(difficulty === null) && (
                 <div className="startup-overlay" style={{
