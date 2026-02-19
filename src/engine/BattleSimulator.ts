@@ -328,12 +328,13 @@ export class BattleSimulator {
         if (permanentTarget) permanentTarget.addGrowth(hp, atk);
 
         if (sourceName) {
-            let msg = `${unit.name} `;
-            if (hp > 0 && atk > 0) msg += `增加了 ${hp}/${atk} 屬性`;
-            else if (hp > 0) msg += `增加了 ${hp} 生命`;
-            else msg += `增加了 ${atk} 攻擊`;
-            msg += `！`;
-            this.log(msg);
+            // Log moved to specific skills or silenced to reduce clutter as requested
+            // let msg = `${unit.name} `;
+            // if (hp > 0 && atk > 0) msg += `增加了 ${hp}/${atk} 屬性`;
+            // else if (hp > 0) msg += `增加了 ${hp} 生命`;
+            // else msg += `增加了 ${atk} 攻擊`;
+            // msg += `！`;
+            // this.log(msg);
         }
 
         // Claw Synergy: Extra +2 Atk on any growth
@@ -671,8 +672,8 @@ export class BattleSimulator {
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
                 if (e.source && mySide === sSide && e.source !== unit) {
                     const buff = [0, 1, 2, 5][unit.level] || 1;
-                    await this.notifySkill(unit, `激勵了 ${e.source.name} + ${buff} 與 ${buff}`);
-                    this.growUnit(e.source, buff, buff, '菊草葉的激勵');
+                    await this.notifySkill(unit, `激勵了 ${e.source.name}`);
+                    this.growUnit(e.source, buff, buff);
                 }
             });
         }
@@ -892,8 +893,8 @@ export class BattleSimulator {
     }
 
     private async handleDeath(unit: Unit, killer?: Unit) {
-        // Removed isSwallowed guard to ensure cleanup
-        this.log(`${unit.name} 倒下了！`);
+        // Log removed per user request: "不要在說明角色倒下，對戰訊息太多了"
+        // this.log(`${unit.name} 倒下了！`);
 
         // Sableye: Revenge kill
         if (unit.family === 'sableye' && killer && killer.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
