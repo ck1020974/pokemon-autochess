@@ -761,13 +761,26 @@ function App() {
             {isPortrait && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
-                    background: '#020617', zIndex: 9999,
+                    background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
+                    zIndex: 9999,
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    color: '#fff', textAlign: 'center', padding: '20px'
+                    color: '#fff', textAlign: 'center', padding: '20px',
+                    backdropFilter: 'blur(20px)'
                 }}>
-                    <div className="rotate-icon" style={{ fontSize: '4rem', marginBottom: '20px' }}>📱🔄</div>
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>請旋轉手機</h2>
-                    <p style={{ color: '#94a3b8' }}>為了獲得最佳遊戲體驗，請切換至橫向模式<br />Please rotate your device to landscape</p>
+                    <div className="rotate-icon" style={{
+                        fontSize: '5rem',
+                        marginBottom: '30px',
+                        filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.5))'
+                    }}>📱</div>
+                    <h2 style={{
+                        fontSize: '1.8rem',
+                        fontWeight: 'bold',
+                        letterSpacing: '4px',
+                        background: 'linear-gradient(to bottom, #fff, #94a3b8)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        margin: 0
+                    }}>請旋轉手機以開始遊戲</h2>
                 </div>
             )}
 

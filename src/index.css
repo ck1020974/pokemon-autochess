@@ -1221,164 +1221,148 @@ h3 {
 
 @media (max-width: 1024px) and (orientation: portrait) {
   .startup-header-box {
-    margin-top: 35vh !important;
+    margin-top: 15vh !important;
   }
 
   .startup-footer-box {
-    margin-bottom: 35vh !important;
+    margin-bottom: 15vh !important;
   }
 }
 
 /* --- Mobile Landscape Specific Optimization --- */
 @media (orientation: landscape) and (max-height: 500px) {
   .startup-overlay {
-    padding: 10px 0 !important;
+    padding: 20px 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;
-    gap: 15px !important;
+    justify-content: space-around !important;
+    /* Space items out */
+    gap: 10px !important;
   }
 
   .startup-header-box {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
-    transform: translateY(5px);
   }
 
   .startup-footer-box {
     margin-bottom: 0 !important;
     margin-top: 0 !important;
-    transform: translateY(-5px);
   }
 
   .startup-overlay h1 {
-    font-size: 1rem !important;
-    letter-spacing: 2px !important;
+    font-size: 1.4rem !important;
+    letter-spacing: 3px !important;
     margin: 0 !important;
   }
 
   .difficulty-grid {
     grid-template-columns: repeat(4, 1fr) !important;
     /* One row for landscape */
-    gap: 10px !important;
-    width: 90% !important;
-    max-width: 600px !important;
+    gap: 15px !important;
+    width: 95% !important;
+    max-width: 800px !important;
     margin: 0 auto !important;
-    align-items: center !important;
   }
 
   .difficulty-btn {
-    padding: 8px 4px !important;
-    min-height: 70px !important;
-    gap: 4px !important;
-    border-radius: 12px !important;
+    padding: 15px 5px !important;
+    min-height: 120px !important;
+    /* Back to comfortable height */
+    gap: 10px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4) !important;
   }
 
   .difficulty-btn img {
-    width: 28px !important;
-    height: 28px !important;
+    width: 48px !important;
+    /* Back to normal size */
+    height: 48px !important;
   }
 
   .difficulty-btn span {
-    font-size: 0.7rem !important;
+    font-size: 0.95rem !important;
+    /* Back to normal size */
     letter-spacing: 1px !important;
   }
 
   .startup-overlay p {
-    font-size: 0.7rem !important;
+    font-size: 0.9rem !important;
     margin: 0 !important;
-    opacity: 0.6 !important;
+    opacity: 0.8 !important;
+    letter-spacing: 2px !important;
   }
 
   /* Rotate Hint Animation */
   .rotate-icon {
-    animation: rotateHint 2s infinite ease-in-out;
+    animation: rotateHint 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
 @keyframes rotateHint {
   0% {
-    transform: rotate(0deg);
+    transform: rotate(0deg) scale(1);
   }
 
-  25% {
-    transform: rotate(90deg);
+  20% {
+    transform: rotate(90deg) scale(1.1);
   }
 
-  50% {
-    transform: rotate(90deg);
+  40% {
+    transform: rotate(90deg) scale(1.1);
   }
 
-  75% {
-    transform: rotate(0deg);
+  60% {
+    transform: rotate(0deg) scale(1);
   }
 
   100% {
-    transform: rotate(0deg);
+    transform: rotate(0deg) scale(1);
   }
 }
 
 @media (max-width: 600px) {
   .startup-overlay {
-    gap: 2px !important;
-    justify-content: space-between !important;
-    /* Push header/footer away */
-    padding: 0 !important;
-  }
-
-  /* Phase 3 Extreme Move title DOWN */
-  .startup-header-box {
-    margin-top: 32vh !important;
-    margin-bottom: 0 !important;
-  }
-
-  /* Phase 3 Extreme Move footer text UP */
-  .startup-footer-box {
-    margin-bottom: 32vh !important;
-    margin-top: 0 !important;
+    gap: 20px !important;
+    justify-content: center !important;
+    padding: 20px !important;
   }
 
   .startup-overlay h1 {
-    font-size: 1.1rem !important;
+    font-size: 1.8rem !important;
     letter-spacing: 2px !important;
-    padding: 0 20px !important;
   }
 
   .difficulty-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 6px !important;
-    width: 70% !important;
-    /* Even narrower */
-    max-width: 260px !important;
-    margin: 0 auto !important;
+    gap: 12px !important;
+    width: 90% !important;
+    max-width: 340px !important;
   }
 
   .difficulty-btn {
-    padding: 6px 3px !important;
-    min-height: 65px !important;
-    /* Micro frame */
-    gap: 2px !important;
-    border-radius: 8px !important;
+    padding: 20px 10px !important;
+    min-height: 130px !important;
+    gap: 8px !important;
+    border-radius: 20px !important;
   }
 
   .difficulty-btn img {
-    width: 24px !important;
-    /* Micro icon */
-    height: 24px !important;
-    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.4)) !important;
+    width: 52px !important;
+    height: 52px !important;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.4)) !important;
   }
 
   .difficulty-btn span {
-    font-size: 0.65rem !important;
-    /* Micro text */
+    font-size: 1rem !important;
     letter-spacing: 1px !important;
   }
 
   .startup-overlay p {
-    font-size: 0.65rem !important;
-    padding: 0 20px !important;
-    letter-spacing: 1px !important;
-    opacity: 0.4 !important;
+    font-size: 0.95rem !important;
+    padding: 0 10px !important;
+    letter-spacing: 2px !important;
+    opacity: 0.8 !important;
   }
 }
 
