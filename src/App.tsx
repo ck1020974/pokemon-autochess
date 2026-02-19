@@ -438,10 +438,10 @@ function App() {
                 }
 
                 // Stats Calculation
-                // Rule: "First 3 turns keep original stats".
-                // We only apply scaling if Turn > 3.
-                if (game.turn > 3) {
-                    // Add Level Scaling (Base Stats are low, we need this for 2/3-Star power)
+                // Rule: "First 4 turns keep original stats".
+                // We only apply scaling if Turn > 4 (starts at 5)
+                if (game.turn > 4) {
+                    // Add Level Scaling
                     const levelBonusHp = (u.level - 1) * 3;
                     const levelBonusAtk = (u.level - 1) * 2;
 
@@ -450,20 +450,24 @@ function App() {
                     u.stats.attack += levelBonusAtk;
 
                     // Turn Scaling (Global Difficulty)
-                    // Turn 1-5: Small scaling.
-                    // Turn 6+: Harder.
-                    const turnScale = Math.floor(game.turn * 0.8);
+                    const turnScale = Math.floor(game.turn * 0.6);
                     u.stats.hp += turnScale;
                     u.stats.maxHp += turnScale;
                     u.stats.attack += Math.floor(turnScale / 1.5);
 
-                    // Elite/Champ Flat Buffs
+                    // Elite/Champ Buffs
                     if (game.wins >= 8) {
-                        u.stats.hp += 5;
-                        u.stats.maxHp += 5;
-                        u.stats.attack += 3;
+                        // Progressive Elite scaling: Win 8 (+2/1), Win 9 (+4/2), Win 10 (+6/3), Win 11 (+8/4)
+                        const eliteIndex = game.wins - 7;
+                        const eliteBonusHp = eliteIndex * 2;
+                        const eliteBonusAtk = eliteIndex * 1;
+
+                        u.stats.hp += eliteBonusHp;
+                        u.stats.maxHp += eliteBonusHp;
+                        u.stats.attack += eliteBonusAtk;
                     }
                     if (game.wins >= 12) {
+                        // Champion flat bonus
                         u.stats.hp += 10;
                         u.stats.maxHp += 10;
                         u.stats.attack += 5;
