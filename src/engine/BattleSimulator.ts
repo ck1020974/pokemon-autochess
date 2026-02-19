@@ -129,7 +129,7 @@ export class BattleSimulator {
             if (unit.level >= 3) {
                 await this.notifySkill(unit, `激勵了友軍，全體攻擊 +5`);
                 myTeam.filter(u => u && u.stats.hp > 0).forEach(u => {
-                    this.buffAttack(u, 5, 'Mankey');
+                    this.buffAttack(u, 5);
                 });
                 await this.delay(200);
             } else {
@@ -138,7 +138,7 @@ export class BattleSimulator {
                     const front = myTeam[idx - 1];
                     if (front) {
                         const amount = [0, 2, 5][unit.level] || 2;
-                        this.buffAttack(front, amount, 'Mankey');
+                        this.buffAttack(front, amount);
                         await this.notifySkill(unit, `提升了 ${front.name} 的攻擊`);
                         await this.delay(200);
                     }
@@ -257,7 +257,8 @@ export class BattleSimulator {
                 if (front && front.stats.hp > 0) {
                     await this.notifySkill(unit, `吞下了 ${front.name}`);
                     await this.delay(400);
-                    this.growUnit(unit, front.stats.maxHp, front.stats.attack, 'Swallow');
+                    const multiplier = unit.level >= 3 ? 2 : 1;
+                    this.growUnit(unit, front.stats.maxHp * multiplier, front.stats.attack * multiplier, '吞噬');
                     const fState = this.unitStates.get(front) || {};
                     fState.isSwallowed = true;
                     this.unitStates.set(front, fState);
@@ -327,15 +328,6 @@ export class BattleSimulator {
         if (permanentTarget) permanentTarget.addGrowth(hp, atk);
 
         if (sourceName) {
-            const translatedSource = sourceName === 'Triplets' ? '三胞胎' :
-                sourceName === 'Starter' ? '御三家' :
-                    sourceName === 'Water' ? '潮汐' :
-                        sourceName === 'Claw' ? '尖爪' :
-                            sourceName === 'Swallow' ? '吞噬' :
-                                sourceName === 'Mudkip' ? '水躍魚' :
-                                    sourceName === 'Onix' ? '大岩蛇' :
-                                        sourceName === 'Snover' ? '雪笠怪' : sourceName;
-
             let msg = `${unit.name} `;
             if (hp > 0 && atk > 0) msg += `增加了 ${hp}/${atk} 屬性`;
             else if (hp > 0) msg += `增加了 ${hp} 生命`;
@@ -356,12 +348,8 @@ export class BattleSimulator {
         }
     }
 
-    private buffAttack(unit: Unit, amount: number, sourceName: string) {
+    private buffAttack(unit: Unit, amount: number) {
         unit.addBuff(amount);
-        const translatedSource = sourceName === 'Fire' ? '燃燒' :
-            sourceName === 'Angry' ? '憤怒' :
-                sourceName === 'Ghost' ? '暗影' :
-                    sourceName === 'Mankey' ? '猴怪' : sourceName;
         this.log(`${unit.name} ${amount >= 0 ? '提升' : '降低'}了 ${Math.abs(amount)} 攻擊！`);
     }
 
@@ -434,7 +422,7 @@ export class BattleSimulator {
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
                     const buff = count >= 4 ? 4 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
-                    if (buff > 0) this.buffAttack(unit, buff, 'Fire');
+                    if (buff > 0) this.buffAttack(unit, buff);
                 }
             });
         }
@@ -445,7 +433,7 @@ export class BattleSimulator {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.target === unit) {
                     if (this.getSynergyCountForUnit(unit, 'Angry') >= 2) {
-                        this.buffAttack(unit, 2, 'Angry');
+                        this.buffAttack(unit, 2);
                     }
                 }
             });
@@ -518,7 +506,7 @@ export class BattleSimulator {
                     const state = this.unitStates.get(unit) || {};
                     if (!state.heracrossEnraged && unit.stats.hp > 0) {
                         const currentAtk = unit.stats.attack;
-                        this.buffAttack(unit, currentAtk, 'Heracross');
+                        this.buffAttack(unit, currentAtk);
                         state.heracrossEnraged = true;
                         this.unitStates.set(unit, state);
                         this.log(`${unit.name} 攻擊翻倍！`);
@@ -528,13 +516,28 @@ export class BattleSimulator {
         }
 
         // Onix: Stats on Move
+        // Onix: Stats on Move & Steelix Reflect
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
                     await this.notifySkill(unit, '提升了生命');
-                    this.growUnit(unit, 2, 0, 'Onix');
+                    const amount = unit.level >= 3 ? 4 : 2;
+                    this.growUnit(unit, amount, 0, 'Onix');
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
-                    if (original) original.addGrowth(2, 0);
+                    if (original) original.addGrowth(amount, 0);
+                }
+            });
+
+            // Steelix (Evolved Onix) Reflect logic
+            this.eventBus.on('ON_HURT', async (e) => {
+                if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
+                    const amount = e.context.amount;
+                    if (amount > 0) {
+                        const multiplier = unit.templateId === 'onix' ? 0.5 : 1.0;
+                        const reflectDmg = Math.ceil(amount * multiplier);
+                        this.log(`${unit.name} 反彈了傷害！`);
+                        await this.dealDamage(unit, e.source, reflectDmg, true);
+                    }
                 }
             });
         }
@@ -564,13 +567,14 @@ export class BattleSimulator {
                         if (deathIdx === -1) deathIdx = 0;
                     }
 
-                    const count = unit.level; // 1, 2, 3 based on level/star
+                    const count = [0, 1, 2, 5][unit.level] || 1;
+                    const seedStats = [0, 1, 2, 3][unit.level] || 1;
                     await this.notifySkill(unit, `召喚了 ${count} 隻小種子`);
                     await this.delay(200);
                     for (let i = 0; i < count; i++) {
                         // Re-fetch team reference (compactTeams may replace the array object)
                         const { myTeam: currentTeam } = this.getTeams(unit);
-                        await this.spawnUnit(currentTeam, deathIdx + i, 'sprout', 1, 1, 1, true);
+                        await this.spawnUnit(currentTeam, deathIdx + i, 'sprout', 1, seedStats, seedStats, true);
                     }
                     await this.compactTeams();
                 }
@@ -592,8 +596,9 @@ export class BattleSimulator {
 
                     await this.notifySkill(unit, '召喚了小老鼠');
                     await this.delay(200);
-                    const stats = [0, 1, 2, 3][unit.level] || 1;
-                    for (let i = 0; i < 2; i++) {
+                    const count = unit.level >= 3 ? 5 : 2;
+                    const stats = [0, 2, 3, 3][unit.level] || 2;
+                    for (let i = 0; i < count; i++) {
                         const { myTeam: currentTeam } = this.getTeams(unit);
                         await this.spawnUnit(currentTeam, deathIdx + i, 'mouse', 1, stats, stats, true);
                     }
@@ -665,7 +670,7 @@ export class BattleSimulator {
                 const { side: mySide } = this.getTeams(unit);
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
                 if (e.source && mySide === sSide && e.source !== unit) {
-                    const buff = [0, 1, 2, 3][unit.level] || 1;
+                    const buff = [0, 1, 2, 5][unit.level] || 1;
                     await this.notifySkill(unit, `激勵了 ${e.source.name} + ${buff} 與 ${buff}`);
                     this.growUnit(e.source, buff, buff, '菊草葉的激勵');
                 }
@@ -749,11 +754,16 @@ export class BattleSimulator {
             const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
             const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (liveEnemies.length > 0) {
-                // Priority to other enemies, but hit same if only 1 enemy total
-                const others = liveEnemies.filter(u => u !== defender);
-                const r = others.length > 0 ? others[Math.floor(Math.random() * others.length)] : defender;
-                this.log(`${attacker.name} 同時對 ${r.name} 進行了攻擊！`);
-                attackPromises.push(this.dealDamage(attacker, r, dmg));
+                const targetCount = attacker.level >= 3 ? 2 : 1;
+                let potentialTargets = liveEnemies.filter(u => u !== defender);
+                if (potentialTargets.length === 0) potentialTargets = [defender];
+
+                // Shuffle and pick
+                const finalTargets = [...potentialTargets].sort(() => 0.5 - Math.random()).slice(0, targetCount);
+                for (const r of finalTargets) {
+                    this.log(`${attacker.name} 同時對 ${r.name} 進行了攻擊！`);
+                    attackPromises.push(this.dealDamage(attacker, r, dmg));
+                }
             }
         }
 
@@ -765,7 +775,7 @@ export class BattleSimulator {
             if (idx !== -1 && idx < opTeam.length - 1) {
                 const neighbor = opTeam[idx + 1];
                 if (neighbor && neighbor.stats.hp > 0) {
-                    const splashDmg = [0, 2, 4, 6][attacker.level] || 2;
+                    const splashDmg = [0, 2, 4, 8][attacker.level] || 2;
                     await this.notifySkill(attacker, `對 ${neighbor.name} 造成了 ${splashDmg} 傷害`);
                     attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
                 }
@@ -776,7 +786,8 @@ export class BattleSimulator {
 
         // Snover: Knockback
         if (attacker.family === 'snover' && !this.unitStates.get(attacker)?.isSilenced) {
-            this.growUnit(attacker, 0, 1, attacker.name);
+            const buffAtk = [0, 1, 2, 5][attacker.level] || 1;
+            this.growUnit(attacker, 0, buffAtk, attacker.name);
             if (defender.stats.hp > 0) {
                 const team = this.playerTeam.includes(defender) ? this.playerTeam : this.enemyTeam;
                 const idx = team.indexOf(defender);
@@ -919,25 +930,31 @@ export class BattleSimulator {
             // Sneasel family: Atk on kill (Permanent)
             if (killer.family === 'sneasel') {
                 const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                this.growUnit(killer, 0, 3, '狃拉技能', original);
+                const buff = killer.level >= 2 ? 4 : 2;
+                this.growUnit(killer, 0, buff, '狃拉技能', original);
             }
 
             // Charmander family: Stats on kill (Temporary)
             if (killer.family === 'charmander') {
-                const buff = killer.level;
-                if (Math.random() < 0.5) this.growUnit(killer, 0, buff, '小火龍技能');
-                else this.growUnit(killer, buff, 0, '小火龍技能');
+                if (killer.level >= 3) {
+                    this.growUnit(killer, 3, 3, '噴火龍技能');
+                } else {
+                    const buff = killer.level;
+                    if (Math.random() < 0.5) this.growUnit(killer, 0, buff, '小火龍技能');
+                    else this.growUnit(killer, buff, 0, '小火龍技能');
+                }
             }
 
             // Cyndaquil family: Atk and HP on kill (Temporary)
             if (killer.family === 'cyndaquil') {
                 const kState = this.unitStates.get(killer) || {};
-                const maxTimes = killer.level;
+                const maxTimes = killer.level + 1;
                 const used = kState.cyndaquilKills || 0;
                 if (used < maxTimes) {
                     kState.cyndaquilKills = used + 1;
                     this.unitStates.set(killer, kState);
-                    this.growUnit(killer, 3, 2, '火球鼠技能');
+                    const amt = killer.level >= 3 ? 4 : 2;
+                    this.growUnit(killer, amt, amt, '火球鼠技能');
                 }
             }
 

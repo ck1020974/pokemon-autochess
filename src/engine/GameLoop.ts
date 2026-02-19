@@ -130,7 +130,8 @@ export class GameLoop {
             if (!u) return;
             // Magnemite: Random +2 Atk or +2 HP (x Lv times)
             if (u.family === 'magnemite') {
-                for (let i = 0; i < u.level; i++) {
+                const maxTimes = [0, 1, 2, 5][u.level] || u.level;
+                for (let i = 0; i < maxTimes; i++) {
                     const amount = 2;
                     if (Math.random() < 0.5) applyBuff(u, amount, 'atk', 'Magnemite');
                     else applyBuff(u, amount, 'hp', 'Magnemite');
