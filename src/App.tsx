@@ -995,9 +995,9 @@ function App() {
             {/* Battle Log & Timeout HUD */}
             {
                 game.phase === GamePhase.BATTLE && (
-                    <div style={{ position: 'relative', height: '150px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <div style={{ position: 'relative', height: '180px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', gap: '15px', paddingTop: '40px' }}>
                         {/* 1. Battle Log */}
-                        <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5, minHeight: '3em', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5, minHeight: '3em', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             {logs.length > 0 ? (
                                 logs.slice(-3).map((log, i) => (
                                     <div key={i} style={{ opacity: i === 2 ? 1 : (i === 1 ? 0.6 : 0.3) }}>
