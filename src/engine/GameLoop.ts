@@ -97,7 +97,7 @@ export class GameLoop {
         const normalUnits = this.playerTeam.filter(u => u && u.synergies.includes('Normal')) as Unit[];
         const normalCount = getUniqueCount(normalUnits);
         if (normalCount >= 2) {
-            const buff = normalCount >= 4 ? 5 : (normalCount >= 3 ? 3 : 1);
+            const buff = normalCount >= 4 ? 6 : (normalCount >= 3 ? 3 : 1);
             const frontUnit = this.playerTeam.find(u => u !== null);
             if (frontUnit) {
                 applyBuff(frontUnit, buff, 'hp', 'Normal');
@@ -108,7 +108,7 @@ export class GameLoop {
         const ghostUnits = this.playerTeam.filter(u => u && u.synergies.includes('Ghost')) as Unit[];
         const ghostCount = getUniqueCount(ghostUnits);
         if (ghostCount >= 2) {
-            const buff = ghostCount >= 4 ? 5 : (ghostCount >= 3 ? 3 : 1);
+            const buff = ghostCount >= 4 ? 6 : (ghostCount >= 3 ? 3 : 1);
             const frontUnit = this.playerTeam.find(u => u !== null);
             if (frontUnit) {
                 applyBuff(frontUnit, buff, 'atk', 'Ghost');
