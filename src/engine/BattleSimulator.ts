@@ -328,7 +328,7 @@ export class BattleSimulator {
         if (permanentTarget) permanentTarget.addGrowth(hp, atk);
 
         if (sourceName) {
-            if (hp > 0 && atk > 0) this.log(`${unit.name} 提高了 ${hp}/${atk} 屬性！`);
+            if (hp > 0 && atk > 0) this.log(`${unit.name} 提高了 ${atk} 攻擊 與 生命`);
             else if (hp > 0) this.log(`${unit.name} 提高了 ${hp} 生命！`);
             else if (atk > 0) this.log(`${unit.name} 提高了 ${atk} 攻擊！`);
         }

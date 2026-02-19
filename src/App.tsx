@@ -839,7 +839,6 @@ function App() {
                             const isInteractive = game.phase === GamePhase.SHOP;
                             return (
                                 <div
-                                    key={unit ? unit.id : `empty-${i}`}
                                     className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''}`}
                                     onDragOver={isInteractive ? onDragOver : undefined}
                                     onDrop={isInteractive ? (e) => onDrop(e, i) : undefined}
@@ -999,7 +998,7 @@ function App() {
             {/* Battle Log & Timeout HUD */}
             {
                 game.phase === GamePhase.BATTLE && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px', padding: '0 0', marginTop: '-40px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px', padding: '0 0', marginTop: '-15px' }}>
                         {/* 1. Battle Controls (Top) */}
                         <div className="battle-controls-container" style={{ zIndex: 10, position: 'relative' }}>
                             <button onClick={togglePause} style={{
