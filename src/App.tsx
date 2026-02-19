@@ -737,12 +737,22 @@ function App() {
 
     const displayPlayerTeam = game.phase === GamePhase.BATTLE ? simulatorRef.current?.playerTeam : game.playerTeam;
     const displayEnemyTeam = game.phase === GamePhase.BATTLE ? simulatorRef.current?.enemyTeam : Array(5).fill(null);
+    const [focusedDifficulty, setFocusedDifficulty] = useState<string | null>(null);
+
+    const handleDifficultyClick = (id: string) => {
+        if (isPreloading) return;
+        if (focusedDifficulty === id) {
+            handleDifficultySelect(id as any);
+        } else {
+            setFocusedDifficulty(id);
+        }
+    };
 
     // Calculate Synergies (All)
     const synergyStatus = getSynergyStatus(game.playerTeam);
 
     return (
-        <div className="game-container">
+        <div className="game-container" onClick={() => focusedDifficulty && setFocusedDifficulty(null)}>
             {/* Difficulty & Preloading Initial Screen */}
             {(difficulty === null) && (
                 <div className="startup-overlay" style={{
@@ -760,7 +770,7 @@ function App() {
                         gridTemplateColumns: 'repeat(4, 1fr)',
                         gap: '30px',
                         maxWidth: '950px',
-                        width: '95%',
+                        width: '94%',
                         margin: '0 auto'
                     }}>
                         {[
@@ -771,20 +781,26 @@ function App() {
                         ].map(d => (
                             <button
                                 key={d.id}
-                                className={`difficulty-btn ${isPreloading ? 'loading' : ''}`}
-                                onClick={() => !isPreloading && handleDifficultySelect(d.id as any)}
+                                className={`difficulty-btn ${isPreloading ? 'loading' : ''} ${focusedDifficulty === d.id ? 'is-focused' : ''}`}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDifficultyClick(d.id);
+                                }}
                                 style={{
                                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px',
                                     padding: '30px 15px',
                                     background: 'rgba(0,0,0,0.4)',
-                                    border: `1px solid ${d.color}33`,
+                                    border: focusedDifficulty === d.id ? `2px solid ${d.color}` : `1px solid ${d.color}33`,
                                     borderRadius: '24px', cursor: isPreloading ? 'wait' : 'pointer',
                                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                     opacity: isPreloading ? 0.6 : 1,
                                     width: '100%',
                                     minHeight: '200px',
                                     backdropFilter: 'blur(10px)',
-                                    boxShadow: `0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px ${d.color}11`
+                                    boxShadow: focusedDifficulty === d.id
+                                        ? `0 15px 40px rgba(0,0,0,0.6), 0 0 30px ${d.color}44`
+                                        : `0 10px 30px rgba(0,0,0,0.4), inset 0 0 20px ${d.color}11`,
+                                    transform: focusedDifficulty === d.id ? 'translateY(-10px) scale(1.05)' : 'none'
                                 }}
                             >
                                 <img src={d.icon} alt={d.name} style={{ width: '96px', height: '96px', filter: `drop-shadow(0 0 20px ${d.color}66)` }} />
@@ -794,7 +810,13 @@ function App() {
                     </div>
 
                     <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                        <p style={{ color: '#94a3b8', fontSize: '1.1rem', letterSpacing: '4px', opacity: 0.8 }}>選擇您的挑戰難度</p>
+                        <p style={{
+                            color: '#94a3b8',
+                            fontSize: '1.1rem',
+                            letterSpacing: '4px',
+                            opacity: 0.8,
+                            padding: '0 20px'
+                        }}>選擇您的挑戰難度</p>
                     </div>
 
                     {isPreloading && (
