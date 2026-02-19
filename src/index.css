@@ -798,6 +798,40 @@ h3 {
   }
 }
 
+@keyframes morph {
+  0% {
+    filter: blur(0px);
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    filter: blur(8px);
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+
+  100% {
+    filter: blur(0px);
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes jump {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
 @keyframes death {
   0% {
     opacity: 1;
@@ -832,6 +866,14 @@ h3 {
 
 .hurt-anim .unit-image {
   animation: hurt 0.15s ease-out;
+}
+
+.jump-anim {
+  animation: jump 0.3s ease-out;
+}
+
+.morph-anim {
+  animation: morph 0.5s ease-in-out;
 }
 
 /* --- Mobile Responsiveness (Optimized for Landscape) --- */

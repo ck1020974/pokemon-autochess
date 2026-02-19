@@ -145,16 +145,16 @@ export class GameLoop {
             this.wins++;
             if (this.wins === 4) {
                 this.lives++;
-                console.log("擊敗道館館主 (4 勝)：+1 生命");
+                console.log("擊敗半數館主 ：+1 生命");
             }
             if (this.wins === 8) {
                 this.lives++;
-                console.log("獲得勳章 (8 勝)：+1 生命");
+                console.log("擊敗所有館主 ：+1 生命");
             }
             // Elite Four Defeated at Win 12
             if (this.wins === 12) {
                 this.lives++;
-                console.log("擊敗四天王 (12 勝)：+1 生命");
+                console.log("擊敗四大天王 ：+1 生命");
             }
             if (this.wins >= 13) {
                 this.phase = GamePhase.VICTORY;
@@ -323,13 +323,10 @@ export class GameLoop {
             const unit = this.playerTeam[index];
             if (!unit) return;
 
-            // Special: Sell Trigger for Lv 3 Merge-Effect Units (Wigglytuff/Gengar)
-            if (unit.level === 3) {
-                if (unit.family === 'igglybuff' || unit.family === 'gastly') {
-                    // Trigger "Merge" effect but on Sell
-                    console.log(`Sell Trigger for ${unit.name} (Lv 3)`);
-                    this.triggerMergeEffect(unit);
-                }
+            // Special: Sell Trigger for Mankey/Dwebble (All Levels)
+            if (unit.family === 'mankey' || unit.family === 'dwebble') {
+                console.log(`Sell Trigger for ${unit.name} (Lv ${unit.level})`);
+                this.triggerMergeEffect(unit);
             }
 
             this.gold += 1;
@@ -468,30 +465,44 @@ export class GameLoop {
 
     // Helper for Merge/Evolution Effects
     private triggerMergeEffect(unit: Unit) {
-        // Gastly: Merge/Evolve -> Front Ally +2/5/10 Atk
-        if (unit.family === 'gastly') {
-            const team = this.playerTeam;
-            const idx = team.indexOf(unit);
-            if (idx > 0) {
-                const front = team[idx - 1];
-                if (front) {
-                    const amount = [0, 2, 5, 10][unit.level] || 2;
-                    front.addBuff(amount);
-                    console.log(`Gastly Family Merge: +${amount} Atk to ${front.name}`);
+        // Mankey: Merge/Evolve -> Front Ally +2/5 Atk; Sell Lv 3 -> All Allies +10 Atk
+        if (unit.family === 'mankey') {
+            if (unit.level === 3) {
+                this.playerTeam.filter(u => u && u !== unit).forEach(u => {
+                    u!.addBuff(10);
+                });
+                console.log(`Mankey Family Sell (Lv 3): +10 Atk to All Allies`);
+            } else {
+                const team = this.playerTeam;
+                const idx = team.indexOf(unit);
+                if (idx > 0) {
+                    const front = team[idx - 1];
+                    if (front) {
+                        const amount = unit.level === 2 ? 5 : 2;
+                        front.addBuff(amount);
+                        console.log(`Mankey Family Merge: +${amount} Atk to ${front.name}`);
+                    }
                 }
             }
         }
 
-        // Igglybuff: Merge/Evolve -> Front Ally +2/5/10 HP
-        if (unit.family === 'igglybuff') {
-            const team = this.playerTeam;
-            const idx = team.indexOf(unit);
-            if (idx > 0) {
-                const front = team[idx - 1];
-                if (front) {
-                    const amount = [0, 2, 5, 10][unit.level] || 2;
-                    front.addGrowth(amount, 0);
-                    console.log(`Igglybuff Family Merge/Sell: +${amount} HP to ${front.name}`);
+        // Dwebble: Merge/Evolve -> Front Ally +2/5 HP; Sell Lv 3 -> All Allies +10 HP
+        if (unit.family === 'dwebble') {
+            if (unit.level === 3) {
+                this.playerTeam.filter(u => u && u !== unit).forEach(u => {
+                    u!.addGrowth(10, 0);
+                });
+                console.log(`Dwebble Family Sell (Lv 3): +10 HP to All Allies`);
+            } else {
+                const team = this.playerTeam;
+                const idx = team.indexOf(unit);
+                if (idx > 0) {
+                    const front = team[idx - 1];
+                    if (front) {
+                        const amount = unit.level === 2 ? 5 : 2;
+                        front.addGrowth(amount, 0);
+                        console.log(`Dwebble Family Merge: +${amount} HP to ${front.name}`);
+                    }
                 }
             }
         }

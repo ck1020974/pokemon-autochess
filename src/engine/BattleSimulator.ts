@@ -53,7 +53,7 @@ export class BattleSimulator {
         // Helper for Category Rank
         const getRank = (unit: Unit) => {
             if (unit.family === 'spiritomb') return 3; // Priority 1: Silence
-            const utility = ['ditto', 'mankey', 'dwebble', 'mudkip', 'gulpin'];
+            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin'];
             if (utility.includes(unit.family)) return 2; // Priority 2: Utility/Transform
             if (unit.family === 'houndour') return 1; // Priority 3: Damage
             return 0;
@@ -124,9 +124,9 @@ export class BattleSimulator {
             return;
         }
 
-        // Mankey Family: Atk buff at start
-        if (unit.family === 'mankey') {
-            if (unit.level >= 3) {
+        // Gastly Family: Atk buff at start (Swapped from Mankey)
+        if (unit.family === 'gastly') {
+            if (unit.templateId === 'gengar') { // Stage 3
                 await this.notifySkill(unit, `激勵了友軍，全體攻擊 +5`);
                 myTeam.filter(u => u && u.stats.hp > 0).forEach(u => {
                     this.buffAttack(u, 5);
@@ -137,7 +137,7 @@ export class BattleSimulator {
                 if (idx > 0) {
                     const front = myTeam[idx - 1];
                     if (front) {
-                        const amount = [0, 2, 5][unit.level] || 2;
+                        const amount = unit.templateId === 'haunter' ? 5 : 2;
                         this.buffAttack(front, amount);
                         await this.notifySkill(unit, `提高了 ${front.name} 的攻擊`);
                         await this.delay(200);
@@ -146,12 +146,12 @@ export class BattleSimulator {
             }
         }
 
-        // Dwebble Family: HP buff at start
-        if (unit.family === 'dwebble') {
-            if (unit.level >= 3) {
+        // Igglybuff Family: HP buff at start (Swapped from Dwebble)
+        if (unit.family === 'igglybuff') {
+            if (unit.templateId === 'wigglytuff') { // Stage 3
                 await this.notifySkill(unit, `團結了友軍，全體生命 +5`);
                 myTeam.filter(u => u && u.stats.hp > 0).forEach(u => {
-                    this.growUnit(u, 5, 0, 'Dwebble');
+                    this.growUnit(u, 5, 0, 'Igglybuff');
                 });
                 await this.delay(200);
             } else {
@@ -159,8 +159,8 @@ export class BattleSimulator {
                 if (idx > 0) {
                     const front = myTeam[idx - 1];
                     if (front) {
-                        const amount = [0, 2, 5][unit.level] || 2;
-                        this.growUnit(front, amount, 0, 'Dwebble');
+                        const amount = unit.templateId === 'jigglypuff' ? 5 : 2;
+                        this.growUnit(front, amount, 0, 'Igglybuff');
                         await this.notifySkill(unit, `提高了 ${front.name} 的生命`);
                         await this.delay(200);
                     }
@@ -190,7 +190,7 @@ export class BattleSimulator {
         }
 
         // Spiritomb: Invalidate 2 enemy skills (Exclusive: Once per team, no Spiritomb targets)
-        if (unit.family === 'spiritomb') {
+        if (unit.family === 'spiritomb' && !this.spiritombTriggered.has(side)) {
             const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0 && e.family !== 'spiritomb');
             if (livingEnemies.length > 0) {
                 const targets = [...livingEnemies].sort(() => 0.5 - Math.random()).slice(0, 2);
@@ -214,40 +214,44 @@ export class BattleSimulator {
                 for (const u of allies) {
                     if (u.stats.hp > target.stats.hp) target = u;
                 }
+                await this.playAnimation(unit, 'morph', 500);
                 await this.notifySkill(unit, `變身成了 ${target.name}`);
                 await this.delay(400);
+                // Balanced Transformation (User Request: Skill power matches Ditto's level)
                 unit.family = target.family;
-                unit.synergies = [...target.synergies];
+
+                // Find the correct template for this family at THIS level (Ditto's level)
+                let currentTemplate = UNIT_TEMPLATES[target.family] || UNIT_TEMPLATES[target.templateId];
+                for (let i = 1; i < unit.level; i++) {
+                    if (currentTemplate.evolveId && UNIT_TEMPLATES[currentTemplate.evolveId]) {
+                        currentTemplate = UNIT_TEMPLATES[currentTemplate.evolveId];
+                    }
+                }
+
+                // Identify vs Appearance
+                unit.templateId = currentTemplate.id;       // Skill logic depends on this
+                unit.description = currentTemplate.description; // UI shows this
+                unit.synergies = [...currentTemplate.synergies]; // Synergies match Ditto's tier in that family
+
+                // Appearance (Copied from target)
+                unit.name = target.name;
                 unit.imageUrl = target.imageUrl;
+                unit.battleImageUrl = target.battleImageUrl;
 
-                // Recalculate Synergies after transformation!
-                this.calculateCachedSynergies(this.playerTeam.filter(u => u !== null), this.playerSynergies);
-                this.calculateCachedSynergies(this.enemyTeam.filter(u => u !== null), this.enemySynergies);
+                // NOTE: Synergy recalculation is skipped to prevent extra population count
 
-                // Register new abilities (Ditto still keeps its SOBA trigger, but adds new ones)
+                // Register new abilities (Ditto now registers listeners based on its new identity)
                 this.registerUnitAbilities(unit);
 
                 // Chain Reaction: If new form has Battle-Start ability, trigger it immediately
-                const startAbilities = ['mankey', 'dwebble', 'houndour', 'spiritomb', 'mudkip', 'gulpin'];
+                const startAbilities = ['gastly', 'igglybuff', 'houndour', 'spiritomb', 'mudkip', 'gulpin'];
                 if (startAbilities.includes(unit.family)) {
                     await this.executeUnitStartOfBattleAbility(unit);
                 }
             }
         }
 
-        // Mudkip: Support Front Ally
-        if (unit.family === 'mudkip') {
-            const idx = myTeam.indexOf(unit);
-            if (idx > 0) {
-                const front = myTeam[idx - 1];
-                if (front) {
-                    const amount = [0, 3, 5, 10][unit.level] || 3;
-                    this.growUnit(front, amount, amount, 'Mudkip');
-                    await this.notifySkill(unit, `支援了 ${front.name}`);
-                    await this.delay(200);
-                }
-            }
-        }
+        // Mudkip Family: Logic moved to registerUnitAbilities
 
         // Gulpin & Swalot: Swallow Front Ally
         if (unit.family === 'gulpin') {
@@ -279,6 +283,7 @@ export class BattleSimulator {
     }
 
     private calculateCachedSynergies(team: Unit[], map: Map<string, number>) {
+        map.clear(); // CRITICAL: Reset before recalculating
         const families = new Map<string, Set<string>>();
         team.forEach(u => {
             u.synergies.forEach(syn => {
@@ -388,7 +393,7 @@ export class BattleSimulator {
 
         // Water: HP Growth on Attack
         if (unit.synergies.includes('Water')) {
-            this.eventBus.on('BEFORE_ATTACK', (e) => {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (unit.stats.hp <= 0) return;
                 if (e.source === unit) {
@@ -397,6 +402,23 @@ export class BattleSimulator {
                     if (buff > 0) {
                         this.growUnit(unit, buff, 0, '潮汐');
                     }
+                }
+            });
+        }
+
+        // Mudkip Family: Stats on Front Ally Attack (Redirected from Start of Battle)
+        if (unit.family === 'mudkip') {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+                if (this.unitStates.get(unit)?.isSilenced) return;
+                if (unit.stats.hp <= 0) return;
+                const { myTeam } = this.getTeams(unit);
+                const idx = myTeam.indexOf(unit);
+                // Trigger when FRONT ally attacks
+                if (idx > 0 && myTeam[idx - 1] === e.source) {
+                    const buff = [0, 2, 4, 6][unit.level] || 2;
+                    await this.notifySkill(unit, `獲得了激勵`);
+                    await this.playAnimation(unit, 'jump', 300);
+                    this.growUnit(unit, buff, buff, '水躍魚技能');
                 }
             });
         }
@@ -410,6 +432,7 @@ export class BattleSimulator {
                 if (idx > 0 && myTeam[idx - 1] === e.source && e.target) {
                     await this.delay(150);
                     this.log(`${unit.name} 進行了追擊！`);
+                    await this.playAnimation(unit, 'jump', 300);
                     const dmg = [0, 3, 5, 10][unit.level] || 3;
                     await this.dealDamage(unit, e.target, dmg);
                 }
@@ -672,6 +695,7 @@ export class BattleSimulator {
                 if (e.source && mySide === sSide && e.source !== unit) {
                     const buff = [0, 1, 2, 5][unit.level] || 1;
                     await this.notifySkill(unit, `激勵了 ${e.source.name}`);
+                    await this.playAnimation(unit, 'jump', 300);
                     this.growUnit(e.source, buff, buff);
                 }
             });

@@ -42,7 +42,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'charizard', name: '噴火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/噴火龍00.webp', battleImageUrl: 'assets/噴火龍01.webp',
-        description: '擊殺敵方後 +3 攻擊 與 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '擊殺敵方後 +5 攻擊 或 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 3. Squirtle
@@ -70,19 +70,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'gastly', name: '鬼斯', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/鬼斯00.webp', battleImageUrl: 'assets/鬼斯01.webp',
-        description: '合成時前方友軍 +2 攻擊。', synergies: ['Ghost'], evolveId: 'haunter'
+        description: '戰鬥開始時，前方友軍 +2 攻擊。', synergies: ['Ghost'], evolveId: 'haunter'
     },
     haunter: {
         id: 'haunter', name: '鬼斯通', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/鬼斯通00.webp', battleImageUrl: 'assets/鬼斯通01.webp',
-        description: '合成時前方友軍 +5 攻擊。', synergies: ['Ghost'], evolveId: 'gengar', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍 +5 攻擊。', synergies: ['Ghost'], evolveId: 'gengar', isHiddenFromShop: true
     },
     gengar: {
         id: 'gengar', name: '耿鬼', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/耿鬼00.webp', battleImageUrl: 'assets/耿鬼01.webp',
-        description: '出售時前方友軍 +10 攻擊。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '戰鬥開始時，全體友軍 +5 攻擊。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 5. Chikorita
@@ -150,19 +150,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'igglybuff', name: '寶寶丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
         imageUrl: 'assets/寶寶丁00.webp', battleImageUrl: 'assets/寶寶丁01.webp',
-        description: '合成時前方友軍 +2 生命。', synergies: ['Normal'], evolveId: 'jigglypuff'
+        description: '戰鬥開始時，前方友軍 +2 生命。', synergies: ['Normal'], evolveId: 'jigglypuff'
     },
     jigglypuff: {
         id: 'jigglypuff', name: '胖丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
         imageUrl: 'assets/胖丁00.webp', battleImageUrl: 'assets/胖丁01.webp',
-        description: '合成時前方友軍 +5 生命。', synergies: ['Normal'], evolveId: 'wigglytuff', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍 +5 生命。', synergies: ['Normal'], evolveId: 'wigglytuff', isHiddenFromShop: true
     },
     wigglytuff: {
         id: 'wigglytuff', name: '胖可丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
         imageUrl: 'assets/胖可丁00.webp', battleImageUrl: 'assets/胖可丁01.webp',
-        description: '出售時前方友軍 +10 生命。', synergies: ['Normal'], isHiddenFromShop: true
+        description: '戰鬥開始時，全體友軍 +5 生命。', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 9. Treecko
@@ -210,19 +210,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'mudkip', name: '水躍魚', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/水躍魚00.webp', battleImageUrl: 'assets/水躍魚01.webp',
-        description: '戰鬥開始時，前方友軍增加 3 生命 與 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
+        description: '前方友軍攻擊時，自身 +2 攻擊 與 生命。', synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
     },
     marshtomp: {
         id: 'marshtomp', name: '沼躍魚', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/沼躍魚00.webp', battleImageUrl: 'assets/沼躍魚01.webp',
-        description: '戰鬥開始時，前方友軍增加 5 生命 與 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
+        description: '前方友軍攻擊時，自身 +4 攻擊 與 生命。', synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
     },
     swampert: {
         id: 'swampert', name: '巨沼怪', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/巨沼怪00.webp', battleImageUrl: 'assets/巨沼怪01.webp',
-        description: '戰鬥開始時，前方友軍增加 10 生命 與 攻擊。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '前方友軍攻擊時，自身 +6 攻擊 與 生命。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 12. Sprigatito
@@ -350,19 +350,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'mankey', name: '猴怪', tier: 1, family: 'mankey',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/猴怪00.webp', battleImageUrl: 'assets/猴怪01.webp',
-        description: '戰鬥開始時，前方友軍 +2 攻擊。', synergies: ['Angry'], evolveId: 'primeape'
+        description: '合成與出售時前方友軍 +2 攻擊。', synergies: ['Angry'], evolveId: 'primeape'
     },
     primeape: {
         id: 'primeape', name: '火爆猴', tier: 1, family: 'mankey',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/火爆猴00.webp', battleImageUrl: 'assets/火爆猴01.webp',
-        description: '戰鬥開始時，前方友軍 +5 攻擊。', synergies: ['Angry'], evolveId: 'primeape_final', isHiddenFromShop: true
+        description: '合成與出售時前方友軍 +5 攻擊。', synergies: ['Angry'], evolveId: 'primeape_final', isHiddenFromShop: true
     },
     primeape_final: {
         id: 'primeape_final', name: '火爆猴', tier: 1, family: 'mankey',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/火爆猴00.webp', battleImageUrl: 'assets/火爆猴01.webp',
-        description: '戰鬥開始時，全體友軍 +5 攻擊。', synergies: ['Angry'], isHiddenFromShop: true
+        description: '出售時全體友軍 +10 攻擊。', synergies: ['Angry'], isHiddenFromShop: true
     },
 
     // 19. Onix
@@ -422,7 +422,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'slowbro_final', name: '呆殼獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/呆殼獸00.webp', battleImageUrl: 'assets/呆殼獸01.webp',
-        description: '受傷時，若生命 < 50%，回復 20 生命 (每場戰鬥 1 次)。', synergies: ['Slow', 'Water'], isHiddenFromShop: true
+        description: '受傷時，若生命 < 50%，回復 50 生命 (每場戰鬥 1 次)。', synergies: ['Slow', 'Water'], isHiddenFromShop: true
     },
 
     // 22. Magnemite
@@ -550,37 +550,37 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'dwebble', name: '石居蟹', tier: 1, family: 'dwebble',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/石居蟹00.webp', battleImageUrl: 'assets/石居蟹01.webp',
-        description: '戰鬥開始時，前方友軍 +2 生命。', synergies: ['Hard'], evolveId: 'crustle'
+        description: '合成與出售時前方友軍 +2 生命。', synergies: ['Hard'], evolveId: 'crustle'
     },
     crustle: {
         id: 'crustle', name: '岩殿居蟹', tier: 1, family: 'dwebble',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/岩殿居蟹00.webp', battleImageUrl: 'assets/岩殿居蟹01.webp',
-        description: '戰鬥開始時，前方友軍 +5 生命。', synergies: ['Hard'], evolveId: 'crustle_final', isHiddenFromShop: true
+        description: '合成與出售時前方友軍 +5 生命。', synergies: ['Hard'], evolveId: 'crustle_final', isHiddenFromShop: true
     },
     crustle_final: {
         id: 'crustle_final', name: '岩殿居蟹', tier: 1, family: 'dwebble',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/岩殿居蟹00.webp', battleImageUrl: 'assets/岩殿居蟹01.webp',
-        description: '戰鬥開始時，全體友軍 +5 生命。', synergies: ['Hard'], isHiddenFromShop: true
+        description: '出售時全體友軍 +10 生命。', synergies: ['Hard'], isHiddenFromShop: true
     },
 
     // 29. Kangaskhan
     kangaskhan: {
         id: 'kangaskhan', name: '袋獸', tier: 4, family: 'kangaskhan',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
         description: '若敵方已進化，再攻擊一次。', synergies: ['Normal'], evolveId: 'kangaskhan_2'
     },
     kangaskhan_2: {
         id: 'kangaskhan_2', name: '袋獸', tier: 4, family: 'kangaskhan',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
         description: '若敵方已進化，再攻擊一次。', synergies: ['Normal'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
     },
     kangaskhan_3: {
         id: 'kangaskhan_3', name: '袋獸', tier: 4, family: 'kangaskhan',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
         description: '若敵方已進化，再攻擊一次。', synergies: ['Normal'], isHiddenFromShop: true
     },
@@ -608,19 +608,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
     // 31. Sableye
     sableye: {
         id: 'sableye', name: '勾魂眼', tier: 4, family: 'sableye',
-        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
         description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], evolveId: 'sableye_2'
     },
     sableye_2: {
         id: 'sableye_2', name: '勾魂眼', tier: 4, family: 'sableye',
-        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
         description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], evolveId: 'sableye_3', isHiddenFromShop: true
     },
     sableye_3: {
         id: 'sableye_3', name: '勾魂眼', tier: 4, family: 'sableye',
-        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
         description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], isHiddenFromShop: true
     },
