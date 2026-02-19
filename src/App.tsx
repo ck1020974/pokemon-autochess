@@ -999,9 +999,9 @@ function App() {
             {/* Battle Log & Timeout HUD */}
             {
                 game.phase === GamePhase.BATTLE && (
-                    <div style={{ position: 'relative', height: '220px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', gap: '30px', paddingTop: '10px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '50px', padding: '20px 0' }}>
                         {/* 1. Battle Controls (Top) */}
-                        <div className="battle-controls-container" style={{ zIndex: 10 }}>
+                        <div className="battle-controls-container" style={{ zIndex: 10, position: 'relative' }}>
                             <button onClick={togglePause} style={{
                                 border: 'none',
                                 color: '#ddd',
@@ -1018,7 +1018,7 @@ function App() {
                         </div>
 
                         {/* 2. Battle Log (Bottom) */}
-                        <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5, minHeight: '3em', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5, minHeight: '4.5em', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             {logs.length > 0 ? (
                                 logs.slice(-3).map((log, i) => (
                                     <div key={i} style={{ opacity: i === 2 ? 1 : (i === 1 ? 0.6 : 0.3) }}>
