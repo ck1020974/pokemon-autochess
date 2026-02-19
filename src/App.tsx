@@ -758,8 +758,8 @@ function App() {
                     <div className="difficulty-grid" style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(4, 1fr)',
-                        gap: '15px',
-                        maxWidth: '850px',
+                        gap: '30px',
+                        maxWidth: '950px',
                         width: '95%',
                         margin: '0 auto'
                     }}>
@@ -774,22 +774,27 @@ function App() {
                                 className={`difficulty-btn ${isPreloading ? 'loading' : ''}`}
                                 onClick={() => !isPreloading && handleDifficultySelect(d.id as any)}
                                 style={{
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
-                                    padding: '16px 8px', background: 'rgba(255,255,255,0.05)', border: `2px solid ${d.color}22`,
-                                    borderRadius: '16px', cursor: isPreloading ? 'wait' : 'pointer',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px',
+                                    padding: '30px 15px',
+                                    background: 'rgba(0,0,0,0.4)',
+                                    border: `1px solid ${d.color}33`,
+                                    borderRadius: '24px', cursor: isPreloading ? 'wait' : 'pointer',
                                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                     opacity: isPreloading ? 0.6 : 1,
-                                    width: '100%'
+                                    width: '100%',
+                                    minHeight: '200px',
+                                    backdropFilter: 'blur(10px)',
+                                    boxShadow: `0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px ${d.color}11`
                                 }}
                             >
-                                <img src={d.icon} alt={d.name} style={{ width: '48px', height: '48px', filter: `drop-shadow(0 0 10px ${d.color}44)` }} />
-                                <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: d.color }}>{d.name}</span>
+                                <img src={d.icon} alt={d.name} style={{ width: '96px', height: '96px', filter: `drop-shadow(0 0 20px ${d.color}66)` }} />
+                                <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: d.color, letterSpacing: '2px' }}>{d.name}</span>
                             </button>
                         ))}
                     </div>
 
-                    <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                        <p style={{ color: '#64748b', fontSize: '1.1rem', letterSpacing: '2px' }}>選擇您的挑戰難度</p>
+                    <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                        <p style={{ color: '#94a3b8', fontSize: '1.1rem', letterSpacing: '4px', opacity: 0.8 }}>選擇您的挑戰難度</p>
                     </div>
 
                     {isPreloading && (
