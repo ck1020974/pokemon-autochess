@@ -499,7 +499,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         description: '死亡後對隨機敵方造成 5 傷害。', synergies: ['Ghost'], evolveId: 'banette_final', isHiddenFromShop: true
     },
     banette_final: {
-        id: 'banette_final', name: '詛咒娃娃', tier: 3, family: 'shuppet',
+        id: 'banette_final', name: '詛咒娃娃', tier: 1, family: 'shuppet',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/詛咒娃娃00.webp', battleImageUrl: 'assets/詛咒娃娃01.webp',
         description: '死亡後對隨機敵方造成 99 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
@@ -567,20 +567,20 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
 
     // 29. Kangaskhan
     kangaskhan: {
-        id: 'kangaskhan', name: '袋獸', tier: 4, family: 'kangaskhan',
-        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        id: 'kangaskhan', name: '袋獸', tier: 3, family: 'kangaskhan',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
         description: '若敵方已進化，再攻擊一次。', synergies: ['Normal'], evolveId: 'kangaskhan_2'
     },
     kangaskhan_2: {
-        id: 'kangaskhan_2', name: '袋獸', tier: 4, family: 'kangaskhan',
-        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        id: 'kangaskhan_2', name: '袋獸', tier: 3, family: 'kangaskhan',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
         description: '若敵方已進化，再攻擊一次。', synergies: ['Normal'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
     },
     kangaskhan_3: {
-        id: 'kangaskhan_3', name: '袋獸', tier: 4, family: 'kangaskhan',
-        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        id: 'kangaskhan_3', name: '袋獸', tier: 3, family: 'kangaskhan',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
         description: '若敵方已進化，再攻擊一次。', synergies: ['Normal'], isHiddenFromShop: true
     },
@@ -607,20 +607,20 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
 
     // 31. Sableye
     sableye: {
-        id: 'sableye', name: '勾魂眼', tier: 4, family: 'sableye',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        id: 'sableye', name: '勾魂眼', tier: 3, family: 'sableye',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
         description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], evolveId: 'sableye_2'
     },
     sableye_2: {
-        id: 'sableye_2', name: '勾魂眼', tier: 4, family: 'sableye',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        id: 'sableye_2', name: '勾魂眼', tier: 3, family: 'sableye',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
         description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], evolveId: 'sableye_3', isHiddenFromShop: true
     },
     sableye_3: {
-        id: 'sableye_3', name: '勾魂眼', tier: 4, family: 'sableye',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        id: 'sableye_3', name: '勾魂眼', tier: 3, family: 'sableye',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
         description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], isHiddenFromShop: true
     },
@@ -687,14 +687,14 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         description: '戰鬥開始時，吞噬前方友軍並繼承其兩倍生命與攻擊。', synergies: ['Slow'], isHiddenFromShop: true
     },
     heracross: {
-        id: 'heracross', name: '赫拉克羅斯', tier: 3, family: 'heracross',
-        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        id: 'heracross', name: '赫拉克羅斯', tier: 4, family: 'heracross',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/赫拉克羅斯00.webp', battleImageUrl: 'assets/赫拉克羅斯01.webp',
         description: '首次受傷後，攻擊力翻倍。', synergies: ['Beetle']
     },
     pinsir: {
-        id: 'pinsir', name: '凱羅斯', tier: 3, family: 'pinsir',
-        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        id: 'pinsir', name: '凱羅斯', tier: 4, family: 'pinsir',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/凱羅斯00.webp', battleImageUrl: 'assets/凱羅斯01.webp',
         description: '無視所有減傷和閃避效果。', synergies: ['Beetle']
     },
