@@ -779,8 +779,9 @@ function App() {
                         background: 'linear-gradient(to bottom, #fff, #94a3b8)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
-                        margin: 0
-                    }}>請旋轉手機以開始遊戲</h2>
+                        margin: 0,
+                        lineHeight: '1.4'
+                    }}>請旋轉手機<br />以開始遊戲</h2>
                 </div>
             )}
 
