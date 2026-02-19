@@ -774,12 +774,12 @@ export class BattleSimulator {
         // Base attack
         attackPromises.push(this.dealDamage(attacker, defender, dmg, false));
 
-        // Kangaskhan: Second hit if evolved and defender still alive
+        // Kangaskhan: Second hit if defender is evolved AND attacker/defender both survive the first hit
         if (attacker.family === 'kangaskhan' && (defender.templateId !== defender.family) && !this.unitStates.get(attacker)?.isSilenced) {
             await Promise.all(attackPromises); // Wait for the first hit
-            if (defender.stats.hp > 0) {
+            if (defender.stats.hp > 0 && attacker.stats.hp > 0) {
                 await this.notifySkill(attacker, '發動了第二次攻擊');
-                attackPromises.push(this.dealDamage(attacker, defender, dmg, false));
+                attackPromises.push(this.dealDamage(attacker, defender, attacker.stats.attack, false));
             }
         }
 
