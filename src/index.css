@@ -1212,41 +1212,55 @@ h3 {
 }
 
 /* --- Difficulty Screen Responsive --- */
+.startup-overlay {
+  overflow-y: auto !important;
+  padding: 20px 0 !important;
+}
+
 @media (max-width: 600px) {
+  .startup-overlay {
+    gap: 15px !important;
+    justify-content: flex-start !important;
+    /* Start from top if overflowing */
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+  }
+
   .startup-overlay h1 {
-    font-size: 2.2rem !important;
+    font-size: 1.8rem !important;
     letter-spacing: 2px !important;
-    margin-bottom: 30px !important;
+    margin-bottom: 10px !important;
   }
 
   .difficulty-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 20px !important;
-    width: 92% !important;
-    max-width: 400px !important;
+    gap: 12px !important;
+    width: 94% !important;
+    max-width: 360px !important;
   }
 
   .difficulty-btn {
-    padding: 20px 10px !important;
-    min-height: 160px !important;
-    gap: 12px !important;
+    padding: 15px 8px !important;
+    min-height: 130px !important;
+    gap: 10px !important;
     border-radius: 20px !important;
   }
 
   .difficulty-btn img {
-    width: 64px !important;
-    height: 64px !important;
-    filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.5)) !important;
+    width: 52px !important;
+    height: 52px !important;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.4)) !important;
   }
 
   .difficulty-btn span {
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
     letter-spacing: 1px !important;
   }
 
   .startup-overlay p {
-    font-size: 1rem !important;
-    margin-top: 30px !important;
+    font-size: 0.9rem !important;
+    margin-top: 10px !important;
     letter-spacing: 2px !important;
+    opacity: 0.7 !important;
   }
 }
