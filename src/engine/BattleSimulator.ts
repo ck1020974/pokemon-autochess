@@ -1006,6 +1006,7 @@ export class BattleSimulator {
 
         // Special: If unit just died but didn't trigger immediate spawn (which uses insert:true),
         // we compact. But spawnUnit(insert:true) handles displacement correctly.
+        await this.delay(200);
         await this.compactTeams();
     }
 
@@ -1102,11 +1103,23 @@ export class BattleSimulator {
         this.unitStates.set(newUnit, {});
         this.registerUnitAbilities(newUnit);
 
-        await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
-        this.log(`${newUnit.name} 加入了戰場！`);
-        await this.delay(50);
+        // 1. Refresh UI so the DOM element for the new unit is created
+        if (this.onUpdate) this.onUpdate();
+        await this.delay(50); // Give browser a moment to render
+
+        // 2. Play spawn animation and log
         const el = document.getElementById(newUnit.id);
         if (el) el.classList.add('spawn-anim');
+        this.log(`${newUnit.name} 加入了戰場！`);
+
+        // 3. Wait for the appearance to be noticed
+        await this.delay(150);
+
+        // 4. Finally emit the event for others to react (e.g. Chikorita buffs)
+        await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
+
+        // Small settle time after reactions
+        await this.delay(50);
     }
 
     private async notifySkill(unit: Unit, message: string) {
