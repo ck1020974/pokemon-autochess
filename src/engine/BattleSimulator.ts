@@ -990,7 +990,21 @@ export class BattleSimulator {
                     this.growUnit(killer, 3, 3, '噴火龍技能');
                 } else {
                     const buff = killer.level;
-                    if (Math.random() < 0.5) this.growUnit(killer, 0, buff, '小火龍技能');
+                    const canAddAtk = killer.stats.attack < 50;
+                    const canAddHp = killer.stats.maxHp < 50;
+
+                    let choice: 'hp' | 'atk';
+                    if (canAddAtk && !canAddHp) {
+                        choice = 'atk';
+                        if (Math.random() < 0.5) this.log(`${killer.name} 生命已達上限，轉為提高攻擊！`);
+                    } else if (canAddHp && !canAddAtk) {
+                        choice = 'hp';
+                        if (Math.random() < 0.5) this.log(`${killer.name} 攻擊已達上限，轉為提高生命！`);
+                    } else {
+                        choice = Math.random() < 0.5 ? 'atk' : 'hp';
+                    }
+
+                    if (choice === 'atk') this.growUnit(killer, 0, buff, '小火龍技能');
                     else this.growUnit(killer, buff, 0, '小火龍技能');
                 }
             }
