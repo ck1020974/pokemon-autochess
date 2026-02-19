@@ -761,8 +761,8 @@ function App() {
                     zIndex: 10000, display: 'flex', flexDirection: 'column',
                     justifyContent: 'center', alignItems: 'center', gap: '40px'
                 }}>
-                    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                        <h1 style={{ fontSize: '3.5rem', margin: '0 0 10px 0', letterSpacing: '4px', background: 'linear-gradient(to bottom, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>POKEMON AUTOCHESS</h1>
+                    <div style={{ textAlign: 'center', marginBottom: '10px', marginTop: '5vh' }} className="startup-header-box">
+                        <h1 style={{ fontSize: '3.5rem', margin: '0', letterSpacing: '4px', background: 'linear-gradient(to bottom, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>POKEMON AUTOCHESS</h1>
                     </div>
 
                     <div className="difficulty-grid" style={{
@@ -809,7 +809,7 @@ function App() {
                         ))}
                     </div>
 
-                    <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                    <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '5vh' }} className="startup-footer-box">
                         <p style={{
                             color: '#94a3b8',
                             fontSize: '1.1rem',
@@ -854,7 +854,7 @@ function App() {
                     <span>💰 金幣: {game.gold}</span>
                     <span>📅 回合: {game.turn}</span>
                 </div>
-                <div style={{ display: 'flex', gap: '30px' }}>
+                <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
                     <span style={{ color: game.wins < 8 ? '#fff' : '#888' }}>🏅 道館: {Math.min(game.wins, 8)}/8</span>
                     <span style={{ color: (game.wins >= 8 && game.wins < 12) ? '#fbbf24' : '#888' }}>⚔️ 四天王: {Math.max(0, Math.min(game.wins - 8, 4))}/4</span>
                     <span style={{ color: game.wins >= 12 ? '#f472b6' : '#888' }}>👑 冠軍: {Math.max(0, Math.min(game.wins - 12, 1))}/1</span>

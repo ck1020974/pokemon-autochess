@@ -1213,62 +1213,76 @@ h3 {
 
 /* --- Difficulty Screen Responsive --- */
 .startup-overlay {
-  overflow-y: auto !important;
-  /* Safe area padding to prevent text from touching edge */
-  padding: 5vh 5vw !important;
+  overflow: hidden !important;
+  /* Disable scroll as requested */
+  padding: 0 !important;
   box-sizing: border-box !important;
 }
 
 @media (max-width: 600px) {
   .startup-overlay {
-    gap: 20px !important;
-    /* Slightly more space than 15px for breathing */
-    justify-content: flex-start !important;
-    padding-top: 8vh !important;
-    padding-bottom: 8vh !important;
+    gap: 10px !important;
+    justify-content: space-between !important;
+    /* Push header/footer away */
+    padding: 0 !important;
+  }
+
+  /* Move title DOWN */
+  .startup-header-box {
+    margin-top: 15vh !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Move footer text UP */
+  .startup-footer-box {
+    margin-bottom: 15vh !important;
+    margin-top: 0 !important;
   }
 
   .startup-overlay h1 {
-    font-size: 1.6rem !important;
-    /* Slightly smaller to fit width */
+    font-size: 1.4rem !important;
     letter-spacing: 2px !important;
-    margin-bottom: 5px !important;
-    padding: 0 10px !important;
+    padding: 0 20px !important;
   }
 
   .difficulty-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-    /* Tighten gap to save horizontal space */
-    width: 90% !important;
-    max-width: 340px !important;
+    gap: 8px !important;
+    width: 85% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
   }
 
   .difficulty-btn {
-    padding: 15px 5px !important;
-    min-height: 120px !important;
-    /* Lower height to fit more on screen */
-    gap: 8px !important;
-    border-radius: 20px !important;
+    padding: 10px 5px !important;
+    min-height: 100px !important;
+    /* Scaled down frame */
+    gap: 5px !important;
+    border-radius: 16px !important;
   }
 
   .difficulty-btn img {
-    width: 48px !important;
-    height: 48px !important;
-    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.4)) !important;
+    width: 40px !important;
+    /* Scaled down icon */
+    height: 40px !important;
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.4)) !important;
   }
 
   .difficulty-btn span {
-    font-size: 0.95rem !important;
+    font-size: 0.85rem !important;
+    /* Scaled down text */
     letter-spacing: 1px !important;
   }
 
   .startup-overlay p {
-    font-size: 0.9rem !important;
-    margin-top: 15px !important;
-    padding: 0 15px !important;
-    letter-spacing: 2px !important;
+    font-size: 0.85rem !important;
+    padding: 0 20px !important;
+    letter-spacing: 1.5px !important;
     opacity: 0.7 !important;
-    line-height: 1.4 !important;
   }
+}
+
+/* Header Alignment Fix */
+.header>div {
+  align-items: center !important;
 }
