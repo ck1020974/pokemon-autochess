@@ -536,7 +536,7 @@ export class BattleSimulator {
                     if (amount > 0) {
                         const multiplier = unit.templateId === 'onix' ? 0.5 : 1.0;
                         const reflectDmg = Math.ceil(amount * multiplier);
-                        this.log(`${unit.name} 反彈了傷害！`);
+                        this.log(`${unit.name} 反彈了 ${reflectDmg} 傷害`);
                         await this.dealDamage(unit, e.source, reflectDmg, true);
                     }
                 }
@@ -617,7 +617,7 @@ export class BattleSimulator {
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[Math.floor(Math.random() * living.length)];
-                        await this.notifySkill(unit, `對 ${target.name} 降下了詛咒`);
+                        await this.notifySkill(unit, `死前對 ${target.name} 造成傷害`);
                         await this.delay(400);
                         const dmg = [0, 2, 5, 99][unit.level] || 2;
                         await this.dealDamage(unit, target, dmg, true);
@@ -690,7 +690,7 @@ export class BattleSimulator {
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[0];
-                        await this.notifySkill(unit, `與 ${e.source.name} 連動，對 ${target.name} 造成了 ${dmg} 傷害`);
+                        await this.notifySkill(unit, `對 ${target.name} 發動了種子機關槍`);
                         await this.delay(250);
                         await this.dealDamage(unit, target, dmg, true);
                     }
@@ -1029,7 +1029,7 @@ export class BattleSimulator {
         // We count only units with HP > 0.
         const livingUnits = team.filter(u => u && u.stats.hp > 0).length;
         if (livingUnits >= 5) {
-            this.log(`戰場已滿，無法召喚 ${newUnit.name}！ (存活: ${livingUnits}/5)`);
+            this.log(`戰場已滿，無法再召喚 ${newUnit.name}！ `);
             return;
         }
 
