@@ -731,7 +731,7 @@ function App() {
                             {battleResult === 'WIN' ? 'VICTORY ⭕' :
                                 battleResult === 'LOSS' ? 'DEFEAT ❌' : 'DRAW 🤝'}
                         </div>
-                        {battleResult === 'WIN' && (game.wins === 8 || game.wins === 12) && (
+                        {battleResult === 'WIN' && (game.wins === 3 || game.wins === 7 || game.wins === 11) && (
                             <div className="result-subtitle" style={{ fontSize: '1.5rem', color: '#ffffffff', marginBottom: '20px' }}>增加一點生命 ❤️</div>
                         )}
                         <div className="result-subtitle">點擊任意處繼續</div>
@@ -998,7 +998,7 @@ function App() {
             {/* Battle Log & Timeout HUD */}
             {
                 game.phase === GamePhase.BATTLE && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px', padding: '0 0', marginTop: '40px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px', padding: '0 0', marginTop: '8px' }}>
                         {/* 1. Battle Controls (Top) */}
                         <div className="battle-controls-container" style={{ zIndex: 10, position: 'relative' }}>
                             <button onClick={togglePause} style={{

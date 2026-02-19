@@ -143,6 +143,10 @@ export class GameLoop {
     public endBattle(result: 'WIN' | 'LOSS' | 'DRAW') {
         if (result === 'WIN') {
             this.wins++;
+            if (this.wins === 4) {
+                this.lives++;
+                console.log("擊敗道館館主 (4 勝)：+1 生命");
+            }
             if (this.wins === 8) {
                 this.lives++;
                 console.log("獲得勳章 (8 勝)：+1 生命");
