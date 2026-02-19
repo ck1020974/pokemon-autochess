@@ -490,19 +490,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'shuppet', name: '怨影娃娃', tier: 1, family: 'shuppet',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/怨影娃娃00.webp', battleImageUrl: 'assets/怨影娃娃01.webp',
-        description: '死亡後對隨機敵方造成 2 傷害。', synergies: ['Ghost'], evolveId: 'banette'
+        description: '死亡後對隨機敵方造成 4 傷害。', synergies: ['Ghost'], evolveId: 'banette'
     },
     banette: {
         id: 'banette', name: '詛咒娃娃', tier: 1, family: 'shuppet',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/詛咒娃娃00.webp', battleImageUrl: 'assets/詛咒娃娃01.webp',
-        description: '死亡後對隨機敵方造成 4 傷害。', synergies: ['Ghost'], evolveId: 'banette_final', isHiddenFromShop: true
+        description: '死亡後對隨機敵方造成 10 傷害。', synergies: ['Ghost'], evolveId: 'banette_final', isHiddenFromShop: true
     },
     banette_final: {
         id: 'banette_final', name: '詛咒娃娃', tier: 1, family: 'shuppet',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/詛咒娃娃00.webp', battleImageUrl: 'assets/詛咒娃娃01.webp',
-        description: '死亡後對隨機敵方造成 10 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '死亡後對隨機敵方造成 99 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 26. Drifloon (Renamed from Drifblim Base)

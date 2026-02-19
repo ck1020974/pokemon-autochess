@@ -374,7 +374,12 @@ function App() {
             let synergyTargetCount = 0;
             let uniqueConstraint = false;
 
-            if (game.wins >= 8) {
+            // Updated Elite Thresholds: Master (Win 3+), Ultra (Win 5+), Others (Win 8+)
+            const isEliteMatch = (difficulty === 'MASTER' && game.wins >= 3) ||
+                (difficulty === 'ULTRA' && game.wins >= 5) ||
+                (game.wins >= 8);
+
+            if (isEliteMatch) {
                 // Elite/Champ Strategies
                 const stratRoll = Math.random();
                 if (stratRoll < 0.33) {
@@ -484,37 +489,48 @@ function App() {
                     u.level = 2;
                 }
 
-                // Stats Calculation
-                // Rule: "First 4 turns keep original stats".
-                // We only apply scaling if Turn > 4 (starts at 5)
-                if (game.turn > 4) {
-                    // Add Level Scaling
-                    const levelBonusHp = (u.level - 1) * 3;
-                    const levelBonusAtk = (u.level - 1) * 2;
+                // Stats Calculation (Natural Synthesis Simulation)
+                // Rule: All levels get growth now. 2-Star = 2*Base + 1. 3-Star = 3*Base + 6 (accumulated).
+                const baseStats = UNIT_TEMPLATES[u.family || u.id].baseStats;
+                if (u.level === 2) {
+                    const bonusHp = baseStats.maxHp + 1; // Base + (Base+1) = 2*Base + 1
+                    const bonusAtk = baseStats.attack + 1;
+                    u.stats.hp += bonusHp;
+                    u.stats.maxHp += bonusHp;
+                    u.stats.attack += bonusAtk;
+                } else if (u.level === 3) {
+                    const bonusHp = baseStats.maxHp * 2 + 6; // Base + (2*Base+6) = 3*Base + 6
+                    const bonusAtk = baseStats.attack * 2 + 6;
+                    u.stats.hp += bonusHp;
+                    u.stats.maxHp += bonusHp;
+                    u.stats.attack += bonusAtk;
+                }
 
-                    u.stats.hp += levelBonusHp;
-                    u.stats.maxHp += levelBonusHp;
-                    u.stats.attack += levelBonusAtk;
+                // Turn Scaling (Global Difficulty)
+                // Rule: Master starts at turn 3 (gradual), others at turn 5.
+                const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
+                if (game.turn >= turnScalingStart) {
+                    let scaleFactor = 0.6;
+                    // Gradual growth for Master at turn 3-4
+                    if (difficulty === 'MASTER' && game.turn <= 4) {
+                        scaleFactor = 0.3;
+                    }
 
-                    // Turn Scaling (Global Difficulty)
-                    const turnScale = Math.floor(game.turn * 0.6);
+                    const turnScale = Math.floor(game.turn * scaleFactor);
                     u.stats.hp += turnScale;
                     u.stats.maxHp += turnScale;
                     u.stats.attack += Math.floor(turnScale / 1.5);
 
-                    // Elite/Champ Buffs
+                    // Elite/Champ Buffs (Keep legacy scaling for post-Elite matches)
                     if (game.wins >= 8) {
-                        // Progressive Elite scaling: Win 8 (+2/1), Win 9 (+4/2), Win 10 (+6/3), Win 11 (+8/4)
                         const eliteIndex = game.wins - 7;
                         const eliteBonusHp = eliteIndex * 2;
                         const eliteBonusAtk = eliteIndex * 1;
-
                         u.stats.hp += eliteBonusHp;
                         u.stats.maxHp += eliteBonusHp;
                         u.stats.attack += eliteBonusAtk;
                     }
                     if (game.wins >= 12) {
-                        // Champion flat bonus
                         u.stats.hp += 10;
                         u.stats.maxHp += 10;
                         u.stats.attack += 5;

@@ -669,7 +669,7 @@ export class BattleSimulator {
                         const target = living[Math.floor(Math.random() * living.length)];
                         await this.notifySkill(unit, `死前對 ${target.name} 造成傷害`);
                         await this.delay(400);
-                        const dmg = [0, 2, 4, 10][unit.level] || 2;
+                        const dmg = [0, 4, 10, 99][unit.level] || 4;
                         await this.dealDamage(unit, target, dmg, true);
                     }
                 }
