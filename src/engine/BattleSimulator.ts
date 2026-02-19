@@ -81,9 +81,27 @@ export class BattleSimulator {
         // Run global start of battle sequence
         await this.runGlobalStartOfBattleAbilities(allUnits.map(item => item.unit));
 
-        // 6. Apply Start-of-Battle Synergies (Constant effects + Snow Weather)
+        // 6. Apply Start-of-Battle Synergies (Personal buffs: Triplets, Starter)
         await this.applyBattleStartSynergies(this.playerTeam.filter(u => u !== null));
         await this.applyBattleStartSynergies(this.enemyTeam.filter(u => u !== null));
+
+        // 7. Global Weather: Snow (Only triggers once even if both sides have it)
+        const hasSnow = (this.playerSynergies.get('Snow') || 0) >= 2 || (this.enemySynergies.get('Snow') || 0) >= 2;
+        if (hasSnow) {
+            this.log("天空降下了冰雹...");
+            await this.delay(500);
+            const allUnits = [...this.playerTeam, ...this.enemyTeam].filter((u: Unit) => u !== null && u.stats.hp > 0);
+            for (const target of allUnits) {
+                if (target.synergies.includes('Snow')) continue;
+
+                // User Request: 33% of lifetime Max HP
+                const dmg = Math.ceil(target.stats.maxHp * 0.33);
+                this.log(`${target.name} 受到 ${dmg} 點傷害！`);
+                await this.dealDamage(null, target, dmg, true);
+                if (this.onUpdate) this.onUpdate();
+                await this.delay(100);
+            }
+        }
 
         // Initial compaction to ensure everyone is at the front
         await this.compactTeams();
@@ -206,18 +224,28 @@ export class BattleSimulator {
             }
         }
 
-        // Ditto: Transform
+        // Ditto: Transform (Optimized timing)
         if (unit.family === 'ditto') {
-            const allies = myTeam.filter(u => u && u !== unit && u.stats.hp > 0);
+            const allies = myTeam.filter((u: Unit) => u && u !== unit && u.stats.hp > 0);
             if (allies.length > 0) {
                 let target = allies[0];
                 for (const u of allies) {
                     if (u.stats.hp > target.stats.hp) target = u;
                 }
-                await this.playAnimation(unit, 'morph', 500);
-                await this.notifySkill(unit, `變身成了 ${target.name}`);
-                await this.delay(400);
-                // Balanced Transformation (User Request: Skill power matches Ditto's level)
+
+                const originalName = unit.name;
+                const stars = '⭐'.repeat(unit.level);
+
+                // 1. Play animation (Start) - Don't await yet
+                const animPromise = this.playAnimation(unit, 'morph', 500);
+
+                // 2. Log skill first so it uses original name
+                this.log(`${originalName}(${stars}) 變身成了 ${target.name}！`);
+
+                // 3. Wait for the peak of the blur (250ms)
+                await this.delay(250);
+
+                // 4. Perform the data transformation
                 unit.family = target.family;
 
                 // Find the correct template for this family at THIS level (Ditto's level)
@@ -228,17 +256,20 @@ export class BattleSimulator {
                     }
                 }
 
-                // Identify vs Appearance
-                unit.templateId = currentTemplate.id;       // Skill logic depends on this
-                unit.description = currentTemplate.description; // UI shows this
-                unit.synergies = [...currentTemplate.synergies]; // Synergies match Ditto's tier in that family
+                unit.templateId = currentTemplate.id;
+                unit.description = currentTemplate.description;
+                unit.synergies = [...currentTemplate.synergies];
 
                 // Appearance (Copied from target)
                 unit.name = target.name;
                 unit.imageUrl = target.imageUrl;
                 unit.battleImageUrl = target.battleImageUrl;
 
-                // NOTE: Synergy recalculation is skipped to prevent extra population count
+                // 5. Refresh UI while animation is still running (blurry character)
+                if (this.onUpdate) this.onUpdate();
+
+                // 6. Wait for animation to finish
+                await animPromise;
 
                 // Register new abilities (Ditto now registers listeners based on its new identity)
                 this.registerUnitAbilities(unit);
@@ -299,32 +330,16 @@ export class BattleSimulator {
     private async applyBattleStartSynergies(team: Unit[]) {
         if (team.length === 0) return;
         if (this.getSynergyCountForUnit(team[0], 'Triplets') >= 3) {
-            team.filter(u => u && u.synergies.includes('Triplets')).forEach(u => {
+            team.filter((u: Unit) => u && u.synergies.includes('Triplets')).forEach(u => {
                 this.growUnit(u, 3, 3, 'Triplets');
             });
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
-            team.filter(u => u && u.synergies.includes('Starter')).forEach(u => {
+            team.filter((u: Unit) => u && u.synergies.includes('Starter')).forEach(u => {
                 this.growUnit(u, 1, 1, '御三家');
             });
         }
 
-        if (this.getSynergyCountForUnit(team[0], 'Snow') >= 2) {
-            this.log("天空降下了冰雹...");
-            await this.delay(500);
-            const { myTeam, opTeam } = this.getTeams(team[0]);
-            const allUnits = [...myTeam, ...opTeam].filter(u => u !== null && u.stats.hp > 0);
-
-            for (const target of allUnits) {
-                if (target.synergies.includes('Snow')) continue;
-
-                // User Request: 33% of lifetime Max HP
-                const dmg = Math.ceil(target.stats.maxHp * 0.33);
-                this.log(`${target.name} 受到 ${dmg} 點傷害！`);
-                await this.dealDamage(null, target, dmg, true);
-                await this.delay(100);
-            }
-        }
     }
 
     private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string, permanentTarget?: Unit | null) {
