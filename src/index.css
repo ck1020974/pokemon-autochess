@@ -1221,64 +1221,65 @@ h3 {
 
 @media (max-width: 600px) {
   .startup-overlay {
-    gap: 10px !important;
+    gap: 5px !important;
     justify-content: space-between !important;
     /* Push header/footer away */
     padding: 0 !important;
   }
 
-  /* Move title DOWN */
+  /* Extreme Move title DOWN */
   .startup-header-box {
-    margin-top: 22vh !important;
+    margin-top: 25vh !important;
     margin-bottom: 0 !important;
   }
 
-  /* Move footer text UP */
+  /* Extreme Move footer text UP */
   .startup-footer-box {
-    margin-bottom: 22vh !important;
+    margin-bottom: 25vh !important;
     margin-top: 0 !important;
   }
 
   .startup-overlay h1 {
-    font-size: 1.3rem !important;
+    font-size: 1.2rem !important;
     letter-spacing: 2px !important;
     padding: 0 20px !important;
   }
 
   .difficulty-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-    width: 80% !important;
-    max-width: 300px !important;
+    gap: 8px !important;
+    width: 75% !important;
+    /* Narrower grid to center more */
+    max-width: 280px !important;
     margin: 0 auto !important;
   }
 
   .difficulty-btn {
-    padding: 10px 5px !important;
-    min-height: 85px !important;
-    /* Scaled down frame even more */
-    gap: 4px !important;
-    border-radius: 12px !important;
+    padding: 8px 4px !important;
+    min-height: 75px !important;
+    /* Even smaller frame */
+    gap: 3px !important;
+    border-radius: 10px !important;
   }
 
   .difficulty-btn img {
-    width: 32px !important;
-    /* Extremely scaled down icon */
-    height: 32px !important;
+    width: 28px !important;
+    /* Scaled down even more */
+    height: 28px !important;
     filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.4)) !important;
   }
 
   .difficulty-btn span {
-    font-size: 0.75rem !important;
-    /* Scaled down text */
+    font-size: 0.7rem !important;
+    /* Scaled down text more */
     letter-spacing: 1px !important;
   }
 
   .startup-overlay p {
-    font-size: 0.8rem !important;
+    font-size: 0.75rem !important;
     padding: 0 20px !important;
     letter-spacing: 1px !important;
-    opacity: 0.6 !important;
+    opacity: 0.5 !important;
   }
 }
 

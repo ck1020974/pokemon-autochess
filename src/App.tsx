@@ -218,11 +218,8 @@ function App() {
         }
     };
 
-    // --- Difficulty \u0026 Preloading States ---
+    // --- Difficulty & Preloading States ---
     const [difficulty, setDifficulty] = useState<'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER' | null>(null);
-    const [isPreloading, setIsPreloading] = useState(true);
-    const [loadedCount, setLoadedCount] = useState(0);
-    const [totalAssets, setTotalAssets] = useState(0);
 
     // Battle Paused State
     const [isPaused, setIsPaused] = useState(false);
@@ -238,30 +235,19 @@ function App() {
             });
 
             const assetUrls = Array.from(urls);
-            setTotalAssets(assetUrls.length);
-            let loaded = 0;
 
             const promises = assetUrls.map(url => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.src = url;
-                    img.onload = () => {
-                        loaded++;
-                        setLoadedCount(loaded);
-                        resolve(null);
-                    };
-                    img.onerror = () => {
-                        loaded++;
-                        setLoadedCount(loaded);
-                        resolve(null);
-                    };
+                    img.onload = () => resolve(url);
+                    img.onerror = () => resolve(url);
                 });
             });
 
             console.log(`[系統] 開始預載入 ${assetUrls.length} 個美術資源...`);
             await Promise.all(promises);
             console.log(`[系統] 所有資源載入完成！`);
-            setIsPreloading(false);
         };
 
         preloadAllAssets();
@@ -738,15 +724,6 @@ function App() {
     const displayPlayerTeam = game.phase === GamePhase.BATTLE ? simulatorRef.current?.playerTeam : game.playerTeam;
     const displayEnemyTeam = game.phase === GamePhase.BATTLE ? simulatorRef.current?.enemyTeam : Array(5).fill(null);
     const [focusedDifficulty, setFocusedDifficulty] = useState<string | null>(null);
-
-    const handleDifficultyClick = (id: string) => {
-        if (isPreloading) return;
-        if (focusedDifficulty === id) {
-            handleDifficultySelect(id as any);
-        } else {
-            setFocusedDifficulty(id);
-        }
-    };
 
     // Calculate Synergies (All)
     const synergyStatus = getSynergyStatus(game.playerTeam);
