@@ -216,26 +216,30 @@ function App() {
     const [isPaused, setIsPaused] = useState(false);
     const isPausedRef = useRef(false);
 
-    // Image Preloading
+    // Image Preloading - Systematically cache all unit assets on startup
     useEffect(() => {
-        const preloadImages = () => {
-            const urls: string[] = [];
+        const preloadAllAssets = async () => {
+            const urls = new Set<string>();
             Object.values(UNIT_TEMPLATES).forEach(t => {
-                if (t.imageUrl) urls.push(t.imageUrl);
-                if (t.battleImageUrl) urls.push(t.battleImageUrl);
+                if (t.imageUrl) urls.add(t.imageUrl);
+                if (t.battleImageUrl) urls.add(t.battleImageUrl);
             });
 
-            // De-duplicate
-            const uniqueUrls = Array.from(new Set(urls));
-
-            uniqueUrls.forEach(url => {
-                const img = new Image();
-                img.src = url;
+            const promises = Array.from(urls).map(url => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.src = url;
+                    img.onload = resolve;
+                    img.onerror = resolve; // Continue even if one fails
+                });
             });
-            console.log(`Preloading ${uniqueUrls.length} assets...`);
+
+            console.log(`[系統] 開始預載入 ${urls.size} 個美術資源...`);
+            await Promise.all(promises);
+            console.log(`[系統] 所有資源載入完成！`);
         };
 
-        preloadImages();
+        preloadAllAssets();
     }, []);
 
     const togglePause = () => {

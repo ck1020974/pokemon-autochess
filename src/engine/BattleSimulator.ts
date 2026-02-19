@@ -582,11 +582,13 @@ export class BattleSimulator {
 
         // Fuecoco: Ally Death -> Gain HP
         if (unit.family === 'fuecoco') {
-            this.eventBus.on('AFTER_DEATH', (e) => {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
                     const amount = [0, 3, 5, 10][unit.level] || 3;
+                    await this.notifySkill(unit, `獲得了意志（+${amount}生命）`);
+                    await this.playAnimation(unit, 'jump', 300);
                     this.growUnit(unit, amount, 0, '呆火鱷技能');
                 }
             });
@@ -729,6 +731,7 @@ export class BattleSimulator {
                     if (living.length > 0) {
                         const target = living[0];
                         await this.notifySkill(unit, `對 ${target.name} 發動了種子機關槍`);
+                        await this.playAnimation(unit, 'jump', 300);
                         await this.delay(250);
                         await this.dealDamage(unit, target, dmg, true);
                     }
@@ -738,11 +741,13 @@ export class BattleSimulator {
 
         // Sprigatito Family: Gain stats on Summon
         if (unit.family === 'sprigatito') {
-            this.eventBus.on('ON_FRIEND_SUMMONED', (e) => {
+            this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
                     const buff = [0, 3, 5, 10][unit.level] || 3;
+                    await this.notifySkill(unit, `獲得了成長`);
+                    await this.playAnimation(unit, 'jump', 300);
                     this.growUnit(unit, buff, buff, '新葉喵技能');
                 }
             });
@@ -896,7 +901,7 @@ export class BattleSimulator {
             // Squirtle: Flat reduction
             if (target.family === 'squirtle' && amount > 0) amount = Math.max(1, amount - target.level);
         } else if (source) {
-            this.log(`${source.name} 穿透了一切！`);
+            this.log(`${source.name} 貫穿了一切！`);
         }
 
         target.stats.hp -= amount;
@@ -935,7 +940,7 @@ export class BattleSimulator {
 
         // Sableye: Revenge kill
         if (unit.family === 'sableye' && killer && killer.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-            this.log(`${unit.name} 拉著 ${killer.name} 同歸於盡！`);
+            this.log(`${unit.name} 帶著 ${killer.name} 同歸於盡！`);
             const state = this.unitStates.get(unit) || {};
             state.isAbsoluteKill = true;
             this.unitStates.set(unit, state);
@@ -1105,21 +1110,21 @@ export class BattleSimulator {
 
         // 1. Refresh UI so the DOM element for the new unit is created
         if (this.onUpdate) this.onUpdate();
-        await this.delay(50); // Give browser a moment to render
+        await this.delay(100); // Wait for DOM/Reflow
 
         // 2. Play spawn animation and log
         const el = document.getElementById(newUnit.id);
         if (el) el.classList.add('spawn-anim');
         this.log(`${newUnit.name} 加入了戰場！`);
 
-        // 3. Wait for the appearance to be noticed
-        await this.delay(150);
+        // 3. Wait for the unit to "Stand Up" (Settle its entry animation)
+        await this.delay(450); // Match index.css spawn-anim duration (0.5s)
 
         // 4. Finally emit the event for others to react (e.g. Chikorita buffs)
         await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
 
         // Small settle time after reactions
-        await this.delay(50);
+        await this.delay(100);
     }
 
     private async notifySkill(unit: Unit, message: string) {
