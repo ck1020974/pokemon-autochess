@@ -1221,65 +1221,65 @@ h3 {
 
 @media (max-width: 600px) {
   .startup-overlay {
-    gap: 5px !important;
+    gap: 2px !important;
     justify-content: space-between !important;
     /* Push header/footer away */
     padding: 0 !important;
   }
 
-  /* Extreme Move title DOWN */
+  /* Phase 3 Extreme Move title DOWN */
   .startup-header-box {
-    margin-top: 25vh !important;
+    margin-top: 32vh !important;
     margin-bottom: 0 !important;
   }
 
-  /* Extreme Move footer text UP */
+  /* Phase 3 Extreme Move footer text UP */
   .startup-footer-box {
-    margin-bottom: 25vh !important;
+    margin-bottom: 32vh !important;
     margin-top: 0 !important;
   }
 
   .startup-overlay h1 {
-    font-size: 1.2rem !important;
+    font-size: 1.1rem !important;
     letter-spacing: 2px !important;
     padding: 0 20px !important;
   }
 
   .difficulty-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-    width: 75% !important;
-    /* Narrower grid to center more */
-    max-width: 280px !important;
+    gap: 6px !important;
+    width: 70% !important;
+    /* Even narrower */
+    max-width: 260px !important;
     margin: 0 auto !important;
   }
 
   .difficulty-btn {
-    padding: 8px 4px !important;
-    min-height: 75px !important;
-    /* Even smaller frame */
-    gap: 3px !important;
-    border-radius: 10px !important;
+    padding: 6px 3px !important;
+    min-height: 65px !important;
+    /* Micro frame */
+    gap: 2px !important;
+    border-radius: 8px !important;
   }
 
   .difficulty-btn img {
-    width: 28px !important;
-    /* Scaled down even more */
-    height: 28px !important;
-    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.4)) !important;
+    width: 24px !important;
+    /* Micro icon */
+    height: 24px !important;
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.4)) !important;
   }
 
   .difficulty-btn span {
-    font-size: 0.7rem !important;
-    /* Scaled down text more */
+    font-size: 0.65rem !important;
+    /* Micro text */
     letter-spacing: 1px !important;
   }
 
   .startup-overlay p {
-    font-size: 0.75rem !important;
+    font-size: 0.65rem !important;
     padding: 0 20px !important;
     letter-spacing: 1px !important;
-    opacity: 0.5 !important;
+    opacity: 0.4 !important;
   }
 }
 
