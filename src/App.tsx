@@ -82,7 +82,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies }: any) {
+function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy }: any) {
     let activeDesc = synergy.description;
     const isActive = count !== undefined && count >= synergy.tiers[0];
     const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
@@ -91,7 +91,7 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies }
         <div className="synergy-icon" style={style}>
             {synergy.icon}
             {showCount && count !== undefined && <span style={{ position: 'absolute', bottom: -5, right: -5, fontSize: '0.7rem', background: '#000', borderRadius: '50%', padding: '0 4px', border: '1px solid #333', color: '#fff' }}>{count}</span>}
-            <div className="synergy-tooltip">
+            <div className={`synergy-tooltip ${isEnemy ? 'is-enemy' : ''}`}>
                 <div style={{ fontWeight: 'bold', color: isActive ? synergy.color : '#aaa', marginBottom: '4px' }}>
                     {synergy.icon} {synergy.name} {count !== undefined ? `(${count})` : ''}
                 </div>
@@ -818,7 +818,7 @@ function App() {
                 {(initialEnemyTeam.length > 0 || displayEnemyTeam) && (
                     <div className="board-synergies" style={{ left: 'auto', right: '10px', flexDirection: 'row-reverse' }}>
                         {getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || [])).map(syn => (
-                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeFamilies={syn.activeFamilies} />
+                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeFamilies={syn.activeFamilies} isEnemy={true} />
                         ))}
                     </div>
                 )}
@@ -999,7 +999,7 @@ function App() {
             {/* Battle Log & Timeout HUD */}
             {
                 game.phase === GamePhase.BATTLE && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '50px', padding: '20px 0' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px', padding: '10px 0' }}>
                         {/* 1. Battle Controls (Top) */}
                         <div className="battle-controls-container" style={{ zIndex: 10, position: 'relative' }}>
                             <button onClick={togglePause} style={{

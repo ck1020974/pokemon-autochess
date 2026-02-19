@@ -379,7 +379,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && myTeam.includes(unit)) { // Ensure unit is still in team
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
-                    const heal = count >= 4 ? 4 : (count >= 3 ? 3 : (count >= 2 ? 2 : 0));
+                    const heal = count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
                     // Double-check HP again right before healing to prevent race conditions
                     if (heal > 0 && unit.stats.hp > 0) this.heal(unit, heal);
                 }
@@ -393,7 +393,7 @@ export class BattleSimulator {
                 if (unit.stats.hp <= 0) return;
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const buff = count >= 4 ? 4 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
+                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (buff > 0) {
                         this.growUnit(unit, buff, 0, 'Water');
                     }
@@ -422,7 +422,7 @@ export class BattleSimulator {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
-                    const buff = count >= 4 ? 4 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
+                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (buff > 0) this.buffAttack(unit, buff);
                 }
             });

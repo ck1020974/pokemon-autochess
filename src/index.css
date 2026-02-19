@@ -753,6 +753,12 @@ h3 {
   line-height: 1.4;
 }
 
+.synergy-tooltip.is-enemy {
+  left: auto;
+  right: 110%;
+  text-align: right;
+}
+
 .synergy-icon:hover .synergy-tooltip {
   visibility: visible;
   opacity: 1;
