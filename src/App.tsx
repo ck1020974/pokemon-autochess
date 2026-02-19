@@ -999,22 +999,9 @@ function App() {
             {/* Battle Log & Timeout HUD */}
             {
                 game.phase === GamePhase.BATTLE && (
-                    <div style={{ position: 'relative', height: '180px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', gap: '15px', paddingTop: '40px' }}>
-                        {/* 1. Battle Log */}
-                        <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5, minHeight: '3em', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            {logs.length > 0 ? (
-                                logs.slice(-3).map((log, i) => (
-                                    <div key={i} style={{ opacity: i === 2 ? 1 : (i === 1 ? 0.6 : 0.3) }}>
-                                        {log.message}
-                                    </div>
-                                ))
-                            ) : (
-                                <div>戰鬥進行中...</div>
-                            )}
-                        </div>
-
-                        {/* 3. Battle Controls (Bottom) */}
-                        <div className="battle-controls-container" style={{ zIndex: 10, marginTop: '10px' }}>
+                    <div style={{ position: 'relative', height: '220px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', gap: '30px', paddingTop: '10px' }}>
+                        {/* 1. Battle Controls (Top) */}
+                        <div className="battle-controls-container" style={{ zIndex: 10 }}>
                             <button onClick={togglePause} style={{
                                 border: 'none',
                                 color: '#ddd',
@@ -1028,6 +1015,19 @@ function App() {
                             }}>
                                 {isPaused ? '▶️ 繼續' : '⛔ 暫停'}
                             </button>
+                        </div>
+
+                        {/* 2. Battle Log (Bottom) */}
+                        <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5, minHeight: '3em', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            {logs.length > 0 ? (
+                                logs.slice(-3).map((log, i) => (
+                                    <div key={i} style={{ opacity: i === 2 ? 1 : (i === 1 ? 0.6 : 0.3) }}>
+                                        {log.message}
+                                    </div>
+                                ))
+                            ) : (
+                                <div>戰鬥進行中...</div>
+                            )}
                         </div>
                     </div>
                 )
