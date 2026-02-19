@@ -669,7 +669,7 @@ export class BattleSimulator {
                         const target = living[Math.floor(Math.random() * living.length)];
                         await this.notifySkill(unit, `死前對 ${target.name} 造成傷害`);
                         await this.delay(400);
-                        const dmg = [0, 2, 5, 99][unit.level] || 2;
+                        const dmg = [0, 2, 4, 10][unit.level] || 2;
                         await this.dealDamage(unit, target, dmg, true);
                     }
                 }
@@ -683,7 +683,7 @@ export class BattleSimulator {
                 if (e.source === unit) {
                     const { opTeam } = this.getTeams(unit);
                     await this.notifySkill(unit, '發動了自爆');
-                    const dmg = [0, 1, 3, 8][unit.level] || 1;
+                    const dmg = [0, 2, 5, 15][unit.level] || 2;
                     // Staggered sequence for AOE damage
                     for (const target of opTeam.filter(u => u && u.stats.hp > 0)) {
                         await this.dealDamage(unit, target, dmg, true);
@@ -983,7 +983,7 @@ export class BattleSimulator {
             // Sneasel family: Atk on kill (Permanent)
             if (killer.family === 'sneasel') {
                 const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                const buff = killer.level >= 2 ? 4 : 2;
+                const buff = killer.level >= 2 ? 2 : 1;
                 this.growUnit(killer, 0, buff, '狃拉技能', original);
             }
 
@@ -1136,21 +1136,17 @@ export class BattleSimulator {
 
         // 1. Refresh UI so the DOM element for the new unit is created
         if (this.onUpdate) this.onUpdate();
-        await this.delay(50); // DOM Buffer
+        // Delay removed as per user request to fix Chikorita/Treecko sync issues
 
         // 2. Play spawn animation and log
         const el = document.getElementById(newUnit.id);
         if (el) el.classList.add('spawn-anim');
         this.log(`${newUnit.name} 加入了戰場！`);
 
-        // 3. Wait for the unit to "Stand Up" (Settle its entry animation)
-        await this.delay(350); // Compressed animation duration
+        // 3. Stand up delay removed
 
         // 4. Finally emit the event for others to react (e.g. Chikorita buffs)
         await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
-
-        // Small settle time after reactions
-        await this.delay(50);
     }
 
     private async notifySkill(unit: Unit, message: string) {

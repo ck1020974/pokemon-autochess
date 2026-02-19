@@ -470,19 +470,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'sneasel', name: '狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/狃拉00.webp', battleImageUrl: 'assets/狃拉01.webp',
-        description: '擊殺後永久 +2 攻擊；攻擊時，隨機再攻擊 1 個敵方。', synergies: ['Claw', 'Snow'], evolveId: 'weavile'
+        description: '擊殺後永久 +1 攻擊；攻擊時，隨機再攻擊 1 個敵方。', synergies: ['Claw', 'Snow'], evolveId: 'weavile'
     },
     weavile: {
         id: 'weavile', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '擊殺後永久 +4 攻擊；攻擊時，隨機再攻擊 1 個敵方。', synergies: ['Claw', 'Snow'], evolveId: 'weavile_final', isHiddenFromShop: true
+        description: '擊殺後永久 +2 攻擊；攻擊時，隨機再攻擊 1 個敵方。', synergies: ['Claw', 'Snow'], evolveId: 'weavile_final', isHiddenFromShop: true
     },
     weavile_final: {
         id: 'weavile_final', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '擊殺後永久 +4 攻擊；攻擊時，隨機再攻擊 2 個敵方。', synergies: ['Claw', 'Snow'], isHiddenFromShop: true
+        description: '擊殺後永久 +2 攻擊；攻擊時，隨機再攻擊 2 個敵方。', synergies: ['Claw', 'Snow'], isHiddenFromShop: true
     },
 
     // 25. Shuppet (Tier 1)
@@ -496,33 +496,33 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'banette', name: '詛咒娃娃', tier: 1, family: 'shuppet',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/詛咒娃娃00.webp', battleImageUrl: 'assets/詛咒娃娃01.webp',
-        description: '死亡後對隨機敵方造成 5 傷害。', synergies: ['Ghost'], evolveId: 'banette_final', isHiddenFromShop: true
+        description: '死亡後對隨機敵方造成 4 傷害。', synergies: ['Ghost'], evolveId: 'banette_final', isHiddenFromShop: true
     },
     banette_final: {
         id: 'banette_final', name: '詛咒娃娃', tier: 1, family: 'shuppet',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/詛咒娃娃00.webp', battleImageUrl: 'assets/詛咒娃娃01.webp',
-        description: '死亡後對隨機敵方造成 99 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '死亡後對隨機敵方造成 10 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 26. Drifloon (Renamed from Drifblim Base)
     drifloon: {
         id: 'drifloon', name: '飄飄球', tier: 2, family: 'drifloon',
-        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/飄飄球00.webp', battleImageUrl: 'assets/飄飄球01.webp',
-        description: '死亡後對全體敵方造成 1 傷害。', synergies: ['Ghost'], evolveId: 'drifblim'
+        description: '死亡後對全體敵方造成 2 傷害。', synergies: ['Ghost'], evolveId: 'drifblim'
     },
     drifblim: {
         id: 'drifblim', name: '隨風球', tier: 2, family: 'drifloon',
-        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/隨風球00.webp', battleImageUrl: 'assets/隨風球01.webp',
-        description: '死亡後對全體敵方造成 3 傷害。', synergies: ['Ghost'], evolveId: 'drifblim_final', isHiddenFromShop: true
+        description: '死亡後對全體敵方造成 5 傷害。', synergies: ['Ghost'], evolveId: 'drifblim_final', isHiddenFromShop: true
     },
     drifblim_final: {
         id: 'drifblim_final', name: '隨風球', tier: 2, family: 'drifloon',
-        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/隨風球00.webp', battleImageUrl: 'assets/隨風球01.webp',
-        description: '死亡後對全體敵方造成 8 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '死亡後對全體敵方造成 15 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 27. Snover
