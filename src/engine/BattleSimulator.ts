@@ -784,18 +784,13 @@ export class BattleSimulator {
             }
         }
 
-        // Doduo: Extra random hit (Maximum 1 extra hit)
+        // Doduo: Extra hit on same target
         if (attacker.family === 'doduo' && !this.unitStates.get(attacker)?.isSilenced) {
             const chance = [0, 0.25, 0.33, 0.5][attacker.level] || 0.25;
             if (Math.random() < chance) {
-                const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
-                const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
-                const living = opTeam.filter(u => u && u.stats.hp > 0);
-                if (living.length > 0) {
-                    const target = living[Math.floor(Math.random() * living.length)];
-                    this.log(`${attacker.name} 對 ${target.name} 發動了二連擊！`);
-                    attackPromises.push(this.dealDamage(attacker, target, dmg));
-                }
+                // User Request: Should hit the same target
+                this.log(`${attacker.name} 對 ${defender.name} 發動了連擊！`);
+                attackPromises.push(this.dealDamage(attacker, defender, dmg));
             }
         }
 
@@ -1091,7 +1086,9 @@ export class BattleSimulator {
 
         // Team Limit Check: Field limit is 5 survivors.
         const livingUnits = team.filter(u => u && u.stats.hp > 0).length;
-        const isReplacingSlot = team[index] === null || (team[index] && team[index].stats.hp <= 0);
+        // Clamp index to slot 0-4 for replacement check
+        const checkIdx = Math.min(index, 4);
+        const isReplacingSlot = !team[checkIdx] || team[checkIdx].stats.hp <= 0;
 
         if (livingUnits >= 5 && !isReplacingSlot) {
             this.log(`戰場已滿，無法再召喚 ${newUnit.name}！ `);
@@ -1100,30 +1097,30 @@ export class BattleSimulator {
 
         // Placement Logic: "若有空間即召喚"
         if (insert) {
-            // Clamp index to current team length to avoid sparse arrays if shifted
-            const safeIdx = Math.min(index, team.length);
+            // Clamp index to slot 0-4 to prevent array expansion beyond 5
+            let safeIdx = Math.min(index, 4);
 
-            // Priority 1: Fill the dead unit's slot directly (Prevents array growth)
-            if (team[safeIdx] === null || (team[safeIdx] && team[safeIdx].stats.hp <= 0)) {
+            // Priority 1: Fill the target slot if empty/dead
+            if (!team[safeIdx] || team[safeIdx].stats.hp <= 0) {
                 team[safeIdx] = newUnit;
-            }
-            // Priority 2: Find ANY other dead/null slot to avoid splice if possible
-            else {
-                const vacancyIdx = team.findIndex(u => !u || u.stats.hp <= 0);
+            } else {
+                // Priority 2: Splice into position (shifts others back)
+                team.splice(safeIdx, 0, newUnit);
+
+                // Then immediately find and remove a vacancy to restore length 5
+                const vacancyIdx = team.findIndex((u, i) => i !== safeIdx && (!u || u.stats.hp <= 0));
                 if (vacancyIdx !== -1) {
-                    team.splice(safeIdx, 0, newUnit);
-                    // Remove the first vacancy found to keep array count stable
-                    const newVacancyIdx = team.findIndex((u, i) => i !== safeIdx && (!u || u.stats.hp <= 0));
-                    if (newVacancyIdx !== -1) team.splice(newVacancyIdx, 1);
-                } else {
-                    team.splice(safeIdx, 0, newUnit);
+                    team.splice(vacancyIdx, 1);
+                } else if (team.length > 5) {
+                    // Safety: if no vacancy found, pop the one pushed past index 4
+                    team.splice(5, team.length - 5);
                 }
             }
         } else {
-            // Click/Standard Spawn: Fill first null or append
-            const nullIdx = team.indexOf(null as any);
-            if (nullIdx !== -1) team[nullIdx] = newUnit;
-            else team.push(newUnit);
+            // Click/Standard Spawn: Fill first null or append within 5-slot limit
+            const nullIdx = team.findIndex(u => !u || u.stats.hp <= 0);
+            if (nullIdx !== -1 && nullIdx < 5) team[nullIdx] = newUnit;
+            else if (team.length < 5) team.push(newUnit);
         }
 
         this.unitStates.set(newUnit, {});
