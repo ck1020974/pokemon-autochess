@@ -1232,65 +1232,71 @@ h3 {
 /* --- Mobile Landscape Specific Optimization --- */
 @media (orientation: landscape) and (max-height: 500px) {
   .startup-overlay {
-    padding: 20px 0 !important;
+    padding: 15px 0 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-around !important;
-    /* Space items out */
     gap: 10px !important;
   }
 
   .startup-header-box {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+    transform: translateY(15px);
+    /* 小幅往下 */
   }
 
   .startup-footer-box {
     margin-bottom: 0 !important;
     margin-top: 0 !important;
+    transform: translateY(-15px);
+    /* 往上一點 */
   }
 
   .startup-overlay h1 {
-    font-size: 1.4rem !important;
-    letter-spacing: 3px !important;
+    font-size: 2.22rem !important;
+    /* 顯著放大標題 */
+    letter-spacing: 5px !important;
     margin: 0 !important;
+    line-height: 1.1 !important;
   }
 
   .difficulty-grid {
     grid-template-columns: repeat(4, 1fr) !important;
-    /* One row for landscape */
     gap: 15px !important;
     width: 95% !important;
-    max-width: 800px !important;
+    max-width: 900px !important;
     margin: 0 auto !important;
   }
 
   .difficulty-btn {
     padding: 15px 5px !important;
-    min-height: 120px !important;
-    /* Back to comfortable height */
-    gap: 10px !important;
+    min-height: 145px !important;
+    /* 增加按鈕外框高度 */
+    gap: 12px !important;
     border-radius: 20px !important;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
   }
 
   .difficulty-btn img {
-    width: 48px !important;
-    /* Back to normal size */
-    height: 48px !important;
+    width: 60px !important;
+    /* 難度球放大 */
+    height: 60px !important;
   }
 
   .difficulty-btn span {
-    font-size: 0.95rem !important;
-    /* Back to normal size */
-    letter-spacing: 1px !important;
+    font-size: 1.15rem !important;
+    letter-spacing: 2px !important;
+    font-weight: bold !important;
   }
 
   .startup-overlay p {
-    font-size: 0.9rem !important;
+    font-size: 1.2rem !important;
+    /* 選擇挑戰難度字體放大 */
     margin: 0 !important;
-    opacity: 0.8 !important;
-    letter-spacing: 2px !important;
+    opacity: 0.9 !important;
+    letter-spacing: 3px !important;
+    font-weight: bold !important;
   }
 
   /* Rotate Hint Animation */
@@ -1323,46 +1329,55 @@ h3 {
 
 @media (max-width: 600px) {
   .startup-overlay {
-    gap: 20px !important;
+    gap: 35px !important;
     justify-content: center !important;
     padding: 20px !important;
   }
 
   .startup-overlay h1 {
-    font-size: 1.8rem !important;
-    letter-spacing: 2px !important;
+    font-size: 3rem !important;
+    /* 超大 H1 文字 */
+    letter-spacing: 4px !important;
+    line-height: 1.1 !important;
   }
 
   .difficulty-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-    width: 90% !important;
-    max-width: 340px !important;
+    gap: 20px !important;
+    width: 95% !important;
+    max-width: 420px !important;
   }
 
   .difficulty-btn {
-    padding: 20px 10px !important;
-    min-height: 130px !important;
-    gap: 8px !important;
-    border-radius: 20px !important;
+    padding: 30px 15px !important;
+    min-height: 165px !important;
+    /* 旗艦級卡牌高度 */
+    gap: 15px !important;
+    border-radius: 26px !important;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6) !important;
   }
 
   .difficulty-btn img {
-    width: 52px !important;
-    height: 52px !important;
-    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.4)) !important;
+    width: 72px !important;
+    /* 超級大難度球 */
+    height: 72px !important;
+    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5)) !important;
   }
 
   .difficulty-btn span {
-    font-size: 1rem !important;
-    letter-spacing: 1px !important;
+    font-size: 1.3rem !important;
+    letter-spacing: 2px !important;
+    font-weight: bold !important;
   }
 
   .startup-overlay p {
-    font-size: 0.95rem !important;
+    font-size: 1.45rem !important;
+    /* 超級大提示文字 */
     padding: 0 10px !important;
-    letter-spacing: 2px !important;
-    opacity: 0.8 !important;
+    letter-spacing: 5px !important;
+    opacity: 1 !important;
+    font-weight: bold !important;
+    color: #fff !important;
   }
 }
 
