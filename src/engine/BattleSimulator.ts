@@ -19,14 +19,15 @@ export class BattleSimulator {
     // Track battle-specific state for units (e.g. "hasBlockedDeath")
     public unitStates: Map<Unit, any> = new Map(); // Changed from private to public for UI access
     private initialPlayerSet: Set<Unit> = new Set();
-    private spiritombTriggered: Set<string> = new Set(); // To track 'player' or 'enemy' activation
-    private originalPlayerTeam: (Unit | null)[] | null = null;
+    private spiritombTriggered: Set<string> = new Set();
+    private originalPlayerTeam?: (Unit | null)[];
+    private isCompacting = false;
     // Cached Synergies (Persist through death)
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
 
     constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[]) {
-        this.originalPlayerTeam = originalPlayerTeam || null;
+        this.originalPlayerTeam = originalPlayerTeam;
         // Preserve 5-slot architecture to match UI indices exactly
         this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
         this.enemyTeam = enemyTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
@@ -146,10 +147,10 @@ export class BattleSimulator {
         if (unit.family === 'gastly') {
             if (unit.templateId === 'gengar') { // Stage 3
                 await this.notifySkill(unit, `激勵了友軍，全體攻擊 +5`);
-                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => {
-                    this.buffAttack(u, 5);
-                });
-                await this.delay(200);
+                for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
+                    this.buffAttack(u!, 5);
+                    await this.delay(65);
+                }
             } else {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0) {
@@ -158,7 +159,6 @@ export class BattleSimulator {
                         const amount = unit.templateId === 'haunter' ? 5 : 2;
                         this.buffAttack(front, amount);
                         await this.notifySkill(unit, `提高了 ${front.name} 的攻擊`);
-                        await this.delay(200);
                     }
                 }
             }
@@ -168,10 +168,10 @@ export class BattleSimulator {
         if (unit.family === 'igglybuff') {
             if (unit.templateId === 'wigglytuff') { // Stage 3
                 await this.notifySkill(unit, `團結了友軍，全體生命 +5`);
-                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => {
-                    this.growUnit(u, 5, 0, 'Igglybuff');
-                });
-                await this.delay(200);
+                for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
+                    this.growUnit(u!, 5, 0, 'Igglybuff');
+                    await this.delay(65);
+                }
             } else {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0) {
@@ -180,7 +180,6 @@ export class BattleSimulator {
                         const amount = unit.templateId === 'jigglypuff' ? 5 : 2;
                         this.growUnit(front, amount, 0, 'Igglybuff');
                         await this.notifySkill(unit, `提高了 ${front.name} 的生命`);
-                        await this.delay(200);
                     }
                 }
             }
@@ -552,15 +551,18 @@ export class BattleSimulator {
             });
         }
 
-        // Onix: Stats on Move
         // Onix: Stats on Move & Steelix Reflect
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
                     const amount = unit.level >= 3 ? 4 : 2;
-                    await this.notifySkill(unit, `移動：+${amount}生命`);
-                    this.growUnit(unit, amount, 0); // Silence generic log
-                    this.log(`${unit.name} 透過移動提高了 ${amount} 生命`);
+                    if (!this.isCompacting) {
+                        await this.notifySkill(unit, `提高了 ${amount} 生命`);
+                    } else {
+                        // Silent log during compaction to avoid flood
+                        this.log(`${unit.name} 提高了 ${amount} 生命`);
+                    }
+                    this.growUnit(unit, amount, 0);
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                     if (original) original.addGrowth(amount, 0);
                 }
@@ -673,7 +675,11 @@ export class BattleSimulator {
                     const { opTeam } = this.getTeams(unit);
                     await this.notifySkill(unit, '發動了自爆');
                     const dmg = [0, 1, 3, 8][unit.level] || 1;
-                    await Promise.all(opTeam.filter(u => u && u.stats.hp > 0).map(u => this.dealDamage(unit, u!, dmg, true)));
+                    // Staggered sequence for AOE damage
+                    for (const target of opTeam.filter(u => u && u.stats.hp > 0)) {
+                        await this.dealDamage(unit, target, dmg, true);
+                        await this.delay(65);
+                    }
                 }
             });
         }
@@ -949,9 +955,24 @@ export class BattleSimulator {
             state.isAbsoluteKill = false;
         }
 
-        // 1. Process Killer Rewards FIRST (Before unit is removed)
-        // This allows simultaneous kills to potentially save the killer (e.g. Cyndaquil)
-        if (killer && !this.unitStates.get(killer)?.isSilenced) {
+        // 1. Emit AFTER_DEATH (Fuecoco etc. triggers here)
+        await this.eventBus.emit({ type: 'AFTER_DEATH', source: unit, context: { killer } });
+
+        // 2. Remove from team (Victim is gone)
+        if (this.playerTeam.includes(unit)) {
+            const idx = this.playerTeam.indexOf(unit);
+            if (this.playerTeam[idx] === unit) {
+                this.playerTeam[idx] = null as any;
+            }
+        } else if (this.enemyTeam.includes(unit)) {
+            const idx = this.enemyTeam.indexOf(unit);
+            if (this.enemyTeam[idx] === unit) {
+                this.enemyTeam[idx] = null as any;
+            }
+        }
+
+        // 3. Process Killer Rewards ONLY if killer survived
+        if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
             // Sneasel family: Atk on kill (Permanent)
             if (killer.family === 'sneasel') {
                 const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
@@ -990,35 +1011,13 @@ export class BattleSimulator {
             }
         }
 
-        // 2. Emit AFTER_DEATH (Fuecoco etc. triggers here)
-        await this.eventBus.emit({ type: 'AFTER_DEATH', source: unit, context: { killer } });
-
-        // 3. Final Survival Check: Did ANY skill (Fuecoco, Cyndaquil, etc.) bring this unit back to life?
-        if (unit.stats.hp > 0) {
-            this.log(`${unit.name} 奇蹟般地撐住了！`);
-            return; // ABORT DEATH
-        }
-
-        // 4. Remove from team
-        if (this.playerTeam.includes(unit)) {
-            const idx = this.playerTeam.indexOf(unit);
-            if (this.playerTeam[idx] === unit) {
-                this.playerTeam[idx] = null as any;
-            }
-        } else if (this.enemyTeam.includes(unit)) {
-            const idx = this.enemyTeam.indexOf(unit);
-            if (this.enemyTeam[idx] === unit) {
-                this.enemyTeam[idx] = null as any;
-            }
-        }
-
-        // Special: If unit just died but didn't trigger immediate spawn (which uses insert:true),
-        // we compact. But spawnUnit(insert:true) handles displacement correctly.
-        await this.delay(200);
+        // Special: Wait 150ms before compacting as per refined plan
+        await this.delay(150);
         await this.compactTeams();
     }
 
     private async compactTeams() {
+        this.isCompacting = true;
         // Track old positions to detect movement
         const oldPos = new Map<string, number>();
         [...this.playerTeam, ...this.enemyTeam].forEach((u, i) => {
@@ -1039,6 +1038,7 @@ export class BattleSimulator {
         }
 
         if (this.onUpdate) this.onUpdate();
+        this.isCompacting = false;
         await this.delay(100); // 0.1s delay after movement
     }
 
@@ -1113,7 +1113,7 @@ export class BattleSimulator {
 
         // 1. Refresh UI so the DOM element for the new unit is created
         if (this.onUpdate) this.onUpdate();
-        await this.delay(100); // Wait for DOM/Reflow
+        await this.delay(50); // DOM Buffer
 
         // 2. Play spawn animation and log
         const el = document.getElementById(newUnit.id);
@@ -1121,19 +1121,19 @@ export class BattleSimulator {
         this.log(`${newUnit.name} 加入了戰場！`);
 
         // 3. Wait for the unit to "Stand Up" (Settle its entry animation)
-        await this.delay(450); // Match index.css spawn-anim duration (0.5s)
+        await this.delay(350); // Compressed animation duration
 
         // 4. Finally emit the event for others to react (e.g. Chikorita buffs)
         await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
 
         // Small settle time after reactions
-        await this.delay(100);
+        await this.delay(50);
     }
 
     private async notifySkill(unit: Unit, message: string) {
         const fullMsg = `${unit.name} ${message}！`;
         this.log(fullMsg);
-        await this.delay(200); // 0.2s pause for visual feedback
+        await this.delay(250); // 0.25s pause for visual feedback
     }
 
     private log(message: string) {
@@ -1173,7 +1173,7 @@ export class BattleSimulator {
         ];
 
         // 2. Wait for the "impact" point (middle of clash animation)
-        await this.delay(100);
+        await this.delay(150);
 
         // 3. Trigger damage and logic
         await Promise.all([
@@ -1186,6 +1186,12 @@ export class BattleSimulator {
 
         // 5. Compact teams to ensure summons are settled before victory check
         await this.compactTeams();
+
+        // Check if battle ended
+        const result = this.getResult();
+        if (result !== null) {
+            await this.delay(500); // 0.5s pause before UI shows胜负
+        }
 
         return this.playerTeam.some(u => u !== null && u.stats.hp > 0) &&
             this.enemyTeam.some(u => u !== null && u.stats.hp > 0);
