@@ -615,9 +615,10 @@ export class BattleSimulator {
                     for (let i = 0; i < count; i++) {
                         // Re-fetch team reference (compactTeams may replace the array object)
                         const { myTeam: currentTeam } = this.getTeams(unit);
-                        await this.spawnUnit(currentTeam, deathIdx + i, 'sprout', 1, seedStats, seedStats, true);
+                        const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
+                        await this.spawnUnit(currentTeam, targetIdx, 'sprout', 1, seedStats, seedStats, true);
                     }
-                    await this.compactTeams();
+                    // COMPACTION REMOVED HERE: handleDeath will do it once after all effects
                 }
             });
         }
@@ -641,9 +642,10 @@ export class BattleSimulator {
                     const stats = [0, 0, 1, 2][unit.level]; // Match Bulbasaur logic: 0 bonus = 1/1
                     for (let i = 0; i < count; i++) {
                         const { myTeam: currentTeam } = this.getTeams(unit);
-                        await this.spawnUnit(currentTeam, deathIdx + i, 'mouse', 1, stats, stats, true);
+                        const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
+                        await this.spawnUnit(currentTeam, targetIdx, 'mouse', 1, stats, stats, true);
                     }
-                    await this.compactTeams();
+                    // COMPACTION REMOVED HERE
                 }
             });
         }
@@ -955,7 +957,10 @@ export class BattleSimulator {
         }
 
         // 1. Emit AFTER_DEATH (Fuecoco etc. triggers here)
-        await this.eventBus.emit({ type: 'AFTER_DEATH', source: unit, context: { killer } });
+        // Pass deathIdx to help summons find their parent's spot even after shifts
+        const { myTeam } = this.getTeams(unit);
+        const deathIdx = myTeam.indexOf(unit);
+        await this.eventBus.emit({ type: 'AFTER_DEATH', source: unit, context: { killer, deathIdx } });
 
         // 2. Remove from team (Victim is gone)
         if (this.playerTeam.includes(unit)) {
@@ -1012,7 +1017,7 @@ export class BattleSimulator {
 
         // Special: Wait 150ms before compacting as per refined plan
         await this.delay(150);
-        await this.compactTeams();
+        // compactTeams is now called after both attacks in simulateStep
     }
 
     private async compactTeams() {
@@ -1071,33 +1076,33 @@ export class BattleSimulator {
         newUnit.battleImageUrl = template.battleImageUrl;
 
         // Team Limit Check: Field limit is 5 survivors.
-        // We count only units with HP > 0.
         const livingUnits = team.filter(u => u && u.stats.hp > 0).length;
-        if (livingUnits >= 5) {
+        const isReplacingSlot = team[index] === null || (team[index] && team[index].stats.hp <= 0);
+
+        if (livingUnits >= 5 && !isReplacingSlot) {
             this.log(`戰場已滿，無法再召喚 ${newUnit.name}！ `);
             return;
         }
 
         // Placement Logic: "若有空間即召喚"
         if (insert) {
+            // Clamp index to current team length to avoid sparse arrays if shifted
+            const safeIdx = Math.min(index, team.length);
+
             // Priority 1: Fill the dead unit's slot directly (Prevents array growth)
-            if (team[index] === null || (team[index] && team[index].stats.hp <= 0)) {
-                team[index] = newUnit;
+            if (team[safeIdx] === null || (team[safeIdx] && team[safeIdx].stats.hp <= 0)) {
+                team[safeIdx] = newUnit;
             }
             // Priority 2: Find ANY other dead/null slot to avoid splice if possible
             else {
                 const vacancyIdx = team.findIndex(u => !u || u.stats.hp <= 0);
                 if (vacancyIdx !== -1) {
-                    // We have a vacancy elsewhere. To respect the "insert" (ordering),
-                    // we could splice at 'index' and then prune the vacancy.
-                    team.splice(index, 0, newUnit);
+                    team.splice(safeIdx, 0, newUnit);
                     // Remove the first vacancy found to keep array count stable
-                    const newVacancyIdx = team.findIndex((u, i) => i !== index && (!u || u.stats.hp <= 0));
+                    const newVacancyIdx = team.findIndex((u, i) => i !== safeIdx && (!u || u.stats.hp <= 0));
                     if (newVacancyIdx !== -1) team.splice(newVacancyIdx, 1);
                 } else {
-                    // Truly no vacancies in the 5-slot array? 
-                    // This shouldn't happen if livingUnits < 5, but as a fallback:
-                    team.splice(index, 0, newUnit);
+                    team.splice(safeIdx, 0, newUnit);
                 }
             }
         } else {
@@ -1163,7 +1168,7 @@ export class BattleSimulator {
         const pEl = document.getElementById(pFront.id);
         const eEl = document.getElementById(eFront.id);
         if (pEl) pEl.style.setProperty('--clash-offset', '20px');
-        if (eEl) eEl.style.setProperty('--clash-offset', '20px'); // Also 20px because scaleX(-1) reverses X axis
+        if (eEl) eEl.style.setProperty('--clash-offset', '20px');
 
         // 1. Start clash animations
         const anims = [
@@ -1189,7 +1194,7 @@ export class BattleSimulator {
         // Check if battle ended
         const result = this.getResult();
         if (result !== null) {
-            await this.delay(500); // 0.5s pause before UI shows胜负
+            await this.delay(500); // 0.5s pause before UI shows result
         }
 
         return this.playerTeam.some(u => u !== null && u.stats.hp > 0) &&
