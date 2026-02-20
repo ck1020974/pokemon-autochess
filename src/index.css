@@ -1303,6 +1303,10 @@ h3 {
   .rotate-icon {
     animation: rotateHint 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  .timeout-countdown {
+    font-size: 5rem !important;
+  }
 }
 
 @keyframes rotateHint {
