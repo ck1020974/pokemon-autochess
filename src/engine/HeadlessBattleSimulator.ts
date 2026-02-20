@@ -403,7 +403,7 @@ export class HeadlessBattleSimulator {
                     const amount = [0, 1, 2, 4][unit.level] || 1;
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, 0, amount, original, true);
+                        this.growUnit(ally, amount, 0, original, true);
                     }
                 }
             });
@@ -417,7 +417,7 @@ export class HeadlessBattleSimulator {
                     const amount = [0, 1, 2, 4][unit.level] || 1;
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, amount, 0, original, true);
+                        this.growUnit(ally, 0, amount, original, true);
                     }
                 }
             });

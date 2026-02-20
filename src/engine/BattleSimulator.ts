@@ -681,7 +681,7 @@ export class BattleSimulator {
                     await this.playTeamAnimation(myTeam, 'glow-pale-red', 1000);
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, 0, amount, '呆火鱷技能強化', original, true);
+                        this.growUnit(ally, amount, 0, '呆火鱷技能強化', original, true);
                     }
                 }
             });
@@ -706,7 +706,7 @@ export class BattleSimulator {
                     await this.playTeamAnimation(myTeam, 'glow-pale-blue', 1000);
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, amount, 0, '潤水鴨技能強化', original, true);
+                        this.growUnit(ally, 0, amount, '潤水鴨技能強化', original, true);
                     }
                 }
             });
