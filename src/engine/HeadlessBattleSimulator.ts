@@ -555,8 +555,11 @@ export class HeadlessBattleSimulator {
                     const { opTeam } = this.getTeams(unit);
                     const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
                     if (livingEnemies.length > 0) {
-                        const target = livingEnemies[livingEnemies.length - 1];
-                        await this.dealDamage(unit, target, unit.stats.attack, true);
+                        const targetCount = unit.level >= 3 ? 2 : 1;
+                        const targets = livingEnemies.slice(-targetCount);
+                        for (const target of targets) {
+                            await this.dealDamage(unit, target, unit.stats.attack, true);
+                        }
                     }
                 }
             });

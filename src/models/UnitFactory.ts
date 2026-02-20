@@ -739,7 +739,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'gardevoir', name: '沙奈朵', tier: 3, family: 'ralts',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/沙奈朵00.webp', battleImageUrl: 'assets/沙奈朵01.webp',
-        description: '攻擊時，同時對敵方末位角色發動攻擊。', synergies: ['Psychic'], isHiddenFromShop: true
+        description: '攻擊時，同時對敵方最後兩位角色發動攻擊。', synergies: ['Psychic'], isHiddenFromShop: true
     },
     mrmime: {
         id: 'mrmime', name: '魔牆人偶', tier: 5, family: 'mrmime',

@@ -26,7 +26,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Snow': { id: 'Snow', name: '降雪', icon: '❄️', description: '[2] 戰鬥開始時，其他角色受到生命 33% 傷害', tiers: [2], color: '#bae6fd' },
     'Claw': { id: 'Claw', name: '尖爪', icon: '🐯', description: '[2] 體質提升時，額外 +2 攻擊', tiers: [2], color: '#fca5a5' },
     'Beetle': { id: 'Beetle', name: '甲蟲', icon: '🪲', description: '[2] 準備結束時，永久 +2 攻擊 或 生命', tiers: [2], color: '#b5e48c' },
-    'Psychic': { id: 'Psychic', name: '念力', icon: '🔮', description: '[2] 敵方攻擊兩次後，對全體敵方造成 2N 傷害 (N=勝場)', tiers: [2], color: '#a855f7' },
+    'Psychic': { id: 'Psychic', name: '念力', icon: '🪄', description: '[2] 敵方攻擊兩次後，對全體敵方造成 2N 傷害 (N=勝場)', tiers: [2], color: '#a855f7' },
 
 };
 

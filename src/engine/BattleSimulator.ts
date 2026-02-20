@@ -335,7 +335,7 @@ export class BattleSimulator {
                     await this.notifySkill(unit, `發動了瞬間移動！`);
                     opTeam[firstIdx] = last;
                     opTeam[lastIdx] = first;
-                    this.log(`「敵方首位」和「敵方末位」互換了位置！`);
+                    this.log(`${unit.name}發動了瞬間移動！『${first.name}』和『${last.name}』互換了位置！`);
                     await this.compactTeams();
                     await this.delay(300);
                     if (this.onUpdate) this.onUpdate();
@@ -955,6 +955,20 @@ export class BattleSimulator {
                     const splashDmg = [0, 2, 4, 8][attacker.level] || 2;
                     await this.notifySkill(attacker, `對 ${neighbor.name} 使用了咬住！`);
                     attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
+                }
+            }
+        }
+
+        if (attacker.family === 'ralts' && !this.unitStates.get(attacker)?.isSilenced) {
+            const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
+            const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
+            const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+            if (liveEnemies.length > 0) {
+                const targetCount = attacker.level >= 3 ? 2 : 1;
+                const targets = liveEnemies.slice(-targetCount);
+                for (const target of targets) {
+                    this.log(`${attacker.name}對 ${target.name} 發動了精神強念！`);
+                    attackPromises.push(this.dealDamage(attacker, target, attacker.stats.attack, true));
                 }
             }
         }
