@@ -22,6 +22,8 @@ export class BattleSimulator {
     private spiritombTriggered: Set<string> = new Set();
     private originalPlayerTeam?: (Unit | null)[];
     private isCompacting = false;
+    private isSimulatingStep = false;
+    private queuedKillRewards: (() => Promise<void>)[] = [];
     // Cached Synergies (Persist through death)
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
@@ -1020,65 +1022,76 @@ export class BattleSimulator {
 
         // 3. Process Killer Rewards ONLY if killer survived
         if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
-            // Sneasel family: Atk on kill (Permanent)
-            if (killer.family === 'sneasel') {
-                const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                const buff = killer.level >= 2 ? 2 : 1;
-                this.growUnit(killer, 0, buff, '狃拉技能', original);
-            }
+            const executeReward = async () => {
+                // Critical: Re-check survival if reward was deferred
+                if (killer.stats.hp <= 0) return;
 
-            // Charmander family: Stats on kill (Temporary)
-            if (killer.family === 'charmander') {
-                if (killer.level >= 3) {
-                    const canAddAtk = killer.stats.attack < 50;
-                    const canAddHp = killer.stats.maxHp < 50;
-                    const buff = 5;
+                // Sneasel family: Atk on kill (Permanent)
+                if (killer.family === 'sneasel') {
+                    const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
+                    const buff = killer.level >= 2 ? 2 : 1;
+                    this.growUnit(killer, 0, buff, '狃拉技能', original);
+                }
 
-                    let choice: 'hp' | 'atk';
-                    if (canAddAtk && !canAddHp) choice = 'atk';
-                    else if (canAddHp && !canAddAtk) choice = 'hp';
-                    else choice = Math.random() < 0.5 ? 'atk' : 'hp';
+                // Charmander family: Stats on kill (Temporary)
+                if (killer.family === 'charmander') {
+                    if (killer.level >= 3) {
+                        const canAddAtk = killer.stats.attack < 50;
+                        const canAddHp = killer.stats.maxHp < 50;
+                        const buff = 5;
 
-                    if (choice === 'atk') this.growUnit(killer, 0, buff, '噴火龍技能');
-                    else this.growUnit(killer, buff, 0, '噴火龍技能');
-                } else {
-                    const buff = killer.level;
-                    const canAddAtk = killer.stats.attack < 50;
-                    const canAddHp = killer.stats.maxHp < 50;
+                        let choice: 'hp' | 'atk';
+                        if (canAddAtk && !canAddHp) choice = 'atk';
+                        else if (canAddHp && !canAddAtk) choice = 'hp';
+                        else choice = Math.random() < 0.5 ? 'atk' : 'hp';
 
-                    let choice: 'hp' | 'atk';
-                    if (canAddAtk && !canAddHp) {
-                        choice = 'atk';
-                        if (Math.random() < 0.5) this.log(`${killer.name} 生命已達上限，轉為提高攻擊！`);
-                    } else if (canAddHp && !canAddAtk) {
-                        choice = 'hp';
-                        if (Math.random() < 0.5) this.log(`${killer.name} 攻擊已達上限，轉為提高生命！`);
+                        if (choice === 'atk') this.growUnit(killer, 0, buff, '噴火龍技能');
+                        else this.growUnit(killer, buff, 0, '噴火龍技能');
                     } else {
-                        choice = Math.random() < 0.5 ? 'atk' : 'hp';
+                        const buff = killer.level;
+                        const canAddAtk = killer.stats.attack < 50;
+                        const canAddHp = killer.stats.maxHp < 50;
+
+                        let choice: 'hp' | 'atk';
+                        if (canAddAtk && !canAddHp) {
+                            choice = 'atk';
+                            if (Math.random() < 0.5) this.log(`${killer.name} 生命已達上限，轉為提高攻擊！`);
+                        } else if (canAddHp && !canAddAtk) {
+                            choice = 'hp';
+                            if (Math.random() < 0.5) this.log(`${killer.name} 攻擊已達上限，轉為提高生命！`);
+                        } else {
+                            choice = Math.random() < 0.5 ? 'atk' : 'hp';
+                        }
+
+                        if (choice === 'atk') this.growUnit(killer, 0, buff, '小火龍技能');
+                        else this.growUnit(killer, buff, 0, '小火龍技能');
                     }
-
-                    if (choice === 'atk') this.growUnit(killer, 0, buff, '小火龍技能');
-                    else this.growUnit(killer, buff, 0, '小火龍技能');
                 }
-            }
 
-            // Cyndaquil family: Atk and HP on kill (Temporary)
-            if (killer.family === 'cyndaquil') {
-                const kState = this.unitStates.get(killer) || {};
-                const maxTimes = killer.level + 1;
-                const used = kState.cyndaquilKills || 0;
-                if (used < maxTimes) {
-                    kState.cyndaquilKills = used + 1;
-                    this.unitStates.set(killer, kState);
-                    const amt = killer.level >= 3 ? 4 : 2;
-                    this.growUnit(killer, amt, amt, '火球鼠技能');
+                // Cyndaquil family: Atk and HP on kill (Temporary)
+                if (killer.family === 'cyndaquil') {
+                    const kState = this.unitStates.get(killer) || {};
+                    const maxTimes = killer.level + 1;
+                    const used = kState.cyndaquilKills || 0;
+                    if (used < maxTimes) {
+                        kState.cyndaquilKills = used + 1;
+                        this.unitStates.set(killer, kState);
+                        const amt = killer.level >= 3 ? 4 : 2;
+                        this.growUnit(killer, amt, amt, '火球鼠技能');
+                    }
                 }
-            }
 
-            // Quaxly family: Atk on kill (Temporary)
-            if (killer.family === 'quaxly') {
-                const buff = [0, 3, 5, 10][killer.level] || 3;
-                this.growUnit(killer, 0, buff, '潤水鴨技能');
+                // Quaxly family: Atk on kill (Temporary)
+                if (killer.family === 'quaxly') {
+                    const buff = [0, 3, 5, 10][killer.level] || 3;
+                    this.growUnit(killer, 0, buff, '潤水鴨技能');
+                }
+            };
+
+            if (this.isSimulatingStep) {
+                this.queuedKillRewards.push(executeReward);
+            } else {
+                await executeReward();
             }
         }
 
@@ -1258,19 +1271,30 @@ export class BattleSimulator {
         // 2. Wait for the "impact" point (middle of clash animation)
         await this.delay(150);
 
-        // 3. Trigger damage and logic
+        // 3. Trigger damage and logic (Enable deferred rewards)
+        this.isSimulatingStep = true;
+        this.queuedKillRewards = [];
+
         await Promise.all([
             this.performAttack(pFront, eFront),
             this.performAttack(eFront, pFront)
         ]);
 
-        // 4. Wait for animations and any triggered secondary actions (summoning, etc.)
+        this.isSimulatingStep = false;
+
+        // 4. Process deferred rewards for ANY unit that survived the clash
+        for (const executeReward of this.queuedKillRewards) {
+            await executeReward();
+        }
+        this.queuedKillRewards = [];
+
+        // 5. Wait for animations and any triggered secondary actions (summoning, etc.)
         await Promise.all(anims);
 
-        // 5. Short buffer for cascading death effects (like Drifloon exploding)
+        // 6. Short buffer for cascading death effects (like Drifloon exploding)
         await this.delay(200);
 
-        // 6. Compact teams to ensure survivors are in their final positions
+        // 7. Compact teams to ensure survivors are in their final positions
         await this.compactTeams();
 
         // 7. Victory Check with human-readable buffer
