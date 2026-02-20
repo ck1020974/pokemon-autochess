@@ -727,23 +727,23 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'ralts', name: '拉魯拉絲', tier: 3, family: 'ralts',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/拉魯拉絲00.webp', battleImageUrl: 'assets/拉魯拉絲01.webp',
-        description: '攻擊時，同時對敵方末位角色發動攻擊。', synergies: ['Psychic'], evolveId: 'kirlia'
+        description: '普攻首位敵方的同時，附帶對末位角色發動 50% 傷害。', synergies: ['Psychic'], evolveId: 'kirlia'
     },
     kirlia: {
         id: 'kirlia', name: '奇魯莉安', tier: 3, family: 'ralts',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/奇魯莉安00.webp', battleImageUrl: 'assets/奇魯莉安01.webp',
-        description: '攻擊時，同時對敵方末位角色發動攻擊。', synergies: ['Psychic'], evolveId: 'gardevoir', isHiddenFromShop: true
+        description: '普攻首位敵方的同時，附帶對末位角色發動 50% 傷害。', synergies: ['Psychic'], evolveId: 'gardevoir', isHiddenFromShop: true
     },
     gardevoir: {
         id: 'gardevoir', name: '沙奈朵', tier: 3, family: 'ralts',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/沙奈朵00.webp', battleImageUrl: 'assets/沙奈朵01.webp',
-        description: '攻擊時，同時對敵方最後兩位角色發動攻擊。', synergies: ['Psychic'], isHiddenFromShop: true
+        description: '普攻首位敵方的同時，附帶對末位角色發動 100% 傷害。', synergies: ['Psychic'], isHiddenFromShop: true
     },
     mrmime: {
         id: 'mrmime', name: '魔牆人偶', tier: 5, family: 'mrmime',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/魔牆人偶00.webp', battleImageUrl: 'assets/魔牆人偶01.webp',
         description: '戰鬥開始時，使我方受到的前 5 次傷害減半。', synergies: ['Psychic']
     }

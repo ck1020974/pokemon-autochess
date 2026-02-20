@@ -202,9 +202,9 @@ export class GameLoop {
             this.savedTeam = [];
         }
 
-        // Update Difficulty Score: Loss scales 50% slower than Win/Draw
+        // Update Difficulty Score: Loss protection (Slower increase on loss)
         if (result === 'LOSS') {
-            this.difficultyScore += 0.5;
+            this.difficultyScore += 0.25;
         } else {
             this.difficultyScore += 1.0;
         }

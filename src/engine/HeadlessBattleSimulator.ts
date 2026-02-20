@@ -10,6 +10,7 @@ export class HeadlessBattleSimulator {
     public eventBus: EventBus;
     public turnCount: number = 0;
     public unitStates: Map<Unit, any> = new Map();
+    private lightScreenActivated: Set<string> = new Set();
     private initialPlayerSet: Set<Unit> = new Set();
     private spiritombTriggered: Set<string> = new Set();
     private psychicTriggered: Set<string> = new Set();
@@ -37,6 +38,7 @@ export class HeadlessBattleSimulator {
 
     public async init() {
         this.spiritombTriggered.clear();
+        this.lightScreenActivated.clear();
         const allUnits: { unit: Unit, pos: number, isPlayer: boolean }[] = [];
         this.playerTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: true }); });
         this.enemyTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: false }); });
@@ -127,10 +129,12 @@ export class HeadlessBattleSimulator {
         }
 
         // Mr. Mime: Light Screen
-        if (unit.family === 'mrmime') {
+        // Mr. Mime: Light Screen (Once per team)
+        if (unit.family === 'mrmime' && !this.lightScreenActivated.has(side)) {
             const globalState = this.unitStates.get(unit) || {};
             globalState.lightScreen = 5;
             this.unitStates.set(unit, globalState);
+            this.lightScreenActivated.add(side);
         }
         if (unit.family === 'houndour') {
             const times = [0, 1, 3, 5][unit.level] || 1;
@@ -232,8 +236,9 @@ export class HeadlessBattleSimulator {
             const allUnits = [...this.playerTeam, ...this.enemyTeam].filter(u => u !== null && u.stats.hp > 0);
             for (const target of allUnits) {
                 if (target.synergies.includes('Snow')) continue;
-                const dmg = Math.ceil(target.stats.maxHp * 0.33);
-                await this.dealDamage(null, target, dmg, true, true);
+                let dmg = Math.ceil(target.stats.maxHp * 0.33);
+                if (dmg >= target.stats.hp) dmg = Math.max(0, target.stats.hp - 1);
+                if (dmg > 0) await this.dealDamage(null, target, dmg, true, true);
             }
         }
     }
@@ -623,6 +628,16 @@ export class HeadlessBattleSimulator {
             if (idx !== -1 && idx < opTeam.length - 1 && opTeam[idx + 1] && opTeam[idx + 1]!.stats.hp > 0) {
                 const splashDmg = [0, 2, 4, 6][attacker.level] || 2;
                 promises.push(this.dealDamage(attacker, opTeam[idx + 1]!, splashDmg, true));
+            }
+        }
+        if (attacker.family === 'ralts' && !s?.isSilenced) {
+            const { opTeam } = this.getTeams(attacker);
+            const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+            if (liveEnemies.length > 0) {
+                const target = liveEnemies[liveEnemies.length - 1];
+                const multiplier = attacker.level >= 3 ? 1.0 : 0.5;
+                const bonusDmg = Math.ceil(attacker.stats.attack * multiplier);
+                promises.push(this.dealDamage(attacker, target, bonusDmg, true));
             }
         }
         await Promise.all(promises);

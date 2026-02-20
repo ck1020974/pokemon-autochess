@@ -17,7 +17,8 @@ export class BattleSimulator {
     public onUpdate?: () => void; // Hook for UI refresh during async steps
 
     // Track battle-specific state for units (e.g. "hasBlockedDeath")
-    public unitStates: Map<Unit, any> = new Map(); // Changed from private to public for UI access
+    public unitStates: Map<Unit, any> = new Map();
+    private lightScreenActivated: Set<string> = new Set();
     private initialPlayerSet: Set<Unit> = new Set();
     private spiritombTriggered: Set<string> = new Set();
     private psychicTriggered: Set<string> = new Set();
@@ -63,6 +64,7 @@ export class BattleSimulator {
 
     public async init() {
         this.spiritombTriggered.clear();
+        this.lightScreenActivated.clear();
         // Collect all units and their positions
         const allUnits: { unit: Unit, pos: number, isPlayer: boolean }[] = [];
         this.playerTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: true }); });
@@ -113,9 +115,16 @@ export class BattleSimulator {
                 if (target.synergies.includes('Snow')) continue;
 
                 // User Request: 33% of lifetime Max HP
-                const dmg = Math.ceil(target.stats.maxHp * 0.33);
-                // Silent set to true to avoid individual "受到 N 點傷害" logs
-                await this.dealDamage(null, target, dmg, true, true);
+                let dmg = Math.ceil(target.stats.maxHp * 0.33);
+                // Feature: Snow damage cannot kill a unit (minimum 1 HP remaining)
+                if (dmg >= target.stats.hp) {
+                    dmg = Math.max(0, target.stats.hp - 1);
+                }
+
+                if (dmg > 0) {
+                    // Silent set to true to avoid individual "受到 N 點傷害" logs
+                    await this.dealDamage(null, target, dmg, true, true);
+                }
                 if (this.onUpdate) this.onUpdate();
                 await this.delay(100);
             }
@@ -336,7 +345,8 @@ export class BattleSimulator {
                     await this.notifySkill(unit, `發動了瞬間移動！`);
                     opTeam[firstIdx] = last;
                     opTeam[lastIdx] = first;
-                    this.log(`${unit.name}發動了瞬間移動！『${first.name}』和『${last.name}』互換了位置！`);
+                    this.log(`${unit.name}發動了瞬間移動！`);
+                    this.log(`${first.name} 和 ${last.name} 互換了位置！`);
                     await this.compactTeams();
                     await this.delay(300);
                     if (this.onUpdate) this.onUpdate();
@@ -344,12 +354,13 @@ export class BattleSimulator {
             }
         }
 
-        // Mr. Mime: Light Screen
-        if (unit.family === 'mrmime') {
+        // Mr. Mime: Light Screen (Once per team)
+        if (unit.family === 'mrmime' && !this.lightScreenActivated.has(side)) {
             await this.notifySkill(unit, `發動了光牆！`);
             const globalState = this.unitStates.get(unit) || {};
             globalState.lightScreen = 5;
             this.unitStates.set(unit, globalState);
+            this.lightScreenActivated.add(side);
             await this.delay(200);
         }
     }
@@ -646,13 +657,19 @@ export class BattleSimulator {
             });
         }
 
-        // Fuecoco: Friendly Kill -> All Perm Atk
         if (unit.family === 'fuecoco') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const { myTeam } = this.getTeams(unit);
                 // Ensure unit is still alive and in the team array (not replaced by null)
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
+                    const uState = this.unitStates.get(unit) || {};
+                    const now = Date.now();
+                    const lastAnim = uState.lastSkillAnimTime || 0;
+                    if (now - lastAnim < 500) return; // Debounce animation spam
+                    uState.lastSkillAnimTime = now;
+                    this.unitStates.set(unit, uState);
+
                     const amount = [0, 1, 2, 4][unit.level] || 1;
                     await this.notifySkill(unit, `發動了閃焰高歌！`);
                     await this.playTeamAnimation(myTeam, 'glow-pale-red', 1000);
@@ -671,6 +688,13 @@ export class BattleSimulator {
                 // Ensure unit is still alive and in the team array
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
+                    const uState = this.unitStates.get(unit) || {};
+                    const now = Date.now();
+                    const lastAnim = uState.lastSkillAnimTime || 0;
+                    if (now - lastAnim < 500) return; // Debounce
+                    uState.lastSkillAnimTime = now;
+                    this.unitStates.set(unit, uState);
+
                     const amount = [0, 1, 2, 4][unit.level] || 1;
                     await this.notifySkill(unit, `發動了流水旋舞！`);
                     await this.playTeamAnimation(myTeam, 'glow-pale-blue', 1000);
@@ -854,22 +878,7 @@ export class BattleSimulator {
             });
         }
 
-        // Ralts Family: Attack backline
-        if (unit.family === 'ralts') {
-            this.eventBus.on('BEFORE_ATTACK', async (e) => {
-                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
-                if (e.source === unit) {
-                    const { opTeam } = this.getTeams(unit);
-                    const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
-                    if (livingEnemies.length > 0) {
-                        const target = livingEnemies[livingEnemies.length - 1];
-                        // Simultaneous attack message
-                        this.log(`${unit.name} 對「${target.name}」發動了精神強念！`);
-                        await this.dealDamage(unit, target, unit.stats.attack, true);
-                    }
-                }
-            });
-        }
+        // Ralts Family: Logic moved to performAttack to prevent double attack bug (and nerf damage)
 
         // Sprigatito Family: Gain stats on Summon for All
         if (unit.family === 'sprigatito') {
@@ -878,6 +887,13 @@ export class BattleSimulator {
                 // Ensure unit is still alive and in the team array (not replaced by null)
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
+                    const uState = this.unitStates.get(unit) || {};
+                    const now = Date.now();
+                    const lastAnim = uState.lastSkillAnimTime || 0;
+                    if (now - lastAnim < 500) return; // Debounce
+                    uState.lastSkillAnimTime = now;
+                    this.unitStates.set(unit, uState);
+
                     const amount = [0, 1, 2, 4][unit.level] || 1;
                     await this.notifySkill(unit, `發動了千變萬花！`);
                     await this.playTeamAnimation(myTeam, 'glow-pale-green', 1000);
@@ -965,12 +981,11 @@ export class BattleSimulator {
             const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
             const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (liveEnemies.length > 0) {
-                const targetCount = attacker.level >= 3 ? 2 : 1;
-                const targets = liveEnemies.slice(-targetCount);
-                for (const target of targets) {
-                    this.log(`${attacker.name}對 ${target.name} 發動了精神強念！`);
-                    attackPromises.push(this.dealDamage(attacker, target, attacker.stats.attack, true));
-                }
+                const target = liveEnemies[liveEnemies.length - 1];
+                const multiplier = attacker.level >= 3 ? 1.0 : 0.5;
+                const bonusDmg = Math.ceil(attacker.stats.attack * multiplier);
+                this.log(`${attacker.name} 對 ${target.name} 發動了精神強念！`);
+                attackPromises.push(this.dealDamage(attacker, target, bonusDmg, true));
             }
         }
 
@@ -1023,7 +1038,7 @@ export class BattleSimulator {
             if (this.playerAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('enemy')) {
                 this.psychicTriggered.add('enemy');
                 this.playerAttackCount = 0;
-                this.log("受到了預知未來的攻擊！");
+                this.log("我方受到了預知未來的攻擊！");
                 const allAllies = this.playerTeam.filter(u => u && u.stats.hp > 0);
                 const dmg = 2; // Default 2 for enemy psychic? Or based on turn? Let's use 2 as a base.
                 for (const target of allAllies) {
