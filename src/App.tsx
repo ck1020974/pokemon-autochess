@@ -716,22 +716,22 @@ function App() {
                 // C. Turn-Based Difficulty & Stat Inflation
                 const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
                 if (game.difficultyScore >= turnScalingStart) {
-                    let scaleFactor = 0.6;
-                    if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.3;
+                    let scaleFactor = 0.75;
+                    if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.4;
                     const turnScale = Math.floor(game.difficultyScore * scaleFactor);
                     u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
 
                     if (game.wins >= 8) {
                         const eIdx = game.wins - 7;
-                        let eBHp = eIdx * 2; let eBAtk = eIdx * 1;
+                        let eBHp = eIdx * 3; let eBAtk = Math.ceil(eIdx * 1.5);
                         // Nerf for high tier units to avoid oppressive stats
                         if (u.tier === 5) { eBHp = Math.ceil(eBHp / 3); eBAtk = Math.ceil(eBAtk / 3); }
                         else if (u.tier === 4) { eBHp = Math.ceil(eBHp / 2); eBAtk = Math.ceil(eBAtk / 2); }
                         u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
                     }
                     if (game.wins >= 12) {
-                        let wB = 10; let wA = 5;
-                        if (u.tier === 5) { wB = 3; wA = 2; } else if (u.tier === 4) { wB = 5; wA = 3; }
+                        let wB = 12; let wA = 6;
+                        if (u.tier === 5) { wB = 4; wA = 2; } else if (u.tier === 4) { wB = 6; wA = 3; }
                         u.stats.hp += wB; u.stats.maxHp += wB; u.stats.attack += wA;
                     }
                 }
