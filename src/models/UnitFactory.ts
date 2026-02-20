@@ -10,19 +10,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'bulbasaur', name: '妙蛙種子', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/妙蛙種子00.webp', battleImageUrl: 'assets/妙蛙種子01.webp',
-        description: '死亡後召喚 1 隻 1/1 小種子。', synergies: ['Starter', 'Grass'], evolveId: 'ivysaur'
+        description: '死亡後召喚 1/2/5 隻 1/1 小種子。', synergies: ['Starter', 'Grass'], evolveId: 'ivysaur'
     },
     ivysaur: {
         id: 'ivysaur', name: '妙蛙草', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/妙蛙草00.webp', battleImageUrl: 'assets/妙蛙草01.webp',
-        description: '死亡後召喚 2 隻 2/2 小種子。', synergies: ['Starter', 'Grass'], evolveId: 'venusaur', isHiddenFromShop: true
+        description: '死亡後召喚 1 隻 2/2 妙蛙種子。', synergies: ['Starter', 'Grass'], evolveId: 'venusaur', isHiddenFromShop: true
     },
     venusaur: {
         id: 'venusaur', name: '妙蛙花', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/妙蛙花00.webp', battleImageUrl: 'assets/妙蛙花01.webp',
-        description: '死亡後召喚 5 隻 3/3 小種子。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '死亡後召喚 2 隻 妙蛙草。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 2. Charmander

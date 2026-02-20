@@ -1025,6 +1025,7 @@ function App() {
                             const isInteractive = game.phase === GamePhase.SHOP;
                             return (
                                 <div
+                                    key={unit ? unit.id : `player-empty-${i}`}
                                     className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''}`}
                                     onDragOver={isInteractive ? onDragOver : undefined}
                                     onDrop={isInteractive ? (e) => onDrop(e, i) : undefined}

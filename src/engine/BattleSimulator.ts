@@ -33,10 +33,10 @@ export class BattleSimulator {
         this.enemyTeam = enemyTeam.map(u => {
             if (!u) return null;
             const clone = this.cloneUnit(u);
-            // Apply Difficulty Scaling to Enemy
-            clone.stats.hp = Math.floor(clone.stats.hp * difficultyMultiplier);
-            clone.stats.maxHp = Math.floor(clone.stats.maxHp * difficultyMultiplier);
-            clone.stats.attack = Math.floor(clone.stats.attack * difficultyMultiplier);
+            // Apply Difficulty Scaling to Enemy (Ensure floor is 1)
+            clone.stats.hp = Math.max(1, Math.floor(clone.stats.hp * difficultyMultiplier));
+            clone.stats.maxHp = Math.max(1, Math.floor(clone.stats.maxHp * difficultyMultiplier));
+            clone.stats.attack = Math.max(1, Math.floor(clone.stats.attack * difficultyMultiplier));
             // Feature: Global Stat Cap 50/50
             clone.capStats();
             return clone;
@@ -619,7 +619,7 @@ export class BattleSimulator {
             });
         }
 
-        // Bulbasaur: Spawn Sprout (Prevent loop if instance is already a sprout)
+        // Bulbasaur Line (Matryoshka Summons)
         if (unit.family === 'bulbasaur' && unit.templateId !== 'sprout') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
@@ -632,16 +632,34 @@ export class BattleSimulator {
                         if (deathIdx === -1) deathIdx = 0;
                     }
 
-                    const count = [0, 1, 2, 5][unit.level] || 1;
-                    const bonus = [0, 0, 1, 2][unit.level];
-                    const seedStats = 1 + bonus; // Base 1 + Bonus (1st star = 1/1, 2nd = 1/1, 3rd = 2/2, etc.)
-                    await this.notifySkill(unit, `召喚了 ${count} 隻小種子`);
-                    await this.delay(200);
-                    for (let i = 0; i < count; i++) {
-                        // Re-fetch team reference (compactTeams may replace the array object)
+                    if (unit.templateId === 'venusaur') {
+                        // Venusaur -> 2x Ivysaur (4/4)
+                        await this.notifySkill(unit, '召喚了 2 隻妙蛙草');
+                        await this.delay(200);
+                        for (let i = 0; i < 2; i++) {
+                            const { myTeam: currentTeam } = this.getTeams(unit);
+                            const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
+                            await this.spawnUnit(currentTeam, targetIdx, 'ivysaur', 1, 4, 4, true);
+                        }
+                    } else if (unit.templateId === 'ivysaur') {
+                        // Ivysaur -> 1x Bulbasaur (2/2)
+                        await this.notifySkill(unit, '召喚了 妙蛙種子');
+                        await this.delay(200);
                         const { myTeam: currentTeam } = this.getTeams(unit);
-                        const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
-                        await this.spawnUnit(currentTeam, targetIdx, 'sprout', 1, seedStats, seedStats, true);
+                        const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx : deathIdx;
+                        await this.spawnUnit(currentTeam, targetIdx, 'bulbasaur', 1, 2, 2, true);
+                    } else {
+                        // Bulbasaur (1/2/3 star) -> Original Sprout Logic
+                        const count = [0, 1, 2, 5][unit.level] || 1;
+                        const bonus = [0, 0, 1, 2][unit.level];
+                        const seedStats = 1 + bonus;
+                        await this.notifySkill(unit, `召喚了 ${count} 隻小種子`);
+                        await this.delay(200);
+                        for (let i = 0; i < count; i++) {
+                            const { myTeam: currentTeam } = this.getTeams(unit);
+                            const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
+                            await this.spawnUnit(currentTeam, targetIdx, 'sprout', 1, seedStats, seedStats, true);
+                        }
                     }
                     // COMPACTION REMOVED HERE: handleDeath will do it once after all effects
                 }
@@ -1104,9 +1122,12 @@ export class BattleSimulator {
         if (!template) return;
         const newUnit = new Unit(template);
         newUnit.level = level;
-        newUnit.stats.hp = hp;
-        newUnit.stats.maxHp = hp;
-        newUnit.stats.attack = attack;
+        // Fix: Ensure spawned stats are at least 1/1 to prevent instant death or invincibility
+        const safeHp = Math.max(1, hp);
+        const safeAtk = Math.max(1, attack);
+        newUnit.stats.hp = safeHp;
+        newUnit.stats.maxHp = safeHp;
+        newUnit.stats.attack = safeAtk;
         // Feature: Cap spawned unit stats at 50/50
         newUnit.capStats();
         newUnit.family = template.family || template.id;
