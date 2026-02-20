@@ -15,8 +15,12 @@ export class HeadlessBattleSimulator {
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
     private originalPlayerTeam: (Unit | null)[] | null = null;
+    private playerWins: number = 0;
+    private playerAttackCount: number = 0;
+    private enemyAttackCount: number = 0;
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[]) {
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], playerWins: number = 0) {
+        this.playerWins = playerWins || 0;
         this.originalPlayerTeam = originalPlayerTeam || null;
         this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
         this.enemyTeam = enemyTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
@@ -104,6 +108,28 @@ export class HeadlessBattleSimulator {
                     if (front) this.growUnit(front, unit.templateId === 'jigglypuff' ? 5 : 2, 0);
                 }
             }
+        }
+
+        // Natu/Xatu: Swap enemy first and last
+        if (unit.family === 'natu') {
+            const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0);
+            if (livingEnemies.length >= 2) {
+                const first = livingEnemies[0];
+                const last = livingEnemies[livingEnemies.length - 1];
+                const firstIdx = opTeam.indexOf(first);
+                const lastIdx = opTeam.indexOf(last);
+                if (firstIdx !== -1 && lastIdx !== -1 && firstIdx !== lastIdx) {
+                    opTeam[firstIdx] = last;
+                    opTeam[lastIdx] = first;
+                }
+            }
+        }
+
+        // Mr. Mime: Light Screen
+        if (unit.family === 'mrmime') {
+            const globalState = this.unitStates.get(unit) || {};
+            globalState.lightScreen = 5;
+            this.unitStates.set(unit, globalState);
         }
         if (unit.family === 'houndour') {
             const times = [0, 1, 3, 5][unit.level] || 1;
@@ -520,6 +546,21 @@ export class HeadlessBattleSimulator {
                 }
             });
         }
+
+        // Ralts Family: Attack backline
+        if (unit.family === 'ralts') {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
+                if (e.source === unit) {
+                    const { opTeam } = this.getTeams(unit);
+                    const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+                    if (livingEnemies.length > 0) {
+                        const target = livingEnemies[livingEnemies.length - 1];
+                        await this.dealDamage(unit, target, unit.stats.attack, true);
+                    }
+                }
+            });
+        }
         if (unit.family === 'heracross') {
             this.eventBus.on('ON_HURT', (e) => {
                 if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
@@ -599,14 +640,51 @@ export class HeadlessBattleSimulator {
             }
         }
         await this.eventBus.emit({ type: 'AFTER_ATTACK', source: attacker, target: defender, context: {} });
+
+        // Psychic Synergy: "Future Sight"
+        const attackerIsEnemy = this.enemyTeam.includes(attacker);
+        if (attackerIsEnemy) {
+            this.enemyAttackCount++;
+            const psychicCount = this.playerSynergies.get('Psychic') || 0;
+            if (this.enemyAttackCount >= 2 && psychicCount >= 2) {
+                this.enemyAttackCount = 0;
+                const allEnemies = this.enemyTeam.filter(u => u && u.stats.hp > 0);
+                const dmg = 2 * this.playerWins;
+                for (const target of allEnemies) await this.dealDamage(null, target, dmg, true, true);
+            }
+        } else {
+            this.playerAttackCount++;
+            const psychicCount = this.enemySynergies.get('Psychic') || 0;
+            if (this.playerAttackCount >= 2 && psychicCount >= 2) {
+                this.playerAttackCount = 0;
+                const allAllies = this.playerTeam.filter(u => u && u.stats.hp > 0);
+                for (const target of allAllies) await this.dealDamage(null, target, 2, true, true);
+            }
+        }
     }
 
     public async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false, _silent: boolean = false) {
         if (target.stats.hp <= 0) return;
+
+        const { myTeam, side } = this.getTeams(target);
         const targetState = this.unitStates.get(target) || {};
         const sourceState = source ? this.unitStates.get(source) || {} : {};
         const isBypassing = (source && source.family === 'pinsir' && !sourceState.isSilenced) ||
             (source && source.family === 'sableye' && sourceState.isAbsoluteKill);
+
+        // --- Light Screen Logic ---
+        const isEnemySource = source ? this.getTeams(source).side !== side : true;
+        if (isEnemySource && !isBypassing) {
+            const aliveMimes = myTeam.filter(u => u && u.family === 'mrmime' && u.stats.hp > 0);
+            for (const mime of aliveMimes) {
+                const mState = this.unitStates.get(mime);
+                if (mState && mState.lightScreen > 0) {
+                    amount = Math.ceil(amount / 2);
+                    mState.lightScreen--;
+                    break;
+                }
+            }
+        }
 
         if (sourceState.isLethalStrike) {
             sourceState.isLethalStrike = false;

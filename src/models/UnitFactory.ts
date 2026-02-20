@@ -330,19 +330,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'meowth', name: '喵喵', tier: 2, family: 'meowth',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/喵喵00.webp', battleImageUrl: 'assets/喵喵01.webp',
-        description: '回合開始時 +1 金幣。', synergies: ['Normal', 'Claw'], evolveId: 'persian'
+        description: '準備階段時 +1 金幣。', synergies: ['Normal', 'Claw'], evolveId: 'persian'
     },
     persian: {
         id: 'persian', name: '貓老大', tier: 2, family: 'meowth',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/貓老大00.webp', battleImageUrl: 'assets/貓老大01.webp',
-        description: '回合開始時 +3 金幣。', synergies: ['Normal', 'Claw'], evolveId: 'persian_final', isHiddenFromShop: true
+        description: '準備階段時 +3 金幣。', synergies: ['Normal', 'Claw'], evolveId: 'persian_final', isHiddenFromShop: true
     },
     persian_final: {
         id: 'persian_final', name: '貓老大', tier: 2, family: 'meowth',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/貓老大00.webp', battleImageUrl: 'assets/貓老大01.webp',
-        description: '回合開始時 +5 金幣。', synergies: ['Normal', 'Claw'], isHiddenFromShop: true
+        description: '準備階段時 +5 金幣。', synergies: ['Normal', 'Claw'], isHiddenFromShop: true
     },
 
     // 18. Mankey (Tier 1)
@@ -510,19 +510,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'drifloon', name: '飄飄球', tier: 2, family: 'drifloon',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/飄飄球00.webp', battleImageUrl: 'assets/飄飄球01.webp',
-        description: '死亡後對全體敵方造成 2 傷害。', synergies: ['Ghost'], evolveId: 'drifblim'
+        description: '死亡後對全體造成 2 傷害。', synergies: ['Ghost'], evolveId: 'drifblim'
     },
     drifblim: {
         id: 'drifblim', name: '隨風球', tier: 2, family: 'drifloon',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/隨風球00.webp', battleImageUrl: 'assets/隨風球01.webp',
-        description: '死亡後對全體敵方造成 5 傷害。', synergies: ['Ghost'], evolveId: 'drifblim_final', isHiddenFromShop: true
+        description: '死亡後對全體造成 5 傷害。', synergies: ['Ghost'], evolveId: 'drifblim_final', isHiddenFromShop: true
     },
     drifblim_final: {
         id: 'drifblim_final', name: '隨風球', tier: 2, family: 'drifloon',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/隨風球00.webp', battleImageUrl: 'assets/隨風球01.webp',
-        description: '死亡後對全體敵方造成 15 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '死亡後對全體造成 15 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 27. Snover
@@ -703,5 +703,48 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/大蔥鴨00.webp', battleImageUrl: 'assets/大蔥鴨01.webp',
         description: '首次攻擊造成 99 傷害。', synergies: ['Normal']
+    },
+    // --- New Psychic Units ---
+    natu: {
+        id: 'natu', name: '天然雀', tier: 2, family: 'natu',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/天然雀00.webp', battleImageUrl: 'assets/天然雀01.webp',
+        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Slow'], evolveId: 'xatu'
+    },
+    xatu: {
+        id: 'xatu', name: '天然鳥', tier: 2, family: 'natu',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/天然鳥00.webp', battleImageUrl: 'assets/天然鳥01.webp',
+        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Slow'], evolveId: 'xatu_final', isHiddenFromShop: true
+    },
+    xatu_final: {
+        id: 'xatu_final', name: '天然鳥', tier: 2, family: 'natu',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/天然鳥00.webp', battleImageUrl: 'assets/天然鳥01.webp',
+        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Slow'], isHiddenFromShop: true
+    },
+    ralts: {
+        id: 'ralts', name: '拉魯拉絲', tier: 3, family: 'ralts',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: 'assets/拉魯拉絲00.webp', battleImageUrl: 'assets/拉魯拉絲01.webp',
+        description: '攻擊時，同時對敵方末位角色發動攻擊。', synergies: ['Psychic'], evolveId: 'kirlia'
+    },
+    kirlia: {
+        id: 'kirlia', name: '奇魯莉安', tier: 3, family: 'ralts',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: 'assets/奇魯莉安00.webp', battleImageUrl: 'assets/奇魯莉安01.webp',
+        description: '攻擊時，同時對敵方末位角色發動攻擊。', synergies: ['Psychic'], evolveId: 'gardevoir', isHiddenFromShop: true
+    },
+    gardevoir: {
+        id: 'gardevoir', name: '沙奈朵', tier: 3, family: 'ralts',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: 'assets/沙奈朵00.webp', battleImageUrl: 'assets/沙奈朵01.webp',
+        description: '攻擊時，同時對敵方末位角色發動攻擊。', synergies: ['Psychic'], isHiddenFromShop: true
+    },
+    mrmime: {
+        id: 'mrmime', name: '魔牆人偶', tier: 5, family: 'mrmime',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: 'assets/魔牆人偶00.webp', battleImageUrl: 'assets/魔牆人偶01.webp',
+        description: '戰鬥開始時，使我方受到的前 5 次傷害減半。', synergies: ['Psychic']
     }
 }

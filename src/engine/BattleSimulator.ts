@@ -24,11 +24,15 @@ export class BattleSimulator {
     private isCompacting = false;
     private isSimulatingStep = false;
     private queuedKillRewards: (() => Promise<void>)[] = [];
+    private playerWins: number = 0;
+    private playerAttackCount: number = 0;
+    private enemyAttackCount: number = 0;
     // Cached Synergies (Persist through death)
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0) {
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, playerWins: number = 0) {
+        this.playerWins = playerWins;
         this.originalPlayerTeam = originalPlayerTeam;
         // Preserve 5-slot architecture to match UI indices exactly
         this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
@@ -316,6 +320,36 @@ export class BattleSimulator {
                     if (this.onUpdate) this.onUpdate();
                 }
             }
+        }
+
+        // Natu/Xatu: Swap enemy first and last
+        if (unit.family === 'natu') {
+            const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0);
+            if (livingEnemies.length >= 2) {
+                const first = livingEnemies[0];
+                const last = livingEnemies[livingEnemies.length - 1];
+                const firstIdx = opTeam.indexOf(first);
+                const lastIdx = opTeam.indexOf(last);
+
+                if (firstIdx !== -1 && lastIdx !== -1 && firstIdx !== lastIdx) {
+                    await this.notifySkill(unit, `發動了瞬間移動！`);
+                    opTeam[firstIdx] = last;
+                    opTeam[lastIdx] = first;
+                    this.log(`「敵方首位」和「敵方末位」互換了位置！`);
+                    await this.compactTeams();
+                    await this.delay(300);
+                    if (this.onUpdate) this.onUpdate();
+                }
+            }
+        }
+
+        // Mr. Mime: Light Screen
+        if (unit.family === 'mrmime') {
+            await this.notifySkill(unit, `發動了光牆！`);
+            const globalState = this.unitStates.get(unit) || {};
+            globalState.lightScreen = 5;
+            this.unitStates.set(unit, globalState);
+            await this.delay(200);
         }
     }
 
@@ -819,6 +853,23 @@ export class BattleSimulator {
             });
         }
 
+        // Ralts Family: Attack backline
+        if (unit.family === 'ralts') {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
+                if (e.source === unit) {
+                    const { opTeam } = this.getTeams(unit);
+                    const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+                    if (livingEnemies.length > 0) {
+                        const target = livingEnemies[livingEnemies.length - 1];
+                        // Simultaneous attack message
+                        this.log(`${unit.name} 對「${target.name}」發動了精神強念！`);
+                        await this.dealDamage(unit, target, unit.stats.attack, true);
+                    }
+                }
+            });
+        }
+
         // Sprigatito Family: Gain stats on Summon for All
         if (unit.family === 'sprigatito') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
@@ -933,18 +984,72 @@ export class BattleSimulator {
         }
 
         await this.eventBus.emit({ type: 'AFTER_ATTACK', source: attacker, target: defender, context: {} });
+
+        // Psychic Synergy: "Future Sight"
+        const attackerIsEnemy = this.enemyTeam.includes(attacker);
+        if (attackerIsEnemy) {
+            this.enemyAttackCount++;
+            const psychicCount = this.playerSynergies.get('Psychic') || 0;
+            if (this.enemyAttackCount >= 2 && psychicCount >= 2) {
+                this.enemyAttackCount = 0;
+                this.log("敵方受到了預知未來的攻擊！");
+                const allEnemies = this.enemyTeam.filter(u => u && u.stats.hp > 0);
+                const dmg = 2 * this.playerWins;
+                for (const target of allEnemies) {
+                    await this.dealDamage(null, target, dmg, true, true); // silent damage for clutter control
+                }
+                if (this.onUpdate) this.onUpdate();
+                await this.delay(300);
+            }
+        } else {
+            this.playerAttackCount++;
+            const psychicCount = this.enemySynergies.get('Psychic') || 0;
+            if (this.playerAttackCount >= 2 && psychicCount >= 2) {
+                this.playerAttackCount = 0;
+                this.log("受到了預知未來的攻擊！");
+                const allAllies = this.playerTeam.filter(u => u && u.stats.hp > 0);
+                const dmg = 2; // Default 2 for enemy psychic? Or based on turn? Let's use 2 as a base.
+                for (const target of allAllies) {
+                    await this.dealDamage(null, target, dmg, true, true);
+                }
+                if (this.onUpdate) this.onUpdate();
+                await this.delay(300);
+            }
+        }
     }
 
     private async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false, silent: boolean = false) {
         if (target.stats.hp <= 0) return;
-        // Optimization: Removed overly aggressive source.hp check that broke clash symmetry.
-        // Secondary hits (like Kangaskhan) are handled specifically in performAttack.
 
+        const { myTeam, side } = this.getTeams(target);
         const targetState = this.unitStates.get(target) || {};
-        // Source state for bypass logic
         const sourceState = source ? this.unitStates.get(source) || {} : {};
         const isBypassing = (source && source.family === 'pinsir' && !sourceState.isSilenced) ||
             (source && source.family === 'sableye' && sourceState.isAbsoluteKill);
+
+        // --- NEW: Light Screen Logic (Halve ALL enemy damage, consumes 1 charge per instance) ---
+        // source === null means it's an environment effect or synergy effect, which we treat as enemy for the defender
+        const isEnemySource = source ? this.getTeams(source).side !== side : true;
+
+        if (isEnemySource && !isBypassing) {
+            const aliveMimes = myTeam.filter(u => u && u.family === 'mrmime' && u.stats.hp > 0);
+            for (const mime of aliveMimes) {
+                const mState = this.unitStates.get(mime);
+                if (mState && mState.lightScreen > 0) {
+                    const originalAmount = amount;
+                    amount = Math.ceil(amount / 2);
+                    mState.lightScreen--;
+                    this.log(`${target.name} 的光牆吸收了傷害 (${originalAmount} -> ${amount})`);
+                    if (mState.lightScreen === 0) {
+                        this.log(side === 'player' ? "我方的光牆消失了" : "敵方的光牆消失了");
+                    }
+                    break; // Only one light screen charge consumed per damage instance
+                }
+            }
+        }
+
+        // Optimization: Removed overly aggressive source.hp check that broke clash symmetry.
+        // Secondary hits (like Kangaskhan) are handled specifically in performAttack.
 
         // Lethal Strike (Farfetch'd)
         if (sourceState.isLethalStrike && !sourceState.lethalStrikeUsed) {

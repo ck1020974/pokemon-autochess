@@ -552,7 +552,7 @@ function App() {
             // Save initial state for UI Synergy (Before simulator modifies/removes dead units)
             setInitialEnemyTeam([...enemyTeam]);
 
-            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, game.difficultyMultiplier);
+            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, game.difficultyMultiplier, game.wins);
             simulatorRef.current.onUpdate = () => {
                 if (simulatorRef.current) {
                     setLogs([...simulatorRef.current.logs]);
