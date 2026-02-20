@@ -340,14 +340,28 @@ function App() {
             let forcedStarCount = 0; // How many units are forced to 3-Star
 
             if (game.wins >= 12) {
-                // Champion: All 3-Star
-                enemyBaseLevel = 3;
-                forcedStarCount = 5;
+                // Champion:
+                if (difficulty === 'NORMAL' || difficulty === 'GREAT') {
+                    // Normal/Great Champion: 3 Stars
+                    enemyBaseLevel = 2;
+                    forcedStarCount = 3;
+                } else {
+                    // Champion: All 5 Units 3-Star
+                    enemyBaseLevel = 3;
+                    forcedStarCount = 5;
+                }
             } else if (game.wins >= 8) {
-                // Elite Four: Progressive 3-Stars (1, 2, 3, 4)
-                enemyBaseLevel = 2; // Others are 2-Star? Or 1? Let's say 2 for Elite.
+                // Elite Four:
                 const eliteIndex = game.wins - 8; // 0, 1, 2, 3
-                forcedStarCount = eliteIndex + 1; // 1, 2, 3, 4
+                if (difficulty === 'NORMAL' || difficulty === 'GREAT') {
+                    // Normal/Great Elite: First two (0,1) = 1 star, Last two (2,3) = 2 stars
+                    enemyBaseLevel = 2;
+                    forcedStarCount = eliteIndex < 2 ? 1 : 2;
+                } else {
+                    // Elite Four: Progressive 3-Stars (1, 2, 3, 4)
+                    enemyBaseLevel = 2;
+                    forcedStarCount = eliteIndex + 1; // 1, 2, 3, 4
+                }
             } else {
                 // Gym (Wins 0-7)
                 // New Progressive Logic:
@@ -380,10 +394,11 @@ function App() {
             let synergyTargetCount = 0;
             let uniqueConstraint = false;
 
-            // Updated Elite Thresholds: Master (Win 3+), Ultra (Win 5+), Others (Win 8+)
+            // Updated Elite Thresholds: Master (Win 3+), Ultra (Win 5+), Normal (Win 10+), Great (Win 8+)
             const isEliteMatch = (difficulty === 'MASTER' && game.wins >= 3) ||
                 (difficulty === 'ULTRA' && game.wins >= 5) ||
-                (game.wins >= 8);
+                (difficulty === 'NORMAL' && game.wins >= 10) ||
+                (difficulty === 'GREAT' && game.wins >= 8);
 
             if (isEliteMatch) {
                 // Elite/Champ Strategies
@@ -552,7 +567,9 @@ function App() {
             // Save initial state for UI Synergy (Before simulator modifies/removes dead units)
             setInitialEnemyTeam([...enemyTeam]);
 
-            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, game.difficultyMultiplier, game.wins);
+            // Master Turn 1 Balance: Ensure 1.0 multiplier for fairness
+            const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
+            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, game.wins);
             simulatorRef.current.onUpdate = () => {
                 if (simulatorRef.current) {
                     setLogs([...simulatorRef.current.logs]);
@@ -588,7 +605,7 @@ function App() {
                                 setSelected(null);
                                 setBattleResult(result);
                             }
-                        }, 1000);
+                        }, 300); // Shorter settlement delay as per user request
                         return; // Stop loop
                     }
                 } finally {

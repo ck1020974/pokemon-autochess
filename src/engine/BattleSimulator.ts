@@ -722,7 +722,7 @@ export class BattleSimulator {
                     if (unit.templateId === 'venusaur') {
                         // Venusaur -> 2x Ivysaur (4/4)
                         await this.notifySkill(unit, '召喚了 2 隻妙蛙草');
-                        await this.delay(200);
+                        await this.delay(100); // reduced from 200
                         for (let i = 0; i < 2; i++) {
                             const { myTeam: currentTeam } = this.getTeams(unit);
                             const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
@@ -731,7 +731,7 @@ export class BattleSimulator {
                     } else if (unit.templateId === 'ivysaur') {
                         // Ivysaur -> 1x Bulbasaur (2/2)
                         await this.notifySkill(unit, '召喚了 妙蛙種子');
-                        await this.delay(200);
+                        await this.delay(100); // reduced from 200
                         const { myTeam: currentTeam } = this.getTeams(unit);
                         const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx : deathIdx;
                         await this.spawnUnit(currentTeam, targetIdx, 'bulbasaur', 1, 2, 2, true);
@@ -741,7 +741,7 @@ export class BattleSimulator {
                         // Description says "1/1 Sprouts" regardless of Bulbasaur level
                         const seedStats = 1;
                         await this.notifySkill(unit, `召喚了 ${count} 隻小種子`);
-                        await this.delay(200);
+                        await this.delay(100); // reduced from 200
                         for (let i = 0; i < count; i++) {
                             const { myTeam: currentTeam } = this.getTeams(unit);
                             const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
@@ -767,7 +767,7 @@ export class BattleSimulator {
                     }
 
                     await this.notifySkill(unit, '召喚了小老鼠');
-                    await this.delay(200);
+                    await this.delay(100); // reduced from 200
                     const count = unit.level >= 3 ? 5 : 2;
                     const bonus = [0, 0, 1, 2][unit.level];
                     const stats = 1 + bonus; // Base 1 + Bonus
@@ -791,7 +791,7 @@ export class BattleSimulator {
                     if (living.length > 0) {
                         const target = living[Math.floor(Math.random() * living.length)];
                         await this.notifySkill(unit, `對目標使用了影子偷襲！`);
-                        await this.delay(400);
+                        await this.delay(200); // reduced from 400
                         const dmg = [0, 4, 10, 99][unit.level] || 4;
                         await this.dealDamage(unit, target, dmg, true);
                     }
@@ -871,7 +871,7 @@ export class BattleSimulator {
                         const target = living[0];
                         await this.notifySkill(unit, `對 ${target.name} 使用了種子機關槍！`);
                         await this.playAnimation(unit, 'jump', 300);
-                        await this.delay(250);
+                        await this.delay(100); // reduced from 250
                         await this.dealDamage(unit, target, dmg, true);
                     }
                 }
