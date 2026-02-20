@@ -834,548 +834,548 @@ export class BattleSimulator {
             }
         });
     }
-}
 
     public async performAttack(attacker: Unit, defender: Unit) {
-    if (attacker.stats.hp <= 0 || defender.stats.hp <= 0) return;
-    // Ordinary attack log removed per design request to reduce clutter
-    // this.log(`${attacker.name} 攻擊了 ${defender.name}！`);
-    await this.delay(100);
+        if (attacker.stats.hp <= 0 || defender.stats.hp <= 0) return;
+        // Ordinary attack log removed per design request to reduce clutter
+        // this.log(`${attacker.name} 攻擊了 ${defender.name}！`);
+        await this.delay(100);
 
-    await this.eventBus.emit({ type: 'BEFORE_ATTACK', source: attacker, target: defender, context: {} });
+        await this.eventBus.emit({ type: 'BEFORE_ATTACK', source: attacker, target: defender, context: {} });
 
-    const attackPromises: Promise<any>[] = [];
-    const dmg = attacker.stats.attack;
+        const attackPromises: Promise<any>[] = [];
+        const dmg = attacker.stats.attack;
 
-    // Base attack
-    attackPromises.push(this.dealDamage(attacker, defender, dmg, false));
+        // Base attack
+        attackPromises.push(this.dealDamage(attacker, defender, dmg, false));
 
-    // Kangaskhan: Second hit if defender is evolved AND attacker/defender both survive the first hit
-    if (attacker.family === 'kangaskhan' && (defender.templateId !== defender.family) && !this.unitStates.get(attacker)?.isSilenced) {
-        await Promise.all(attackPromises); // Wait for the first hit and any triggers
-        // Re-check survival after the first hit and its consequences (like reflect)
-        if (defender.stats.hp > 0 && attacker.stats.hp > 0) {
-            await this.notifySkill(attacker, `對 ${defender.name} 發動了親子愛！`);
-            const secondHit = this.dealDamage(attacker, defender, attacker.stats.attack, false);
-            attackPromises.push(secondHit);
-        }
-    }
-
-    // Doduo: Extra hit on same target
-    if (attacker.family === 'doduo' && !this.unitStates.get(attacker)?.isSilenced) {
-        const chance = [0, 0.25, 0.33, 0.5][attacker.level] || 0.25;
-        if (Math.random() < chance) {
-            // User Request: Should hit the same target
-            this.log(`${attacker.name} 對 ${defender.name} 發動了二連擊！`);
-            attackPromises.push(this.dealDamage(attacker, defender, dmg));
-        }
-    }
-
-    // Sneasel: 1 extra random hit (Can hit same target if only 1 enemy)
-    if (attacker.family === 'sneasel' && !this.unitStates.get(attacker)?.isSilenced) {
-        const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
-        const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
-        const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
-        if (liveEnemies.length > 0) {
-            const targetCount = attacker.level >= 3 ? 2 : 1;
-            let potentialTargets = liveEnemies.filter(u => u !== defender);
-            if (potentialTargets.length === 0) potentialTargets = [defender];
-
-            // Shuffle and pick
-            const finalTargets = [...potentialTargets].sort(() => 0.5 - Math.random()).slice(0, targetCount);
-            for (const r of finalTargets) {
-                this.log(`${attacker.name} 對 ${r.name} 發動了暗襲要害！`);
-                attackPromises.push(this.dealDamage(attacker, r, dmg));
+        // Kangaskhan: Second hit if defender is evolved AND attacker/defender both survive the first hit
+        if (attacker.family === 'kangaskhan' && (defender.templateId !== defender.family) && !this.unitStates.get(attacker)?.isSilenced) {
+            await Promise.all(attackPromises); // Wait for the first hit and any triggers
+            // Re-check survival after the first hit and its consequences (like reflect)
+            if (defender.stats.hp > 0 && attacker.stats.hp > 0) {
+                await this.notifySkill(attacker, `對 ${defender.name} 發動了親子愛！`);
+                const secondHit = this.dealDamage(attacker, defender, attacker.stats.attack, false);
+                attackPromises.push(secondHit);
             }
         }
-    }
 
-    // Totodile: Splash to neighbor (Fixed 2, 4, 6 dmg)
-    if (attacker.family === 'totodile' && !this.unitStates.get(attacker)?.isSilenced) {
-        const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
-        const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
-        const idx = opTeam.indexOf(defender);
-        if (idx !== -1 && idx < opTeam.length - 1) {
-            const neighbor = opTeam[idx + 1];
-            if (neighbor && neighbor.stats.hp > 0) {
-                const splashDmg = [0, 2, 4, 8][attacker.level] || 2;
-                await this.notifySkill(attacker, `對 ${neighbor.name} 使用了咬住！`);
-                attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
+        // Doduo: Extra hit on same target
+        if (attacker.family === 'doduo' && !this.unitStates.get(attacker)?.isSilenced) {
+            const chance = [0, 0.25, 0.33, 0.5][attacker.level] || 0.25;
+            if (Math.random() < chance) {
+                // User Request: Should hit the same target
+                this.log(`${attacker.name} 對 ${defender.name} 發動了二連擊！`);
+                attackPromises.push(this.dealDamage(attacker, defender, dmg));
             }
         }
-    }
 
-    await Promise.all(attackPromises);
+        // Sneasel: 1 extra random hit (Can hit same target if only 1 enemy)
+        if (attacker.family === 'sneasel' && !this.unitStates.get(attacker)?.isSilenced) {
+            const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
+            const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
+            const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+            if (liveEnemies.length > 0) {
+                const targetCount = attacker.level >= 3 ? 2 : 1;
+                let potentialTargets = liveEnemies.filter(u => u !== defender);
+                if (potentialTargets.length === 0) potentialTargets = [defender];
 
-    // Snover: Knockback
-    if (attacker.family === 'snover' && !this.unitStates.get(attacker)?.isSilenced) {
-        const buffAtk = [0, 1, 2, 5][attacker.level] || 1;
-        this.growUnit(attacker, 0, buffAtk, attacker.name);
-        if (defender.stats.hp > 0) {
-            const team = this.playerTeam.includes(defender) ? this.playerTeam : this.enemyTeam;
-            const idx = team.indexOf(defender);
-            if (idx !== -1 && idx < team.length - 1) {
-                const behind = team[idx + 1];
-                if (behind) {
-                    team[idx] = behind;
-                    team[idx + 1] = defender;
-                    await this.notifySkill(attacker, `對 ${defender.name} 使用了木槌！`);
-                    await this.compactTeams();
-                    await this.delay(300);
-                    await this.eventBus.emit({ type: 'ON_MOVE', source: defender, context: {} });
-                    await this.eventBus.emit({ type: 'ON_MOVE', source: behind, context: {} });
+                // Shuffle and pick
+                const finalTargets = [...potentialTargets].sort(() => 0.5 - Math.random()).slice(0, targetCount);
+                for (const r of finalTargets) {
+                    this.log(`${attacker.name} 對 ${r.name} 發動了暗襲要害！`);
+                    attackPromises.push(this.dealDamage(attacker, r, dmg));
                 }
             }
         }
-    }
 
-    await this.eventBus.emit({ type: 'AFTER_ATTACK', source: attacker, target: defender, context: {} });
-}
+        // Totodile: Splash to neighbor (Fixed 2, 4, 6 dmg)
+        if (attacker.family === 'totodile' && !this.unitStates.get(attacker)?.isSilenced) {
+            const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
+            const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
+            const idx = opTeam.indexOf(defender);
+            if (idx !== -1 && idx < opTeam.length - 1) {
+                const neighbor = opTeam[idx + 1];
+                if (neighbor && neighbor.stats.hp > 0) {
+                    const splashDmg = [0, 2, 4, 8][attacker.level] || 2;
+                    await this.notifySkill(attacker, `對 ${neighbor.name} 使用了咬住！`);
+                    attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
+                }
+            }
+        }
+
+        await Promise.all(attackPromises);
+
+        // Snover: Knockback
+        if (attacker.family === 'snover' && !this.unitStates.get(attacker)?.isSilenced) {
+            const buffAtk = [0, 1, 2, 5][attacker.level] || 1;
+            this.growUnit(attacker, 0, buffAtk, attacker.name);
+            if (defender.stats.hp > 0) {
+                const team = this.playerTeam.includes(defender) ? this.playerTeam : this.enemyTeam;
+                const idx = team.indexOf(defender);
+                if (idx !== -1 && idx < team.length - 1) {
+                    const behind = team[idx + 1];
+                    if (behind) {
+                        team[idx] = behind;
+                        team[idx + 1] = defender;
+                        await this.notifySkill(attacker, `對 ${defender.name} 使用了木槌！`);
+                        await this.compactTeams();
+                        await this.delay(300);
+                        await this.eventBus.emit({ type: 'ON_MOVE', source: defender, context: {} });
+                        await this.eventBus.emit({ type: 'ON_MOVE', source: behind, context: {} });
+                    }
+                }
+            }
+        }
+
+        await this.eventBus.emit({ type: 'AFTER_ATTACK', source: attacker, target: defender, context: {} });
+    }
 
     private async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false) {
-    if (target.stats.hp <= 0) return;
-    // Optimization: Removed overly aggressive source.hp check that broke clash symmetry.
-    // Secondary hits (like Kangaskhan) are handled specifically in performAttack.
+        if (target.stats.hp <= 0) return;
+        // Optimization: Removed overly aggressive source.hp check that broke clash symmetry.
+        // Secondary hits (like Kangaskhan) are handled specifically in performAttack.
 
-    const targetState = this.unitStates.get(target) || {};
-    // Source state for bypass logic
-    const sourceState = source ? this.unitStates.get(source) || {} : {};
-    const isBypassing = (source && source.family === 'pinsir' && !sourceState.isSilenced) ||
-        (source && source.family === 'sableye' && sourceState.isAbsoluteKill);
+        const targetState = this.unitStates.get(target) || {};
+        // Source state for bypass logic
+        const sourceState = source ? this.unitStates.get(source) || {} : {};
+        const isBypassing = (source && source.family === 'pinsir' && !sourceState.isSilenced) ||
+            (source && source.family === 'sableye' && sourceState.isAbsoluteKill);
 
-    // Lethal Strike (Farfetch'd)
-    if (sourceState.isLethalStrike && !sourceState.lethalStrikeUsed) {
-        sourceState.isLethalStrike = false;
-        sourceState.lethalStrikeUsed = true; // Mark as permanently used
-        amount = 99;
-        await this.notifySkill(source!, '致命一擊');
-        this.log(`${source!.name} 對目標使用了迎頭一擊！`);
-    }
+        // Lethal Strike (Farfetch'd)
+        if (sourceState.isLethalStrike && !sourceState.lethalStrikeUsed) {
+            sourceState.isLethalStrike = false;
+            sourceState.lethalStrikeUsed = true; // Mark as permanently used
+            amount = 99;
+            await this.notifySkill(source!, '致命一擊');
+            this.log(`${source!.name} 對目標使用了迎頭一擊！`);
+        }
 
-    // Diglett: Chance to dodge (only basic attacks, not skills; Pinsir bypasses)
-    if (target.family === 'diglett' && !targetState.isSilenced && !isSkillDamage && !isBypassing) {
-        const dodgeChance = [0, 0.25, 0.33, 0.5][target.level] || 0.25;
-        if (Math.random() < dodgeChance) {
-            this.log(`${target.name} 發動了沙隱！`);
+        // Diglett: Chance to dodge (only basic attacks, not skills; Pinsir bypasses)
+        if (target.family === 'diglett' && !targetState.isSilenced && !isSkillDamage && !isBypassing) {
+            const dodgeChance = [0, 0.25, 0.33, 0.5][target.level] || 0.25;
+            if (Math.random() < dodgeChance) {
+                this.log(`${target.name} 發動了沙隱！`);
+                if (this.onUpdate) this.onUpdate();
+                return;
+            }
+        }
+
+        // Emitting BEFORE_HURT allows skills like Mimikyu to nullify damage
+        const hurtContext = { source, amount };
+        await this.eventBus.emit({ type: 'BEFORE_HURT', target, context: hurtContext });
+        amount = hurtContext.amount; // Get modified damage from listeners
+
+        if (amount <= 0 && source !== null) {
+            // Damage nullified (e.g. by Mimikyu), don't show hurt anim
             if (this.onUpdate) this.onUpdate();
             return;
         }
-    }
 
-    // Emitting BEFORE_HURT allows skills like Mimikyu to nullify damage
-    const hurtContext = { source, amount };
-    await this.eventBus.emit({ type: 'BEFORE_HURT', target, context: hurtContext });
-    amount = hurtContext.amount; // Get modified damage from listeners
-
-    if (amount <= 0 && source !== null) {
-        // Damage nullified (e.g. by Mimikyu), don't show hurt anim
-        if (this.onUpdate) this.onUpdate();
-        return;
-    }
-
-    // Pinsir/Sableye ignore reductions
-    if (!isBypassing) {
-        // Slow: 33% damage reduction
-        if (this.getSynergyCountForUnit(target, 'Slow') >= 2 && target.synergies.includes('Slow')) {
-            amount = Math.max(1, Math.ceil(amount * 2 / 3));
-        }
-        // Squirtle: Flat reduction
-        if (target.family === 'squirtle' && amount > 0) amount = Math.max(1, amount - target.level);
-    } else if (source) {
-        this.log(`${source.name} 發動了破格！`);
-    }
-
-    target.stats.hp -= amount;
-    if (isSkillDamage) {
-        this.log(`${target.name} 受到 ${amount} 點傷害！`);
-    }
-
-    // Emit ON_HURT for triggers (like Steelix reflection) before checking survival effects
-    await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount } });
-
-    if (target.stats.hp <= 0 && !isBypassing && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2 && !targetState.hardUsed) {
-        target.stats.hp = 1;
-        targetState.hardUsed = true;
-        this.unitStates.set(target, targetState);
-        this.log(`${target.name} 發動了結實！`);
-    }
-
-    if (target.stats.hp <= 0) {
-        // DEATH: Go straight to handleDeath, skipping hurt animation
-        await this.handleDeath(target, source || undefined);
-    } else {
-        // SURVIVE: Play hurt animation IF not in front row (index 0)
-        const { myTeam } = this.getTeams(target);
-        const isFront = myTeam[0] === target;
-
-        if (!isFront) {
-            await this.playAnimation(target, 'hurt', 150);
-            await this.delay(100); // Wait 100ms after flicker
-        }
-    }
-}
-
-    private async handleDeath(unit: Unit, killer ?: Unit) {
-    // Log removed per user request: "不要在說明角色倒下，對戰訊息太多了"
-    // this.log(`${unit.name} 倒下了！`);
-
-    // Sableye: Revenge kill
-    if (unit.family === 'sableye' && killer && killer.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-        this.log(`${unit.name} 對 ${killer.name} 發動了同命！`);
-        const state = this.unitStates.get(unit) || {};
-        state.isAbsoluteKill = true;
-        this.unitStates.set(unit, state);
-        await this.dealDamage(unit, killer, 9999);
-        // reset is not strictly needed since unit faints, but good for safety
-        state.isAbsoluteKill = false;
-    }
-
-    // 1. Emit AFTER_DEATH (Fuecoco etc. triggers here)
-    // Pass deathIdx to help summons find their parent's spot even after shifts
-    const { myTeam } = this.getTeams(unit);
-    const deathIdx = myTeam.indexOf(unit);
-    await this.eventBus.emit({ type: 'AFTER_DEATH', source: unit, context: { killer, deathIdx } });
-
-    // 2. Remove from team (Victim is gone)
-    if (this.playerTeam.includes(unit)) {
-        const idx = this.playerTeam.indexOf(unit);
-        if (this.playerTeam[idx] === unit) {
-            this.playerTeam[idx] = null as any;
-        }
-    } else if (this.enemyTeam.includes(unit)) {
-        const idx = this.enemyTeam.indexOf(unit);
-        if (this.enemyTeam[idx] === unit) {
-            this.enemyTeam[idx] = null as any;
-        }
-    }
-
-    // 3. Process Killer Rewards ONLY if killer survived
-    if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
-        const executeReward = async () => {
-            // Critical: Re-check survival if reward was deferred
-            if (killer.stats.hp <= 0) return;
-
-            // Sneasel family: Atk on kill (Permanent)
-            if (killer.family === 'sneasel') {
-                const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                const buff = killer.level >= 2 ? 2 : 1;
-                this.growUnit(killer, 0, buff, '狃拉技能', original);
+        // Pinsir/Sableye ignore reductions
+        if (!isBypassing) {
+            // Slow: 33% damage reduction
+            if (this.getSynergyCountForUnit(target, 'Slow') >= 2 && target.synergies.includes('Slow')) {
+                amount = Math.max(1, Math.ceil(amount * 2 / 3));
             }
+            // Squirtle: Flat reduction
+            if (target.family === 'squirtle' && amount > 0) amount = Math.max(1, amount - target.level);
+        } else if (source) {
+            this.log(`${source.name} 發動了破格！`);
+        }
 
-            // Charmander family: Stats on kill (Temporary)
-            if (killer.family === 'charmander') {
-                if (killer.level >= 3) {
-                    const canAddAtk = killer.stats.attack < 50;
-                    const canAddHp = killer.stats.maxHp < 50;
-                    const buff = 5;
+        target.stats.hp -= amount;
+        if (isSkillDamage) {
+            this.log(`${target.name} 受到 ${amount} 點傷害！`);
+        }
 
-                    let choice: 'hp' | 'atk';
-                    if (canAddAtk && !canAddHp) choice = 'atk';
-                    else if (canAddHp && !canAddAtk) choice = 'hp';
-                    else choice = Math.random() < 0.5 ? 'atk' : 'hp';
+        // Emit ON_HURT for triggers (like Steelix reflection) before checking survival effects
+        await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount } });
 
-                    this.log(`${killer.name} 發動了蓄能焰襲！`);
-                    if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲強化');
-                    else this.growUnit(killer, buff, 0, '蓄能焰襲強化');
-                } else {
-                    const buff = killer.level;
-                    const canAddAtk = killer.stats.attack < 50;
-                    const canAddHp = killer.stats.maxHp < 50;
+        if (target.stats.hp <= 0 && !isBypassing && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2 && !targetState.hardUsed) {
+            target.stats.hp = 1;
+            targetState.hardUsed = true;
+            this.unitStates.set(target, targetState);
+            this.log(`${target.name} 發動了結實！`);
+        }
 
-                    let choice: 'hp' | 'atk';
-                    if (canAddAtk && !canAddHp) {
-                        choice = 'atk';
-                    } else if (canAddHp && !canAddAtk) {
-                        choice = 'hp';
-                    } else {
-                        choice = Math.random() < 0.5 ? 'atk' : 'hp';
-                    }
-
-                    this.log(`${killer.name} 發動了蓄能焰襲！`);
-                    if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲強化');
-                    else this.growUnit(killer, buff, 0, '蓄能焰襲強化');
-                }
-            }
-
-            // Cyndaquil family: Atk and HP on kill (Temporary)
-            if (killer.family === 'cyndaquil') {
-                const kState = this.unitStates.get(killer) || {};
-                const maxTimes = killer.level + 1;
-                const used = kState.cyndaquilKills || 0;
-                if (used < maxTimes) {
-                    kState.cyndaquilKills = used + 1;
-                    this.unitStates.set(killer, kState);
-                    const amt = killer.level >= 3 ? 4 : 2;
-                    this.growUnit(killer, amt, amt, '發動了火焰輪！');
-                }
-            }
-
-            // Reward logic handled by event listeners in registerUnitAbilities
-        };
-
-        if (this.isSimulatingStep) {
-            this.queuedKillRewards.push(executeReward);
+        if (target.stats.hp <= 0) {
+            // DEATH: Go straight to handleDeath, skipping hurt animation
+            await this.handleDeath(target, source || undefined);
         } else {
-            await executeReward();
+            // SURVIVE: Play hurt animation IF not in front row (index 0)
+            const { myTeam } = this.getTeams(target);
+            const isFront = myTeam[0] === target;
+
+            if (!isFront) {
+                await this.playAnimation(target, 'hurt', 150);
+                await this.delay(100); // Wait 100ms after flicker
+            }
         }
     }
 
-    // Special: Wait 150ms before compacting as per refined plan
-    await this.delay(150);
-    // compactTeams is now called after both attacks in simulateStep
-}
+    private async handleDeath(unit: Unit, killer?: Unit) {
+        // Log removed per user request: "不要在說明角色倒下，對戰訊息太多了"
+        // this.log(`${unit.name} 倒下了！`);
+
+        // Sableye: Revenge kill
+        if (unit.family === 'sableye' && killer && killer.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
+            this.log(`${unit.name} 對 ${killer.name} 發動了同命！`);
+            const state = this.unitStates.get(unit) || {};
+            state.isAbsoluteKill = true;
+            this.unitStates.set(unit, state);
+            await this.dealDamage(unit, killer, 9999);
+            // reset is not strictly needed since unit faints, but good for safety
+            state.isAbsoluteKill = false;
+        }
+
+        // 1. Emit AFTER_DEATH (Fuecoco etc. triggers here)
+        // Pass deathIdx to help summons find their parent's spot even after shifts
+        const { myTeam } = this.getTeams(unit);
+        const deathIdx = myTeam.indexOf(unit);
+        await this.eventBus.emit({ type: 'AFTER_DEATH', source: unit, context: { killer, deathIdx } });
+
+        // 2. Remove from team (Victim is gone)
+        if (this.playerTeam.includes(unit)) {
+            const idx = this.playerTeam.indexOf(unit);
+            if (this.playerTeam[idx] === unit) {
+                this.playerTeam[idx] = null as any;
+            }
+        } else if (this.enemyTeam.includes(unit)) {
+            const idx = this.enemyTeam.indexOf(unit);
+            if (this.enemyTeam[idx] === unit) {
+                this.enemyTeam[idx] = null as any;
+            }
+        }
+
+        // 3. Process Killer Rewards ONLY if killer survived
+        if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
+            const executeReward = async () => {
+                // Critical: Re-check survival if reward was deferred
+                if (killer.stats.hp <= 0) return;
+
+                // Sneasel family: Atk on kill (Permanent)
+                if (killer.family === 'sneasel') {
+                    const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
+                    const buff = killer.level >= 2 ? 2 : 1;
+                    this.growUnit(killer, 0, buff, '狃拉技能', original);
+                }
+
+                // Charmander family: Stats on kill (Temporary)
+                if (killer.family === 'charmander') {
+                    if (killer.level >= 3) {
+                        const canAddAtk = killer.stats.attack < 50;
+                        const canAddHp = killer.stats.maxHp < 50;
+                        const buff = 5;
+
+                        let choice: 'hp' | 'atk';
+                        if (canAddAtk && !canAddHp) choice = 'atk';
+                        else if (canAddHp && !canAddAtk) choice = 'hp';
+                        else choice = Math.random() < 0.5 ? 'atk' : 'hp';
+
+                        this.log(`${killer.name} 發動了蓄能焰襲！`);
+                        if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲強化');
+                        else this.growUnit(killer, buff, 0, '蓄能焰襲強化');
+                    } else {
+                        const buff = killer.level;
+                        const canAddAtk = killer.stats.attack < 50;
+                        const canAddHp = killer.stats.maxHp < 50;
+
+                        let choice: 'hp' | 'atk';
+                        if (canAddAtk && !canAddHp) {
+                            choice = 'atk';
+                        } else if (canAddHp && !canAddAtk) {
+                            choice = 'hp';
+                        } else {
+                            choice = Math.random() < 0.5 ? 'atk' : 'hp';
+                        }
+
+                        this.log(`${killer.name} 發動了蓄能焰襲！`);
+                        if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲強化');
+                        else this.growUnit(killer, buff, 0, '蓄能焰襲強化');
+                    }
+                }
+
+                // Cyndaquil family: Atk and HP on kill (Temporary)
+                if (killer.family === 'cyndaquil') {
+                    const kState = this.unitStates.get(killer) || {};
+                    const maxTimes = killer.level + 1;
+                    const used = kState.cyndaquilKills || 0;
+                    if (used < maxTimes) {
+                        kState.cyndaquilKills = used + 1;
+                        this.unitStates.set(killer, kState);
+                        const amt = killer.level >= 3 ? 4 : 2;
+                        this.growUnit(killer, amt, amt, '發動了火焰輪！');
+                    }
+                }
+
+                // Reward logic handled by event listeners in registerUnitAbilities
+            };
+
+            if (this.isSimulatingStep) {
+                this.queuedKillRewards.push(executeReward);
+            } else {
+                await executeReward();
+            }
+        }
+
+        // Special: Wait 150ms before compacting as per refined plan
+        await this.delay(150);
+        // compactTeams is now called after both attacks in simulateStep
+    }
 
     private async compactTeams() {
-    this.isCompacting = true;
-    // Track old positions to detect movement
-    const oldPos = new Map<string, number>();
-    [...this.playerTeam, ...this.enemyTeam].forEach((u, i) => {
-        if (u) oldPos.set(u.id, i);
-    });
+        this.isCompacting = true;
+        // Track old positions to detect movement
+        const oldPos = new Map<string, number>();
+        [...this.playerTeam, ...this.enemyTeam].forEach((u, i) => {
+            if (u) oldPos.set(u.id, i);
+        });
 
-    this.playerTeam = this.compactTeam(this.playerTeam);
-    this.enemyTeam = this.compactTeam(this.enemyTeam);
+        this.playerTeam = this.compactTeam(this.playerTeam);
+        this.enemyTeam = this.compactTeam(this.enemyTeam);
 
-    // Emit ON_MOVE for units that actually shifted
-    const allUnits = [...this.playerTeam, ...this.enemyTeam];
-    for (let i = 0; i < allUnits.length; i++) {
-        const u = allUnits[i];
-        if (u && oldPos.has(u.id) && oldPos.get(u.id) !== i) {
-            // Potential optimization: only emit if game is in progress
-            await this.eventBus.emit({ type: 'ON_MOVE', source: u, context: {} });
+        // Emit ON_MOVE for units that actually shifted
+        const allUnits = [...this.playerTeam, ...this.enemyTeam];
+        for (let i = 0; i < allUnits.length; i++) {
+            const u = allUnits[i];
+            if (u && oldPos.has(u.id) && oldPos.get(u.id) !== i) {
+                // Potential optimization: only emit if game is in progress
+                await this.eventBus.emit({ type: 'ON_MOVE', source: u, context: {} });
+            }
         }
-    }
 
-    if (this.onUpdate) this.onUpdate();
-    this.isCompacting = false;
-    await this.delay(100); // 0.1s delay after movement
-}
+        if (this.onUpdate) this.onUpdate();
+        this.isCompacting = false;
+        await this.delay(100); // 0.1s delay after movement
+    }
 
     private compactTeam(team: Unit[]): Unit[] {
-    const survivors = team.filter(u => u !== null && u.stats.hp > 0);
-    const result = new Array(5).fill(null);
-    for (let i = 0; i < survivors.length; i++) {
-        result[i] = survivors[i];
+        const survivors = team.filter(u => u !== null && u.stats.hp > 0);
+        const result = new Array(5).fill(null);
+        for (let i = 0; i < survivors.length; i++) {
+            result[i] = survivors[i];
+        }
+        return result;
     }
-    return result;
-}
 
     private heal(target: Unit, amount: number) {
-    if (target.stats.hp <= 0) return;
-    target.stats.hp = Math.min(target.stats.hp + amount, target.stats.maxHp);
-}
+        if (target.stats.hp <= 0) return;
+        target.stats.hp = Math.min(target.stats.hp + amount, target.stats.maxHp);
+    }
 
     private async spawnUnit(team: Unit[], index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false) {
-    const template = UNIT_TEMPLATES[templateId];
-    if (!template) return;
-    const newUnit = new Unit(template);
-    newUnit.level = level;
-    // Fix: Ensure spawned stats are at least 1/1 to prevent instant death or invincibility
-    const safeHp = Math.max(1, hp);
-    const safeAtk = Math.max(1, attack);
-    newUnit.stats.hp = safeHp;
-    newUnit.stats.maxHp = safeHp;
-    newUnit.stats.attack = safeAtk;
-    // Feature: Cap spawned unit stats at 50/50
-    newUnit.capStats();
-    newUnit.family = template.family || template.id;
-    newUnit.synergies = [...template.synergies];
+        const template = UNIT_TEMPLATES[templateId];
+        if (!template) return;
+        const newUnit = new Unit(template);
+        newUnit.level = level;
+        // Fix: Ensure spawned stats are at least 1/1 to prevent instant death or invincibility
+        const safeHp = Math.max(1, hp);
+        const safeAtk = Math.max(1, attack);
+        newUnit.stats.hp = safeHp;
+        newUnit.stats.maxHp = safeHp;
+        newUnit.stats.attack = safeAtk;
+        // Feature: Cap spawned unit stats at 50/50
+        newUnit.capStats();
+        newUnit.family = template.family || template.id;
+        newUnit.synergies = [...template.synergies];
 
-    // User Request: Spawned tokens should use 01 (Battle Image) if available
-    newUnit.imageUrl = template.battleImageUrl || template.imageUrl;
-    newUnit.battleImageUrl = template.battleImageUrl;
+        // User Request: Spawned tokens should use 01 (Battle Image) if available
+        newUnit.imageUrl = template.battleImageUrl || template.imageUrl;
+        newUnit.battleImageUrl = template.battleImageUrl;
 
-    // Team Limit Check: Field limit is 5 survivors.
-    const livingUnits = team.filter(u => u && u.stats.hp > 0).length;
-    // Clamp index to slot 0-4 for replacement check
-    const checkIdx = Math.min(index, 4);
-    const isReplacingSlot = !team[checkIdx] || team[checkIdx].stats.hp <= 0;
+        // Team Limit Check: Field limit is 5 survivors.
+        const livingUnits = team.filter(u => u && u.stats.hp > 0).length;
+        // Clamp index to slot 0-4 for replacement check
+        const checkIdx = Math.min(index, 4);
+        const isReplacingSlot = !team[checkIdx] || team[checkIdx].stats.hp <= 0;
 
-    if (livingUnits >= 5 && !isReplacingSlot) {
-        this.log(`戰場已滿，無法再召喚 ${newUnit.name}！ `);
-        return;
-    }
-
-    // Placement Logic: "若有空間即召喚"
-    if (insert) {
-        // Clamp index to slot 0-4 to prevent array expansion beyond 5
-        let safeIdx = Math.min(index, 4);
-
-        // Priority 1: Fill the target slot if empty/dead
-        if (!team[safeIdx] || team[safeIdx].stats.hp <= 0) {
-            team[safeIdx] = newUnit;
-        } else {
-            // Priority 2: Splice into position (shifts others back)
-            team.splice(safeIdx, 0, newUnit);
-
-            // Then immediately find and remove a vacancy to restore length 5
-            const vacancyIdx = team.findIndex((u, i) => i !== safeIdx && (!u || u.stats.hp <= 0));
-            if (vacancyIdx !== -1) {
-                team.splice(vacancyIdx, 1);
-            } else if (team.length > 5) {
-                // Safety: if no vacancy found, pop the one pushed past index 4
-                team.splice(5, team.length - 5);
-            }
+        if (livingUnits >= 5 && !isReplacingSlot) {
+            this.log(`戰場已滿，無法再召喚 ${newUnit.name}！ `);
+            return;
         }
-    } else {
-        // Click/Standard Spawn: Fill first null or append within 5-slot limit
-        const nullIdx = team.findIndex(u => !u || u.stats.hp <= 0);
-        if (nullIdx !== -1 && nullIdx < 5) team[nullIdx] = newUnit;
-        else if (team.length < 5) team.push(newUnit);
+
+        // Placement Logic: "若有空間即召喚"
+        if (insert) {
+            // Clamp index to slot 0-4 to prevent array expansion beyond 5
+            let safeIdx = Math.min(index, 4);
+
+            // Priority 1: Fill the target slot if empty/dead
+            if (!team[safeIdx] || team[safeIdx].stats.hp <= 0) {
+                team[safeIdx] = newUnit;
+            } else {
+                // Priority 2: Splice into position (shifts others back)
+                team.splice(safeIdx, 0, newUnit);
+
+                // Then immediately find and remove a vacancy to restore length 5
+                const vacancyIdx = team.findIndex((u, i) => i !== safeIdx && (!u || u.stats.hp <= 0));
+                if (vacancyIdx !== -1) {
+                    team.splice(vacancyIdx, 1);
+                } else if (team.length > 5) {
+                    // Safety: if no vacancy found, pop the one pushed past index 4
+                    team.splice(5, team.length - 5);
+                }
+            }
+        } else {
+            // Click/Standard Spawn: Fill first null or append within 5-slot limit
+            const nullIdx = team.findIndex(u => !u || u.stats.hp <= 0);
+            if (nullIdx !== -1 && nullIdx < 5) team[nullIdx] = newUnit;
+            else if (team.length < 5) team.push(newUnit);
+        }
+
+        this.unitStates.set(newUnit, {});
+        this.registerUnitAbilities(newUnit);
+
+        // 1. Refresh UI so the DOM element for the new unit is created
+        if (this.onUpdate) this.onUpdate();
+        // Delay removed as per user request to fix Chikorita/Treecko sync issues
+
+        // 2. Play spawn animation and log (Deferred to ensure DOM exists after React render)
+        requestAnimationFrame(() => {
+            const el = document.getElementById(newUnit.id);
+            if (el) el.classList.add('spawn-anim');
+        });
+        this.log(`${newUnit.name} 加入了戰場！`);
+
+        // 3. Stand up delay removed
+
+        // 4. Finally emit the event for others to react (e.g. Chikorita buffs)
+        await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
     }
-
-    this.unitStates.set(newUnit, {});
-    this.registerUnitAbilities(newUnit);
-
-    // 1. Refresh UI so the DOM element for the new unit is created
-    if (this.onUpdate) this.onUpdate();
-    // Delay removed as per user request to fix Chikorita/Treecko sync issues
-
-    // 2. Play spawn animation and log (Deferred to ensure DOM exists after React render)
-    requestAnimationFrame(() => {
-        const el = document.getElementById(newUnit.id);
-        if (el) el.classList.add('spawn-anim');
-    });
-    this.log(`${newUnit.name} 加入了戰場！`);
-
-    // 3. Stand up delay removed
-
-    // 4. Finally emit the event for others to react (e.g. Chikorita buffs)
-    await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
-}
 
     private async notifySkill(unit: Unit, message: string) {
-    const fullMsg = `${unit.name} ${message}！`;
-    this.log(fullMsg);
-    await this.delay(250); // 0.25s pause for visual feedback
-}
+        const fullMsg = `${unit.name} ${message}！`;
+        this.log(fullMsg);
+        await this.delay(250); // 0.25s pause for visual feedback
+    }
 
     private log(message: string) {
-    this.logs.push({ message, turn: this.turnCount });
-    if (this.onUpdate) this.onUpdate();
-}
+        this.logs.push({ message, turn: this.turnCount });
+        if (this.onUpdate) this.onUpdate();
+    }
 
     private async playTeamAnimation(units: (Unit | null)[], anim: string, duration: number) {
-    const aliveUnits = units.filter(u => u && u.stats.hp > 0) as Unit[];
-    if (aliveUnits.length === 0) return;
+        const aliveUnits = units.filter(u => u && u.stats.hp > 0) as Unit[];
+        if (aliveUnits.length === 0) return;
 
-    // Ensure DOM update before seeking elements
-    if (this.onUpdate) this.onUpdate();
+        // Ensure DOM update before seeking elements
+        if (this.onUpdate) this.onUpdate();
 
-    return new Promise<void>(resolve => {
-        requestAnimationFrame(async () => {
-            const className = `${anim}-anim`; // anim might be a full class like 'glow-pale-red'
-            // Use the animation name directly if no '-anim' suffix is needed, but playAnimation uses suffix
-            // Let's allow raw class names for more flexibility
-            const finalClass = anim.includes('-') ? anim : className;
+        return new Promise<void>(resolve => {
+            requestAnimationFrame(async () => {
+                const className = `${anim}-anim`; // anim might be a full class like 'glow-pale-red'
+                // Use the animation name directly if no '-anim' suffix is needed, but playAnimation uses suffix
+                // Let's allow raw class names for more flexibility
+                const finalClass = anim.includes('-') ? anim : className;
 
-            const elements: HTMLElement[] = [];
-            aliveUnits.forEach(u => {
-                const el = document.getElementById(u.id);
-                if (el) {
-                    el.classList.add(finalClass);
-                    elements.push(el);
-                }
+                const elements: HTMLElement[] = [];
+                aliveUnits.forEach(u => {
+                    const el = document.getElementById(u.id);
+                    if (el) {
+                        el.classList.add(finalClass);
+                        elements.push(el);
+                    }
+                });
+
+                await this.delay(duration);
+
+                elements.forEach(el => el.classList.remove(finalClass));
+                resolve();
             });
-
-            await this.delay(duration);
-
-            elements.forEach(el => el.classList.remove(finalClass));
-            resolve();
         });
-    });
-}
+    }
 
     private async playAnimation(unit: Unit, anim: string, duration: number) {
-    // Ensure DOM update before seeking element
-    if (this.onUpdate) this.onUpdate();
+        // Ensure DOM update before seeking element
+        if (this.onUpdate) this.onUpdate();
 
-    // Use requestAnimationFrame to ensure the element exists if it was JUST rendered
-    return new Promise<void>(resolve => {
-        requestAnimationFrame(async () => {
-            const el = document.getElementById(unit.id);
-            if (el) {
-                const className = `${anim}-anim`;
-                el.classList.add(className);
-                await this.delay(duration);
-                el.classList.remove(className);
-            }
-            resolve();
+        // Use requestAnimationFrame to ensure the element exists if it was JUST rendered
+        return new Promise<void>(resolve => {
+            requestAnimationFrame(async () => {
+                const el = document.getElementById(unit.id);
+                if (el) {
+                    const className = `${anim}-anim`;
+                    el.classList.add(className);
+                    await this.delay(duration);
+                    el.classList.remove(className);
+                    el.classList.remove(className);
+                }
+                resolve();
+            });
         });
-    });
-}
+    }
 
-    public async simulateStep(): Promise < boolean > {
-    const pFront = this.playerTeam.find(u => u !== null && u.stats.hp > 0);
-    const eFront = this.enemyTeam.find(u => u !== null && u.stats.hp > 0);
+    public async simulateStep(): Promise<boolean> {
+        const pFront = this.playerTeam.find(u => u !== null && u.stats.hp > 0);
+        const eFront = this.enemyTeam.find(u => u !== null && u.stats.hp > 0);
 
-    if(!pFront || !eFront) return false;
+        if (!pFront || !eFront) return false;
 
-this.turnCount++;
+        this.turnCount++;
 
-const pEl = document.getElementById(pFront.id);
-const eEl = document.getElementById(eFront.id);
-if (pEl) pEl.style.setProperty('--clash-offset', '20px');
-if (eEl) eEl.style.setProperty('--clash-offset', '20px');
+        const pEl = document.getElementById(pFront.id);
+        const eEl = document.getElementById(eFront.id);
+        if (pEl) pEl.style.setProperty('--clash-offset', '20px');
+        if (eEl) eEl.style.setProperty('--clash-offset', '20px');
 
-// 1. Start clash animations
-const anims = [
-    this.playAnimation(pFront, 'clash', 300),
-    this.playAnimation(eFront, 'clash', 300)
-];
+        // 1. Start clash animations
+        const anims = [
+            this.playAnimation(pFront, 'clash', 300),
+            this.playAnimation(eFront, 'clash', 300)
+        ];
 
-// 2. Wait for the "impact" point (middle of clash animation)
-await this.delay(150);
+        // 2. Wait for the "impact" point (middle of clash animation)
+        await this.delay(150);
 
-// 3. Trigger damage and logic (Enable deferred rewards)
-this.isSimulatingStep = true;
-this.queuedKillRewards = [];
+        // 3. Trigger damage and logic (Enable deferred rewards)
+        this.isSimulatingStep = true;
+        this.queuedKillRewards = [];
 
-await Promise.all([
-    this.performAttack(pFront, eFront),
-    this.performAttack(eFront, pFront)
-]);
+        await Promise.all([
+            this.performAttack(pFront, eFront),
+            this.performAttack(eFront, pFront)
+        ]);
 
-this.isSimulatingStep = false;
+        this.isSimulatingStep = false;
 
-// 4. Process deferred rewards for ANY unit that survived the clash
-for (const executeReward of this.queuedKillRewards) {
-    await executeReward();
-}
-this.queuedKillRewards = [];
+        // 4. Process deferred rewards for ANY unit that survived the clash
+        for (const executeReward of this.queuedKillRewards) {
+            await executeReward();
+        }
+        this.queuedKillRewards = [];
 
-// 5. Wait for animations and any triggered secondary actions (summoning, etc.)
-await Promise.all(anims);
+        // 5. Wait for animations and any triggered secondary actions (summoning, etc.)
+        await Promise.all(anims);
 
-// 6. Short buffer for cascading death effects (like Drifloon exploding)
-await this.delay(200);
+        // 6. Short buffer for cascading death effects (like Drifloon exploding)
+        await this.delay(200);
 
-// 7. Compact teams to ensure survivors are in their final positions
-await this.compactTeams();
+        // 7. Compact teams to ensure survivors are in their final positions
+        await this.compactTeams();
 
-// 7. Victory Check with human-readable buffer
-const result = this.getResult();
-if (result !== null) {
-    // Before declaring victory, ensure we aren't mid-summoning
-    // (e.g. Rattata just died, we want to see the mice before Victory pops)
-    await this.delay(1500);
-}
+        // 8. Victory Check with human-readable buffer
+        const result = this.getResult();
+        if (result !== null) {
+            // Before declaring victory, ensure we aren't mid-summoning
+            // (e.g. Rattata just died, we want to see the mice before Victory pops)
+            await this.delay(1500);
+        }
 
-return this.playerTeam.some(u => u !== null && u.stats.hp > 0) &&
-    this.enemyTeam.some(u => u !== null && u.stats.hp > 0);
+        return this.playerTeam.some(u => u !== null && u.stats.hp > 0) &&
+            this.enemyTeam.some(u => u !== null && u.stats.hp > 0);
     }
 
     public getResult(): 'WIN' | 'LOSS' | 'DRAW' | null {
-    const pAlive = this.playerTeam.some(u => u !== null && u.stats.hp > 0);
-    const eAlive = this.enemyTeam.some(u => u !== null && u.stats.hp > 0);
+        const pAlive = this.playerTeam.some(u => u !== null && u.stats.hp > 0);
+        const eAlive = this.enemyTeam.some(u => u !== null && u.stats.hp > 0);
 
-    if (!pAlive && !eAlive) return 'DRAW';
-    if (!pAlive) return 'LOSS';
-    if (!eAlive) return 'WIN';
-    return null;
-}
+        if (!pAlive && !eAlive) return 'DRAW';
+        if (!pAlive) return 'LOSS';
+        if (!eAlive) return 'WIN';
+        return null;
+    }
 
     private delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 }
