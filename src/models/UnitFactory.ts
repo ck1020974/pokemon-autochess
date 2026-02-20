@@ -748,3 +748,47 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         description: '戰鬥開始時，使我方受到的前 5 次傷害減半。', synergies: ['Psychic']
     }
 }
+
+export type PreferredPosition = 'FRONT' | 'MID' | 'BACK' | 'FRONT_MID' | 'MID_BACK' | 'ALL';
+
+export const PREFERRED_POSITIONS: Record<string, PreferredPosition> = {
+    'bulbasaur': 'FRONT_MID',
+    'charmander': 'ALL',
+    'squirtle': 'ALL',
+    'gastly': 'ALL',
+    'chikorita': 'BACK',
+    'cyndaquil': 'ALL',
+    'totodile': 'FRONT',
+    'igglybuff': 'ALL',
+    'treecko': 'MID_BACK',
+    'torchic': 'MID_BACK',
+    'mudkip': 'MID',
+    'sprigatito': 'BACK',
+    'fuecoco': 'BACK',
+    'quaxly': 'BACK',
+    'rattata': 'FRONT_MID',
+    'diglett': 'ALL',
+    'meowth': 'ALL',
+    'mankey': 'ALL',
+    'onix': 'ALL',
+    'doduo': 'ALL',
+    'slowpoke': 'ALL',
+    'magnemite': 'ALL',
+    'houndour': 'ALL',
+    'sneasel': 'FRONT',
+    'drifloon': 'ALL',
+    'snover': 'FRONT',
+    'dwebble': 'ALL',
+    'kangaskhan': 'FRONT',
+    'ditto': 'ALL',
+    'sableye': 'ALL',
+    'mimikyu': 'ALL',
+    'spiritomb': 'ALL',
+    'gulpin': 'MID_BACK',
+    'heracross': 'ALL',
+    'pinsir': 'ALL',
+    'farfetchd': 'FRONT',
+    'natu': 'ALL',
+    'ralts': 'FRONT',
+    'mrmime': 'ALL'
+};

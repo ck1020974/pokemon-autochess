@@ -6,7 +6,7 @@ import { GameLoop, GamePhase } from './engine/GameLoop';
 import { Unit } from './models/Unit';
 import { BattleSimulator } from './engine/BattleSimulator';
 import type { BattleLog } from './engine/BattleSimulator';
-import { UNIT_TEMPLATES } from './models/UnitFactory';
+import { UNIT_TEMPLATES, PREFERRED_POSITIONS } from './models/UnitFactory';
 import { SYNERGIES } from './models/Synergies';
 
 // Difficulty Icons
@@ -403,165 +403,191 @@ function App() {
             if (isEliteMatch) {
                 // Elite/Champ Strategies
                 const stratRoll = Math.random();
-                if (stratRoll < 0.33) {
+                if (stratRoll < 0.2) {
                     // (1) Elemental: Fire/Water/Grass (4 Units)
                     const elements = ['Fire', 'Water', 'Grass'];
                     coreSynergyId = elements[Math.floor(Math.random() * elements.length)];
                     synergyTargetCount = 4;
-                } else if (stratRoll < 0.66) {
+                } else if (stratRoll < 0.4) {
                     // (2) Environment: Cave/Snow (Contains characters)
                     const envs = ['Cave', 'Snow'];
                     coreSynergyId = envs[Math.floor(Math.random() * envs.length)];
-                    synergyTargetCount = 2; // "包含" -> At least 2?
-                } else {
+                    synergyTargetCount = 2;
+                } else if (stratRoll < 0.6) {
                     // (3) Triplets: 3 Different Characters
                     coreSynergyId = 'Triplets';
                     synergyTargetCount = 3;
                     uniqueConstraint = true;
+                } else if (stratRoll < 0.8) {
+                    // (4) New: Psychic Strategy
+                    coreSynergyId = 'Psychic';
+                    synergyTargetCount = 3;
+                } else {
+                    // (5) New: Starter Strategy
+                    coreSynergyId = 'Starter';
+                    synergyTargetCount = 4;
                 }
             } else {
                 // Gym Strategy (Turn >= 2)
                 if (game.turn >= 2) {
                     const availableSynergies = Object.values(SYNERGIES).map(s => s.id);
                     coreSynergyId = availableSynergies[Math.floor(Math.random() * availableSynergies.length)];
-                    synergyTargetCount = 3; // "挑選至少兩個" -> 3 is safe.
+                    synergyTargetCount = 3;
                 }
             }
 
-            // 4. Generate Team
-            const enemyTeam: (Unit | null)[] = [];
-            const usedTemplateIds = new Set<string>();
+            // 4. Generate Team (Draw then Sort Strategy)
+            let enemyTeam: (Unit | null)[] = [];
+            let attempts = 0;
+            const MAX_ENEMY_ATTEMPTS = 5;
 
-            for (let i = 0; i < enemyCount; i++) {
-                // Determine Pool
-                let pool = allTemplates;
+            const sortTeamByPositions = (units: Unit[]): (Unit | null)[] | null => {
+                const POS_CONSTRAINTS: Record<number, string[]> = {
+                    0: ['FRONT', 'FRONT_MID', 'ALL'],
+                    1: ['FRONT', 'MID', 'FRONT_MID', 'MID_BACK', 'ALL'],
+                    2: ['MID', 'FRONT_MID', 'MID_BACK', 'ALL'],
+                    3: ['MID', 'BACK', 'FRONT_MID', 'MID_BACK', 'ALL'],
+                    4: ['BACK', 'MID_BACK', 'ALL']
+                };
+                const result: (Unit | null)[] = new Array(5).fill(null);
+                const usedUnitIdx = new Set<number>();
+                const targetCount = units.length;
 
-                // Synergy Logic
-                if (i < synergyTargetCount && coreSynergyId) {
-                    const synergyPool = allTemplates.filter(u => u.synergies.includes(coreSynergyId!));
+                const sortedByConstraint = [...units].sort((a, b) => {
+                    const getLen = (unit: Unit) => {
+                        const p = PREFERRED_POSITIONS[unit.family || unit.templateId] || 'ALL';
+                        if (p === 'ALL') return 5;
+                        if (p === 'FRONT' || p === 'BACK') return 2;
+                        if (p === 'MID') return 3;
+                        if (p === 'FRONT_MID') return 4;
+                        if (p === 'MID_BACK') return 4;
+                        return 5;
+                    };
+                    return getLen(a) - getLen(b);
+                });
 
-                    // Apply Unique Constraint for Triplets
-                    if (uniqueConstraint) {
-                        const uniquePool = synergyPool.filter(u => !usedTemplateIds.has(u.family || u.id));
-                        // If we run out of unique units, fall back to full synergy pool
-                        if (uniquePool.length > 0) pool = uniquePool;
-                        else pool = synergyPool;
-                    } else {
-                        if (synergyPool.length > 0) pool = synergyPool;
-                    }
-                }
+                const backtrack = (slotIdx: number): boolean => {
+                    if (slotIdx === 5) return true;
+                    if (slotIdx >= targetCount) return backtrack(slotIdx + 1);
 
-                // Pick Template
-                if (pool.length === 0) pool = allTemplates; // Safety
-                let t = pool[Math.floor(Math.random() * pool.length)];
-
-                usedTemplateIds.add(t.family || t.id);
-
-                // Handle Evolution (Natural)
-                // If enemyBaseLevel is high, attempt to evolve unit to match
-                let tempLevel = 1;
-                while (tempLevel < enemyBaseLevel && t.evolveId) {
-                    const nextT = UNIT_TEMPLATES[t.evolveId];
-                    if (nextT) {
-                        t = nextT;
-                        tempLevel++;
-                    } else { break; }
-                }
-
-                const u = new Unit(t);
-                u.level = enemyBaseLevel;
-
-                // Force Star Count (3-Star - Elite/Champ)
-                if (i < forcedStarCount) {
-                    // Try to evolve to Stage 3 if possible
-                    while (u.evolveId && u.level < 3) {
-                        const nextT = UNIT_TEMPLATES[u.evolveId];
-                        if (nextT) {
-                            u.templateId = nextT.id;
-                            u.name = nextT.name;
-                            u.description = nextT.description;
-                            u.imageUrl = nextT.imageUrl; // Use Base Image
-                            u.battleImageUrl = nextT.battleImageUrl;
-                            u.evolveId = nextT.evolveId;
-                            u.synergies = nextT.synergies || [];
-                            u.tier = nextT.tier;
-                            u.level++;
-                        } else { break; }
-                    }
-                    u.level = 3;
-                }
-                // Force Star Count (2-Star - Gym Progressive)
-                else if (i < forcedTwoStarCount && u.level < 2) {
-                    // Upgrade to Level 2
-                    if (u.evolveId) {
-                        const nextT = UNIT_TEMPLATES[u.evolveId];
-                        if (nextT) {
-                            u.templateId = nextT.id;
-                            u.name = nextT.name;
-                            u.description = nextT.description;
-                            u.imageUrl = nextT.imageUrl;
-                            u.battleImageUrl = nextT.battleImageUrl;
-                            u.evolveId = nextT.evolveId;
-                            u.synergies = nextT.synergies || [];
-                            u.tier = nextT.tier;
-                            u.level++;
+                    for (let i = 0; i < sortedByConstraint.length; i++) {
+                        if (usedUnitIdx.has(i)) continue;
+                        const u = sortedByConstraint[i];
+                        const pref = PREFERRED_POSITIONS[u.family || u.templateId] || 'ALL';
+                        if (POS_CONSTRAINTS[slotIdx].includes(pref)) {
+                            usedUnitIdx.add(i);
+                            result[slotIdx] = u;
+                            if (backtrack(slotIdx + 1)) return true;
+                            result[slotIdx] = null;
+                            usedUnitIdx.delete(i);
                         }
                     }
-                    u.level = 2;
-                }
+                    return false;
+                };
 
-                // Stats Calculation (Natural Synthesis Simulation)
-                // Rule: All levels get growth now. 2-Star = 2*Base + 1. 3-Star = 3*Base + 6 (accumulated).
-                const baseStats = UNIT_TEMPLATES[u.family || u.id].baseStats;
-                if (u.level === 2) {
-                    const bonusHp = baseStats.maxHp + 1; // Base + (Base+1) = 2*Base + 1
-                    const bonusAtk = baseStats.attack + 1;
-                    u.stats.hp += bonusHp;
-                    u.stats.maxHp += bonusHp;
-                    u.stats.attack += bonusAtk;
-                } else if (u.level === 3) {
-                    const bonusHp = baseStats.maxHp * 2 + 6; // Base + (2*Base+6) = 3*Base + 6
-                    const bonusAtk = baseStats.attack * 2 + 6;
-                    u.stats.hp += bonusHp;
-                    u.stats.maxHp += bonusHp;
-                    u.stats.attack += bonusAtk;
-                }
+                if (backtrack(0)) return result;
+                return null;
+            };
 
-                // Turn Scaling (Global Difficulty)
-                // Rule: Master starts at dynamic score 3 (gradual), others at 5.
-                const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
-                if (game.difficultyScore >= turnScalingStart) {
-                    let scaleFactor = 0.6;
-                    // Gradual growth for Master at early dynamic score
-                    if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) {
-                        scaleFactor = 0.3;
+            while (attempts < MAX_ENEMY_ATTEMPTS) {
+                const candidateUnits: Unit[] = [];
+                const usedTemplateIds = new Set<string>();
+
+                for (let i = 0; i < enemyCount; i++) {
+                    let pool = allTemplates;
+                    if (i < synergyTargetCount && coreSynergyId) {
+                        const synergyPool = allTemplates.filter(u => u.synergies.includes(coreSynergyId!));
+                        if (uniqueConstraint) {
+                            const uniquePool = synergyPool.filter(u => !usedTemplateIds.has(u.family || u.id));
+                            pool = uniquePool.length > 0 ? uniquePool : synergyPool;
+                        } else {
+                            pool = synergyPool.length > 0 ? synergyPool : allTemplates;
+                        }
+                    }
+                    if (pool.length === 0) pool = allTemplates;
+                    let t = pool[Math.floor(Math.random() * pool.length)];
+                    usedTemplateIds.add(t.family || t.id);
+
+                    let tempLevel = 1;
+                    while (tempLevel < enemyBaseLevel && t.evolveId) {
+                        const nextT = UNIT_TEMPLATES[t.evolveId];
+                        if (nextT) { t = nextT; tempLevel++; } else break;
+                    }
+                    const u = new Unit(t);
+                    u.level = enemyBaseLevel;
+
+                    if (i < forcedStarCount) {
+                        while (u.evolveId && u.level < 3) {
+                            const nextT = UNIT_TEMPLATES[u.evolveId];
+                            if (nextT) {
+                                Object.assign(u, {
+                                    templateId: nextT.id, name: nextT.name, description: nextT.description,
+                                    imageUrl: nextT.battleImageUrl || nextT.imageUrl,
+                                    battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
+                                    synergies: nextT.synergies || [], tier: nextT.tier
+                                });
+                                u.level++;
+                            } else break;
+                        }
+                        u.level = 3;
+                    } else if (i < forcedTwoStarCount && u.level < 2) {
+                        if (u.evolveId) {
+                            const nextT = UNIT_TEMPLATES[u.evolveId];
+                            if (nextT) {
+                                Object.assign(u, {
+                                    templateId: nextT.id, name: nextT.name, description: nextT.description,
+                                    imageUrl: nextT.battleImageUrl || nextT.imageUrl,
+                                    battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
+                                    synergies: nextT.synergies || [], tier: nextT.tier
+                                });
+                                u.level++;
+                            }
+                        }
+                        u.level = 2;
                     }
 
-                    const turnScale = Math.floor(game.difficultyScore * scaleFactor);
-                    u.stats.hp += turnScale;
-                    u.stats.maxHp += turnScale;
-                    u.stats.attack += Math.floor(turnScale / 1.5);
+                    const baseStats = UNIT_TEMPLATES[u.family || u.id].baseStats;
+                    if (u.level === 2) {
+                        const bHp = baseStats.maxHp + 1; const bAtk = baseStats.attack + 1;
+                        u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
+                    } else if (u.level === 3) {
+                        const bHp = baseStats.maxHp * 2 + 6; const bAtk = baseStats.attack * 2 + 6;
+                        u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
+                    }
 
-                    // Elite/Champ Buffs (Keep legacy scaling for post-Elite matches)
-                    if (game.wins >= 8) {
-                        const eliteIndex = game.wins - 7;
-                        const eliteBonusHp = eliteIndex * 2;
-                        const eliteBonusAtk = eliteIndex * 1;
-                        u.stats.hp += eliteBonusHp;
-                        u.stats.maxHp += eliteBonusHp;
-                        u.stats.attack += eliteBonusAtk;
+                    const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
+                    if (game.difficultyScore >= turnScalingStart) {
+                        let scaleFactor = 0.6;
+                        if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.3;
+                        const turnScale = Math.floor(game.difficultyScore * scaleFactor);
+                        u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
+                        if (game.wins >= 8) {
+                            const eIdx = game.wins - 7; const eBHp = eIdx * 2; const eBAtk = eIdx * 1;
+                            u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
+                        }
+                        if (game.wins >= 12) { u.stats.hp += 10; u.stats.maxHp += 10; u.stats.attack += 5; }
                     }
-                    if (game.wins >= 12) {
-                        u.stats.hp += 10;
-                        u.stats.maxHp += 10;
-                        u.stats.attack += 5;
-                    }
+                    if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
+                    candidateUnits.push(u);
                 }
 
-                // Battle Image Switch
-                if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
-
-                enemyTeam.push(u);
+                if (isEliteMatch) {
+                    const sorted = sortTeamByPositions(candidateUnits);
+                    if (sorted) { enemyTeam = sorted; break; }
+                } else {
+                    enemyTeam = candidateUnits;
+                    while (enemyTeam.length < 5) enemyTeam.push(null);
+                    break;
+                }
+                attempts++;
+            }
+            if (enemyTeam.length === 0) {
+                // Final fallback: just generate randomly if sorting keeps failing
+                attempts = 0; // Reset for actual one-shot generation
+                for (let i = 0; i < enemyCount; i++) {
+                    enemyTeam.push(new Unit(allTemplates[Math.floor(Math.random() * allTemplates.length)]));
+                }
+                while (enemyTeam.length < 5) enemyTeam.push(null);
             }
 
             // Save initial state for UI Synergy (Before simulator modifies/removes dead units)
