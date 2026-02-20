@@ -458,7 +458,6 @@ function App() {
                 const stratRoll = Math.random();
                 const eliteAllTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
                 const t5Pool = eliteAllTemplates.filter(u => u.tier === 5);
-                const t4t5Pool = eliteAllTemplates.filter(u => u.tier >= 4);
 
                 let fixedTemplates: any[] = [];
                 let randomCount = 0;
