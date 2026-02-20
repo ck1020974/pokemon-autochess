@@ -743,7 +743,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
     },
     mrmime: {
         id: 'mrmime', name: '魔牆人偶', tier: 5, family: 'mrmime',
-        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/魔牆人偶00.webp', battleImageUrl: 'assets/魔牆人偶01.webp',
         description: '戰鬥開始時，使我方受到的前 5 次傷害減半。', synergies: ['Psychic']
     }

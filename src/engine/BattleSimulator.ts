@@ -20,6 +20,7 @@ export class BattleSimulator {
     public unitStates: Map<Unit, any> = new Map(); // Changed from private to public for UI access
     private initialPlayerSet: Set<Unit> = new Set();
     private spiritombTriggered: Set<string> = new Set();
+    private psychicTriggered: Set<string> = new Set();
     private originalPlayerTeam?: (Unit | null)[];
     private isCompacting = false;
     private isSimulatingStep = false;
@@ -1004,7 +1005,8 @@ export class BattleSimulator {
         if (attackerIsEnemy) {
             this.enemyAttackCount++;
             const psychicCount = this.playerSynergies.get('Psychic') || 0;
-            if (this.enemyAttackCount >= 2 && psychicCount >= 2) {
+            if (this.enemyAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('player')) {
+                this.psychicTriggered.add('player');
                 this.enemyAttackCount = 0;
                 this.log("敵方受到了預知未來的攻擊！");
                 const allEnemies = this.enemyTeam.filter(u => u && u.stats.hp > 0);
@@ -1018,7 +1020,8 @@ export class BattleSimulator {
         } else {
             this.playerAttackCount++;
             const psychicCount = this.enemySynergies.get('Psychic') || 0;
-            if (this.playerAttackCount >= 2 && psychicCount >= 2) {
+            if (this.playerAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('enemy')) {
+                this.psychicTriggered.add('enemy');
                 this.playerAttackCount = 0;
                 this.log("受到了預知未來的攻擊！");
                 const allAllies = this.playerTeam.filter(u => u && u.stats.hp > 0);
@@ -1050,10 +1053,8 @@ export class BattleSimulator {
             for (const mime of aliveMimes) {
                 const mState = this.unitStates.get(mime);
                 if (mState && mState.lightScreen > 0) {
-                    const originalAmount = amount;
                     amount = Math.ceil(amount / 2);
                     mState.lightScreen--;
-                    this.log(`${target.name} 的光牆吸收了傷害 (${originalAmount} -> ${amount})`);
                     if (mState.lightScreen === 0) {
                         this.log(side === 'player' ? "我方的光牆消失了" : "敵方的光牆消失了");
                     }

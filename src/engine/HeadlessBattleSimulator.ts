@@ -12,6 +12,7 @@ export class HeadlessBattleSimulator {
     public unitStates: Map<Unit, any> = new Map();
     private initialPlayerSet: Set<Unit> = new Set();
     private spiritombTriggered: Set<string> = new Set();
+    private psychicTriggered: Set<string> = new Set();
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
     private originalPlayerTeam: (Unit | null)[] | null = null;
@@ -649,7 +650,8 @@ export class HeadlessBattleSimulator {
         if (attackerIsEnemy) {
             this.enemyAttackCount++;
             const psychicCount = this.playerSynergies.get('Psychic') || 0;
-            if (this.enemyAttackCount >= 2 && psychicCount >= 2) {
+            if (this.enemyAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('player')) {
+                this.psychicTriggered.add('player');
                 this.enemyAttackCount = 0;
                 const allEnemies = this.enemyTeam.filter(u => u && u.stats.hp > 0);
                 const dmg = 2 * this.playerWins;
@@ -658,7 +660,8 @@ export class HeadlessBattleSimulator {
         } else {
             this.playerAttackCount++;
             const psychicCount = this.enemySynergies.get('Psychic') || 0;
-            if (this.playerAttackCount >= 2 && psychicCount >= 2) {
+            if (this.playerAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('enemy')) {
+                this.psychicTriggered.add('enemy');
                 this.playerAttackCount = 0;
                 const allAllies = this.playerTeam.filter(u => u && u.stats.hp > 0);
                 for (const target of allAllies) await this.dealDamage(null, target, 2, true, true);
