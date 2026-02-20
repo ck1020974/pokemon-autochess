@@ -633,7 +633,8 @@ export class BattleSimulator {
                     }
 
                     const count = [0, 1, 2, 5][unit.level] || 1;
-                    const seedStats = [0, 0, 1, 2][unit.level]; // 0 bonus = 1/1, 1 bonus = 2/2, 2 bonus = 3/3
+                    const bonus = [0, 0, 1, 2][unit.level];
+                    const seedStats = 1 + bonus; // Base 1 + Bonus (1st star = 1/1, 2nd = 1/1, 3rd = 2/2, etc.)
                     await this.notifySkill(unit, `召喚了 ${count} 隻小種子`);
                     await this.delay(200);
                     for (let i = 0; i < count; i++) {
@@ -663,7 +664,8 @@ export class BattleSimulator {
                     await this.notifySkill(unit, '召喚了小老鼠');
                     await this.delay(200);
                     const count = unit.level >= 3 ? 5 : 2;
-                    const stats = [0, 0, 1, 2][unit.level]; // Match Bulbasaur logic: 0 bonus = 1/1
+                    const bonus = [0, 0, 1, 2][unit.level];
+                    const stats = 1 + bonus; // Base 1 + Bonus
                     for (let i = 0; i < count; i++) {
                         const { myTeam: currentTeam } = this.getTeams(unit);
                         const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
@@ -883,8 +885,8 @@ export class BattleSimulator {
 
     private async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false) {
         if (target.stats.hp <= 0) return;
-        // Basic attacks from dead units are prohibited. Skills (death rattles) are allowed.
-        if (source && source.stats.hp <= 0 && !isSkillDamage) return;
+        // Optimization: Removed overly aggressive source.hp check that broke clash symmetry.
+        // Secondary hits (like Kangaskhan) are handled specifically in performAttack.
 
         const targetState = this.unitStates.get(target) || {};
         // Source state for bypass logic
