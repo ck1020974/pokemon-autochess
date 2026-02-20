@@ -456,22 +456,36 @@ function App() {
             if (isEliteMatch) {
                 // Elite/Champ Strategies Refined
                 const stratRoll = Math.random();
+                const shopTier = game.shop.getTier(game.turn);
                 const eliteAllTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
-                const t5Pool = eliteAllTemplates.filter(u => u.tier === 5);
+                const availableTemplates = eliteAllTemplates.filter(t => t.tier <= shopTier);
+                const t5Pool = availableTemplates.filter(u => u.tier === 5);
 
                 let fixedTemplates: any[] = [];
                 let randomCount = 0;
 
+                // Helper to ensure template respects shop tier
+                const ensureTier = (t: any) => {
+                    if (t.tier <= shopTier) return t;
+                    const tierPool = availableTemplates.filter(v => v.tier <= shopTier);
+                    return tierPool[Math.floor(Math.random() * tierPool.length)];
+                };
+
                 if (stratRoll < 0.15) {
                     // (1) Starter: 3 Starters + 1 T4/T5 Starter + 1 Random
                     const starterPool = eliteAllTemplates.filter(u => u.synergies.includes('Starter'));
-                    const highStarterPool = starterPool.filter(u => u.tier >= 4);
+                    const availableHighStarter = starterPool.filter(u => u.tier >= 4 && u.tier <= shopTier);
                     fixedTemplates = [
-                        starterPool[Math.floor(Math.random() * starterPool.length)],
-                        starterPool[Math.floor(Math.random() * starterPool.length)],
-                        starterPool[Math.floor(Math.random() * starterPool.length)]
+                        ensureTier(starterPool[Math.floor(Math.random() * starterPool.length)]),
+                        ensureTier(starterPool[Math.floor(Math.random() * starterPool.length)]),
+                        ensureTier(starterPool[Math.floor(Math.random() * starterPool.length)])
                     ];
-                    fixedTemplates.push(highStarterPool.length > 0 ? highStarterPool[Math.floor(Math.random() * highStarterPool.length)] : starterPool[Math.floor(Math.random() * starterPool.length)]);
+                    if (availableHighStarter.length > 0) {
+                        fixedTemplates.push(availableHighStarter[Math.floor(Math.random() * availableHighStarter.length)]);
+                    } else {
+                        const lowStarters = starterPool.filter(u => u.tier <= shopTier);
+                        fixedTemplates.push(lowStarters[Math.floor(Math.random() * lowStarters.length)]);
+                    }
                     randomCount = 1;
                     coreSynergyId = 'Starter'; synergyTargetCount = 4;
                 } else if (stratRoll < 0.30) {
@@ -479,72 +493,77 @@ function App() {
                     const natu = eliteAllTemplates.find(u => u.family === 'natu');
                     const ralts = eliteAllTemplates.find(u => u.family === 'ralts');
                     const mrmime = eliteAllTemplates.find(u => u.family === 'mrmime');
-                    if (natu) fixedTemplates.push(natu);
-                    if (ralts) fixedTemplates.push(ralts);
-                    if (mrmime) fixedTemplates.push(mrmime);
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                    randomCount = 1;
+                    if (natu) fixedTemplates.push(ensureTier(natu));
+                    if (ralts) fixedTemplates.push(ensureTier(ralts));
+                    if (mrmime) fixedTemplates.push(ensureTier(mrmime));
+                    if (t5Pool.length > 0) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    randomCount = 5 - fixedTemplates.length;
                     coreSynergyId = 'Psychic'; synergyTargetCount = 3;
                 } else if (stratRoll < 0.45) {
                     // (3) Cave/Hard: Onix, Diglett + (50% Magneton) + 1 T5 + Random
                     const onix = eliteAllTemplates.find(u => u.family === 'onix');
                     const diglett = eliteAllTemplates.find(u => u.family === 'diglett');
-                    if (onix) fixedTemplates.push(onix);
-                    if (diglett) fixedTemplates.push(diglett);
+                    if (onix) fixedTemplates.push(ensureTier(onix));
+                    if (diglett) fixedTemplates.push(ensureTier(diglett));
                     if (Math.random() < 0.5) {
                         const mag = eliteAllTemplates.find(u => u.family === 'magnemite');
-                        if (mag) fixedTemplates.push(mag);
+                        if (mag) fixedTemplates.push(ensureTier(mag));
                     }
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    if (t5Pool.length > 0) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
                     randomCount = 5 - fixedTemplates.length;
                     coreSynergyId = 'Cave'; synergyTargetCount = 2;
                 } else if (stratRoll < 0.60) {
                     // (4) Snow: Weavile, Abomasnow + 1 T5 + 2 Random
                     const sneasel = eliteAllTemplates.find(u => u.family === 'sneasel');
                     const snover = eliteAllTemplates.find(u => u.family === 'snover');
-                    if (sneasel) fixedTemplates.push(sneasel);
-                    if (snover) fixedTemplates.push(snover);
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                    randomCount = 2;
+                    if (sneasel) fixedTemplates.push(ensureTier(sneasel));
+                    if (snover) fixedTemplates.push(ensureTier(snover));
+                    if (t5Pool.length > 0) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    randomCount = 5 - fixedTemplates.length;
                     coreSynergyId = 'Snow'; synergyTargetCount = 2;
                 } else if (stratRoll < 0.75) {
-                    // ... continue ...
                     // (5) Triplets: Dugtrio, Dodrio, Magneton + 1 T5 + 1 Random
                     const diglett = eliteAllTemplates.find(u => u.family === 'diglett');
                     const doduo = eliteAllTemplates.find(u => u.family === 'doduo');
                     const mag = eliteAllTemplates.find(u => u.family === 'magnemite');
-                    if (diglett) fixedTemplates.push(diglett);
-                    if (doduo) fixedTemplates.push(doduo);
-                    if (mag) fixedTemplates.push(mag);
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                    randomCount = 1;
+                    if (diglett) fixedTemplates.push(ensureTier(diglett));
+                    if (doduo) fixedTemplates.push(ensureTier(doduo));
+                    if (mag) fixedTemplates.push(ensureTier(mag));
+                    if (t5Pool.length > 0) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    randomCount = 5 - fixedTemplates.length;
                     coreSynergyId = 'Triplets'; synergyTargetCount = 3; uniqueConstraint = true;
                 } else if (stratRoll < 0.85) {
                     // (6) Slow: Swalot, Slowbro + 2 T5 + 1 Random
                     const gulpin = eliteAllTemplates.find(u => u.family === 'gulpin');
                     const slowpoke = eliteAllTemplates.find(u => u.family === 'slowpoke');
-                    if (gulpin) fixedTemplates.push(gulpin);
-                    if (slowpoke) fixedTemplates.push(slowpoke);
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                    randomCount = 1;
+                    if (gulpin) fixedTemplates.push(ensureTier(gulpin));
+                    if (slowpoke) fixedTemplates.push(ensureTier(slowpoke));
+                    if (t5Pool.length > 0) {
+                        fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                        if (t5Pool.length > 1) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    }
+                    randomCount = 5 - fixedTemplates.length;
                     coreSynergyId = 'Slow'; synergyTargetCount = 2;
                 } else if (stratRoll < 0.95) {
                     // (7) Beetle: Pinsir, Heracross + 2 T5 + 1 Random
                     const pinsir = eliteAllTemplates.find(u => u.family === 'pinsir');
                     const heracross = eliteAllTemplates.find(u => u.family === 'heracross');
-                    if (pinsir) fixedTemplates.push(pinsir);
-                    if (heracross) fixedTemplates.push(heracross);
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                    randomCount = 1;
+                    if (pinsir) fixedTemplates.push(ensureTier(pinsir));
+                    if (heracross) fixedTemplates.push(ensureTier(heracross));
+                    if (t5Pool.length > 0) {
+                        fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                        if (t5Pool.length > 1) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    }
+                    randomCount = 5 - fixedTemplates.length;
                     coreSynergyId = 'Beetle'; synergyTargetCount = 2;
                 } else {
                     // (8) T5 Flow: 3 T5 + 2 Random
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                    randomCount = 2;
+                    if (t5Pool.length > 0) {
+                        for (let i = 0; i < Math.min(3, t5Pool.length); i++) {
+                            fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                        }
+                    }
+                    randomCount = 5 - fixedTemplates.length;
                 }
 
                 while (attempts < MAX_ENEMY_ATTEMPTS) {
@@ -563,7 +582,7 @@ function App() {
                     }
                     // 2. Fill Random Slots
                     for (let i = 0; i < randomCount; i++) {
-                        const t = eliteAllTemplates[Math.floor(Math.random() * eliteAllTemplates.length)];
+                        const t = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
                         const u = new Unit(t);
                         u.level = enemyBaseLevel;
                         candidateUnits.push(u);
@@ -619,10 +638,27 @@ function App() {
                             const turnScale = Math.floor(game.difficultyScore * scaleFactor);
                             u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
                             if (game.wins >= 8) {
-                                const eIdx = game.wins - 7; const eBHp = eIdx * 2; const eBAtk = eIdx * 1;
+                                const eIdx = game.wins - 7;
+                                let eBHp = eIdx * 2;
+                                let eBAtk = eIdx * 1;
+
+                                // Nerf for high tier units: T5 (1/3), T4 (1/2)
+                                if (u.tier === 5) {
+                                    eBHp = Math.ceil(eBHp / 3);
+                                    eBAtk = Math.ceil(eBAtk / 3);
+                                } else if (u.tier === 4) {
+                                    eBHp = Math.ceil(eBHp / 2);
+                                    eBAtk = Math.ceil(eBAtk / 2);
+                                }
+
                                 u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
                             }
-                            if (game.wins >= 12) { u.stats.hp += 10; u.stats.maxHp += 10; u.stats.attack += 5; }
+                            if (game.wins >= 12) {
+                                let wB = 10; let wA = 5;
+                                if (u.tier === 5) { wB = 3; wA = 2; }
+                                else if (u.tier === 4) { wB = 5; wA = 3; }
+                                u.stats.hp += wB; u.stats.maxHp += wB; u.stats.attack += wA;
+                            }
                         }
                         if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
                     });
