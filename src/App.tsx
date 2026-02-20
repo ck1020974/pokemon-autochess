@@ -507,16 +507,16 @@ function App() {
                 }
 
                 // Turn Scaling (Global Difficulty)
-                // Rule: Master starts at turn 3 (gradual), others at turn 5.
+                // Rule: Master starts at dynamic score 3 (gradual), others at 5.
                 const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
-                if (game.turn >= turnScalingStart) {
+                if (game.difficultyScore >= turnScalingStart) {
                     let scaleFactor = 0.6;
-                    // Gradual growth for Master at turn 3-4
-                    if (difficulty === 'MASTER' && game.turn <= 4) {
+                    // Gradual growth for Master at early dynamic score
+                    if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) {
                         scaleFactor = 0.3;
                     }
 
-                    const turnScale = Math.floor(game.turn * scaleFactor);
+                    const turnScale = Math.floor(game.difficultyScore * scaleFactor);
                     u.stats.hp += turnScale;
                     u.stats.maxHp += turnScale;
                     u.stats.attack += Math.floor(turnScale / 1.5);

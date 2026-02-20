@@ -23,6 +23,7 @@ export class GameLoop {
     public savedTeam: (Unit | null)[] = []; // Store original team before battle
     public shop: Shop;
     public difficultyMultiplier: number = 1.0;
+    public difficultyScore: number = 1.0; // Dynamic difficulty tracker
 
     constructor() {
         this.shop = new Shop();
@@ -199,6 +200,13 @@ export class GameLoop {
         if (this.savedTeam.length > 0) {
             this.playerTeam = this.savedTeam;
             this.savedTeam = [];
+        }
+
+        // Update Difficulty Score: Loss scales 50% slower than Win/Draw
+        if (result === 'LOSS') {
+            this.difficultyScore += 0.5;
+        } else {
+            this.difficultyScore += 1.0;
         }
 
         this.turn++;
