@@ -1379,6 +1379,10 @@ h3 {
     font-weight: bold !important;
     color: #fff !important;
   }
+
+  .timeout-countdown {
+    font-size: 8rem !important;
+  }
 }
 
 /* Header Alignment Fix */

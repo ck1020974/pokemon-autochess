@@ -101,7 +101,7 @@ export class BattleSimulator {
         // 7. Global Weather: Snow (Only triggers once even if both sides have it)
         const hasSnow = (this.playerSynergies.get('Snow') || 0) >= 2 || (this.enemySynergies.get('Snow') || 0) >= 2;
         if (hasSnow) {
-            this.log("天空降下了冰雹...");
+            this.log("開始下冰雹了！");
             await this.delay(500);
             const allUnits = [...this.playerTeam, ...this.enemyTeam].filter((u: Unit) => u !== null && u.stats.hp > 0);
             for (const target of allUnits) {
@@ -109,11 +109,13 @@ export class BattleSimulator {
 
                 // User Request: 33% of lifetime Max HP
                 const dmg = Math.ceil(target.stats.maxHp * 0.33);
-                this.log(`${target.name} 受到 ${dmg} 點傷害！`);
-                await this.dealDamage(null, target, dmg, true);
+                // Silent set to true to avoid individual "受到 N 點傷害" logs
+                await this.dealDamage(null, target, dmg, true, true);
                 if (this.onUpdate) this.onUpdate();
                 await this.delay(100);
             }
+            this.log("冰雹襲擊了雙方隊伍！");
+            await this.delay(400);
         }
 
         // Initial compaction to ensure everyone is at the front
@@ -160,7 +162,7 @@ export class BattleSimulator {
             if (unit.templateId === 'gengar') { // Stage 3
                 await this.notifySkill(unit, `耿鬼發動了詭計！`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                    this.buffAttack(u!, 5);
+                    this.buffAttack(u!, 5, true);
                     await this.delay(65);
                 }
             } else {
@@ -181,7 +183,7 @@ export class BattleSimulator {
             if (unit.templateId === 'wigglytuff') { // Stage 3
                 await this.notifySkill(unit, `胖可丁發動了治癒波動！`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                    this.growUnit(u!, 5, 0, 'Igglybuff');
+                    this.growUnit(u!, 5, 0, 'Igglybuff', null, true);
                     await this.delay(65);
                 }
             } else {
@@ -341,23 +343,23 @@ export class BattleSimulator {
         if (team.length === 0) return;
         if (this.getSynergyCountForUnit(team[0], 'Triplets') >= 3) {
             team.filter((u: Unit) => u && u.synergies.includes('Triplets')).forEach(u => {
-                this.growUnit(u, 3, 3, 'Triplets');
+                this.growUnit(u, 3, 3, 'Triplets', null, true);
             });
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
             team.filter((u: Unit) => u && u.synergies.includes('Starter')).forEach(u => {
-                this.growUnit(u, 1, 1, '御三家');
+                this.growUnit(u, 1, 1, 'Starter', null, true);
             });
         }
 
     }
 
-    private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string, permanentTarget?: Unit | null) {
+    private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string, permanentTarget?: Unit | null, silent: boolean = false) {
         if (hp === 0 && atk === 0) return;
         unit.addGrowth(hp, atk);
         if (permanentTarget) permanentTarget.addGrowth(hp, atk);
 
-        if (sourceName) {
+        if (sourceName && !silent) {
             if (hp > 0 && atk > 0) this.log(`${unit.name} 提高了 ${atk} 攻擊 與 生命`);
             else if (hp > 0) this.log(`${unit.name} 提高了 ${hp} 生命！`);
             else if (atk > 0) this.log(`${unit.name} 提高了 ${atk} 攻擊！`);
@@ -621,7 +623,7 @@ export class BattleSimulator {
                     await this.playTeamAnimation(myTeam, 'glow-pale-red', 1000);
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, 0, amount, '呆火鱷技能強化', original);
+                        this.growUnit(ally, 0, amount, '呆火鱷技能強化', original, true);
                     }
                 }
             });
@@ -639,7 +641,7 @@ export class BattleSimulator {
                     await this.playTeamAnimation(myTeam, 'glow-pale-blue', 1000);
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, amount, 0, '潤水鴨技能強化', original);
+                        this.growUnit(ally, amount, 0, '潤水鴨技能強化', original, true);
                     }
                 }
             });
@@ -818,21 +820,23 @@ export class BattleSimulator {
         }
 
         // Sprigatito Family: Gain stats on Summon for All
-        this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
-            const { myTeam } = this.getTeams(unit);
-            // Ensure unit is still alive and in the team array (not replaced by null)
-            if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
-            if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                const amount = [0, 1, 2, 4][unit.level] || 1;
-                await this.notifySkill(unit, `發動了千變萬花！`);
-                await this.playTeamAnimation(myTeam, 'glow-pale-green', 1000);
-                for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                    const isAtk = Math.random() < 0.5;
-                    const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                    this.growUnit(ally, isAtk ? 0 : amount, isAtk ? amount : 0, '新葉貓技能強化', original);
+        if (unit.family === 'sprigatito') {
+            this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
+                const { myTeam } = this.getTeams(unit);
+                // Ensure unit is still alive and in the team array (not replaced by null)
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
+                if (e.source && myTeam.includes(e.source) && e.source !== unit) {
+                    const amount = [0, 1, 2, 4][unit.level] || 1;
+                    await this.notifySkill(unit, `發動了千變萬花！`);
+                    await this.playTeamAnimation(myTeam, 'glow-pale-green', 1000);
+                    for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
+                        const isAtk = Math.random() < 0.5;
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
+                        this.growUnit(ally, isAtk ? 0 : amount, isAtk ? amount : 0, '新葉貓技能強化', original, true);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public async performAttack(attacker: Unit, defender: Unit) {
@@ -931,7 +935,7 @@ export class BattleSimulator {
         await this.eventBus.emit({ type: 'AFTER_ATTACK', source: attacker, target: defender, context: {} });
     }
 
-    private async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false) {
+    private async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false, silent: boolean = false) {
         if (target.stats.hp <= 0) return;
         // Optimization: Removed overly aggressive source.hp check that broke clash symmetry.
         // Secondary hits (like Kangaskhan) are handled specifically in performAttack.
@@ -985,7 +989,7 @@ export class BattleSimulator {
         }
 
         target.stats.hp -= amount;
-        if (isSkillDamage) {
+        if (isSkillDamage && !silent) {
             this.log(`${target.name} 受到 ${amount} 點傷害！`);
         }
 
