@@ -376,13 +376,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'steelix', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '移動後，永久 +2 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
+        description: '移動後，永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
     },
     steelix_final: {
         id: 'steelix_final', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '移動後，永久  +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], isHiddenFromShop: true
+        description: '移動後，永久 +8 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], isHiddenFromShop: true
     },
 
     // 20. Doduo
@@ -482,7 +482,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'weavile_final', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '擊殺後永久 +2 攻擊；攻擊時，隨機再攻擊 2 個敵方。', synergies: ['Claw', 'Snow'], isHiddenFromShop: true
+        description: '擊殺後永久 +3 攻擊；攻擊時，隨機再攻擊 1 個敵方。', synergies: ['Claw', 'Snow'], isHiddenFromShop: true
     },
 
     // 25. Shuppet (Tier 1)

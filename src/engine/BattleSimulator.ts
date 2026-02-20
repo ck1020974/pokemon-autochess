@@ -652,7 +652,7 @@ export class BattleSimulator {
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = unit.level >= 3 ? 4 : 2;
+                    const amount = [0, 2, 4, 8][unit.level] || 2;
                     if (!this.isCompacting) {
                         await this.notifySkill(unit, `發動了鐵壁！`);
                         this.playTeamAnimation([unit], 'glow-pale-blue', 600);
