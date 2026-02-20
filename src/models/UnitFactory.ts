@@ -236,13 +236,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'floragato', name: '蒂蕾喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/蒂蕾喵00.webp', battleImageUrl: 'assets/蒂蕾喵01.webp',
-        description: '友軍召喚後，友方全體永久 +2 攻擊 或 生命。', synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
+        description: '友軍召喚後，友方全體永久 +1 攻擊 或 生命。', synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
     },
     meowscarada: {
         id: 'meowscarada', name: '魔幻假面喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/魔幻假面喵00.webp', battleImageUrl: 'assets/魔幻假面喵01.webp',
-        description: '友軍召喚後，友方全體永久 +4 攻擊 或 生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '友軍召喚後，友方全體永久 +2 攻擊 或 生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 13. Fuecoco
@@ -256,13 +256,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'crocalor', name: '炙燙鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/炙燙鱷00.webp', battleImageUrl: 'assets/炙燙鱷01.webp',
-        description: '友軍擊殺後，友方全體永久 +2 生命。', synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
+        description: '友軍擊殺後，友方全體永久 +1 生命。', synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
     },
     skeledirge: {
         id: 'skeledirge', name: '骨紋巨聲鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/骨紋巨聲鱷00.webp', battleImageUrl: 'assets/骨紋巨聲鱷01.webp',
-        description: '友軍擊殺後，友方全體永久 +4 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '友軍擊殺後，友方全體永久 +2 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 14. Quaxly
@@ -276,13 +276,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'quaxwell', name: '湧躍鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/湧躍鴨00.webp', battleImageUrl: 'assets/湧躍鴨01.webp',
-        description: '友軍擊殺後，友方全體永久 +2 攻擊力。', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
+        description: '友軍擊殺後，友方全體永久 +1 攻擊力。', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
     },
     quaquaval: {
         id: 'quaquaval', name: '狂歡浪舞鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/狂歡浪舞鴨00.webp', battleImageUrl: 'assets/狂歡浪舞鴨01.webp',
-        description: '友軍擊殺後，友方全體永久 +4 攻擊力。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '友軍擊殺後，友方全體永久 +2 攻擊力。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 15. Rattata (Loop same name for stage 3)

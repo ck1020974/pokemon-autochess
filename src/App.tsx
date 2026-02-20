@@ -400,43 +400,7 @@ function App() {
                 (difficulty === 'NORMAL' && game.wins >= 10) ||
                 (difficulty === 'GREAT' && game.wins >= 8);
 
-            if (isEliteMatch) {
-                // Elite/Champ Strategies
-                const stratRoll = Math.random();
-                if (stratRoll < 0.2) {
-                    // (1) Elemental: Fire/Water/Grass (4 Units)
-                    const elements = ['Fire', 'Water', 'Grass'];
-                    coreSynergyId = elements[Math.floor(Math.random() * elements.length)];
-                    synergyTargetCount = 4;
-                } else if (stratRoll < 0.4) {
-                    // (2) Environment: Cave/Snow (Contains characters)
-                    const envs = ['Cave', 'Snow'];
-                    coreSynergyId = envs[Math.floor(Math.random() * envs.length)];
-                    synergyTargetCount = 2;
-                } else if (stratRoll < 0.6) {
-                    // (3) Triplets: 3 Different Characters
-                    coreSynergyId = 'Triplets';
-                    synergyTargetCount = 3;
-                    uniqueConstraint = true;
-                } else if (stratRoll < 0.8) {
-                    // (4) New: Psychic Strategy
-                    coreSynergyId = 'Psychic';
-                    synergyTargetCount = 3;
-                } else {
-                    // (5) New: Starter Strategy
-                    coreSynergyId = 'Starter';
-                    synergyTargetCount = 4;
-                }
-            } else {
-                // Gym Strategy (Turn >= 2)
-                if (game.turn >= 2) {
-                    const availableSynergies = Object.values(SYNERGIES).map(s => s.id);
-                    coreSynergyId = availableSynergies[Math.floor(Math.random() * availableSynergies.length)];
-                    synergyTargetCount = 3;
-                }
-            }
-
-            // 4. Generate Team (Draw then Sort Strategy)
+            // --- Shared Generation Variables ---
             let enemyTeam: (Unit | null)[] = [];
             let attempts = 0;
             const MAX_ENEMY_ATTEMPTS = 5;
@@ -489,97 +453,275 @@ function App() {
                 return null;
             };
 
-            while (attempts < MAX_ENEMY_ATTEMPTS) {
-                const candidateUnits: Unit[] = [];
-                const usedTemplateIds = new Set<string>();
+            if (isEliteMatch) {
+                // Elite/Champ Strategies Refined
+                const stratRoll = Math.random();
+                const eliteAllTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
+                const t5Pool = eliteAllTemplates.filter(u => u.tier === 5);
+                const t4t5Pool = eliteAllTemplates.filter(u => u.tier >= 4);
 
-                for (let i = 0; i < enemyCount; i++) {
-                    let pool = allTemplates;
-                    if (i < synergyTargetCount && coreSynergyId) {
-                        const synergyPool = allTemplates.filter(u => u.synergies.includes(coreSynergyId!));
-                        if (uniqueConstraint) {
-                            const uniquePool = synergyPool.filter(u => !usedTemplateIds.has(u.family || u.id));
-                            pool = uniquePool.length > 0 ? uniquePool : synergyPool;
-                        } else {
-                            pool = synergyPool.length > 0 ? synergyPool : allTemplates;
-                        }
-                    }
-                    if (pool.length === 0) pool = allTemplates;
-                    let t = pool[Math.floor(Math.random() * pool.length)];
-                    usedTemplateIds.add(t.family || t.id);
+                let fixedTemplates: any[] = [];
+                let randomCount = 0;
 
-                    let tempLevel = 1;
-                    while (tempLevel < enemyBaseLevel && t.evolveId) {
-                        const nextT = UNIT_TEMPLATES[t.evolveId];
-                        if (nextT) { t = nextT; tempLevel++; } else break;
+                if (stratRoll < 0.15) {
+                    // (1) Starter: 3 Starters + 1 T4/T5 Starter + 1 Random
+                    const starterPool = eliteAllTemplates.filter(u => u.synergies.includes('Starter'));
+                    const highStarterPool = starterPool.filter(u => u.tier >= 4);
+                    fixedTemplates = [
+                        starterPool[Math.floor(Math.random() * starterPool.length)],
+                        starterPool[Math.floor(Math.random() * starterPool.length)],
+                        starterPool[Math.floor(Math.random() * starterPool.length)]
+                    ];
+                    fixedTemplates.push(highStarterPool.length > 0 ? highStarterPool[Math.floor(Math.random() * highStarterPool.length)] : starterPool[Math.floor(Math.random() * starterPool.length)]);
+                    randomCount = 1;
+                    coreSynergyId = 'Starter'; synergyTargetCount = 4;
+                } else if (stratRoll < 0.30) {
+                    // (2) Psychic: Natu, Ralts, Mr.Mime + 1 T5 + 1 Random
+                    const natu = eliteAllTemplates.find(u => u.family === 'natu');
+                    const ralts = eliteAllTemplates.find(u => u.family === 'ralts');
+                    const mrmime = eliteAllTemplates.find(u => u.family === 'mrmime');
+                    if (natu) fixedTemplates.push(natu);
+                    if (ralts) fixedTemplates.push(ralts);
+                    if (mrmime) fixedTemplates.push(mrmime);
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    randomCount = 1;
+                    coreSynergyId = 'Psychic'; synergyTargetCount = 3;
+                } else if (stratRoll < 0.45) {
+                    // (3) Cave/Hard: Onix, Diglett + (50% Magneton) + 1 T5 + Random
+                    const onix = eliteAllTemplates.find(u => u.family === 'onix');
+                    const diglett = eliteAllTemplates.find(u => u.family === 'diglett');
+                    if (onix) fixedTemplates.push(onix);
+                    if (diglett) fixedTemplates.push(diglett);
+                    if (Math.random() < 0.5) {
+                        const mag = eliteAllTemplates.find(u => u.family === 'magnemite');
+                        if (mag) fixedTemplates.push(mag);
                     }
-                    const u = new Unit(t);
-                    u.level = enemyBaseLevel;
-
-                    if (i < forcedStarCount) {
-                        while (u.evolveId && u.level < 3) {
-                            const nextT = UNIT_TEMPLATES[u.evolveId];
-                            if (nextT) {
-                                Object.assign(u, {
-                                    templateId: nextT.id, name: nextT.name, description: nextT.description,
-                                    imageUrl: nextT.battleImageUrl || nextT.imageUrl,
-                                    battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
-                                    synergies: nextT.synergies || [], tier: nextT.tier
-                                });
-                                u.level++;
-                            } else break;
-                        }
-                        u.level = 3;
-                    } else if (i < forcedTwoStarCount && u.level < 2) {
-                        if (u.evolveId) {
-                            const nextT = UNIT_TEMPLATES[u.evolveId];
-                            if (nextT) {
-                                Object.assign(u, {
-                                    templateId: nextT.id, name: nextT.name, description: nextT.description,
-                                    imageUrl: nextT.battleImageUrl || nextT.imageUrl,
-                                    battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
-                                    synergies: nextT.synergies || [], tier: nextT.tier
-                                });
-                                u.level++;
-                            }
-                        }
-                        u.level = 2;
-                    }
-
-                    const baseStats = UNIT_TEMPLATES[u.family || u.id].baseStats;
-                    if (u.level === 2) {
-                        const bHp = baseStats.maxHp + 1; const bAtk = baseStats.attack + 1;
-                        u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
-                    } else if (u.level === 3) {
-                        const bHp = baseStats.maxHp * 2 + 6; const bAtk = baseStats.attack * 2 + 6;
-                        u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
-                    }
-
-                    const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
-                    if (game.difficultyScore >= turnScalingStart) {
-                        let scaleFactor = 0.6;
-                        if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.3;
-                        const turnScale = Math.floor(game.difficultyScore * scaleFactor);
-                        u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
-                        if (game.wins >= 8) {
-                            const eIdx = game.wins - 7; const eBHp = eIdx * 2; const eBAtk = eIdx * 1;
-                            u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
-                        }
-                        if (game.wins >= 12) { u.stats.hp += 10; u.stats.maxHp += 10; u.stats.attack += 5; }
-                    }
-                    if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
-                    candidateUnits.push(u);
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    randomCount = 5 - fixedTemplates.length;
+                    coreSynergyId = 'Cave'; synergyTargetCount = 2;
+                } else if (stratRoll < 0.60) {
+                    // (4) Snow: Weavile, Abomasnow + 1 T5 + 2 Random
+                    const sneasel = eliteAllTemplates.find(u => u.family === 'sneasel');
+                    const snover = eliteAllTemplates.find(u => u.family === 'snover');
+                    if (sneasel) fixedTemplates.push(sneasel);
+                    if (snover) fixedTemplates.push(snover);
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    randomCount = 2;
+                    coreSynergyId = 'Snow'; synergyTargetCount = 2;
+                } else if (stratRoll < 0.75) {
+                    // ... continue ...
+                    // (5) Triplets: Dugtrio, Dodrio, Magneton + 1 T5 + 1 Random
+                    const diglett = eliteAllTemplates.find(u => u.family === 'diglett');
+                    const doduo = eliteAllTemplates.find(u => u.family === 'doduo');
+                    const mag = eliteAllTemplates.find(u => u.family === 'magnemite');
+                    if (diglett) fixedTemplates.push(diglett);
+                    if (doduo) fixedTemplates.push(doduo);
+                    if (mag) fixedTemplates.push(mag);
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    randomCount = 1;
+                    coreSynergyId = 'Triplets'; synergyTargetCount = 3; uniqueConstraint = true;
+                } else if (stratRoll < 0.85) {
+                    // (6) Slow: Swalot, Slowbro + 2 T5 + 1 Random
+                    const gulpin = eliteAllTemplates.find(u => u.family === 'gulpin');
+                    const slowpoke = eliteAllTemplates.find(u => u.family === 'slowpoke');
+                    if (gulpin) fixedTemplates.push(gulpin);
+                    if (slowpoke) fixedTemplates.push(slowpoke);
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    randomCount = 1;
+                    coreSynergyId = 'Slow'; synergyTargetCount = 2;
+                } else if (stratRoll < 0.95) {
+                    // (7) Beetle: Pinsir, Heracross + 2 T5 + 1 Random
+                    const pinsir = eliteAllTemplates.find(u => u.family === 'pinsir');
+                    const heracross = eliteAllTemplates.find(u => u.family === 'heracross');
+                    if (pinsir) fixedTemplates.push(pinsir);
+                    if (heracross) fixedTemplates.push(heracross);
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    randomCount = 1;
+                    coreSynergyId = 'Beetle'; synergyTargetCount = 2;
+                } else {
+                    // (8) T5 Flow: 3 T5 + 2 Random
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
+                    randomCount = 2;
                 }
 
-                if (isEliteMatch) {
+                while (attempts < MAX_ENEMY_ATTEMPTS) {
+                    const candidateUnits: Unit[] = [];
+                    // 1. Fill Fixed
+                    for (const t of fixedTemplates) {
+                        let finalT = t;
+                        let tempLevel = 1;
+                        while (tempLevel < enemyBaseLevel && finalT.evolveId) {
+                            const nextT = UNIT_TEMPLATES[finalT.evolveId];
+                            if (nextT) { finalT = nextT; tempLevel++; } else break;
+                        }
+                        const u = new Unit(finalT);
+                        u.level = enemyBaseLevel;
+                        candidateUnits.push(u);
+                    }
+                    // 2. Fill Random Slots
+                    for (let i = 0; i < randomCount; i++) {
+                        const t = eliteAllTemplates[Math.floor(Math.random() * eliteAllTemplates.length)];
+                        const u = new Unit(t);
+                        u.level = enemyBaseLevel;
+                        candidateUnits.push(u);
+                    }
+
+                    // 3. Apply Forced Stars & Scaling
+                    candidateUnits.forEach((u, i) => {
+                        if (i < forcedStarCount) {
+                            while (u.evolveId && u.level < 3) {
+                                const nextT = UNIT_TEMPLATES[u.evolveId];
+                                if (nextT) {
+                                    Object.assign(u, {
+                                        templateId: nextT.id, name: nextT.name, description: nextT.description,
+                                        imageUrl: nextT.battleImageUrl || nextT.imageUrl,
+                                        battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
+                                        synergies: nextT.synergies || [], tier: nextT.tier
+                                    });
+                                    u.level++;
+                                } else break;
+                            }
+                            u.level = 3;
+                        } else if (i < forcedTwoStarCount && u.level < 2) {
+                            if (u.evolveId) {
+                                const nextT = UNIT_TEMPLATES[u.evolveId];
+                                if (nextT) {
+                                    Object.assign(u, {
+                                        templateId: nextT.id, name: nextT.name, description: nextT.description,
+                                        imageUrl: nextT.battleImageUrl || nextT.imageUrl,
+                                        battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
+                                        synergies: nextT.synergies || [], tier: nextT.tier
+                                    });
+                                    u.level++;
+                                }
+                            }
+                            u.level = 2;
+                        }
+
+                        const baseT = UNIT_TEMPLATES[u.family || u.templateId];
+                        const baseStats = baseT.baseStats;
+                        if (u.level === 2) {
+                            const bHp = baseStats.maxHp + 1; const bAtk = baseStats.attack + 1;
+                            u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
+                        } else if (u.level === 3) {
+                            const bHp = baseStats.maxHp * 2 + 6; const bAtk = baseStats.attack * 2 + 6;
+                            u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
+                        }
+
+                        // Scaling
+                        const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
+                        if (game.difficultyScore >= turnScalingStart) {
+                            let scaleFactor = 0.6;
+                            if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.3;
+                            const turnScale = Math.floor(game.difficultyScore * scaleFactor);
+                            u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
+                            if (game.wins >= 8) {
+                                const eIdx = game.wins - 7; const eBHp = eIdx * 2; const eBAtk = eIdx * 1;
+                                u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
+                            }
+                            if (game.wins >= 12) { u.stats.hp += 10; u.stats.maxHp += 10; u.stats.attack += 5; }
+                        }
+                        if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
+                    });
+
+                    // 4. Position Sort
                     const sorted = sortTeamByPositions(candidateUnits);
                     if (sorted) { enemyTeam = sorted; break; }
-                } else {
-                    enemyTeam = candidateUnits;
-                    while (enemyTeam.length < 5) enemyTeam.push(null);
-                    break;
+                    attempts++;
                 }
-                attempts++;
+            } else {
+                // Gym Strategy (Turn >= 2)
+                if (game.turn >= 2) {
+                    const availableSynergies = Object.values(SYNERGIES).map(s => s.id);
+                    coreSynergyId = availableSynergies[Math.floor(Math.random() * availableSynergies.length)];
+                    synergyTargetCount = 3;
+                }
+
+                while (attempts < MAX_ENEMY_ATTEMPTS) {
+                    const candidateUnits: Unit[] = [];
+                    const usedTemplateIds = new Set<string>();
+
+                    for (let i = 0; i < enemyCount; i++) {
+                        let pool = allTemplates;
+                        if (i < synergyTargetCount && coreSynergyId) {
+                            const synergyPool = allTemplates.filter(u => u.synergies.includes(coreSynergyId!));
+                            if (uniqueConstraint) {
+                                const uniquePool = synergyPool.filter(u => !usedTemplateIds.has(u.family || u.id));
+                                pool = uniquePool.length > 0 ? uniquePool : synergyPool;
+                            } else {
+                                pool = synergyPool.length > 0 ? synergyPool : allTemplates;
+                            }
+                        }
+                        if (pool.length === 0) pool = allTemplates;
+                        let t = pool[Math.floor(Math.random() * pool.length)];
+                        usedTemplateIds.add(t.family || t.id);
+
+                        let tempLevel = 1;
+                        while (tempLevel < enemyBaseLevel && t.evolveId) {
+                            const nextT = UNIT_TEMPLATES[t.evolveId];
+                            if (nextT) { t = nextT; tempLevel++; } else break;
+                        }
+                        const u = new Unit(t);
+                        u.level = enemyBaseLevel;
+
+                        if (i < forcedStarCount) {
+                            while (u.evolveId && u.level < 3) {
+                                const nextT = UNIT_TEMPLATES[u.evolveId];
+                                if (nextT) {
+                                    Object.assign(u, {
+                                        templateId: nextT.id, name: nextT.name, description: nextT.description,
+                                        imageUrl: nextT.battleImageUrl || nextT.imageUrl,
+                                        battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
+                                        synergies: nextT.synergies || [], tier: nextT.tier
+                                    });
+                                    u.level++;
+                                } else break;
+                            }
+                            u.level = 3;
+                        } else if (i < forcedTwoStarCount && u.level < 2) {
+                            if (u.evolveId) {
+                                const nextT = UNIT_TEMPLATES[u.evolveId];
+                                if (nextT) {
+                                    Object.assign(u, {
+                                        templateId: nextT.id, name: nextT.name, description: nextT.description,
+                                        imageUrl: nextT.battleImageUrl || nextT.imageUrl,
+                                        battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
+                                        synergies: nextT.synergies || [], tier: nextT.tier
+                                    });
+                                    u.level++;
+                                }
+                            }
+                            u.level = 2;
+                        }
+
+                        const baseStats = UNIT_TEMPLATES[u.family || u.id].baseStats;
+                        if (u.level === 2) {
+                            const bHp = baseStats.maxHp + 1; const bAtk = baseStats.attack + 1;
+                            u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
+                        } else if (u.level === 3) {
+                            const bHp = baseStats.maxHp * 2 + 6; const bAtk = baseStats.attack * 2 + 6;
+                            u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
+                        }
+
+                        const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
+                        if (game.difficultyScore >= turnScalingStart) {
+                            let scaleFactor = 0.6;
+                            if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.3;
+                            const turnScale = Math.floor(game.difficultyScore * scaleFactor);
+                            u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
+                        }
+                        if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
+                        candidateUnits.push(u);
+                    }
+                    // 4. Position Sort
+                    const sorted = sortTeamByPositions(candidateUnits);
+                    if (sorted) { enemyTeam = sorted; break; }
+                    attempts++;
+                }
             }
             if (enemyTeam.length === 0) {
                 // Final fallback: just generate randomly if sorting keeps failing

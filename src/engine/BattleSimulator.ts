@@ -362,7 +362,7 @@ export class BattleSimulator {
         // Mr. Mime: Light Screen (Once per team)
         if (unit.family === 'mrmime' && !this.lightScreenActivated.has(side)) {
             await this.notifySkill(unit, `發動了光牆！`);
-            await this.playTeamAnimation(myTeam, 'light-screen', 1000);
+            await this.playTeamAnimation(myTeam, 'light-screen-anim', 1000);
             const globalState = this.unitStates.get(unit) || {};
             globalState.lightScreen = 5;
             this.unitStates.set(unit, globalState);
@@ -676,7 +676,7 @@ export class BattleSimulator {
                     uState.lastSkillAnimTime = now;
                     this.unitStates.set(unit, uState);
 
-                    const amount = [0, 1, 2, 4][unit.level] || 1;
+                    const amount = [0, 1, 1, 2][unit.level] || 1;
                     await this.notifySkill(unit, `發動了閃焰高歌！`);
                     await this.playTeamAnimation(myTeam, 'glow-pale-red', 1000);
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
@@ -701,7 +701,7 @@ export class BattleSimulator {
                     uState.lastSkillAnimTime = now;
                     this.unitStates.set(unit, uState);
 
-                    const amount = [0, 1, 2, 4][unit.level] || 1;
+                    const amount = [0, 1, 1, 2][unit.level] || 1;
                     await this.notifySkill(unit, `發動了流水旋舞！`);
                     await this.playTeamAnimation(myTeam, 'glow-pale-blue', 1000);
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
@@ -900,13 +900,13 @@ export class BattleSimulator {
                     uState.lastSkillAnimTime = now;
                     this.unitStates.set(unit, uState);
 
-                    const amount = [0, 1, 2, 4][unit.level] || 1;
+                    const amount = [0, 1, 1, 2][unit.level] || 1;
                     await this.notifySkill(unit, `發動了千變萬花！`);
                     await this.playTeamAnimation(myTeam, 'glow-pale-green', 1000);
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const isAtk = Math.random() < 0.5;
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, isAtk ? 0 : amount, isAtk ? amount : 0, '新葉貓技能強化', original, true);
+                        this.growUnit(ally, isAtk ? 0 : amount, isAtk ? amount : 0, '新葉喵技能強化', original, true);
                     }
                 }
             });
