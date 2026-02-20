@@ -655,8 +655,7 @@ export class BattleSimulator {
                     const amount = unit.level >= 3 ? 4 : 2;
                     if (!this.isCompacting) {
                         await this.notifySkill(unit, `發動了鐵壁！`);
-                        const { myTeam } = this.getTeams(unit);
-                        await this.playTeamAnimation(myTeam, 'glow-pale-green', 600);
+                        this.playTeamAnimation([unit], 'glow-pale-blue', 600);
                     } else {
                         // Silent log during compaction to avoid flood
                         this.log(`${unit.name} 發動了鐵壁！`);
@@ -1118,6 +1117,7 @@ export class BattleSimulator {
                 if (mState && mState.lightScreen > 0) {
                     amount = Math.ceil(amount / 2);
                     mState.lightScreen--;
+                    this.playTeamAnimation([target], 'light-screen-anim', 400);
                     if (mState.lightScreen === 0) {
                         this.log(side === 'player' ? "我方的光牆消失了" : "敵方的光牆消失了");
                     }
