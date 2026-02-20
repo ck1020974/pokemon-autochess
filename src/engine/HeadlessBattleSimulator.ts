@@ -388,14 +388,15 @@ export class HeadlessBattleSimulator {
             });
         }
         if (unit.family === 'sprigatito') {
-            this.eventBus.on('AFTER_DEATH', async (e) => {
+            this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
-                if (e.context.killer && myTeam.includes(e.context.killer)) {
+                if (e.source && myTeam.includes(e.source) && e.source !== unit) {
                     const amount = [0, 1, 2, 4][unit.level] || 1;
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
+                        const isAtk = Math.random() < 0.5;
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, amount, amount, original);
+                        this.growUnit(ally, isAtk ? 0 : amount, isAtk ? amount : 0, original);
                     }
                 }
             });
