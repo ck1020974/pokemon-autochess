@@ -569,7 +569,7 @@ export class BattleSimulator {
                         // Silent log during compaction to avoid flood
                         this.log(`${unit.name} 提高了 ${amount} 生命`);
                     }
-                    this.growUnit(unit, amount, 0);
+                    this.growUnit(unit, amount, 0, '大岩蛇技能');
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                     if (original) original.addGrowth(amount, 0);
                 }
@@ -1138,9 +1138,11 @@ export class BattleSimulator {
         if (this.onUpdate) this.onUpdate();
         // Delay removed as per user request to fix Chikorita/Treecko sync issues
 
-        // 2. Play spawn animation and log
-        const el = document.getElementById(newUnit.id);
-        if (el) el.classList.add('spawn-anim');
+        // 2. Play spawn animation and log (Deferred to ensure DOM exists after React render)
+        requestAnimationFrame(() => {
+            const el = document.getElementById(newUnit.id);
+            if (el) el.classList.add('spawn-anim');
+        });
         this.log(`${newUnit.name} 加入了戰場！`);
 
         // 3. Stand up delay removed
@@ -1161,15 +1163,22 @@ export class BattleSimulator {
     }
 
     private async playAnimation(unit: Unit, anim: string, duration: number) {
-        const el = document.getElementById(unit.id);
-        if (el) {
-            const className = `${anim}-anim`;
-            el.classList.add(className);
-            if (this.onUpdate) this.onUpdate();
-            await this.delay(duration);
-            el.classList.remove(className);
-            if (this.onUpdate) this.onUpdate();
-        }
+        // Ensure DOM update before seeking element
+        if (this.onUpdate) this.onUpdate();
+
+        // Use requestAnimationFrame to ensure the element exists if it was JUST rendered
+        return new Promise<void>(resolve => {
+            requestAnimationFrame(async () => {
+                const el = document.getElementById(unit.id);
+                if (el) {
+                    const className = `${anim}-anim`;
+                    el.classList.add(className);
+                    await this.delay(duration);
+                    el.classList.remove(className);
+                }
+                resolve();
+            });
+        });
     }
 
     public async simulateStep(): Promise<boolean> {
@@ -1200,16 +1209,21 @@ export class BattleSimulator {
             this.performAttack(eFront, pFront)
         ]);
 
-        // 4. Wait for animations to complete before finishing the step
+        // 4. Wait for animations and any triggered secondary actions (summoning, etc.)
         await Promise.all(anims);
 
-        // 5. Compact teams to ensure summons are settled before victory check
+        // 5. Short buffer for cascading death effects (like Drifloon exploding)
+        await this.delay(200);
+
+        // 6. Compact teams to ensure survivors are in their final positions
         await this.compactTeams();
 
-        // Check if battle ended
+        // 7. Victory Check with human-readable buffer
         const result = this.getResult();
         if (result !== null) {
-            await this.delay(500); // 0.5s pause before UI shows result
+            // Before declaring victory, ensure we aren't mid-summoning
+            // (e.g. Rattata just died, we want to see the mice before Victory pops)
+            await this.delay(1200);
         }
 
         return this.playerTeam.some(u => u !== null && u.stats.hp > 0) &&

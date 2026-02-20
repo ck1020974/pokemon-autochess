@@ -235,6 +235,13 @@ function App() {
                 if (t.imageUrl) urls.add(t.imageUrl);
                 if (t.battleImageUrl) urls.add(t.battleImageUrl);
             });
+            // Ensure derived/token images are also preloaded if they differ
+            urls.add('assets/妙蛙種子01.webp');
+            urls.add('assets/小拉達01.webp');
+            urls.add('assets/飄飄球01.webp');
+            urls.add('assets/隨風球01.webp');
+            urls.add('assets/怨影娃娃01.webp');
+            urls.add('assets/詛咒娃娃01.webp');
 
             const assetUrls = Array.from(urls);
 
