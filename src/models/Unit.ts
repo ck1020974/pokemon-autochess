@@ -121,18 +121,14 @@ export class Unit {
     const secondAtk = Math.min(mpAtk, spAtk);
     const newAtk = Math.floor(highestAtk + secondAtk * 0.5 + 1);
 
-    // Current HP should probably scale proportionally or just heal to full?
-    // SAP rule: Current HP increases by same amount as Max HP increase? 
-    // Or just set to new Max?
-    // Let's assume heal to full on merge for simplicity/fun, or retain damage.
-    // Retaining damage: (NewMax - OldMax) + OldCurrent.
-    // Let's set current HP to NewMax (Heal) - makes game easier/rewarding.
-    const newHp = newMaxHp;
+    // Feature: Cap stats at 50/50
+    const finalHp = Math.min(50, newMaxHp);
+    const finalAtk = Math.min(50, newAtk);
 
     return {
-      hp: newHp,
-      maxHp: newMaxHp,
-      attack: newAtk
+      hp: finalHp,
+      maxHp: finalHp,
+      attack: finalAtk
     };
   }
 }

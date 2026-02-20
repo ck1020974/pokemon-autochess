@@ -37,6 +37,8 @@ export class BattleSimulator {
             clone.stats.hp = Math.floor(clone.stats.hp * difficultyMultiplier);
             clone.stats.maxHp = Math.floor(clone.stats.maxHp * difficultyMultiplier);
             clone.stats.attack = Math.floor(clone.stats.attack * difficultyMultiplier);
+            // Feature: Global Stat Cap 50/50
+            clone.capStats();
             return clone;
         }) as Unit[];
         this.eventBus = new EventBus();
@@ -515,15 +517,29 @@ export class BattleSimulator {
 
         // Slowpoke Family: Heal below 50%
         if (unit.family === 'slowpoke') {
+            // Record original Battle-Start Max HP for heal cap
+            const state = this.unitStates.get(unit) || {};
+            state.originalMaxHp = unit.stats.maxHp;
+            this.unitStates.set(unit, state);
+
             this.eventBus.on('ON_HURT', (e) => {
                 if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const state = this.unitStates.get(unit) || {};
-                    if (!state.slowpokeHealUsed && unit.stats.hp > 0 && unit.stats.hp < unit.stats.maxHp * 0.5) {
-                        const amount = [0, 6, 12, 20][unit.level] || 6;
-                        this.heal(unit, amount);
-                        state.slowpokeHealUsed = true;
-                        this.unitStates.set(unit, state);
-                        this.log(`${unit.name} 發動了再生！`);
+                    const currentState = this.unitStates.get(unit) || {};
+                    if (!currentState.slowpokeHealUsed && unit.stats.hp > 0 && unit.stats.hp < unit.stats.maxHp * 0.5) {
+                        let amount = [0, 6, 12, 50][unit.level] || 6;
+                        // Feature: Heal cannot exceed original max HP (from start of battle)
+                        const cap = currentState.originalMaxHp || unit.stats.maxHp;
+                        const potentialNewHp = unit.stats.hp + amount;
+                        if (potentialNewHp > cap) {
+                            amount = Math.max(0, cap - unit.stats.hp);
+                        }
+
+                        if (amount > 0) {
+                            this.heal(unit, amount);
+                            this.log(`${unit.name} 發動了再生，回復了 ${amount} 生命`);
+                        }
+                        currentState.slowpokeHealUsed = true;
+                        this.unitStates.set(unit, currentState);
                     }
                 }
             });
@@ -785,10 +801,12 @@ export class BattleSimulator {
 
         // Kangaskhan: Second hit if defender is evolved AND attacker/defender both survive the first hit
         if (attacker.family === 'kangaskhan' && (defender.templateId !== defender.family) && !this.unitStates.get(attacker)?.isSilenced) {
-            await Promise.all(attackPromises); // Wait for the first hit
+            await Promise.all(attackPromises); // Wait for the first hit and any triggers
+            // Re-check survival after the first hit and its consequences (like reflect)
             if (defender.stats.hp > 0 && attacker.stats.hp > 0) {
                 await this.notifySkill(attacker, '發動了第二次攻擊');
-                attackPromises.push(this.dealDamage(attacker, defender, attacker.stats.attack, false));
+                const secondHit = this.dealDamage(attacker, defender, attacker.stats.attack, false);
+                attackPromises.push(secondHit);
             }
         }
 
@@ -865,6 +883,8 @@ export class BattleSimulator {
 
     private async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false) {
         if (target.stats.hp <= 0) return;
+        // Basic attacks from dead units are prohibited. Skills (death rattles) are allowed.
+        if (source && source.stats.hp <= 0 && !isSkillDamage) return;
 
         const targetState = this.unitStates.get(target) || {};
         // Source state for bypass logic
@@ -1085,6 +1105,8 @@ export class BattleSimulator {
         newUnit.stats.hp = hp;
         newUnit.stats.maxHp = hp;
         newUnit.stats.attack = attack;
+        // Feature: Cap spawned unit stats at 50/50
+        newUnit.capStats();
         newUnit.family = template.family || template.id;
         newUnit.synergies = [...template.synergies];
 
@@ -1223,7 +1245,7 @@ export class BattleSimulator {
         if (result !== null) {
             // Before declaring victory, ensure we aren't mid-summoning
             // (e.g. Rattata just died, we want to see the mice before Victory pops)
-            await this.delay(1200);
+            await this.delay(1500);
         }
 
         return this.playerTeam.some(u => u !== null && u.stats.hp > 0) &&
