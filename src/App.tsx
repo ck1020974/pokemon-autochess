@@ -1368,10 +1368,10 @@ function App() {
                                             }}>×</div>
                                             {turnsLeft > 0 && (
                                                 <div style={{
-                                                    fontSize: '0.8rem',
+                                                    fontSize: 'clamp(0.6rem, 2vh, 0.8rem)',
                                                     color: 'rgba(255,255,255,0.3)',
                                                     whiteSpace: 'nowrap',
-                                                    marginTop: '5px'
+                                                    marginTop: '2px'
                                                 }}>{turnsLeft} 回合解鎖</div>
                                             )}
                                         </div>
