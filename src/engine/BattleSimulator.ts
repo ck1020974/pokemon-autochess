@@ -343,9 +343,14 @@ export class BattleSimulator {
 
                 if (firstIdx !== -1 && lastIdx !== -1 && firstIdx !== lastIdx) {
                     await this.notifySkill(unit, `發動了瞬間移動！`);
+                    // Visual Effect: Teleport anim on the two swapped units
+                    await Promise.all([
+                        this.playAnimation(first, 'teleport', 400),
+                        this.playAnimation(last, 'teleport', 400)
+                    ]);
+
                     opTeam[firstIdx] = last;
                     opTeam[lastIdx] = first;
-                    this.log(`${unit.name}發動了瞬間移動！`);
                     this.log(`${first.name} 和 ${last.name} 互換了位置！`);
                     await this.compactTeams();
                     await this.delay(300);
@@ -357,6 +362,7 @@ export class BattleSimulator {
         // Mr. Mime: Light Screen (Once per team)
         if (unit.family === 'mrmime' && !this.lightScreenActivated.has(side)) {
             await this.notifySkill(unit, `發動了光牆！`);
+            await this.playTeamAnimation(myTeam, 'light-screen', 1000);
             const globalState = this.unitStates.get(unit) || {};
             globalState.lightScreen = 5;
             this.unitStates.set(unit, globalState);

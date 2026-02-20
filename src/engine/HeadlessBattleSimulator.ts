@@ -124,18 +124,19 @@ export class HeadlessBattleSimulator {
                 if (firstIdx !== -1 && lastIdx !== -1 && firstIdx !== lastIdx) {
                     opTeam[firstIdx] = last;
                     opTeam[lastIdx] = first;
+                    this.log(`${first.name} 和 ${last.name} 互換了位置！`);
                 }
             }
         }
 
         // Mr. Mime: Light Screen
-        // Mr. Mime: Light Screen (Once per team)
         if (unit.family === 'mrmime' && !this.lightScreenActivated.has(side)) {
             const globalState = this.unitStates.get(unit) || {};
             globalState.lightScreen = 5;
             this.unitStates.set(unit, globalState);
             this.lightScreenActivated.add(side);
         }
+
         if (unit.family === 'houndour') {
             const times = [0, 1, 3, 5][unit.level] || 1;
             for (let i = 0; i < times; i++) {
@@ -843,7 +844,10 @@ export class HeadlessBattleSimulator {
         }
         this.unitStates.set(newUnit, {});
         this.registerUnitAbilities(newUnit);
-        await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
+    }
+
+    private log(message: string) {
+        this.logs.push(message);
     }
 
     public async simulateStep(): Promise<boolean> {
