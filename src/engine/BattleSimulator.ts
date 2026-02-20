@@ -501,6 +501,24 @@ export class BattleSimulator {
                 }
             });
         }
+        // Cyndaquil: After attack -> splash neighbor
+        if (unit.family === 'cyndaquil') {
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
+                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
+                    await this.notifySkill(unit, '發動了火焰輪');
+                    const splashDmg = [0, 2, 6, 12][unit.level] || 2;
+                    const { opTeam } = this.getTeams(unit);
+                    const tIdx = e.target ? opTeam.indexOf(e.target) : -1;
+                    // Hit neighbor behind if exists
+                    if (tIdx !== -1 && tIdx < opTeam.length - 1) {
+                        const neighbor = opTeam[tIdx + 1];
+                        if (neighbor && neighbor.stats.hp > 0) {
+                            await this.dealDamage(unit, neighbor, splashDmg, true);
+                        }
+                    }
+                }
+            });
+        }
 
         // Torchic: Pursuit
         if (unit.family === 'torchic') {
@@ -669,16 +687,25 @@ export class BattleSimulator {
                 // Ensure unit is still alive and in the team array (not replaced by null)
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const uState = this.unitStates.get(unit) || {};
-                    const now = Date.now();
-                    const lastAnim = uState.lastSkillAnimTime || 0;
-                    if (now - lastAnim < 500) return; // Debounce animation spam
-                    uState.lastSkillAnimTime = now;
-                    this.unitStates.set(unit, uState);
-
                     const amount = [0, 1, 1, 2][unit.level] || 1;
-                    await this.notifySkill(unit, `發動了閃焰高歌！`);
-                    await this.playTeamAnimation(myTeam, 'glow-pale-red', 1000);
+                    const now = Date.now();
+                    const state = this.unitStates.get(unit) || {};
+                    const lastGlow = state.lastGlobalGlowTime || 0;
+
+                    if (now - lastGlow > 500 && !(e.context as any).fuecocoAnimTriggered) {
+                        (e.context as any).fuecocoAnimTriggered = true;
+                        // Mark all fuecocos on my team so they don't spam glow
+                        myTeam.filter(u => u?.family === 'fuecoco').forEach(u => {
+                            if (u) {
+                                const us = this.unitStates.get(u) || {};
+                                us.lastGlobalGlowTime = now;
+                                this.unitStates.set(u, us);
+                            }
+                        });
+                        this.notifySkill(unit, `發動了閃焰高歌！`); // Don't await so it doesn't block sync loops
+                        this.playTeamAnimation(myTeam, 'glow-pale-red', 1000);
+                    }
+
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
                         this.growUnit(ally, amount, 0, '呆火鱷技能強化', original, true);
@@ -694,16 +721,23 @@ export class BattleSimulator {
                 // Ensure unit is still alive and in the team array
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const uState = this.unitStates.get(unit) || {};
-                    const now = Date.now();
-                    const lastAnim = uState.lastSkillAnimTime || 0;
-                    if (now - lastAnim < 500) return; // Debounce
-                    uState.lastSkillAnimTime = now;
-                    this.unitStates.set(unit, uState);
-
                     const amount = [0, 1, 1, 2][unit.level] || 1;
-                    await this.notifySkill(unit, `發動了流水旋舞！`);
-                    await this.playTeamAnimation(myTeam, 'glow-pale-blue', 1000);
+                    const now = Date.now();
+                    const state = this.unitStates.get(unit) || {};
+                    const lastGlow = state.lastGlobalGlowTime || 0;
+
+                    if (now - lastGlow > 500 && !(e.context as any).quaxlyAnimTriggered) {
+                        (e.context as any).quaxlyAnimTriggered = true;
+                        myTeam.filter(u => u?.family === 'quaxly').forEach(u => {
+                            if (u) {
+                                const us = this.unitStates.get(u) || {};
+                                us.lastGlobalGlowTime = now;
+                                this.unitStates.set(u, us);
+                            }
+                        });
+                        this.notifySkill(unit, `發動了流水旋舞！`);
+                        this.playTeamAnimation(myTeam, 'glow-pale-blue', 1000);
+                    }
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
                         this.growUnit(ally, 0, amount, '潤水鴨技能強化', original, true);
@@ -811,12 +845,13 @@ export class BattleSimulator {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source === unit) {
                     const { myTeam, opTeam } = this.getTeams(unit);
-                    await this.notifySkill(unit, '發動了自爆');
+
                     const dmg = [0, 2, 5, 15][unit.level] || 2;
+                    await this.notifySkill(unit, `發動了自爆\n對全體造成了 ${dmg} 點傷害`);
                     // Affect EVERYONE else (myTeam and opTeam)
                     const allTargets = [...myTeam, ...opTeam].filter(u => u && u !== unit && u.stats.hp > 0);
                     for (const target of allTargets) {
-                        await this.dealDamage(unit, target!, dmg, true);
+                        await this.dealDamage(unit, target!, dmg, true, true); // silent=true
                         await this.delay(65);
                     }
                 }
@@ -893,16 +928,23 @@ export class BattleSimulator {
                 // Ensure unit is still alive and in the team array (not replaced by null)
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    const uState = this.unitStates.get(unit) || {};
-                    const now = Date.now();
-                    const lastAnim = uState.lastSkillAnimTime || 0;
-                    if (now - lastAnim < 500) return; // Debounce
-                    uState.lastSkillAnimTime = now;
-                    this.unitStates.set(unit, uState);
-
                     const amount = [0, 1, 1, 2][unit.level] || 1;
-                    await this.notifySkill(unit, `發動了千變萬花！`);
-                    await this.playTeamAnimation(myTeam, 'glow-pale-green', 1000);
+                    const now = Date.now();
+                    const state = this.unitStates.get(unit) || {};
+                    const lastGlow = state.lastGlobalGlowTime || 0;
+
+                    if (now - lastGlow > 500 && !(e.context as any).sprigatitoAnimTriggered) {
+                        (e.context as any).sprigatitoAnimTriggered = true;
+                        myTeam.filter(u => u?.family === 'sprigatito').forEach(u => {
+                            if (u) {
+                                const us = this.unitStates.get(u) || {};
+                                us.lastGlobalGlowTime = now;
+                                this.unitStates.set(u, us);
+                            }
+                        });
+                        this.notifySkill(unit, `發動了千變萬花！`);
+                        this.playTeamAnimation(myTeam, 'glow-pale-green', 1000);
+                    }
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const isAtk = Math.random() < 0.5;
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
@@ -1126,7 +1168,9 @@ export class BattleSimulator {
             // Squirtle: Flat reduction
             if (target.family === 'squirtle' && amount > 0) amount = Math.max(1, amount - target.level);
         } else if (source) {
-            this.log(`${source.name} 發動了破格！`);
+            if (source.family === 'pinsir') {
+                this.log(`${source.name} 發動了破格！`);
+            }
         }
 
         target.stats.hp -= amount;
@@ -1336,7 +1380,7 @@ export class BattleSimulator {
         const isReplacingSlot = !team[checkIdx] || team[checkIdx].stats.hp <= 0;
 
         if (livingUnits >= 5 && !isReplacingSlot) {
-            this.log(`戰場已滿，無法再召喚 ${newUnit.name}！ `);
+            this.log(`戰場已滿，無法再召喚！`);
             return;
         }
 

@@ -748,6 +748,25 @@ function App() {
                             if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.3;
                             const turnScale = Math.floor(game.difficultyScore * scaleFactor);
                             u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
+                            if (game.wins >= 8) {
+                                const eIdx = game.wins - 7;
+                                let eBHp = eIdx * 2;
+                                let eBAtk = eIdx * 1;
+                                if (u.tier === 5) {
+                                    eBHp = Math.ceil(eBHp / 3);
+                                    eBAtk = Math.ceil(eBAtk / 3);
+                                } else if (u.tier === 4) {
+                                    eBHp = Math.ceil(eBHp / 2);
+                                    eBAtk = Math.ceil(eBAtk / 2);
+                                }
+                                u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
+                            }
+                            if (game.wins >= 12) {
+                                let wB = 10; let wA = 5;
+                                if (u.tier === 5) { wB = 3; wA = 2; }
+                                else if (u.tier === 4) { wB = 5; wA = 3; }
+                                u.stats.hp += wB; u.stats.maxHp += wB; u.stats.attack += wA;
+                            }
                         }
                         if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
                         candidateUnits.push(u);
@@ -762,7 +781,10 @@ function App() {
                 // Final fallback: just generate randomly if sorting keeps failing
                 attempts = 0; // Reset for actual one-shot generation
                 for (let i = 0; i < enemyCount; i++) {
-                    enemyTeam.push(new Unit(allTemplates[Math.floor(Math.random() * allTemplates.length)]));
+                    const template = allTemplates[Math.floor(Math.random() * allTemplates.length)];
+                    const unit = new Unit(template);
+                    if (unit.battleImageUrl) unit.imageUrl = unit.battleImageUrl;
+                    enemyTeam.push(unit);
                 }
                 while (enemyTeam.length < 5) enemyTeam.push(null);
             }

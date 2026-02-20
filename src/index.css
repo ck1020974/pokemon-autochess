@@ -1392,15 +1392,15 @@ h3 {
 
 /* --- T4 Team Glow Animations --- */
 .glow-pale-red {
-  animation: glow-red 0.6s ease-in-out;
+  animation: glow-red 1s ease-in-out;
 }
 
 .glow-pale-blue {
-  animation: glow-blue 0.6s ease-in-out;
+  animation: glow-blue 1s ease-in-out;
 }
 
 .glow-pale-green {
-  animation: glow-green 0.6s ease-in-out;
+  animation: glow-green 1s ease-in-out;
 }
 
 @keyframes glow-red {
@@ -1410,12 +1410,8 @@ h3 {
     filter: drop-shadow(0 0 0px transparent);
   }
 
-  20% {
-    filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.4)) brightness(1.1);
-  }
-
   50% {
-    filter: drop-shadow(0 0 18px rgba(239, 68, 68, 0.6)) brightness(1.2);
+    filter: drop-shadow(0 0 15px rgba(239, 68, 68, 1));
   }
 }
 
@@ -1426,12 +1422,8 @@ h3 {
     filter: drop-shadow(0 0 0px transparent);
   }
 
-  20% {
-    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4)) brightness(1.1);
-  }
-
   50% {
-    filter: drop-shadow(0 0 18px rgba(59, 130, 246, 0.6)) brightness(1.2);
+    filter: drop-shadow(0 0 15px rgba(59, 130, 246, 1));
   }
 }
 
@@ -1442,14 +1434,11 @@ h3 {
     filter: drop-shadow(0 0 0px transparent);
   }
 
-  20% {
-    filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.4)) brightness(1.1);
-  }
-
   50% {
-    filter: drop-shadow(0 0 18px rgba(34, 197, 94, 0.6)) brightness(1.2);
+    filter: drop-shadow(0 0 15px rgba(34, 197, 94, 1));
   }
 }
+
 .teleport-anim {
   animation: teleport-move 0.4s ease-in-out;
 }
@@ -1459,12 +1448,31 @@ h3 {
 }
 
 @keyframes teleport-move {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(0); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes light-screen-pulse {
-  0%, 100% { filter: drop-shadow(0 0 5px rgba(173, 216, 230, 0.3)); }
-  50% { filter: drop-shadow(0 0 20px rgba(173, 216, 230, 0.8)); transform: scale(1.02); }
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(173, 216, 230, 0.3));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 20px rgba(173, 216, 230, 0.8));
+    transform: scale(1.02);
+  }
 }
