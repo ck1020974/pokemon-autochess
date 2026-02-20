@@ -417,16 +417,6 @@ export class BattleSimulator {
             else if (atk > 0) this.log(`${unit.name} 提高了 ${atk} 攻擊！`);
         }
 
-        // Claw Synergy: Extra +2 Atk on any growth
-        if (this.getSynergyCountForUnit(unit, 'Claw') >= 2 && unit.synergies.includes('Claw')) {
-            unit.stats.attack += 2;
-            unit.capStats();
-            if (permanentTarget) {
-                permanentTarget.stats.attack += 2;
-                permanentTarget.capStats();
-            }
-            this.log(`${unit.name} 發動了磨爪！`);
-        }
     }
 
     private buffAttack(unit: Unit, amount: number, silent: boolean = false) {
@@ -470,16 +460,18 @@ export class BattleSimulator {
             });
         }
 
-        // Water: HP Growth on Attack
+        // Water (Vortex): Reduce target attack before attack
         if (unit.synergies.includes('Water')) {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (unit.stats.hp <= 0) return;
-                if (e.source === unit) {
+                if (e.source === unit && e.target && e.target.stats.hp > 0 && e.target.family !== 'sneasel') {
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
-                    if (buff > 0) {
-                        this.growUnit(unit, buff, 0, '潮汐');
+                    const debuff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                    if (debuff > 0 && e.target.stats.attack > 1) {
+                        const amountReduced = Math.min(e.target.stats.attack - 1, debuff);
+                        e.target.stats.attack -= amountReduced;
+                        this.log(`${e.target.name} 被漩渦影響，攻擊力降低了 ${amountReduced}！`);
                     }
                 }
             });
@@ -1245,11 +1237,10 @@ export class BattleSimulator {
                 // Critical: Re-check survival if reward was deferred
                 if (killer.stats.hp <= 0) return;
 
-                // Sneasel family: Atk on kill (Permanent)
-                if (killer.family === 'sneasel') {
+                // Claw Synergy: Atk on kill (Permanent)
+                if (this.getSynergyCountForUnit(killer, 'Claw') >= 2 && killer.synergies.includes('Claw')) {
                     const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                    const buff = killer.level >= 2 ? 2 : 1;
-                    this.growUnit(killer, 0, buff, '狃拉技能', original);
+                    this.growUnit(killer, 0, 2, '發動了魔爪！', original);
                 }
 
                 // Charmander family: Stats on kill (Temporary)

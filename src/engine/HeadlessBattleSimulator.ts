@@ -249,14 +249,6 @@ export class HeadlessBattleSimulator {
         unit.addGrowth(hp, atk);
         if (permanentTarget) permanentTarget.addGrowth(hp, atk);
 
-        if (this.getSynergyCountForUnit(unit, 'Claw') >= 2 && unit.synergies.includes('Claw')) {
-            unit.stats.attack += 2;
-            unit.capStats();
-            if (permanentTarget) {
-                permanentTarget.stats.attack += 2;
-                permanentTarget.capStats();
-            }
-        }
     }
 
     private buffAttack(unit: Unit, amount: number, _silent: boolean = false) {
@@ -294,10 +286,12 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('BEFORE_ATTACK', (e) => {
                 const s = this.unitStates.get(unit);
                 if (s?.isSilenced || unit.stats.hp <= 0) return;
-                if (e.source === unit) {
+                if (e.source === unit && e.target && e.target.stats.hp > 0 && e.target.family !== 'sneasel') {
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
-                    if (buff > 0) this.growUnit(unit, buff, 0);
+                    const debuff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                    if (debuff > 0 && e.target.stats.attack > 1) {
+                        e.target.stats.attack = Math.max(1, e.target.stats.attack - debuff);
+                    }
                 }
             });
         }
@@ -760,9 +754,8 @@ export class HeadlessBattleSimulator {
         if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
             const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id) || null;
 
-            if (killer.family === 'sneasel') {
-                const buff = killer.level >= 2 ? 2 : 1;
-                this.growUnit(killer, 0, buff, original);
+            if (this.getSynergyCountForUnit(killer, 'Claw') >= 2 && killer.synergies.includes('Claw')) {
+                this.growUnit(killer, 0, 2, original);
             }
             if (killer.family === 'charmander') {
                 const buff = killer.level;

@@ -80,28 +80,14 @@ export class GameLoop {
             return families.size;
         };
 
-        // Helper: Apply Synergy Buff & Check Sneasel + Claw Passive
+        // Helper: Apply Synergy Buff
         const applyBuff = (unit: Unit, amount: number, type: 'hp' | 'atk', source: string) => {
-            const clawCount = getUniqueCount(this.playerTeam.filter(u => u && u.synergies.includes('Claw')) as Unit[]);
-
             if (type === 'hp') {
                 unit.addGrowth(amount, 0);
                 console.log(`${source} Synergy: ${unit.name} +${amount} HP`);
             } else {
                 unit.addBuff(amount);
                 console.log(`${source} Synergy: ${unit.name} +${amount} Atk`);
-            }
-
-            // Sneasel: On Buff (Prep Phase) -> Gain +2 Atk
-            if (unit.family === 'sneasel') {
-                unit.addBuff(2);
-                console.log(`Sneasel Passive (${source}): ${unit.name} +2 Atk`);
-            }
-
-            // Claw (2): Extra +2 Atk on any growth
-            if (clawCount >= 2 && unit.synergies.includes('Claw')) {
-                unit.addBuff(2);
-                console.log(`Claw Synergy: ${unit.name} +2 Atk`);
             }
         };
 
