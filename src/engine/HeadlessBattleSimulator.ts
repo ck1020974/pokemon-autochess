@@ -38,7 +38,7 @@ export class HeadlessBattleSimulator {
 
         const getRank = (unit: Unit) => {
             if (unit.family === 'spiritomb') return 3;
-            const utility = ['ditto', 'mankey', 'dwebble', 'mudkip', 'gulpin'];
+            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin'];
             if (utility.includes(unit.family)) return 2;
             if (unit.family === 'houndour') return 1;
             return 0;
@@ -81,25 +81,27 @@ export class HeadlessBattleSimulator {
         const s = this.unitStates.get(unit);
         if (s?.isSilenced) return;
 
-        if (unit.family === 'mankey') {
-            if (unit.level >= 3) {
+        // Gastly Family: Atk buff at start
+        if (unit.family === 'gastly') {
+            if (unit.templateId === 'gengar') {
                 myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.buffAttack(u, 5));
             } else {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0) {
                     const front = myTeam[idx - 1];
-                    if (front) this.buffAttack(front, [0, 2, 5][unit.level] || 2);
+                    if (front) this.buffAttack(front, unit.templateId === 'haunter' ? 5 : 2);
                 }
             }
         }
-        if (unit.family === 'dwebble') {
-            if (unit.level >= 3) {
+        // Igglybuff Family: HP buff at start
+        if (unit.family === 'igglybuff') {
+            if (unit.templateId === 'wigglytuff') {
                 myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.growUnit(u, 5, 0));
             } else {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0) {
                     const front = myTeam[idx - 1];
-                    if (front) this.growUnit(front, [0, 2, 5][unit.level] || 2, 0);
+                    if (front) this.growUnit(front, unit.templateId === 'jigglypuff' ? 5 : 2, 0);
                 }
             }
         }
@@ -133,23 +135,24 @@ export class HeadlessBattleSimulator {
             if (allies.length > 0) {
                 let target = allies[0];
                 for (const u of allies) if (u.stats.hp > target.stats.hp) target = u;
+
                 unit.family = target.family;
-                unit.synergies = [...target.synergies];
+
+                // Mirror logic from BattleSimulator for level-appropriate template
+                let currentTemplate = UNIT_TEMPLATES[target.family] || UNIT_TEMPLATES[target.templateId];
+                for (let i = 1; i < unit.level; i++) {
+                    if (currentTemplate.evolveId && UNIT_TEMPLATES[currentTemplate.evolveId]) {
+                        currentTemplate = UNIT_TEMPLATES[currentTemplate.evolveId];
+                    }
+                }
+                unit.templateId = currentTemplate.id;
+                unit.synergies = [...currentTemplate.synergies];
+
                 this.calculateCachedSynergies(this.playerTeam.filter(u => u !== null), this.playerSynergies);
                 this.calculateCachedSynergies(this.enemyTeam.filter(u => u !== null), this.enemySynergies);
                 this.registerUnitAbilities(unit);
-                const startAbilities = ['mankey', 'dwebble', 'houndour', 'spiritomb', 'mudkip', 'gulpin'];
+                const startAbilities = ['gastly', 'igglybuff', 'houndour', 'spiritomb', 'mudkip', 'gulpin'];
                 if (startAbilities.includes(unit.family)) await this.executeUnitStartOfBattleAbility(unit);
-            }
-        }
-        if (unit.family === 'mudkip') {
-            const idx = myTeam.indexOf(unit);
-            if (idx > 0) {
-                const front = myTeam[idx - 1];
-                if (front) {
-                    const amount = [0, 3, 5, 10][unit.level] || 3;
-                    this.growUnit(front, amount, amount);
-                }
             }
         }
         if (unit.family === 'gulpin') {
@@ -157,7 +160,8 @@ export class HeadlessBattleSimulator {
             if (idx > 0) {
                 const front = myTeam[idx - 1];
                 if (front && front.stats.hp > 0) {
-                    this.growUnit(unit, front.stats.maxHp, front.stats.attack);
+                    const multiplier = unit.level >= 3 ? 2 : 1;
+                    this.growUnit(unit, front.stats.maxHp * multiplier, front.stats.attack * multiplier);
                     const fState = this.unitStates.get(front) || {};
                     fState.isSwallowed = true;
                     this.unitStates.set(front, fState);
@@ -176,6 +180,7 @@ export class HeadlessBattleSimulator {
     }
 
     private calculateCachedSynergies(team: Unit[], map: Map<string, number>) {
+        map.clear();
         const families = new Map<string, Set<string>>();
         team.forEach(u => {
             u.synergies.forEach(syn => {
@@ -189,14 +194,15 @@ export class HeadlessBattleSimulator {
     private async applyBattleStartSynergies(team: Unit[]) {
         if (team.length === 0) return;
         if (this.getSynergyCountForUnit(team[0], 'Triplets') >= 3) {
-            team.filter(u => u && u.synergies.includes('Triplets')).forEach(u => this.growUnit(u, 4, 4));
+            team.filter(u => u && u.synergies.includes('Triplets')).forEach(u => this.growUnit(u, 3, 3));
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
             team.filter(u => u && u.synergies.includes('Starter')).forEach(u => this.growUnit(u, 1, 1));
         }
-        if (this.getSynergyCountForUnit(team[0], 'Snow') >= 2) {
-            const { myTeam, opTeam } = this.getTeams(team[0]);
-            const allUnits = [...myTeam, ...opTeam].filter(u => u !== null && u.stats.hp > 0);
+
+        const hasSnow = (this.playerSynergies.get('Snow') || 0) >= 2 || (this.enemySynergies.get('Snow') || 0) >= 2;
+        if (hasSnow) {
+            const allUnits = [...this.playerTeam, ...this.enemyTeam].filter(u => u !== null && u.stats.hp > 0);
             for (const target of allUnits) {
                 if (target.synergies.includes('Snow')) continue;
                 const dmg = Math.ceil(target.stats.maxHp * 0.33);
@@ -221,12 +227,16 @@ export class HeadlessBattleSimulator {
     }
 
     private buffAttack(unit: Unit, amount: number) {
-        if (amount < 0 && unit.family === 'sneasel') return;
         unit.addBuff(amount);
     }
 
     private getTeams(unit: Unit) {
-        const isPlayer = this.playerTeam.includes(unit);
+        const inPlayer = this.playerTeam.includes(unit);
+        const inEnemy = this.enemyTeam.includes(unit);
+        let isPlayer: boolean;
+        if (inPlayer) isPlayer = true;
+        else if (inEnemy) isPlayer = false;
+        else isPlayer = this.initialPlayerSet.has(unit);
         return {
             myTeam: isPlayer ? this.playerTeam : this.enemyTeam,
             opTeam: isPlayer ? this.enemyTeam : this.playerTeam,
@@ -242,7 +252,7 @@ export class HeadlessBattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && myTeam.includes(unit)) {
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
-                    const healAmount = count >= 4 ? 4 : (count >= 3 ? 3 : (count >= 2 ? 2 : 0));
+                    const healAmount = count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
                     if (healAmount > 0) this.heal(unit, healAmount);
                 }
             });
@@ -253,19 +263,32 @@ export class HeadlessBattleSimulator {
                 if (s?.isSilenced || unit.stats.hp <= 0) return;
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const buff = count >= 4 ? 4 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
+                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (buff > 0) this.growUnit(unit, buff, 0);
+                }
+            });
+        }
+        if (unit.family === 'mudkip') {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (s?.isSilenced || unit.stats.hp <= 0) return;
+                const { myTeam } = this.getTeams(unit);
+                const idx = myTeam.indexOf(unit);
+                if (idx > 0 && myTeam[idx - 1] === e.source) {
+                    const buff = [0, 2, 4, 6][unit.level] || 2;
+                    this.growUnit(unit, buff, buff);
                 }
             });
         }
         if (unit.family === 'torchic') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
-                if (s?.isSilenced) return;
+                if (unit.stats.hp <= 0 || s?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0 && myTeam[idx - 1] === e.source && e.target) {
-                    await this.dealDamage(unit, e.target, 2 * unit.level);
+                    const dmg = [0, 3, 5, 10][unit.level] || 3;
+                    await this.dealDamage(unit, e.target, dmg);
                 }
             });
         }
@@ -275,7 +298,7 @@ export class HeadlessBattleSimulator {
                 if (s?.isSilenced) return;
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
-                    const buff = count >= 4 ? 4 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
+                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (buff > 0) this.buffAttack(unit, buff);
                 }
             });
@@ -284,7 +307,7 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('ON_HURT', (e) => {
                 const s = this.unitStates.get(unit);
                 if (s?.isSilenced) return;
-                if (e.target === unit && this.getSynergyCountForUnit(unit, 'Angry') >= 2) this.buffAttack(unit, 2);
+                if (e.target === unit && this.getSynergyCountForUnit(unit, 'Angry') >= 2) this.buffAttack(unit, 3);
             });
         }
         if (unit.synergies.includes('Cave')) {
@@ -310,7 +333,7 @@ export class HeadlessBattleSimulator {
                 const s = this.unitStates.get(unit) || {};
                 if (e.target === unit && !s.isSilenced) {
                     if (!s.slowpokeHealUsed && unit.stats.hp > 0 && unit.stats.hp < unit.stats.maxHp * 0.5) {
-                        this.heal(unit, [0, 6, 12, 20][unit.level] || 6);
+                        this.heal(unit, [0, 6, 12, 50][unit.level] || 6);
                         s.slowpokeHealUsed = true;
                         this.unitStates.set(unit, s);
                     }
@@ -320,9 +343,20 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    this.growUnit(unit, 2, 0);
+                    const amount = unit.level >= 3 ? 4 : 2;
+                    this.growUnit(unit, amount, 0);
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
-                    if (original) original.addGrowth(2, 0);
+                    if (original) original.addGrowth(amount, 0);
+                }
+            });
+            this.eventBus.on('ON_HURT', async (e) => {
+                if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
+                    const amount = e.context.amount;
+                    if (amount > 0) {
+                        const multiplier = unit.templateId === 'onix' ? 0.5 : 1.0;
+                        const reflectDmg = Math.ceil(amount * multiplier);
+                        await this.dealDamage(unit, e.source, reflectDmg, false);
+                    }
                 }
             });
         }
@@ -331,7 +365,39 @@ export class HeadlessBattleSimulator {
                 const s = this.unitStates.get(unit);
                 if (unit.stats.hp <= 0 || s?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
-                if (e.source && myTeam.includes(e.source) && e.source !== unit) this.growUnit(unit, 2 * unit.level, 0);
+                if (e.context.killer && myTeam.includes(e.context.killer)) {
+                    const amount = [0, 1, 2, 4][unit.level] || 1;
+                    for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
+                        this.growUnit(ally, 0, amount, original);
+                    }
+                }
+            });
+        }
+        if (unit.family === 'quaxly') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
+                const { myTeam } = this.getTeams(unit);
+                if (e.context.killer && myTeam.includes(e.context.killer)) {
+                    const amount = [0, 1, 2, 4][unit.level] || 1;
+                    for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
+                        this.growUnit(ally, amount, 0, original);
+                    }
+                }
+            });
+        }
+        if (unit.family === 'sprigatito') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
+                const { myTeam } = this.getTeams(unit);
+                if (e.context.killer && myTeam.includes(e.context.killer)) {
+                    const amount = [0, 1, 2, 4][unit.level] || 1;
+                    for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
+                        this.growUnit(ally, amount, amount, original);
+                    }
+                }
             });
         }
         if (unit.family === 'bulbasaur' && unit.templateId !== 'sprout') {
@@ -344,9 +410,21 @@ export class HeadlessBattleSimulator {
                     deathIdx = initialTeam.findIndex(u => !u || u.stats.hp <= 0);
                     if (deathIdx === -1) deathIdx = 0;
                 }
-                for (let i = 0; i < unit.level; i++) {
+
+                if (unit.templateId === 'venusaur') {
+                    for (let i = 0; i < 2; i++) {
+                        const { myTeam: currentTeam } = this.getTeams(unit);
+                        await this.spawnUnit(currentTeam, deathIdx + i, 'ivysaur', 1, 4, 4, true);
+                    }
+                } else if (unit.templateId === 'ivysaur') {
                     const { myTeam: currentTeam } = this.getTeams(unit);
-                    await this.spawnUnit(currentTeam, deathIdx + i, 'sprout', 1, 1, 1, true);
+                    await this.spawnUnit(currentTeam, deathIdx, 'bulbasaur', 1, 2, 2, true);
+                } else {
+                    const count = [0, 1, 2, 5][unit.level] || 1;
+                    for (let i = 0; i < count; i++) {
+                        const { myTeam: currentTeam } = this.getTeams(unit);
+                        await this.spawnUnit(currentTeam, deathIdx + i, 'sprout', 1, 1, 1, true);
+                    }
                 }
                 this.compactTeams();
             });
@@ -361,8 +439,10 @@ export class HeadlessBattleSimulator {
                     deathIdx = initialTeam.findIndex(u => !u || u.stats.hp <= 0);
                     if (deathIdx === -1) deathIdx = 0;
                 }
-                const stats = [0, 1, 2, 3][unit.level] || 1;
-                for (let i = 0; i < 2; i++) {
+                const count = unit.level >= 3 ? 5 : 2;
+                const bonus = [0, 0, 1, 2][unit.level];
+                const stats = 1 + bonus;
+                for (let i = 0; i < count; i++) {
                     const { myTeam: currentTeam } = this.getTeams(unit);
                     await this.spawnUnit(currentTeam, deathIdx + i, 'mouse', 1, stats, stats, true);
                 }
@@ -377,7 +457,8 @@ export class HeadlessBattleSimulator {
                 const living = opTeam.filter(u => u && u.stats.hp > 0);
                 if (living.length > 0) {
                     const target = living[Math.floor(Math.random() * living.length)];
-                    await this.dealDamage(unit, target, [0, 2, 5, 99][unit.level] || 2, true);
+                    const dmg = [0, 4, 10, 99][unit.level] || 4;
+                    await this.dealDamage(unit, target, dmg, true);
                 }
             });
         }
@@ -386,7 +467,7 @@ export class HeadlessBattleSimulator {
                 const s = this.unitStates.get(unit);
                 if (s?.isSilenced || e.source !== unit) return;
                 const { opTeam } = this.getTeams(unit);
-                const dmg = [0, 1, 3, 8][unit.level] || 1;
+                const dmg = [0, 2, 5, 15][unit.level] || 2;
                 await Promise.all(opTeam.filter(u => u && u.stats.hp > 0).map(u => this.dealDamage(unit, u!, dmg, true)));
             });
         }
@@ -411,10 +492,10 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'chikorita') {
             this.eventBus.on('ON_FRIEND_SUMMONED', (e) => {
                 const s = this.unitStates.get(unit);
-                if (s?.isSilenced) return;
+                if (unit.stats.hp <= 0 || s?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    const buff = [0, 1, 2, 3][unit.level] || 1;
+                    const buff = [0, 1, 2, 5][unit.level] || 1;
                     this.growUnit(e.source, buff, buff);
                 }
             });
@@ -422,23 +503,12 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'treecko') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 const s = this.unitStates.get(unit);
-                if (s?.isSilenced) return;
+                if (unit.stats.hp <= 0 || s?.isSilenced) return;
                 const { myTeam, opTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    const dmg = [0, 2, 4, 6][unit.level] || 2;
+                    const dmg = [0, 3, 6, 12][unit.level] || 3;
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) await this.dealDamage(unit, living[0], dmg, true);
-                }
-            });
-        }
-        if (unit.family === 'sprigatito') {
-            this.eventBus.on('ON_FRIEND_SUMMONED', (e) => {
-                const s = this.unitStates.get(unit);
-                if (s?.isSilenced) return;
-                const { myTeam } = this.getTeams(unit);
-                if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    const buff = [0, 3, 5, 10][unit.level] || 3;
-                    this.growUnit(unit, buff, buff);
                 }
             });
         }
@@ -448,7 +518,7 @@ export class HeadlessBattleSimulator {
                     const state = this.unitStates.get(unit) || {};
                     if (!state.heracrossTriggered) {
                         state.heracrossTriggered = true;
-                        unit.stats.attack *= 2;
+                        this.buffAttack(unit, unit.stats.attack);
                         this.unitStates.set(unit, state);
                     }
                 }
@@ -534,12 +604,10 @@ export class HeadlessBattleSimulator {
             sourceState.isLethalStrike = false;
             amount = 99;
         }
-        // Diglett: only dodge basic attacks, not skills; Pinsir bypasses
         if (target.family === 'diglett' && !targetState.isSilenced && !isSkillDamage && !isBypassing) {
             if (Math.random() < ([0, 0.25, 0.33, 0.5][target.level] || 0.25)) return;
         }
         if (!isBypassing) {
-            // Squirtle: Flat reduction (1/2/3 based on level)
             if (target.family === 'squirtle' && !targetState.isSilenced) {
                 amount = Math.max(1, amount - target.level);
             }
@@ -548,10 +616,7 @@ export class HeadlessBattleSimulator {
         await this.eventBus.emit({ type: 'BEFORE_HURT', target, context: hurtContext });
         amount = hurtContext.amount;
         if (amount <= 0 && source !== null) return;
-        if (target.family === 'onix' && source && source.stats.hp > 0 && !targetState.isSilenced) {
-            const reflect = Math.floor(amount * 0.5);
-            if (reflect > 0) await this.dealDamage(target, source, reflect);
-        }
+
         if (!isBypassing) {
             if (this.getSynergyCountForUnit(target, 'Slow') >= 2 && target.synergies.includes('Slow')) amount = Math.max(1, Math.ceil(amount * 2 / 3));
         }
@@ -585,30 +650,32 @@ export class HeadlessBattleSimulator {
             if (this.enemyTeam[idx] === unit || (this.enemyTeam[idx] && this.enemyTeam[idx].stats.hp <= 0)) this.enemyTeam[idx] = null as any;
         }
         if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
-            const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
+            const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id) || null;
 
             if (killer.family === 'sneasel') {
-                this.growUnit(killer, 0, 3, original);
+                const buff = killer.level >= 2 ? 2 : 1;
+                this.growUnit(killer, 0, buff, original);
             }
             if (killer.family === 'charmander') {
                 const buff = killer.level;
-                if (Math.random() < 0.5) {
-                    this.growUnit(killer, 0, buff);
-                } else {
-                    this.growUnit(killer, buff, 0);
-                }
+                const canAddAtk = killer.stats.attack < 50;
+                const canAddHp = killer.stats.maxHp < 50;
+                let choice: 'hp' | 'atk';
+                if (canAddAtk && !canAddHp) choice = 'atk';
+                else if (canAddHp && !canAddAtk) choice = 'hp';
+                else choice = Math.random() < 0.5 ? 'atk' : 'hp';
+
+                if (choice === 'atk') this.growUnit(killer, 0, buff);
+                else this.growUnit(killer, buff, 0);
             }
             if (killer.family === 'cyndaquil') {
                 const kState = this.unitStates.get(killer) || {};
-                if ((kState.cyndaquilKills || 0) < killer.level) {
+                if ((kState.cyndaquilKills || 0) < killer.level + 1) {
                     kState.cyndaquilKills = (kState.cyndaquilKills || 0) + 1;
                     this.unitStates.set(killer, kState);
-                    this.growUnit(killer, 3, 2);
+                    const amt = killer.level >= 3 ? 4 : 2;
+                    this.growUnit(killer, amt, amt);
                 }
-            }
-            if (killer.family === 'quaxly') {
-                const buff = [0, 3, 5, 10][killer.level] || 3;
-                this.growUnit(killer, 0, buff);
             }
         }
         this.compactTeams();
@@ -640,13 +707,18 @@ export class HeadlessBattleSimulator {
     private async spawnUnit(team: Unit[], index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false) {
         const template = UNIT_TEMPLATES[templateId];
         if (!template) return;
-        if (team.filter(u => u && u.stats.hp > 0).length >= 5) return;
+
         const newUnit = new Unit(template);
         newUnit.level = level;
-        newUnit.stats.hp = hp;
-        newUnit.stats.maxHp = hp;
-        newUnit.stats.attack = attack;
+        const safeHp = Math.max(1, hp);
+        const safeAtk = Math.max(1, attack);
+        newUnit.stats.hp = safeHp;
+        newUnit.stats.maxHp = safeHp;
+        newUnit.stats.attack = safeAtk;
+        newUnit.capStats();
         newUnit.family = template.family || template.id;
+        newUnit.synergies = [...template.synergies];
+
         if (insert) {
             if (team[index] === null || (team[index] && team[index].stats.hp <= 0)) team[index] = newUnit;
             else {

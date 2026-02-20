@@ -56,7 +56,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
             {/* Silence Visual Overlay */}
             {silenced && (
                 <>
-                    <div className="silence-lock-badge" title="技能已被封印"> 🈲 </div>
+                    <div className="silence-lock-badge" title="招式已被封印"> 🈲 </div>
                     <div className="silence-overlay" />
                 </>
             )}
