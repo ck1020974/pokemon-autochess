@@ -651,8 +651,8 @@ export class BattleSimulator {
                     } else {
                         // Bulbasaur (1/2/3 star) -> Original Sprout Logic
                         const count = [0, 1, 2, 5][unit.level] || 1;
-                        const bonus = [0, 0, 1, 2][unit.level];
-                        const seedStats = 1 + bonus;
+                        // Description says "1/1 Sprouts" regardless of Bulbasaur level
+                        const seedStats = 1;
                         await this.notifySkill(unit, `召喚了 ${count} 隻小種子`);
                         await this.delay(200);
                         for (let i = 0; i < count; i++) {
@@ -1030,7 +1030,17 @@ export class BattleSimulator {
             // Charmander family: Stats on kill (Temporary)
             if (killer.family === 'charmander') {
                 if (killer.level >= 3) {
-                    this.growUnit(killer, 3, 3, '噴火龍技能');
+                    const canAddAtk = killer.stats.attack < 50;
+                    const canAddHp = killer.stats.maxHp < 50;
+                    const buff = 5;
+
+                    let choice: 'hp' | 'atk';
+                    if (canAddAtk && !canAddHp) choice = 'atk';
+                    else if (canAddHp && !canAddAtk) choice = 'hp';
+                    else choice = Math.random() < 0.5 ? 'atk' : 'hp';
+
+                    if (choice === 'atk') this.growUnit(killer, 0, buff, '噴火龍技能');
+                    else this.growUnit(killer, buff, 0, '噴火龍技能');
                 } else {
                     const buff = killer.level;
                     const canAddAtk = killer.stats.attack < 50;
