@@ -210,7 +210,7 @@ export class BattleSimulator {
                     for (const e of livingEnemies) {
                         if (e.stats.hp < target.stats.hp) target = e;
                     }
-                    await this.notifySkill(unit, `對 ${target.name} 發射了噴射火焰`);
+                    await this.notifySkill(unit, `對 ${target.name} 發動了噴射火焰`);
                     await this.dealDamage(unit, target, 4, true);
                     // Wait for death effects/compaction to settle before next fire breath
                     await this.delay(50);
@@ -250,7 +250,7 @@ export class BattleSimulator {
                 const animPromise = this.playAnimation(unit, 'morph', 500);
 
                 // 2. Log skill first so it uses original name
-                this.log(`${originalName}(${unit.level}) 對目標使用了變身！`);
+                this.log(`${originalName}(${unit.level}) 對 ${target.name} 使用了變身！`);
 
                 // 3. Wait for the peak of the blur (250ms)
                 await this.delay(250);
@@ -583,11 +583,13 @@ export class BattleSimulator {
                     const amount = unit.level >= 3 ? 4 : 2;
                     if (!this.isCompacting) {
                         await this.notifySkill(unit, `發動了鐵壁！`);
+                        const { myTeam } = this.getTeams(unit);
+                        await this.playTeamAnimation(myTeam, 'glow-pale-green', 600);
                     } else {
                         // Silent log during compaction to avoid flood
                         this.log(`${unit.name} 發動了鐵壁！`);
                     }
-                    this.growUnit(unit, amount, 0, '大岩蛇技能');
+                    this.growUnit(unit, amount, 0); // Removed sourceName to prevent redundant HP log
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                     if (original) original.addGrowth(amount, 0);
                 }
@@ -614,8 +616,8 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
                     const amount = [0, 1, 2, 4][unit.level] || 1;
-                    await this.notifySkill(unit, `呆火鱷發動了閃焰高歌！`);
-                    await this.playAnimation(unit, 'jump', 300);
+                    await this.notifySkill(unit, `發動了閃焰高歌！`);
+                    await this.playTeamAnimation(myTeam, 'glow-pale-red', 1000);
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
                         this.growUnit(ally, 0, amount, '呆火鱷技能強化', original);
@@ -631,8 +633,8 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
                     const amount = [0, 1, 2, 4][unit.level] || 1;
-                    await this.notifySkill(unit, `潤水鴨發動了流水旋舞！`);
-                    await this.playAnimation(unit, 'jump', 300);
+                    await this.notifySkill(unit, `發動了流水旋舞！`);
+                    await this.playTeamAnimation(myTeam, 'glow-pale-blue', 1000);
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
                         this.growUnit(ally, amount, 0, '潤水鴨技能強化', original);
@@ -803,7 +805,7 @@ export class BattleSimulator {
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[0];
-                        await this.notifySkill(unit, `對目標使用了種子機關槍！`);
+                        await this.notifySkill(unit, `對 ${target.name} 使用了種子機關槍！`);
                         await this.playAnimation(unit, 'jump', 300);
                         await this.delay(250);
                         await this.dealDamage(unit, target, dmg, true);
@@ -819,8 +821,8 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
                     const amount = [0, 1, 2, 4][unit.level] || 1;
-                    await this.notifySkill(unit, `新葉喵發動了千變萬花！`);
-                    await this.playAnimation(unit, 'jump', 300);
+                    await this.notifySkill(unit, `發動了千變萬花！`);
+                    await this.playTeamAnimation(myTeam, 'glow-pale-green', 1000);
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const isAtk = Math.random() < 0.5;
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
@@ -850,7 +852,7 @@ export class BattleSimulator {
             await Promise.all(attackPromises); // Wait for the first hit and any triggers
             // Re-check survival after the first hit and its consequences (like reflect)
             if (defender.stats.hp > 0 && attacker.stats.hp > 0) {
-                await this.notifySkill(attacker, `袋獸對目標發動了親子愛！`);
+                await this.notifySkill(attacker, `對 ${defender.name} 發動了親子愛！`);
                 const secondHit = this.dealDamage(attacker, defender, attacker.stats.attack, false);
                 attackPromises.push(secondHit);
             }
@@ -861,7 +863,7 @@ export class BattleSimulator {
             const chance = [0, 0.25, 0.33, 0.5][attacker.level] || 0.25;
             if (Math.random() < chance) {
                 // User Request: Should hit the same target
-                this.log(`${attacker.name} 對目標發動了二連擊！`);
+                this.log(`${attacker.name} 對 ${defender.name} 發動了二連擊！`);
                 attackPromises.push(this.dealDamage(attacker, defender, dmg));
             }
         }
@@ -879,7 +881,7 @@ export class BattleSimulator {
                 // Shuffle and pick
                 const finalTargets = [...potentialTargets].sort(() => 0.5 - Math.random()).slice(0, targetCount);
                 for (const r of finalTargets) {
-                    this.log(`${attacker.name} 狃拉對敵方目標發動了暗襲要害！`);
+                    this.log(`${attacker.name} 對 ${r.name} 發動了暗襲要害！`);
                     attackPromises.push(this.dealDamage(attacker, r, dmg));
                 }
             }
@@ -894,7 +896,7 @@ export class BattleSimulator {
                 const neighbor = opTeam[idx + 1];
                 if (neighbor && neighbor.stats.hp > 0) {
                     const splashDmg = [0, 2, 4, 8][attacker.level] || 2;
-                    await this.notifySkill(attacker, `小巨鱷對受傷目標使用了咬住！`);
+                    await this.notifySkill(attacker, `對 ${neighbor.name} 使用了咬住！`);
                     attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
                 }
             }
@@ -914,7 +916,7 @@ export class BattleSimulator {
                     if (behind) {
                         team[idx] = behind;
                         team[idx + 1] = defender;
-                        await this.notifySkill(attacker, `對敵方使用了木槌！`);
+                        await this.notifySkill(attacker, `對 ${defender.name} 使用了木槌！`);
                         await this.compactTeams();
                         await this.delay(300);
                         await this.eventBus.emit({ type: 'ON_MOVE', source: defender, context: {} });
@@ -1016,7 +1018,7 @@ export class BattleSimulator {
 
         // Sableye: Revenge kill
         if (unit.family === 'sableye' && killer && killer.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-            this.log(`${unit.name} 對目標使用了同命！`);
+            this.log(`${unit.name} 對 ${killer.name} 使用了同命！`);
             const state = this.unitStates.get(unit) || {};
             state.isAbsoluteKill = true;
             this.unitStates.set(unit, state);
@@ -1246,6 +1248,37 @@ export class BattleSimulator {
     private log(message: string) {
         this.logs.push({ message, turn: this.turnCount });
         if (this.onUpdate) this.onUpdate();
+    }
+
+    private async playTeamAnimation(units: (Unit | null)[], anim: string, duration: number) {
+        const aliveUnits = units.filter(u => u && u.stats.hp > 0) as Unit[];
+        if (aliveUnits.length === 0) return;
+
+        // Ensure DOM update before seeking elements
+        if (this.onUpdate) this.onUpdate();
+
+        return new Promise<void>(resolve => {
+            requestAnimationFrame(async () => {
+                const className = `${anim}-anim`; // anim might be a full class like 'glow-pale-red'
+                // Use the animation name directly if no '-anim' suffix is needed, but playAnimation uses suffix
+                // Let's allow raw class names for more flexibility
+                const finalClass = anim.includes('-') ? anim : className;
+
+                const elements: HTMLElement[] = [];
+                aliveUnits.forEach(u => {
+                    const el = document.getElementById(u.id);
+                    if (el) {
+                        el.classList.add(finalClass);
+                        elements.push(el);
+                    }
+                });
+
+                await this.delay(duration);
+
+                elements.forEach(el => el.classList.remove(finalClass));
+                resolve();
+            });
+        });
     }
 
     private async playAnimation(unit: Unit, anim: string, duration: number) {
