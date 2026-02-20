@@ -226,7 +226,7 @@ export class HeadlessBattleSimulator {
         }
     }
 
-    private buffAttack(unit: Unit, amount: number, silent: boolean = false) {
+    private buffAttack(unit: Unit, amount: number, _silent: boolean = false) {
         unit.addBuff(amount);
     }
 
