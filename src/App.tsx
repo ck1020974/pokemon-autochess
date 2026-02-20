@@ -335,6 +335,16 @@ function App() {
             const shopTier = game.shop.getTier(game.turn);
             const allTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= shopTier);
 
+            // Helper to bias enemy generation towards higher tiers in mid/late game
+            const getRandomEnemyTemplate = (templates: typeof allTemplates) => {
+                if (game.turn >= 8 && Math.random() < 0.6) {
+                    const maxTier = Math.max(...templates.map(t => t.tier));
+                    const highTierPool = templates.filter(t => t.tier >= maxTier - 1);
+                    if (highTierPool.length > 0) return highTierPool[Math.floor(Math.random() * highTierPool.length)];
+                }
+                return templates[Math.floor(Math.random() * templates.length)];
+            };
+
             // 2. Progression Settings (Star Count & Level)
             let enemyBaseLevel = 1;
             let forcedStarCount = 0; // How many units are forced to 3-Star
@@ -588,81 +598,6 @@ function App() {
                         candidateUnits.push(u);
                     }
 
-                    // 3. Apply Forced Stars & Scaling
-                    candidateUnits.forEach((u, i) => {
-                        if (i < forcedStarCount) {
-                            while (u.evolveId && u.level < 3) {
-                                const nextT = UNIT_TEMPLATES[u.evolveId];
-                                if (nextT) {
-                                    Object.assign(u, {
-                                        templateId: nextT.id, name: nextT.name, description: nextT.description,
-                                        imageUrl: nextT.battleImageUrl || nextT.imageUrl,
-                                        battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
-                                        synergies: nextT.synergies || [], tier: nextT.tier
-                                    });
-                                    u.level++;
-                                } else break;
-                            }
-                            u.level = 3;
-                        } else if (i < forcedTwoStarCount && u.level < 2) {
-                            if (u.evolveId) {
-                                const nextT = UNIT_TEMPLATES[u.evolveId];
-                                if (nextT) {
-                                    Object.assign(u, {
-                                        templateId: nextT.id, name: nextT.name, description: nextT.description,
-                                        imageUrl: nextT.battleImageUrl || nextT.imageUrl,
-                                        battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
-                                        synergies: nextT.synergies || [], tier: nextT.tier
-                                    });
-                                    u.level++;
-                                }
-                            }
-                            u.level = 2;
-                        }
-
-                        const baseT = UNIT_TEMPLATES[u.family || u.templateId];
-                        const baseStats = baseT.baseStats;
-                        if (u.level === 2) {
-                            const bHp = baseStats.maxHp + 1; const bAtk = baseStats.attack + 1;
-                            u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
-                        } else if (u.level === 3) {
-                            const bHp = baseStats.maxHp * 2 + 6; const bAtk = baseStats.attack * 2 + 6;
-                            u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
-                        }
-
-                        // Scaling
-                        const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
-                        if (game.difficultyScore >= turnScalingStart) {
-                            let scaleFactor = 0.6;
-                            if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.3;
-                            const turnScale = Math.floor(game.difficultyScore * scaleFactor);
-                            u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
-                            if (game.wins >= 8) {
-                                const eIdx = game.wins - 7;
-                                let eBHp = eIdx * 2;
-                                let eBAtk = eIdx * 1;
-
-                                // Nerf for high tier units: T5 (1/3), T4 (1/2)
-                                if (u.tier === 5) {
-                                    eBHp = Math.ceil(eBHp / 3);
-                                    eBAtk = Math.ceil(eBAtk / 3);
-                                } else if (u.tier === 4) {
-                                    eBHp = Math.ceil(eBHp / 2);
-                                    eBAtk = Math.ceil(eBAtk / 2);
-                                }
-
-                                u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
-                            }
-                            if (game.wins >= 12) {
-                                let wB = 10; let wA = 5;
-                                if (u.tier === 5) { wB = 3; wA = 2; }
-                                else if (u.tier === 4) { wB = 5; wA = 3; }
-                                u.stats.hp += wB; u.stats.maxHp += wB; u.stats.attack += wA;
-                            }
-                        }
-                        if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
-                    });
-
                     // 4. Position Sort
                     const sorted = sortTeamByPositions(candidateUnits);
                     if (sorted) { enemyTeam = sorted; break; }
@@ -692,7 +627,7 @@ function App() {
                             }
                         }
                         if (pool.length === 0) pool = allTemplates;
-                        let t = pool[Math.floor(Math.random() * pool.length)];
+                        let t = getRandomEnemyTemplate(pool);
                         usedTemplateIds.add(t.family || t.id);
 
                         let tempLevel = 1;
@@ -703,72 +638,6 @@ function App() {
                         const u = new Unit(t);
                         u.level = enemyBaseLevel;
 
-                        if (i < forcedStarCount) {
-                            while (u.evolveId && u.level < 3) {
-                                const nextT = UNIT_TEMPLATES[u.evolveId];
-                                if (nextT) {
-                                    Object.assign(u, {
-                                        templateId: nextT.id, name: nextT.name, description: nextT.description,
-                                        imageUrl: nextT.battleImageUrl || nextT.imageUrl,
-                                        battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
-                                        synergies: nextT.synergies || [], tier: nextT.tier
-                                    });
-                                    u.level++;
-                                } else break;
-                            }
-                            u.level = 3;
-                        } else if (i < forcedTwoStarCount && u.level < 2) {
-                            if (u.evolveId) {
-                                const nextT = UNIT_TEMPLATES[u.evolveId];
-                                if (nextT) {
-                                    Object.assign(u, {
-                                        templateId: nextT.id, name: nextT.name, description: nextT.description,
-                                        imageUrl: nextT.battleImageUrl || nextT.imageUrl,
-                                        battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
-                                        synergies: nextT.synergies || [], tier: nextT.tier
-                                    });
-                                    u.level++;
-                                }
-                            }
-                            u.level = 2;
-                        }
-
-                        const baseStats = UNIT_TEMPLATES[u.family || u.id].baseStats;
-                        if (u.level === 2) {
-                            const bHp = baseStats.maxHp + 1; const bAtk = baseStats.attack + 1;
-                            u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
-                        } else if (u.level === 3) {
-                            const bHp = baseStats.maxHp * 2 + 6; const bAtk = baseStats.attack * 2 + 6;
-                            u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
-                        }
-
-                        const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
-                        if (game.difficultyScore >= turnScalingStart) {
-                            let scaleFactor = 0.6;
-                            if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.3;
-                            const turnScale = Math.floor(game.difficultyScore * scaleFactor);
-                            u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
-                            if (game.wins >= 8) {
-                                const eIdx = game.wins - 7;
-                                let eBHp = eIdx * 2;
-                                let eBAtk = eIdx * 1;
-                                if (u.tier === 5) {
-                                    eBHp = Math.ceil(eBHp / 3);
-                                    eBAtk = Math.ceil(eBAtk / 3);
-                                } else if (u.tier === 4) {
-                                    eBHp = Math.ceil(eBHp / 2);
-                                    eBAtk = Math.ceil(eBAtk / 2);
-                                }
-                                u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
-                            }
-                            if (game.wins >= 12) {
-                                let wB = 10; let wA = 5;
-                                if (u.tier === 5) { wB = 3; wA = 2; }
-                                else if (u.tier === 4) { wB = 5; wA = 3; }
-                                u.stats.hp += wB; u.stats.maxHp += wB; u.stats.attack += wA;
-                            }
-                        }
-                        if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
                         candidateUnits.push(u);
                     }
                     // 4. Position Sort
@@ -781,13 +650,94 @@ function App() {
                 // Final fallback: just generate randomly if sorting keeps failing
                 attempts = 0; // Reset for actual one-shot generation
                 for (let i = 0; i < enemyCount; i++) {
-                    const template = allTemplates[Math.floor(Math.random() * allTemplates.length)];
-                    const unit = new Unit(template);
-                    if (unit.battleImageUrl) unit.imageUrl = unit.battleImageUrl;
+                    let tempT = getRandomEnemyTemplate(allTemplates);
+                    let tempLevel = 1;
+                    while (tempLevel < enemyBaseLevel && tempT.evolveId) {
+                        const nextT = UNIT_TEMPLATES[tempT.evolveId];
+                        if (nextT) { tempT = nextT; tempLevel++; } else break;
+                    }
+                    const unit = new Unit(tempT);
+                    unit.level = enemyBaseLevel;
                     enemyTeam.push(unit);
                 }
                 while (enemyTeam.length < 5) enemyTeam.push(null);
             }
+
+            // --- 5. Unified Enemy Scaling & Image Setup ---
+            enemyTeam.forEach((u, i) => {
+                if (!u) return;
+
+                // A. Apply forced stars (upgrades)
+                if (i < forcedStarCount && u.level < 3) {
+                    while (u.evolveId && u.level < 3) {
+                        const nextT = UNIT_TEMPLATES[u.evolveId];
+                        if (nextT) {
+                            Object.assign(u, {
+                                templateId: nextT.id, name: nextT.name, description: nextT.description,
+                                imageUrl: nextT.battleImageUrl || nextT.imageUrl,
+                                battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
+                                synergies: nextT.synergies || [], tier: nextT.tier
+                            });
+                            u.level++;
+                        } else break;
+                    }
+                    if (u.level < 3) u.level = 3;
+                } else if (i < forcedTwoStarCount && u.level < 2) {
+                    if (u.evolveId && u.level < 2) {
+                        const nextT = UNIT_TEMPLATES[u.evolveId];
+                        if (nextT) {
+                            Object.assign(u, {
+                                templateId: nextT.id, name: nextT.name, description: nextT.description,
+                                imageUrl: nextT.battleImageUrl || nextT.imageUrl,
+                                battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
+                                synergies: nextT.synergies || [], tier: nextT.tier
+                            });
+                            u.level++;
+                        }
+                    }
+                    if (u.level < 2) u.level = 2;
+                }
+
+                // Initial Base level might be forcefully bumped without template change if no evolution
+                if (u.level === 1 && enemyBaseLevel > 1) {
+                    u.level = enemyBaseLevel;
+                }
+
+                // B. Base stat bonus for level 2 and 3
+                const baseStats = UNIT_TEMPLATES[u.family || u.templateId]?.baseStats || u.stats;
+                if (u.level === 2) {
+                    const bHp = baseStats.maxHp + 1; const bAtk = baseStats.attack + 1;
+                    u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
+                } else if (u.level >= 3) {
+                    const bHp = baseStats.maxHp * 2 + 6; const bAtk = baseStats.attack * 2 + 6;
+                    u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
+                }
+
+                // C. Turn-Based Difficulty & Stat Inflation
+                const turnScalingStart = difficulty === 'MASTER' ? 3 : 5;
+                if (game.difficultyScore >= turnScalingStart) {
+                    let scaleFactor = 0.6;
+                    if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.3;
+                    const turnScale = Math.floor(game.difficultyScore * scaleFactor);
+                    u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
+
+                    if (game.wins >= 8) {
+                        const eIdx = game.wins - 7;
+                        let eBHp = eIdx * 2; let eBAtk = eIdx * 1;
+                        // Nerf for high tier units to avoid oppressive stats
+                        if (u.tier === 5) { eBHp = Math.ceil(eBHp / 3); eBAtk = Math.ceil(eBAtk / 3); }
+                        else if (u.tier === 4) { eBHp = Math.ceil(eBHp / 2); eBAtk = Math.ceil(eBAtk / 2); }
+                        u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
+                    }
+                    if (game.wins >= 12) {
+                        let wB = 10; let wA = 5;
+                        if (u.tier === 5) { wB = 3; wA = 2; } else if (u.tier === 4) { wB = 5; wA = 3; }
+                        u.stats.hp += wB; u.stats.maxHp += wB; u.stats.attack += wA;
+                    }
+                }
+
+                if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
+            });
 
             // Save initial state for UI Synergy (Before simulator modifies/removes dead units)
             setInitialEnemyTeam([...enemyTeam]);
