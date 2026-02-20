@@ -602,7 +602,7 @@ export class BattleSimulator {
                     if (amount > 0) {
                         const multiplier = unit.templateId === 'onix' ? 0.5 : 1.0;
                         const reflectDmg = Math.ceil(amount * multiplier);
-                        this.log(`${unit.name} 發動了雙倍奉還！`);
+                        this.log(`${unit.name} 反彈了 ${reflectDmg} 點傷害！`);
                         await this.dealDamage(unit, e.source, reflectDmg, false); // Use false to silence redundant amount log
                     }
                 }
@@ -786,7 +786,7 @@ export class BattleSimulator {
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
                 if (e.source && mySide === sSide && e.source !== unit) {
                     const buff = [0, 1, 2, 5][unit.level] || 1;
-                    await this.notifySkill(unit, `菊草葉對妙蛙種子發動了甜甜香氣！`);
+                    await this.notifySkill(unit, `對 ${e.source.name} 發動了甜甜香氣！`);
                     await this.playAnimation(unit, 'jump', 300);
                     this.growUnit(e.source, buff, buff);
                 }
@@ -1018,7 +1018,7 @@ export class BattleSimulator {
 
         // Sableye: Revenge kill
         if (unit.family === 'sableye' && killer && killer.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-            this.log(`${unit.name} 對 ${killer.name} 使用了同命！`);
+            this.log(`${unit.name} 對 ${killer.name} 發動了同命！`);
             const state = this.unitStates.get(unit) || {};
             state.isAbsoluteKill = true;
             this.unitStates.set(unit, state);
@@ -1071,8 +1071,9 @@ export class BattleSimulator {
                         else if (canAddHp && !canAddAtk) choice = 'hp';
                         else choice = Math.random() < 0.5 ? 'atk' : 'hp';
 
-                        if (choice === 'atk') this.growUnit(killer, 0, buff, '小火龍發動了蓄能焰襲！');
-                        else this.growUnit(killer, buff, 0, '小火龍發動了蓄能焰襲！');
+                        this.log(`${killer.name} 發動了蓄能焰襲！`);
+                        if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲強化');
+                        else this.growUnit(killer, buff, 0, '蓄能焰襲強化');
                     } else {
                         const buff = killer.level;
                         const canAddAtk = killer.stats.attack < 50;
@@ -1087,8 +1088,9 @@ export class BattleSimulator {
                             choice = Math.random() < 0.5 ? 'atk' : 'hp';
                         }
 
-                        if (choice === 'atk') this.growUnit(killer, 0, buff, '小火龍發動了蓄能焰襲！');
-                        else this.growUnit(killer, buff, 0, '小火龍發動了蓄能焰襲！');
+                        this.log(`${killer.name} 發動了蓄能焰襲！`);
+                        if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲強化');
+                        else this.growUnit(killer, buff, 0, '蓄能焰襲強化');
                     }
                 }
 
