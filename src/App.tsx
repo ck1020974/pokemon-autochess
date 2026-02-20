@@ -150,11 +150,10 @@ function getSynergyStatus(team: (Unit | null)[]) {
         const count = synergyContributors[syn.id] ? synergyContributors[syn.id].size : 0;
         const isActive = count >= syn.tiers[0];
 
-        // Find units belonging to this synergy
-        const units = Object.values(UNIT_TEMPLATES).filter(t => t.synergies?.includes(syn.id) && !t.isHiddenFromShop && t.id !== 'sprout');
-        // Note: Filtered out hidden/evolved/sprout to show "Base Collectible Units"? 
-        // User said: "Show small 00 icons (let player know what units exist)".
-        // Showing *all* collectible base units seems best.
+        // Find units belonging to this synergy and sort them by tier
+        const units = Object.values(UNIT_TEMPLATES)
+            .filter(t => t.synergies?.includes(syn.id) && !t.isHiddenFromShop && t.id !== 'sprout')
+            .sort((a, b) => a.tier - b.tier);
 
         return {
             ...syn,
@@ -661,7 +660,16 @@ function App() {
         game.shop.toggleFreeze(index);
         update();
     };
-    const handleStartBattle = () => { setSelected(null); setBattleResult(null); game.startBattlePhase(); update(); };
+    const handleStartBattle = () => {
+        if (game.gold > 0) {
+            const confirmed = window.confirm(`您還有 ${game.gold} 金幣尚未花完，確定進入對戰？`);
+            if (!confirmed) return;
+        }
+        setSelected(null);
+        setBattleResult(null);
+        game.startBattlePhase();
+        update();
+    };
 
     const handleBattleResultClick = () => {
         if (battleResult) {

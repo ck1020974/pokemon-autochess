@@ -335,19 +335,19 @@ h3 {
 
 /* Mergeable Unit Glow Effect - Targeted to image, restricted logic to shop */
 .shop-slots .unit-card.is-mergeable .unit-image {
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
-  animation: merge-glow-gentle 2.5s infinite ease-in-out;
+  filter: drop-shadow(0 0 12px rgba(255, 230, 100, 0.7));
+  animation: merge-glow-gentle 2s infinite ease-in-out;
 }
 
 @keyframes merge-glow-gentle {
 
   0%,
   100% {
-    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
+    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4)) brightness(1);
   }
 
   50% {
-    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+    filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.8)) brightness(1.2);
   }
 }
 
@@ -364,9 +364,9 @@ h3 {
   }
 
   30% {
-    transform: scale(1.15);
-    filter: brightness(2.5);
-    box-shadow: 0 0 40px white;
+    transform: scale(1.25);
+    filter: brightness(3) contrast(1.2);
+    box-shadow: 0 0 60px rgba(255, 255, 255, 0.8);
   }
 
   100% {
