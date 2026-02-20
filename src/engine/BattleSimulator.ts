@@ -652,7 +652,7 @@ export class BattleSimulator {
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = [0, 2, 4, 8][unit.level] || 2;
+                    const amount = [0, 2, 3, 4][unit.level] || 2;
                     if (!this.isCompacting) {
                         await this.notifySkill(unit, `發動了鐵壁！`);
                         this.playTeamAnimation([unit], 'glow-pale-blue', 600);
@@ -671,8 +671,7 @@ export class BattleSimulator {
                 if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     const amount = e.context.amount;
                     if (amount > 0) {
-                        const multiplier = unit.templateId === 'onix' ? 0.5 : 1.0;
-                        const reflectDmg = Math.ceil(amount * multiplier);
+                        const reflectDmg = Math.ceil(amount * 1.0);
                         this.log(`${unit.name} 反彈了 ${reflectDmg} 點傷害！`);
                         await this.dealDamage(unit, e.source, reflectDmg, false); // Use false to silence redundant amount log
                     }
@@ -1166,7 +1165,10 @@ export class BattleSimulator {
                 amount = Math.max(1, Math.ceil(amount * 2 / 3));
             }
             // Squirtle: Flat reduction
-            if (target.family === 'squirtle' && amount > 0) amount = Math.max(1, amount - target.level);
+            if (target.family === 'squirtle' && amount > 0) {
+                amount = Math.max(1, amount - target.level);
+                this.log(`${target.name} 發動了縮殼！`);
+            }
         } else if (source) {
             if (source.family === 'pinsir') {
                 this.log(`${source.name} 發動了破格！`);
