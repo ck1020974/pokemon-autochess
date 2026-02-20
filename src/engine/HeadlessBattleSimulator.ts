@@ -361,10 +361,11 @@ export class HeadlessBattleSimulator {
             });
         }
         if (unit.family === 'fuecoco') {
-            this.eventBus.on('AFTER_DEATH', (e) => {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
                 const s = this.unitStates.get(unit);
-                if (unit.stats.hp <= 0 || s?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
+                // Ensure unit is still alive and in the team array (not replaced by null)
+                if (unit.stats.hp <= 0 || s?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
                     const amount = [0, 1, 2, 4][unit.level] || 1;
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
@@ -376,8 +377,9 @@ export class HeadlessBattleSimulator {
         }
         if (unit.family === 'quaxly') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
-                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
+                // Ensure unit is still alive and in the team array
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
                     const amount = [0, 1, 2, 4][unit.level] || 1;
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
@@ -389,8 +391,9 @@ export class HeadlessBattleSimulator {
         }
         if (unit.family === 'sprigatito') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
-                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
+                // Ensure unit is still alive and in the team array
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
                     const amount = [0, 1, 2, 4][unit.level] || 1;
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
@@ -466,10 +469,15 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'drifloon') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const s = this.unitStates.get(unit);
-                if (s?.isSilenced || e.source !== unit) return;
-                const { opTeam } = this.getTeams(unit);
-                const dmg = [0, 2, 5, 15][unit.level] || 2;
-                await Promise.all(opTeam.filter(u => u && u.stats.hp > 0).map(u => this.dealDamage(unit, u!, dmg, true)));
+                if (e.source === unit) {
+                    const { myTeam, opTeam } = this.getTeams(unit);
+                    const dmg = [0, 2, 5, 15][unit.level] || 2;
+                    // Affect EVERYONE else (myTeam and opTeam)
+                    const allTargets = [...myTeam, ...opTeam].filter(u => u && u !== unit && u.stats.hp > 0);
+                    for (const target of allTargets) {
+                        this.dealDamage(unit, target!, dmg);
+                    }
+                }
             });
         }
         if (unit.family === 'mimikyu') {
