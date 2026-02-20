@@ -1298,7 +1298,6 @@ export class BattleSimulator {
                     el.classList.add(className);
                     await this.delay(duration);
                     el.classList.remove(className);
-                    el.classList.remove(className);
                 }
                 resolve();
             });

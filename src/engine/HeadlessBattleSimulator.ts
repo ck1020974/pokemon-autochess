@@ -469,14 +469,13 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'drifloon') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const s = this.unitStates.get(unit);
-                if (e.source === unit) {
-                    const { myTeam, opTeam } = this.getTeams(unit);
-                    const dmg = [0, 2, 5, 15][unit.level] || 2;
-                    // Affect EVERYONE else (myTeam and opTeam)
-                    const allTargets = [...myTeam, ...opTeam].filter(u => u && u !== unit && u.stats.hp > 0);
-                    for (const target of allTargets) {
-                        this.dealDamage(unit, target!, dmg);
-                    }
+                if (s?.isSilenced || e.source !== unit) return;
+                const { myTeam, opTeam } = this.getTeams(unit);
+                const dmg = [0, 2, 5, 15][unit.level] || 2;
+                // Affect EVERYONE else (myTeam and opTeam)
+                const allTargets = [...myTeam, ...opTeam].filter(u => u && u !== unit && u.stats.hp > 0);
+                for (const target of allTargets) {
+                    await this.dealDamage(unit, target!, dmg, true);
                 }
             });
         }
