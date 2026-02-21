@@ -110,19 +110,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'cyndaquil', name: '火球鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火球鼠00.webp', battleImageUrl: 'assets/火球鼠01.webp',
-        description: '擊殺後 +2 攻擊 與 +2 生命 (每場 2 次)。', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
+        description: '攻擊前 +2 攻擊 與 +2 生命 (每場 2 次)。', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
     },
     quilava: {
         id: 'quilava', name: '火岩鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火岩鼠00.webp', battleImageUrl: 'assets/火岩鼠01.webp',
-        description: '擊殺後 +2 攻擊 與 +2 生命 (每場 3 次)。', synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
+        description: '攻擊前 +2 攻擊 與 +2 生命 (每場 3 次)。', synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
     },
     typhlosion: {
         id: 'typhlosion', name: '火爆獸', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火爆獸00.webp', battleImageUrl: 'assets/火爆獸01.webp',
-        description: '擊殺後 +4 攻擊 與 +4 生命 (每場 4 次)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '攻擊前 +4 攻擊 與 +4 生命 (每場 4 次)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 7. Totodile

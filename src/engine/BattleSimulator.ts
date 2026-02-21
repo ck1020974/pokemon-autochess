@@ -41,10 +41,10 @@ export class BattleSimulator {
         this.enemyTeam = enemyTeam.map(u => {
             if (!u) return null;
             const clone = this.cloneUnit(u);
-            // Apply Difficulty Scaling to Enemy (Ensure floor is 1)
-            clone.stats.hp = Math.max(1, Math.floor(clone.stats.hp * difficultyMultiplier));
-            clone.stats.maxHp = Math.max(1, Math.floor(clone.stats.maxHp * difficultyMultiplier));
-            clone.stats.attack = Math.max(1, Math.floor(clone.stats.attack * difficultyMultiplier));
+            // Apply Difficulty Scaling to Enemy (Ensure it doesn't drop below current values)
+            clone.stats.hp = Math.max(clone.stats.hp, Math.floor(clone.stats.hp * difficultyMultiplier));
+            clone.stats.maxHp = Math.max(clone.stats.maxHp, Math.floor(clone.stats.maxHp * difficultyMultiplier));
+            clone.stats.attack = Math.max(clone.stats.attack, Math.floor(clone.stats.attack * difficultyMultiplier));
             // Feature: Global Stat Cap 50/50
             clone.capStats();
             return clone;
@@ -493,11 +493,22 @@ export class BattleSimulator {
                 }
             });
         }
-        // Cyndaquil: After attack -> splash neighbor
+        // Cyndaquil: Before attack -> Growth & Splash neighbor
         if (unit.family === 'cyndaquil') {
-            this.eventBus.on('AFTER_ATTACK', async (e) => {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    await this.notifySkill(unit, '發動了火焰輪');
+                    const kState = this.unitStates.get(unit) || {};
+                    const maxTimes = unit.level + 1;
+                    const used = kState.cyndaquilKills || 0;
+                    if (used < maxTimes) {
+                        kState.cyndaquilKills = used + 1;
+                        this.unitStates.set(unit, kState);
+                        const amt = unit.level >= 3 ? 4 : 2;
+                        this.growUnit(unit, amt, amt, '發動了噴火！');
+                        await this.notifySkill(unit, '發動了噴火！');
+                        await this.playAnimation(unit, 'jump', 300);
+                    }
+
                     const splashDmg = [0, 2, 6, 12][unit.level] || 2;
                     const { opTeam } = this.getTeams(unit);
                     const tIdx = e.target ? opTeam.indexOf(e.target) : -1;
@@ -1278,18 +1289,7 @@ export class BattleSimulator {
                     }
                 }
 
-                // Cyndaquil family: Atk and HP on kill (Temporary)
-                if (killer.family === 'cyndaquil') {
-                    const kState = this.unitStates.get(killer) || {};
-                    const maxTimes = killer.level + 1;
-                    const used = kState.cyndaquilKills || 0;
-                    if (used < maxTimes) {
-                        kState.cyndaquilKills = used + 1;
-                        this.unitStates.set(killer, kState);
-                        const amt = killer.level >= 3 ? 4 : 2;
-                        this.growUnit(killer, amt, amt, '發動了火焰輪！');
-                    }
-                }
+                // Reward logic handled by event listeners in registerUnitAbilities
 
                 // Reward logic handled by event listeners in registerUnitAbilities
             };

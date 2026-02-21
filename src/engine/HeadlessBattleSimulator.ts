@@ -25,7 +25,15 @@ export class HeadlessBattleSimulator {
         this.playerWins = playerWins || 0;
         this.originalPlayerTeam = originalPlayerTeam || null;
         this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
-        this.enemyTeam = enemyTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
+        this.enemyTeam = enemyTeam.map(u => {
+            if (!u) return null;
+            // Apply Difficulty Scaling to Enemy (Ensure it doesn't drop below current values if multiplier < 1)
+            // Note: Multiplier is passed through App.tsx -> Simulator. 
+            // Here we don't have the multiplier arg but we have the result of it? 
+            // Wait, Headless usually clones what is ALREADY scaled if it's enemy? 
+            // Actually Headless takes the same args. Let's check Headless constructor.
+            return this.cloneUnit(u);
+        }) as Unit[];
         this.eventBus = new EventBus();
 
         this.playerTeam.forEach(u => { if (u) this.initialPlayerSet.add(u); });
@@ -73,11 +81,14 @@ export class HeadlessBattleSimulator {
     }
 
     private cloneUnit(unit: Unit): Unit {
-        const clone = new Unit(UNIT_TEMPLATES[unit.templateId]);
+        const template = UNIT_TEMPLATES[unit.templateId];
+        const clone = new Unit(template);
         clone.stats = { ...unit.stats };
         clone.level = unit.level;
         clone.synergies = [...unit.synergies];
         clone.family = unit.family;
+        // Cap stats like in main simulator
+        clone.capStats();
         this.unitStates.set(clone, {});
         return clone;
     }
@@ -327,6 +338,31 @@ export class HeadlessBattleSimulator {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
                     const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (buff > 0) this.buffAttack(unit, buff);
+
+                    // Cyndaquil family logic inside Fire or separately
+                }
+            });
+        }
+        if (unit.family === 'cyndaquil') {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit) || {};
+                if (s.isSilenced) return;
+                if (e.source === unit) {
+                    const used = s.cyndaquilKills || 0;
+                    const max = unit.level + 1;
+                    if (used < max) {
+                        s.cyndaquilKills = used + 1;
+                        this.unitStates.set(unit, s);
+                        const amt = unit.level >= 3 ? 4 : 2;
+                        this.growUnit(unit, amt, amt);
+                    }
+                    const splashDmg = [0, 2, 6, 12][unit.level] || 2;
+                    const { opTeam } = this.getTeams(unit);
+                    const tIdx = e.target ? opTeam.indexOf(e.target) : -1;
+                    if (tIdx !== -1 && tIdx < opTeam.length - 1) {
+                        const neighbor = opTeam[tIdx + 1];
+                        if (neighbor && neighbor.stats.hp > 0) await this.dealDamage(unit, neighbor, splashDmg, true);
+                    }
                 }
             });
         }
@@ -768,15 +804,6 @@ export class HeadlessBattleSimulator {
 
                 if (choice === 'atk') this.growUnit(killer, 0, buff);
                 else this.growUnit(killer, buff, 0);
-            }
-            if (killer.family === 'cyndaquil') {
-                const kState = this.unitStates.get(killer) || {};
-                if ((kState.cyndaquilKills || 0) < killer.level + 1) {
-                    kState.cyndaquilKills = (kState.cyndaquilKills || 0) + 1;
-                    this.unitStates.set(killer, kState);
-                    const amt = killer.level >= 3 ? 4 : 2;
-                    this.growUnit(killer, amt, amt);
-                }
             }
         }
         this.compactTeams();
