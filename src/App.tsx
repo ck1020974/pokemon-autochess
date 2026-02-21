@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { GameLoop, GamePhase } from './engine/GameLoop';
+import { music } from './engine/MusicManager';
 import { Unit } from './models/Unit';
 import { BattleSimulator } from './engine/BattleSimulator';
 import type { BattleLog } from './engine/BattleSimulator';
@@ -226,11 +227,22 @@ function App() {
 
     // --- Difficulty & Preloading States ---
     const [difficulty, setDifficulty] = useState<'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER' | null>(null);
+    const [hasLoaded, setHasLoaded] = useState(false);
+    const [hasStarted, setHasStarted] = useState(false);
+    const [loadingProgress, setLoadingProgress] = useState(0);
     const [isPortrait, setIsPortrait] = useState(false);
 
     // Battle Paused State
     const [isPaused, setIsPaused] = useState(false);
     const isPausedRef = useRef(false);
+
+    // Mute State
+    const [isMuted, setIsMuted] = useState(music.isMuted());
+    const toggleMute = () => {
+        const nextMuted = !isMuted;
+        music.setMuted(nextMuted);
+        setIsMuted(nextMuted);
+    };
 
     // Image Preloading - Systematically cache all unit assets on startup
     useEffect(() => {
@@ -249,23 +261,37 @@ function App() {
             urls.add('assets/詛咒娃娃01.webp');
 
             const assetUrls = Array.from(urls);
+            let loadedCount = 0;
 
             const promises = assetUrls.map(url => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.src = url;
-                    img.onload = () => resolve(url);
-                    img.onerror = () => resolve(url);
+                    const handleLoad = () => {
+                        loadedCount++;
+                        setLoadingProgress(Math.floor((loadedCount / assetUrls.length) * 100));
+                        resolve(url);
+                    };
+                    img.onload = handleLoad;
+                    img.onerror = handleLoad; // Count errors as "processed" to avoid stuck progress
                 });
             });
 
             console.log(`[系統] 開始預載入 ${assetUrls.length} 個美術資源...`);
             await Promise.all(promises);
+            setHasLoaded(true);
             console.log(`[系統] 所有資源載入完成！`);
         };
 
         preloadAllAssets();
     }, []);
+
+    // --- BGM Initial Logic ---
+    useEffect(() => {
+        if (!difficulty) {
+            music.play('start', true);
+        }
+    }, [difficulty]);
 
     // Orientation Detection
     useEffect(() => {
@@ -293,8 +319,10 @@ function App() {
     }, []);
 
     const handleDifficultySelect = (lvl: 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER') => {
+        music.stop(); // Stop 'start' music
         setDifficulty(lvl);
         game.setDifficulty(lvl);
+        update(); // Ensure shop phase logic triggers music check
     };
 
     const togglePause = () => {
@@ -315,16 +343,37 @@ function App() {
         if (game.phase === GamePhase.BATTLE) {
             isPausedRef.current = false;
             setIsPaused(false);
+            music.play('gymfight', true);
         }
     }, [game.phase]);
 
     useEffect(() => {
         if (game.phase === GamePhase.BATTLE) {
             setBattleElapsedSeconds(0);
+        } else if (game.phase === GamePhase.SHOP && difficulty) {
+            setBattleElapsedSeconds(0);
+
+            // Handle Preparation Phase Music
+            if (game.lastResult === 'WIN') {
+                if (game.wins <= 7) {
+                    music.play('pokemonmart', true);
+                } else {
+                    music.play('victoryroad', true);
+                }
+            } else if (game.lastResult === 'LOSS' || game.lastResult === 'DRAW') {
+                if (game.wins <= 7) {
+                    music.playRecoverSequence('pokemoncenter');
+                } else {
+                    music.play('pokemoncenter', true);
+                }
+            } else {
+                // Initial game start (no last result)
+                music.play('pokemonmart', true);
+            }
         } else {
             setBattleElapsedSeconds(0);
         }
-    }, [game.phase]);
+    }, [game.phase, difficulty]);
 
     // Timer loop for timeout (using elapsed seconds for pause sync)
     useEffect(() => {
@@ -787,6 +836,22 @@ function App() {
         }
     }, [game.phase]);
 
+    // Handle Battle Result Music
+    useEffect(() => {
+        if (battleResult === 'WIN') {
+            const currentWins = game.wins;
+            if (currentWins === 4 || currentWins === 8 || currentWins === 12) {
+                music.playLevelUpSequence('gymwin');
+            } else {
+                music.play('gymwin', true);
+            }
+        } else if (battleResult === 'LOSS') {
+            music.stop(); // Stops gymfight
+        } else if (battleResult === 'DRAW') {
+            music.stop();
+        }
+    }, [battleResult]);
+
     // Handle Timeout DRAW
     useEffect(() => {
         if (game.phase === GamePhase.BATTLE && !battleResult) {
@@ -831,6 +896,7 @@ function App() {
             const confirmed = window.confirm(`您還有 ${game.gold} 金幣尚未花完，確定進入對戰？`);
             if (!confirmed) return;
         }
+        music.stop(); // Stop prep music
         setSelected(null);
         setBattleResult(null);
         game.startBattlePhase();
@@ -839,6 +905,7 @@ function App() {
 
     const handleBattleResultClick = () => {
         if (battleResult) {
+            music.stop(); // Stop victory music
             game.endBattle(battleResult);
             simulatorRef.current = null;
             setBattleResult(null);
@@ -982,16 +1049,93 @@ function App() {
                 </div>
             )}
 
-            {/* Difficulty & Preloading Initial Screen */}
-            {(difficulty === null) && (
-                <div className="startup-overlay" style={{
-                    position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
-                    background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
-                    zIndex: 10000, display: 'flex', flexDirection: 'column',
-                    justifyContent: 'center', alignItems: 'center', gap: '40px'
-                }}>
-                    <div style={{ textAlign: 'center', marginBottom: '10px', marginTop: '5vh' }} className="startup-header-box">
-                        <h1 style={{ fontSize: '3.5rem', margin: '0', letterSpacing: '4px', background: 'linear-gradient(to bottom, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>POKEMON AUTOCHESS</h1>
+            {/* Mute Toggle Button removed from here */}
+
+            {/* Loading & Start Screen */}
+            {!hasStarted && (
+                <div className="startup-overlay"
+                    style={{
+                        position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
+                        background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
+                        zIndex: 10000, display: 'flex', flexDirection: 'column',
+                        justifyContent: 'center', alignItems: 'center', gap: '30px'
+                    }}>
+                    <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                        <h1 style={{
+                            fontSize: '5rem',
+                            margin: '0',
+                            letterSpacing: '12px',
+                            background: 'linear-gradient(to bottom, #fff, #94a3b8)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
+                            fontWeight: 900
+                        }}>
+                            POKEMON<br />AUTOCHESS
+                        </h1>
+                    </div>
+
+                    <div className="loading-container" style={{ width: '600px', textAlign: 'center' }}>
+                        <div className="loading-bar-wrapper" style={{
+                            width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)',
+                            borderRadius: '3px', overflow: 'hidden', marginBottom: '20px',
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }}>
+                            <div className="loading-bar-fill" style={{
+                                width: `${loadingProgress}%`, height: '100%',
+                                background: 'linear-gradient(90deg, #60a5fa, #3b82f6)',
+                                transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)'
+                            }} />
+                        </div>
+                        <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
+                            {hasLoaded ? '系統就緒' : `資源載入中... ${loadingProgress}%`}
+                        </p>
+                    </div>
+
+                    <button
+                        className={`start-game-btn ${hasLoaded ? 'is-ready' : ''}`}
+                        disabled={!hasLoaded}
+                        onClick={() => {
+                            music.play('start', true);
+                            setHasStarted(true);
+                        }}
+                    >
+                        開始遊戲
+                    </button>
+
+                    <p style={{
+                        position: 'absolute',
+                        bottom: '20px',
+                        color: 'rgba(148, 163, 184, 0.3)',
+                        fontSize: '0.7rem',
+                        letterSpacing: '2px'
+                    }}>v4.8.6 - PREMIUM EDITION</p>
+                </div>
+            )}
+
+            {/* Difficulty Selection Screen (Only after Start) */}
+            {(hasStarted && difficulty === null) && (
+                <div className="startup-overlay"
+                    style={{
+                        position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
+                        background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
+                        zIndex: 10000, display: 'flex', flexDirection: 'column',
+                        justifyContent: 'center', alignItems: 'center', gap: '40px'
+                    }}>
+                    <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                        <h1 style={{
+                            fontSize: '4.5rem',
+                            margin: '0',
+                            letterSpacing: '10px',
+                            background: 'linear-gradient(to bottom, #fff, #94a3b8)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
+                            fontWeight: 900
+                        }}>
+                            POKEMON<br />AUTOCHESS
+                        </h1>
                     </div>
 
                     <div className="difficulty-grid" style={{
@@ -1043,7 +1187,7 @@ function App() {
                             letterSpacing: '4px',
                             opacity: 0.8,
                             padding: '0 20px'
-                        }}>選擇您的挑戰難度</p>
+                        }}>選擇本次挑戰難度</p>
                     </div>
                 </div>
             )}
@@ -1076,6 +1220,15 @@ function App() {
                     <span style={{ color: game.wins < 8 ? '#fff' : '#888' }}>🏅 道館: {Math.min(game.wins, 8)}/8</span>
                     <span style={{ color: (game.wins >= 8 && game.wins < 12) ? '#fbbf24' : '#888' }}>⚔️ 四天王: {Math.max(0, Math.min(game.wins - 8, 4))}/4</span>
                     <span style={{ color: game.wins >= 12 ? '#f472b6' : '#888' }}>👑 冠軍: {Math.max(0, Math.min(game.wins - 12, 1))}/1</span>
+                    {/* Mute Toggle Button inside Header */}
+                    <button
+                        className="mute-toggle-btn-header"
+                        onClick={toggleMute}
+                        title={isMuted ? "開啟聲音" : "靜音"}
+                        style={{ marginLeft: '20px' }}
+                    >
+                        {isMuted ? '🔇' : '🔊'}
+                    </button>
                 </div>
             </div>
 

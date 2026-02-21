@@ -18,6 +18,7 @@ export class GameLoop {
     public lives: number = 5;
     public wins: number = 0;
     public phase: GamePhase = GamePhase.SHOP;
+    public lastResult: 'WIN' | 'LOSS' | 'DRAW' | null = null;
 
     public playerTeam: (Unit | null)[] = [null, null, null, null, null];
     public savedTeam: (Unit | null)[] = []; // Store original team before battle
@@ -155,6 +156,7 @@ export class GameLoop {
     }
 
     public endBattle(result: 'WIN' | 'LOSS' | 'DRAW') {
+        this.lastResult = result;
         if (result === 'WIN') {
             this.wins++;
             if (this.wins === 4) {
