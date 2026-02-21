@@ -24,6 +24,8 @@ export class BattleSimulator {
     private psychicTriggered: Set<string> = new Set();
     private originalPlayerTeam?: (Unit | null)[];
     private isCompacting = false;
+    private houndoomLogged: Set<string> = new Set();
+    private onixLogged: Set<string> = new Set();
     private isSimulatingStep = false;
     private queuedKillRewards: (() => Promise<void>)[] = [];
     private playerWins: number = 0;
@@ -65,6 +67,8 @@ export class BattleSimulator {
     public async init() {
         this.spiritombTriggered.clear();
         this.lightScreenActivated.clear();
+        this.houndoomLogged.clear();
+        this.onixLogged.clear();
         // Collect all units and their positions
         const allUnits: { unit: Unit, pos: number, isPlayer: boolean }[] = [];
         this.playerTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: true }); });
@@ -216,22 +220,31 @@ export class BattleSimulator {
         // Houndour: 4*Lv Dmg to lowest HP enemy
         if (unit.family === 'houndour') {
             const times = [0, 1, 3, 5][unit.level] || 1;
-            if (times > 0) {
-                const s = side === 'player' ? '敵方' : '我方';
-                this.log(`${unit.name} 對${s}發動了連續噴射火焰！`);
-            }
-            for (let i = 0; i < times; i++) {
-                const currentOpTeam = this.playerTeam.includes(unit) ? this.enemyTeam : this.playerTeam;
-                const livingEnemies = currentOpTeam.filter(e => e && e.stats.hp > 0);
+            const currentOpTeam = this.playerTeam.includes(unit) ? this.enemyTeam : this.playerTeam;
+            const livingEnemies = currentOpTeam.filter(e => e && e.stats.hp > 0);
 
-                if (livingEnemies.length > 0) {
-                    let target = livingEnemies[0];
-                    for (const e of livingEnemies) {
-                        if (e.stats.hp < target.stats.hp) target = e;
+            if (livingEnemies.length > 0 && times > 0) {
+                let firstTarget = livingEnemies[0];
+                for (const e of livingEnemies) {
+                    if (e.stats.hp < firstTarget.stats.hp) firstTarget = e;
+                }
+
+                if (!this.houndoomLogged.has(side)) {
+                    this.log(`${unit.name} 對 ${firstTarget.name} 發動了噴射火焰！`);
+                    this.houndoomLogged.add(side);
+                }
+
+                for (let i = 0; i < times; i++) {
+                    const freshEnemies = currentOpTeam.filter(e => e && e.stats.hp > 0);
+                    if (freshEnemies.length === 0) break;
+
+                    let bestTarget = freshEnemies[0];
+                    for (const e of freshEnemies) {
+                        if (e.stats.hp < bestTarget.stats.hp) bestTarget = e;
                     }
-                    await this.dealDamage(unit, target, 4, true, true); // Silent hits
+                    await this.dealDamage(unit, bestTarget, 4, true, true); // Silent hits
                     await this.delay(50);
-                } else break;
+                }
             }
         }
 
@@ -497,6 +510,7 @@ export class BattleSimulator {
                 // Trigger when FRONT ally attacks
                 if (idx > 0 && myTeam[idx - 1] === e.source) {
                     const buff = [0, 2, 4, 6][unit.level] || 2;
+                    await this.delay(150); // Delay for visual pacing
                     await this.notifySkill(unit, `發動了健美！`);
                     await this.playAnimation(unit, 'jump', 300);
                     this.growUnit(unit, buff, buff, '水躍魚技能');
@@ -540,7 +554,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0 && myTeam[idx - 1] === e.source && e.target) {
-                    await this.delay(150);
+                    await this.delay(200); // Increased delay
                     this.log(`${unit.name} 發動了二連踢！`);
                     await this.playAnimation(unit, 'jump', 300);
                     const dmg = [0, 3, 5, 10][unit.level] || 3;
@@ -666,12 +680,17 @@ export class BattleSimulator {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
                     const amount = [0, 2, 3, 4][unit.level] || 2;
+                    const { side } = this.getTeams(unit);
                     if (!this.isCompacting) {
                         await this.notifySkill(unit, `發動了鐵壁！`);
                         this.playTeamAnimation([unit], 'glow-pale-blue', 600);
                         this.growUnit(unit, amount, 0, '鐵壁', null, true);
                     } else {
-                        // TOTALLY SILENT during compaction to avoid flood
+                        // Throttled log during compaction
+                        if (!this.onixLogged.has(side)) {
+                            this.log(`[大岩蛇] 發動了鐵壁！`);
+                            this.onixLogged.add(side);
+                        }
                         this.growUnit(unit, amount, 0, '鐵壁', null, true);
                     }
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
@@ -777,7 +796,7 @@ export class BattleSimulator {
                         for (let i = 0; i < 2; i++) {
                             const { myTeam: currentTeam } = this.getTeams(unit);
                             const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
-                            await this.spawnUnit(currentTeam, targetIdx, 'ivysaur', 1, 2, 2, true);
+                            await this.spawnUnit(currentTeam, targetIdx, 'ivysaur', 1, 4, 4, true);
                         }
                     } else if (unit.templateId === 'ivysaur') {
                         // Ivysaur -> 1x Bulbasaur (2/2)
@@ -902,6 +921,7 @@ export class BattleSimulator {
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
                 if (e.source && mySide === sSide && e.source !== unit) {
                     const buff = [0, 1, 2, 5][unit.level] || 1;
+                    await this.delay(150);
                     await this.notifySkill(unit, `對 ${e.source.name} 發動了甜甜香氣！`);
                     await this.playAnimation(unit, 'jump', 300);
                     this.growUnit(e.source, buff, buff);
@@ -921,6 +941,7 @@ export class BattleSimulator {
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[0];
+                        await this.delay(150);
                         await this.notifySkill(unit, `對 ${target.name} 使用了種子機關槍！`);
                         await this.playAnimation(unit, 'jump', 300);
                         await this.delay(100); // reduced from 250
@@ -1518,7 +1539,24 @@ export class BattleSimulator {
             this.playAnimation(eFront, 'clash', 300)
         ];
 
-        // 2. Wait for the "impact" point (middle of clash animation)
+        // 2. Pre-Clash Synergy (Water/Vortex occurs BEFORE impact animation)
+        const triggerWater = async (attacker: Unit, defender: Unit) => {
+            if (attacker.synergies.includes('Water')) {
+                const count = this.getSynergyCountForUnit(attacker, 'Water');
+                const debuff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                if (debuff > 0 && defender.stats.attack > 1 && !this.unitStates.get(attacker)?.isSilenced) {
+                    const amountReduced = Math.min(defender.stats.attack - 1, debuff);
+                    defender.stats.attack -= amountReduced;
+                    this.log(`${defender.name} 被漩渦影響，攻擊力降低了 ${amountReduced}！`);
+                }
+            }
+        };
+
+        await Promise.all([
+            triggerWater(pFront, eFront),
+            triggerWater(eFront, pFront)
+        ]);
+
         await this.delay(150);
 
         // 3. Trigger damage and logic (Enable deferred rewards)
