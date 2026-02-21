@@ -303,7 +303,11 @@ function App() {
     };
 
     const toggleBattleSpeed = () => {
-        setBattleSpeed(prev => prev === 1 ? 2 : 1);
+        setBattleSpeed(prev => {
+            if (prev === 1) return 2;
+            if (prev === 2) return 3;
+            return 1;
+        });
     };
 
     // Reset pause when entering BATTLE

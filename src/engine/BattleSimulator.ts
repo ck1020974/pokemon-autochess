@@ -26,6 +26,7 @@ export class BattleSimulator {
     private isCompacting = false;
     private houndoomLogged: Set<string> = new Set();
     private onixLogged: Set<string> = new Set();
+    private natuLogged: Set<string> = new Set();
     private isSimulatingStep = false;
     private queuedKillRewards: (() => Promise<void>)[] = [];
     private playerWins: number = 0;
@@ -71,6 +72,7 @@ export class BattleSimulator {
         this.lightScreenActivated.clear();
         this.houndoomLogged.clear();
         this.onixLogged.clear();
+        this.natuLogged.clear();
         // Collect all units and their positions
         const allUnits: { unit: Unit, pos: number, isPlayer: boolean }[] = [];
         this.playerTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: true }); });
@@ -349,28 +351,38 @@ export class BattleSimulator {
         }
 
         // Natu/Xatu: Swap enemy first and last
-        if (unit.family === 'natu') {
+        if (unit.family === 'natu' && !this.natuLogged.has(side)) {
+            this.natuLogged.add(side);
             const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0);
             if (livingEnemies.length >= 2) {
-                const first = livingEnemies[0];
-                const last = livingEnemies[livingEnemies.length - 1];
-                const firstIdx = opTeam.indexOf(first);
-                const lastIdx = opTeam.indexOf(last);
+                // Determine how many times to teleport based on total Natu/Xatu in team
+                const totalNatu = myTeam.filter(u => u && u.family === 'natu' && u.stats.hp > 0).length;
+                const timesToExecute = totalNatu % 2 === 0 ? 2 : 1;
 
-                if (firstIdx !== -1 && lastIdx !== -1 && firstIdx !== lastIdx) {
-                    await this.notifySkill(unit, `發動了瞬間移動！`);
-                    // Visual Effect: Teleport anim on the two swapped units
-                    await Promise.all([
-                        this.playAnimation(first, 'teleport', 400),
-                        this.playAnimation(last, 'teleport', 400)
-                    ]);
+                for (let t = 0; t < timesToExecute; t++) {
+                    // Re-fetch living enemies each time in case state changed (though unlikely at start)
+                    const currentLiving = opTeam.filter(e => e && e.stats.hp > 0);
+                    if (currentLiving.length < 2) break;
 
-                    opTeam[firstIdx] = last;
-                    opTeam[lastIdx] = first;
-                    this.log(`${first.name} 和 ${last.name} 互換了位置！`);
-                    await this.compactTeams();
-                    await this.delay(300);
-                    if (this.onUpdate) this.onUpdate();
+                    const first = currentLiving[0];
+                    const last = currentLiving[currentLiving.length - 1];
+                    const firstIdx = opTeam.indexOf(first);
+                    const lastIdx = opTeam.indexOf(last);
+
+                    if (firstIdx !== -1 && lastIdx !== -1 && firstIdx !== lastIdx) {
+                        await this.notifySkill(unit, `發動了瞬間移動！`);
+                        await Promise.all([
+                            this.playAnimation(first, 'teleport', 400),
+                            this.playAnimation(last, 'teleport', 400)
+                        ]);
+
+                        opTeam[firstIdx] = last;
+                        opTeam[lastIdx] = first;
+                        this.log(`${first.name} 和 ${last.name} 互換了位置！`);
+                        await this.compactTeams();
+                        await this.delay(300);
+                        if (this.onUpdate) this.onUpdate();
+                    }
                 }
             }
         }
