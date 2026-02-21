@@ -1574,61 +1574,77 @@ h3 {
     transform: scale(1.02);
   }
 }
-/* Mobile Landscape Optimizations (Targeting Reference Image Style) */
+
+/* Mobile Landscape Optimizations (Scaling PC Style) */
 @media (max-width: 1024px) and (orientation: landscape) {
   .startup-overlay {
-    gap: 15px !important;
+    gap: 3vh !important;
   }
 
   .startup-overlay h1 {
-    font-size: 3.2rem !important;
-    letter-spacing: 6px !important;
-    margin-bottom: 25px !important;
-    line-height: 1.1 !important;
+    font-size: 3.5rem !important;
+    letter-spacing: 8px !important;
+    margin-bottom: 10px !important;
+    line-height: 1.2 !important;
+    font-weight: 900 !important;
   }
 
   .loading-container {
-    width: 85% !important;
-    max-width: 680px !important;
+    width: 90% !important;
+    max-width: 650px !important;
   }
 
   .loading-bar-wrapper {
-    height: 2px !important;
+    height: 6px !important;
+    /* Back to thick bar */
     background: rgba(255, 255, 255, 0.05) !important;
-    border: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     margin-bottom: 15px !important;
-    border-radius: 0 !important;
-    overflow: visible !important;
+    border-radius: 3px !important;
+    overflow: hidden !important;
   }
 
   .loading-bar-fill {
     height: 100% !important;
-    background: #3b82f6 !important;
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4) !important;
+    background: linear-gradient(90deg, #60a5fa, #3b82f6) !important;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5) !important;
   }
 
   .loading-container p {
-    font-size: 0.8rem !important;
-    letter-spacing: 4px !important;
-    opacity: 0.35 !important;
-    text-transform: uppercase;
+    font-size: 0.9rem !important;
+    letter-spacing: 3px !important;
+    opacity: 0.7 !important;
   }
 
   .start-game-btn {
-    margin-top: 40px !important;
-    padding: 12px 60px !important;
-    border-radius: 30px !important;
-    font-size: 1rem !important;
-    background: rgba(15, 23, 42, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    margin-top: 10px !important;
+    padding: 12px 50px !important;
+    border-radius: 35px !important;
+    /* Round like PC */
+    font-size: 1.1rem !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
     letter-spacing: 8px !important;
     text-indent: 8px !important;
-    transition: all 0.3s ease !important;
+    font-weight: 600 !important;
   }
 
   .start-game-btn.is-ready {
-    border-color: rgba(255, 255, 255, 0.3) !important;
-    color: rgba(255, 255, 255, 0.9) !important;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.03) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.05) !important;
+    color: white !important;
+  }
+
+  /* Difficulty Grid for Landscape */
+  .difficulty-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+    padding: 0 20px !important;
+  }
+
+  .difficulty-option {
+    padding: 15px 10px !important;
+    min-width: 120px !important;
   }
 }
