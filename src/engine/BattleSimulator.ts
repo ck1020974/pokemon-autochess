@@ -494,7 +494,7 @@ export class BattleSimulator {
                     if (debuff > 0 && e.target.stats.attack > 1) {
                         const amountReduced = Math.min(e.target.stats.attack - 1, debuff);
                         e.target.stats.attack -= amountReduced;
-                        this.log(`${e.target.name} 被漩渦影響，攻擊力降低了 ${amountReduced}！`);
+                        this.log(`${e.target.name} 降低了 ${amountReduced} 攻擊！`);
                     }
                 }
             });
@@ -1547,7 +1547,7 @@ export class BattleSimulator {
                 if (debuff > 0 && defender.stats.attack > 1 && !this.unitStates.get(attacker)?.isSilenced) {
                     const amountReduced = Math.min(defender.stats.attack - 1, debuff);
                     defender.stats.attack -= amountReduced;
-                    this.log(`${defender.name} 被漩渦影響，攻擊力降低了 ${amountReduced}！`);
+                    this.log(`${defender.name} 降低了 ${amountReduced} 攻擊！`);
                 }
             }
         };
