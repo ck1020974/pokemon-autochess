@@ -109,9 +109,14 @@ export class BattleSimulator {
         // Run global start of battle sequence
         await this.runGlobalStartOfBattleAbilities(allUnits.map(item => item.unit));
 
-        // 6. Apply Start-of-Battle Synergies (Personal buffs: Triplets, Starter)
         await this.applyBattleStartSynergies(this.playerTeam.filter(u => u !== null));
         await this.applyBattleStartSynergies(this.enemyTeam.filter(u => u !== null));
+
+        // Psychic Synergy Start Message
+        const hasPsychic = (this.playerSynergies.get('Psychic') || 0) >= 2 || (this.enemySynergies.get('Psychic') || 0) >= 2;
+        if (hasPsychic) {
+            this.log("預知了未來的攻擊…");
+        }
 
         // 7. Global Weather: Snow (Only triggers once even if both sides have it)
         const hasSnow = (this.playerSynergies.get('Snow') || 0) >= 2 || (this.enemySynergies.get('Snow') || 0) >= 2;

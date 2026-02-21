@@ -119,16 +119,8 @@ export class GameLoop {
         const beetleCount = getUniqueCount(beetleUnits);
         if (beetleCount >= 2) {
             beetleUnits.forEach(u => {
-                const canAddAtk = u.stats.attack < 50;
-                const canAddHp = u.stats.maxHp < 50;
-
-                let choice: 'hp' | 'atk';
-                if (canAddAtk && !canAddHp) choice = 'atk';
-                else if (canAddHp && !canAddAtk) choice = 'hp';
-                else choice = Math.random() < 0.5 ? 'atk' : 'hp';
-
-                if (choice === 'atk') applyBuff(u, 2, 'atk', 'Beetle');
-                else applyBuff(u, 2, 'hp', 'Beetle');
+                applyBuff(u, 2, 'hp', 'Beetle');
+                applyBuff(u, 2, 'atk', 'Beetle');
             });
         }
 
