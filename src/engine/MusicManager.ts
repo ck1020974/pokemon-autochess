@@ -5,7 +5,7 @@
 class MusicManager {
     private static instance: MusicManager;
     private currentAudio: HTMLAudioElement | null = null;
-    private musicPath: string = '/music/';
+    private musicPath: string = 'music/';
     private muted: boolean = false;
     private defaultVolume: number = 0.15;
 
