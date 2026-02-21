@@ -185,8 +185,8 @@ export class BattleSimulator {
                     const front = myTeam[idx - 1];
                     if (front) {
                         const amount = unit.templateId === 'haunter' ? 5 : 2;
-                        this.buffAttack(front, amount);
-                        await this.notifySkill(unit, `耿鬼發動了詭計！`);
+                        this.growUnit(front, 0, amount, '能力提升', null, true);
+                        this.log(`${unit.name} 為 ${front.name} 提升了攻勢！`);
                     }
                 }
             }
@@ -206,8 +206,8 @@ export class BattleSimulator {
                     const front = myTeam[idx - 1];
                     if (front) {
                         const amount = unit.templateId === 'jigglypuff' ? 5 : 2;
-                        this.growUnit(front, amount, 0, 'Igglybuff');
-                        await this.notifySkill(unit, `胖可丁發動了治癒波動！`);
+                        this.growUnit(front, amount, 0, '能力提升', null, true);
+                        this.log(`${unit.name} 為 ${front.name} 恢復了生命！`);
                     }
                 }
             }
@@ -216,8 +216,11 @@ export class BattleSimulator {
         // Houndour: 4*Lv Dmg to lowest HP enemy
         if (unit.family === 'houndour') {
             const times = [0, 1, 3, 5][unit.level] || 1;
+            if (times > 0) {
+                const s = side === 'player' ? '敵方' : '我方';
+                this.log(`${unit.name} 對${s}發動了連續噴射火焰！`);
+            }
             for (let i = 0; i < times; i++) {
-                // Re-fetch current enemies to handle team compression after death
                 const currentOpTeam = this.playerTeam.includes(unit) ? this.enemyTeam : this.playerTeam;
                 const livingEnemies = currentOpTeam.filter(e => e && e.stats.hp > 0);
 
@@ -226,9 +229,7 @@ export class BattleSimulator {
                     for (const e of livingEnemies) {
                         if (e.stats.hp < target.stats.hp) target = e;
                     }
-                    await this.notifySkill(unit, `對 ${target.name} 發動了噴射火焰`);
-                    await this.dealDamage(unit, target, 4, true);
-                    // Wait for death effects/compaction to settle before next fire breath
+                    await this.dealDamage(unit, target, 4, true, true); // Silent hits
                     await this.delay(50);
                 } else break;
             }
@@ -668,11 +669,11 @@ export class BattleSimulator {
                     if (!this.isCompacting) {
                         await this.notifySkill(unit, `發動了鐵壁！`);
                         this.playTeamAnimation([unit], 'glow-pale-blue', 600);
+                        this.growUnit(unit, amount, 0, '鐵壁', null, true);
                     } else {
-                        // Silent log during compaction to avoid flood
-                        this.log(`${unit.name} 發動了鐵壁！`);
+                        // TOTALLY SILENT during compaction to avoid flood
+                        this.growUnit(unit, amount, 0, '鐵壁', null, true);
                     }
-                    this.growUnit(unit, amount, 0); // Removed sourceName to prevent redundant HP log
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                     if (original) original.addGrowth(amount, 0);
                 }
@@ -776,7 +777,7 @@ export class BattleSimulator {
                         for (let i = 0; i < 2; i++) {
                             const { myTeam: currentTeam } = this.getTeams(unit);
                             const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
-                            await this.spawnUnit(currentTeam, targetIdx, 'ivysaur', 1, 4, 4, true);
+                            await this.spawnUnit(currentTeam, targetIdx, 'ivysaur', 1, 2, 2, true);
                         }
                     } else if (unit.templateId === 'ivysaur') {
                         // Ivysaur -> 1x Bulbasaur (2/2)
