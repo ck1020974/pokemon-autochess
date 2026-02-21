@@ -1590,7 +1590,7 @@ h3 {
     letter-spacing: 8px !important;
     text-indent: 8px !important;
     /* Forces centering */
-    margin-bottom: 0 !important;
+    margin-bottom: 10 !important;
     line-height: 1.1 !important;
     font-weight: 900 !important;
   }
@@ -1599,7 +1599,7 @@ h3 {
     width: 480px !important;
     /* Precision narrowed to 480px */
     max-width: 90% !important;
-    margin-top: -10px !important;
+    margin-top: -30px !important;
   }
 
   .loading-bar-wrapper {
@@ -1607,7 +1607,7 @@ h3 {
     /* Back to thick bar */
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    margin-bottom: 30px !important;
+    margin-bottom: 25px !important;
     /* Push "SYSTEM READY" text DOWN away from bar */
     border-radius: 3px !important;
     overflow: hidden !important;
@@ -1626,10 +1626,10 @@ h3 {
   }
 
   .start-game-btn {
-    margin-top: -25px !important;
-    /* Lift button UP towards visuals */
+    margin-top: -35px !important;
+    /* Lifted significantly UP towards visuals as requested */
     padding: 14px 40px !important;
-    /* Significantly TALLER and NARROWER */
+    /* Re-adjusted for better height/width proportion */
     border-radius: 35px !important;
     font-size: 1.0rem !important;
     /* Refined smaller font */
