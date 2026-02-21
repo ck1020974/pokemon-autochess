@@ -24,7 +24,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Hard': { id: 'Hard', name: '堅硬', icon: '🛡️', description: '[2] 抵擋死亡，保留 1 生命 (每場 1 次)', tiers: [2], color: '#9ca3af' },
     'Cave': { id: 'Cave', name: '洞穴', icon: '🕳️', description: '[2] 攻擊後，移動至最後方', tiers: [2], color: '#78350f' },
     'Snow': { id: 'Snow', name: '降雪', icon: '❄️', description: '[2] 戰鬥開始時，其他角色受到生命 33% 傷害', tiers: [2], color: '#bae6fd' },
-    'Claw': { id: 'Claw', name: '磨爪', icon: '🐯', description: '[2] 擊殺敵方後，永久 +2 攻擊', tiers: [2], color: '#fca5a5' },
+    'Claw': { id: 'Claw', name: '磨爪', icon: '🐯', description: '[2] 獲得攻擊提升時，額外獲得 +2 攻擊。', tiers: [2], color: '#fca5a5' },
     'Beetle': { id: 'Beetle', name: '甲蟲', icon: '🪲', description: '[2] 準備結束時，永久 +2 攻擊 或 生命', tiers: [2], color: '#b5e48c' },
     'Psychic': { id: 'Psychic', name: '念力', icon: '🪄', description: '[2] 每場戰鬥發動一次，對全體敵方造成 2N 傷害 (N=勝場)', tiers: [2], color: '#a855f7' },
 

@@ -1007,11 +1007,11 @@ export class BattleSimulator {
                 const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
                 const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
                 if (liveEnemies.length > 0) {
-                    const targetCount = attacker.level >= 3 ? 2 : 1;
+                    const targetCount = 1;
                     let potentialTargets = liveEnemies.filter(u => u !== defender);
                     if (potentialTargets.length === 0) potentialTargets = [defender];
 
-                    // Shuffle and pick
+                    // Shuffle and pick 1
                     const finalTargets = [...potentialTargets].sort(() => 0.5 - Math.random()).slice(0, targetCount);
                     for (const r of finalTargets) {
                         this.log(`${attacker.name} 對 ${r.name} 發動了暗襲要害！`);
@@ -1264,7 +1264,7 @@ export class BattleSimulator {
                 if (killer.synergies.includes('Claw') && this.getSynergyCountForUnit(killer, 'Claw') >= 2) {
                     const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
                     this.log(`${killer.name} 發動了磨爪！`);
-                    this.growUnit(killer, 0, 2, '磨爪', original, false);
+                    this.growUnit(killer, 0, 2, '磨爪', original, true);
                 }
 
                 // Check Silence for individual unit abilities
