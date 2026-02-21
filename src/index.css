@@ -1578,7 +1578,9 @@ h3 {
 /* Mobile Landscape Optimizations (Scaling PC Style) */
 @media (max-width: 1024px) and (orientation: landscape) {
   .startup-overlay {
-    gap: 2.5vh !important;
+    gap: 3vh !important;
+    padding-top: 5vh !important;
+    /* Lower content as requested */
   }
 
   .startup-overlay h1 {
@@ -1586,15 +1588,15 @@ h3 {
     /* Larger as requested */
     letter-spacing: 8px !important;
     text-indent: 8px !important;
-    /* Forces centering by offsetting trailing letter-spacing */
+    /* Perfect centering */
     margin-bottom: 5px !important;
     line-height: 1.1 !important;
     font-weight: 900 !important;
   }
 
   .loading-container {
-    width: 390px !important;
-    /* Narrowed to precisely match "AUTOCHESS" width */
+    width: 510px !important;
+    /* Widened to match "AUTOCHESS" precisely */
     max-width: 90% !important;
   }
 
@@ -1603,7 +1605,7 @@ h3 {
     /* Back to thick bar */
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    margin-bottom: 15px !important;
+    margin-bottom: 12px !important;
     border-radius: 3px !important;
     overflow: hidden !important;
   }
@@ -1615,18 +1617,18 @@ h3 {
   }
 
   .loading-container p {
-    font-size: 0.9rem !important;
+    font-size: 0.85rem !important;
     letter-spacing: 3px !important;
     opacity: 0.7 !important;
   }
 
   .start-game-btn {
     margin-top: 5px !important;
-    padding: 10px 45px !important;
-    /* Reduced padding */
+    padding: 8px 35px !important;
+    /* Significantly smaller padding */
     border-radius: 35px !important;
-    font-size: 1.15rem !important;
-    /* Reduced font size from 1.3rem */
+    font-size: 1.0rem !important;
+    /* Smaller font as requested */
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     letter-spacing: 8px !important;
