@@ -1578,9 +1578,10 @@ h3 {
 /* Mobile Landscape Optimizations (Scaling PC Style) */
 @media (max-width: 1024px) and (orientation: landscape) {
   .startup-overlay {
-    gap: 3vh !important;
-    padding-top: 5vh !important;
-    /* Lower content as requested */
+    gap: 1vh !important;
+    /* Pull loading bar UP towards title */
+    padding-top: 10vh !important;
+    /* Lower title/content further */
   }
 
   .startup-overlay h1 {
@@ -1588,16 +1589,17 @@ h3 {
     /* Larger as requested */
     letter-spacing: 8px !important;
     text-indent: 8px !important;
-    /* Perfect centering */
-    margin-bottom: 5px !important;
+    /* Forces centering */
+    margin-bottom: 0 !important;
     line-height: 1.1 !important;
     font-weight: 900 !important;
   }
 
   .loading-container {
-    width: 510px !important;
-    /* Widened to match "AUTOCHESS" precisely */
+    width: 480px !important;
+    /* Precision narrowed to 480px */
     max-width: 90% !important;
+    margin-top: -10px !important;
   }
 
   .loading-bar-wrapper {
@@ -1605,7 +1607,8 @@ h3 {
     /* Back to thick bar */
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 30px !important;
+    /* Push "SYSTEM READY" text DOWN away from bar */
     border-radius: 3px !important;
     overflow: hidden !important;
   }
@@ -1623,12 +1626,13 @@ h3 {
   }
 
   .start-game-btn {
-    margin-top: 5px !important;
-    padding: 8px 35px !important;
-    /* Significantly smaller padding */
+    margin-top: -25px !important;
+    /* Lift button UP towards visuals */
+    padding: 14px 40px !important;
+    /* Significantly TALLER and NARROWER */
     border-radius: 35px !important;
     font-size: 1.0rem !important;
-    /* Smaller font as requested */
+    /* Refined smaller font */
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     letter-spacing: 8px !important;
