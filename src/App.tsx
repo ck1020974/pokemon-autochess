@@ -211,6 +211,12 @@ function App() {
     // Evolution Visual State
     const [evolvingUnitId, setEvolvingUnitId] = useState<string | null>(null);
 
+    // Battle Speed State
+    const [battleSpeed, setBattleSpeed] = useState(1);
+    useEffect(() => {
+        document.documentElement.style.setProperty('--anim-speed', battleSpeed.toString());
+    }, [battleSpeed]);
+
     const triggerEvolutionEffect = (unit: Unit | null) => {
         if (unit) {
             setEvolvingUnitId(unit.id);
@@ -294,6 +300,10 @@ function App() {
     const togglePause = () => {
         isPausedRef.current = !isPausedRef.current;
         setIsPaused(isPausedRef.current);
+    };
+
+    const toggleBattleSpeed = () => {
+        setBattleSpeed(prev => prev === 1 ? 2 : 1);
     };
 
     // Reset pause when entering BATTLE
@@ -704,7 +714,7 @@ function App() {
 
             // Master Turn 1 Balance: Ensure 1.0 multiplier for fairness
             const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
-            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, game.wins);
+            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, game.wins, battleSpeed);
             simulatorRef.current.onUpdate = () => {
                 if (simulatorRef.current) {
                     setLogs([...simulatorRef.current.logs]);
@@ -740,7 +750,7 @@ function App() {
                                 setSelected(null);
                                 setBattleResult(result);
                             }
-                        }, 300); // Shorter settlement delay as per user request
+                        }, 300 / battleSpeed); // Scaled settlement delay
                         return; // Stop loop
                     }
                 } finally {
@@ -751,7 +761,7 @@ function App() {
             let interval: ReturnType<typeof setInterval>;
             const initAndStart = async () => {
                 if (simulatorRef.current) await simulatorRef.current.init();
-                interval = setInterval(runBattleLoop, 1200);
+                interval = setInterval(runBattleLoop, 1200 / battleSpeed);
             };
             initAndStart();
 
@@ -1349,19 +1359,18 @@ function App() {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px', padding: '0 0', marginTop: '8px' }}>
                         {/* 1. Battle Controls (Top) */}
                         <div className="battle-controls-container" style={{ zIndex: 10, position: 'relative' }}>
-                            <button onClick={togglePause} style={{
-                                border: 'none',
-                                color: '#ddd',
-                                fontSize: '1.2rem',
-                                fontWeight: 'bold',
-                                cursor: 'pointer',
-                                textShadow: '0 0 5px rgba(0,0,0,0.8)',
-                                padding: '5px 20px',
-                                background: 'rgba(0,0,0,0.3)',
-                                borderRadius: '20px'
-                            }}>
-                                {isPaused ? '▶️ 繼續' : '⛔ 暫停'}
-                            </button>
+                            <div className="battle-controls-row">
+                                <button className="battle-pause-btn" onClick={togglePause}>
+                                    {isPaused ? '▶️ 繼續' : '⛔ 暫停'}
+                                </button>
+                                <button
+                                    className={`battle-speed-btn ${battleSpeed > 1 ? 'active' : ''}`}
+                                    onClick={toggleBattleSpeed}
+                                    title="切換對戰速度"
+                                >
+                                    ⏩ {battleSpeed}x
+                                </button>
+                            </div>
                         </div>
 
                         {/* 2. Battle Log (Bottom) */}

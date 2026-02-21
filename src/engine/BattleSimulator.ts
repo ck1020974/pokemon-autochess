@@ -34,8 +34,10 @@ export class BattleSimulator {
     // Cached Synergies (Persist through death)
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
+    private speed: number = 1;
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, playerWins: number = 0) {
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, playerWins: number = 0, speed: number = 1) {
+        this.speed = speed;
         this.playerWins = playerWins;
         this.originalPlayerTeam = originalPlayerTeam;
         // Preserve 5-slot architecture to match UI indices exactly
@@ -1608,6 +1610,6 @@ export class BattleSimulator {
     }
 
     private delay(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        return new Promise(resolve => setTimeout(resolve, ms / this.speed));
     }
 }
