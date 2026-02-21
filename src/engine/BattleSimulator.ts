@@ -526,28 +526,42 @@ export class BattleSimulator {
                     const buff = [0, 2, 4, 6][unit.level] || 2;
                     await this.delay(150); // Delay for visual pacing
                     await this.notifySkill(unit, `發動了健美！`);
-                    await this.playAnimation(unit, 'jump', 300);
+                    await this.playAnimation(unit, 'jump', 200);
                     this.growUnit(unit, buff, buff, '水躍魚技能');
                 }
             });
         }
+        // Squirtle Family: Damage Reduction
+        if (unit.family === 'squirtle') {
+            this.eventBus.on('BEFORE_HURT', (e) => {
+                if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
+                    const reduction = [0, 1, 2, 3][unit.level] || 1;
+                    const oldAmt = e.context.amount;
+                    if (oldAmt > 1) {
+                        e.context.amount = Math.max(1, oldAmt - reduction);
+                        if (e.context.amount < oldAmt) {
+                            this.log(`${unit.name} 的縮殼減輕了傷害！`);
+                        }
+                    }
+                }
+            });
+        }
+
         if (unit.family === 'cyndaquil') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const amt = [0, 1, 2, 4][unit.level] || 1;
-                    this.growUnit(unit, amt, amt, '發動了噴火！');
-                    await this.notifySkill(unit, '發動了噴火！');
-                    await this.playAnimation(unit, 'jump', 300);
+                    const state = this.unitStates.get(unit) || {};
+                    const useCount = state.cyndaquilUses || 0;
+                    const maxUses = [0, 2, 3, 4][unit.level] || 2;
 
-                    const splashDmg = [0, 2, 6, 12][unit.level] || 2;
-                    const { opTeam } = this.getTeams(unit);
-                    const tIdx = e.target ? opTeam.indexOf(e.target) : -1;
-                    // Hit neighbor behind if exists
-                    if (tIdx !== -1 && tIdx < opTeam.length - 1) {
-                        const neighbor = opTeam[tIdx + 1];
-                        if (neighbor && neighbor.stats.hp > 0) {
-                            await this.dealDamage(unit, neighbor, splashDmg, true);
-                        }
+                    if (useCount < maxUses) {
+                        state.cyndaquilUses = useCount + 1;
+                        this.unitStates.set(unit, state);
+
+                        const amt = [0, 1, 2, 4][unit.level] || 2;
+                        this.growUnit(unit, amt, amt, '發動了火焰輪');
+                        await this.notifySkill(unit, '發動了火焰輪！');
+                        await this.playAnimation(unit, 'jump', 200);
                     }
                 }
             });
@@ -562,7 +576,7 @@ export class BattleSimulator {
                 if (idx > 0 && myTeam[idx - 1] === e.source && e.target) {
                     await this.delay(200); // Increased delay
                     this.log(`${unit.name} 發動了二連踢！`);
-                    await this.playAnimation(unit, 'jump', 300);
+                    await this.playAnimation(unit, 'jump', 200);
                     const dmg = [0, 3, 5, 10][unit.level] || 3;
                     await this.dealDamage(unit, e.target, dmg);
                 }
@@ -929,7 +943,7 @@ export class BattleSimulator {
                     const buff = [0, 1, 3, 5][unit.level] || 1;
                     await this.delay(150);
                     await this.notifySkill(unit, `對 ${e.source.name} 發動了甜甜香氣！`);
-                    await this.playAnimation(unit, 'jump', 300);
+                    await this.playAnimation(unit, 'jump', 200);
                     this.growUnit(e.source, buff, buff);
                 }
             });
@@ -949,7 +963,7 @@ export class BattleSimulator {
                         const target = living[0];
                         await this.delay(150);
                         await this.notifySkill(unit, `對 ${target.name} 使用了種子機關槍！`);
-                        await this.playAnimation(unit, 'jump', 300);
+                        await this.playAnimation(unit, 'jump', 200);
                         await this.delay(100); // reduced from 250
                         await this.dealDamage(unit, target, dmg, true);
                     }

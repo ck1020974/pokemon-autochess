@@ -728,10 +728,10 @@ function App() {
                 // B. Base stat bonus for level 2 and 3
                 const baseStats = UNIT_TEMPLATES[u.family || u.templateId]?.baseStats || u.stats;
                 if (u.level === 2) {
-                    const bHp = baseStats.maxHp + 1; const bAtk = baseStats.attack + 1;
+                    const bHp = baseStats.maxHp; const bAtk = baseStats.attack;
                     u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
                 } else if (u.level >= 3) {
-                    const bHp = baseStats.maxHp * 2 + 6; const bAtk = baseStats.attack * 2 + 6;
+                    const bHp = baseStats.maxHp * 2; const bAtk = baseStats.attack * 2;
                     u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
                 }
 

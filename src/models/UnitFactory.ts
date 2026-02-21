@@ -22,7 +22,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'venusaur', name: '妙蛙花', tier: 1, family: 'bulbasaur',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/妙蛙花00.webp', battleImageUrl: 'assets/妙蛙花01.webp',
-        description: '死亡後召喚 2 隻 妙蛙草。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '死亡後召喚 2 隻 4/4 妙蛙草。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 2. Charmander
@@ -96,7 +96,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'bayleef', name: '月桂葉', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/月桂葉00.webp', battleImageUrl: 'assets/月桂葉01.webp',
-        description: '友軍召喚物 +2 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
+        description: '友軍召喚物 +3 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
     },
     meganium: {
         id: 'meganium', name: '大竺葵', tier: 2, family: 'chikorita',
@@ -110,7 +110,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'cyndaquil', name: '火球鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火球鼠00.webp', battleImageUrl: 'assets/火球鼠01.webp',
-        description: '攻擊前 +2 攻擊 與 +2 生命 (每場 2 次)。', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
+        description: '攻擊前 +1 攻擊 與 +1 生命 (每場 2 次)。', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
     },
     quilava: {
         id: 'quilava', name: '火岩鼠', tier: 2, family: 'cyndaquil',

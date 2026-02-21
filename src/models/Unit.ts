@@ -112,14 +112,14 @@ export class Unit {
     const spHp = sacrifice.stats.maxHp;
     const highestHp = Math.max(mpHp, spHp);
     const secondHp = Math.min(mpHp, spHp);
-    const newMaxHp = Math.floor(highestHp + secondHp * 0.5 + 1);
+    const newMaxHp = Math.floor(highestHp + secondHp * 0.5);
 
     // Handle Attack
     const mpAtk = main.stats.attack;
     const spAtk = sacrifice.stats.attack;
     const highestAtk = Math.max(mpAtk, spAtk);
     const secondAtk = Math.min(mpAtk, spAtk);
-    const newAtk = Math.floor(highestAtk + secondAtk * 0.5 + 1);
+    const newAtk = Math.floor(highestAtk + secondAtk * 0.5);
 
     // Feature: Cap stats at 50/50
     const finalHp = Math.min(50, newMaxHp);
