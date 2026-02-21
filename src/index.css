@@ -1578,20 +1578,24 @@ h3 {
 /* Mobile Landscape Optimizations (Scaling PC Style) */
 @media (max-width: 1024px) and (orientation: landscape) {
   .startup-overlay {
-    gap: 3vh !important;
+    gap: 2.5vh !important;
   }
 
   .startup-overlay h1 {
-    font-size: 3.5rem !important;
+    font-size: 4.2rem !important;
+    /* Larger as requested */
     letter-spacing: 8px !important;
-    margin-bottom: 10px !important;
-    line-height: 1.2 !important;
+    text-indent: 8px !important;
+    /* Forces centering by offsetting trailing letter-spacing */
+    margin-bottom: 5px !important;
+    line-height: 1.1 !important;
     font-weight: 900 !important;
   }
 
   .loading-container {
-    width: 90% !important;
-    max-width: 650px !important;
+    width: 390px !important;
+    /* Narrowed to precisely match "AUTOCHESS" width */
+    max-width: 90% !important;
   }
 
   .loading-bar-wrapper {
@@ -1617,11 +1621,12 @@ h3 {
   }
 
   .start-game-btn {
-    margin-top: 10px !important;
-    padding: 12px 50px !important;
+    margin-top: 5px !important;
+    padding: 10px 45px !important;
+    /* Reduced padding */
     border-radius: 35px !important;
-    /* Round like PC */
-    font-size: 1.1rem !important;
+    font-size: 1.15rem !important;
+    /* Reduced font size from 1.3rem */
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     letter-spacing: 8px !important;
@@ -1636,15 +1641,27 @@ h3 {
     color: white !important;
   }
 
-  /* Difficulty Grid for Landscape */
+  /* Hide Version Info in Landscape */
+  .startup-overlay>p:last-child {
+    display: none !important;
+  }
+
+  /* Difficulty Grid Position Fine-tuning */
   .difficulty-grid {
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 10px !important;
-    padding: 0 20px !important;
+    gap: 15px !important;
+    padding: 0 30px !important;
+    transform: translateY(-20px) !important;
+    /* Move grid UP as requested */
   }
 
   .difficulty-option {
-    padding: 15px 10px !important;
-    min-width: 120px !important;
+    padding: 20px 10px !important;
+    min-width: 130px !important;
+  }
+
+  .startup-overlay .difficulty-grid+p {
+    transform: translateY(-10px) !important;
+    /* Move footer text UP to follow grid */
   }
 }
