@@ -350,60 +350,33 @@ function App() {
             let forcedStarCount = 0; // How many units are forced to 3-Star
 
             if (game.wins >= 12) {
-                // Champion:
-                if (difficulty === 'NORMAL') {
-                    // Normal Champion: 1 forced 3-star
-                    enemyBaseLevel = 2;
-                    forcedStarCount = 1;
-                } else if (difficulty === 'GREAT') {
-                    // Great Champion: 2 forced 3-stars
-                    enemyBaseLevel = 2;
-                    forcedStarCount = 2;
-                } else {
-                    // Champion: All 5 Units 3-Star
-                    enemyBaseLevel = 3;
-                    forcedStarCount = 5;
-                }
+                // Champion: All 5 Units 3-Star
+                enemyBaseLevel = 3;
+                forcedStarCount = 5;
             } else if (game.wins >= 8) {
-                // Elite Four:
+                // Elite Four: Progressive 3-Stars (1, 2, 3, 4)
                 const eliteIndex = game.wins - 8; // 0, 1, 2, 3
-                if (difficulty === 'NORMAL') {
-                    // Normal Elite: No forced 3-stars
-                    enemyBaseLevel = 2;
-                    forcedStarCount = 0;
-                } else if (difficulty === 'GREAT') {
-                    // Great Elite: Rare 1 forced 3-star
-                    enemyBaseLevel = 2;
-                    forcedStarCount = eliteIndex >= 2 ? 1 : 0;
-                } else {
-                    // Elite Four: Progressive 3-Stars (1, 2, 3, 4)
-                    enemyBaseLevel = 2;
-                    forcedStarCount = eliteIndex + 1; // 1, 2, 3, 4
-                }
+                enemyBaseLevel = 2;
+                forcedStarCount = eliteIndex + 1; // 1, 2, 3, 4
             } else {
-                // Gym (Wins 0-7)
-                // New Progressive Logic:
-                // Turn 1-3: Base Lv 1.
-                // Turn 4-6: Progressive Lv 2 units.
-                // Turn 7+: All Base Lv 2.
                 enemyBaseLevel = 1;
 
                 // Ensure NO 3-Star units in Gym phase (forcedStarCount remains 0)
-                // We handle 2-Star logic below with forcedTwoStarCount
             }
 
             // ... (Variable declarations)
             let forcedTwoStarCount = 0; // For Gym Phase scaling
+            if (game.wins < 8 && game.turn >= 4 && game.turn < 7) {
+                forcedTwoStarCount = game.turn - 3;
+            }
 
             // Apply Gym Difficulty Logic
             if (game.wins < 8) {
                 if (game.turn >= 7) {
                     enemyBaseLevel = 2; // Full 2-Star team
                 } else if (game.turn >= 4) {
-                    // Turn 4: 1 Lv 2
-                    // Turn 5: 2 Lv 2
-                    // Turn 6: 3 Lv 2
-                    forcedTwoStarCount = game.turn - 3;
+                    // Turn 4: 1 Lv 2, Turn 5: 2 Lv 2, Turn 6: 3 Lv 2
+                    // We'll use a new forcedTwoStarCount variable or just enemyBaseLevel
                 }
             }
 
@@ -638,14 +611,8 @@ function App() {
                         let t = getRandomEnemyTemplate(pool);
                         usedTemplateIds.add(t.family || t.id);
 
-                        let tempLevel = 1;
-                        while (tempLevel < enemyBaseLevel && t.evolveId) {
-                            const nextT = UNIT_TEMPLATES[t.evolveId];
-                            if (nextT) { t = nextT; tempLevel++; } else break;
-                        }
                         const u = new Unit(t);
                         u.level = enemyBaseLevel;
-
                         candidateUnits.push(u);
                     }
                     // 4. Position Sort
@@ -658,12 +625,7 @@ function App() {
                 // Final fallback: just generate randomly if sorting keeps failing
                 attempts = 0; // Reset for actual one-shot generation
                 for (let i = 0; i < enemyCount; i++) {
-                    let tempT = getRandomEnemyTemplate(allTemplates);
-                    let tempLevel = 1;
-                    while (tempLevel < enemyBaseLevel && tempT.evolveId) {
-                        const nextT = UNIT_TEMPLATES[tempT.evolveId];
-                        if (nextT) { tempT = nextT; tempLevel++; } else break;
-                    }
+                    const tempT = getRandomEnemyTemplate(allTemplates);
                     const unit = new Unit(tempT);
                     unit.level = enemyBaseLevel;
                     enemyTeam.push(unit);
@@ -676,35 +638,24 @@ function App() {
                 if (!u) return;
 
                 // A. Apply forced stars (upgrades)
-                if (i < forcedStarCount && u.level < 3) {
-                    while (u.evolveId && u.level < 3) {
-                        const nextT = UNIT_TEMPLATES[u.evolveId];
-                        if (nextT) {
-                            Object.assign(u, {
-                                templateId: nextT.id, name: nextT.name, description: nextT.description,
-                                imageUrl: nextT.battleImageUrl || nextT.imageUrl,
-                                battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
-                                synergies: nextT.synergies || [], tier: nextT.tier
-                            });
-                            u.level++;
-                        } else break;
-                    }
-                    if (u.level < 3) u.level = 3;
-                } else if (i < forcedTwoStarCount && u.level < 2) {
-                    if (u.evolveId && u.level < 2) {
-                        const nextT = UNIT_TEMPLATES[u.evolveId];
-                        if (nextT) {
-                            Object.assign(u, {
-                                templateId: nextT.id, name: nextT.name, description: nextT.description,
-                                imageUrl: nextT.battleImageUrl || nextT.imageUrl,
-                                battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
-                                synergies: nextT.synergies || [], tier: nextT.tier
-                            });
-                            u.level++;
-                        }
-                    }
-                    if (u.level < 2) u.level = 2;
+                const targetLvl = (i < forcedStarCount) ? 3 : ((i < forcedTwoStarCount || enemyBaseLevel >= 2) ? 2 : 1);
+
+                // FIXED: Ensure it evolves up to the HIGHER of targetLvl or enemyBaseLevel.
+                const finalTargetLvl = Math.max(targetLvl, enemyBaseLevel);
+
+                while (u.level < finalTargetLvl && u.evolveId) {
+                    const nextT = UNIT_TEMPLATES[u.evolveId];
+                    if (nextT) {
+                        Object.assign(u, {
+                            templateId: nextT.id, name: nextT.name, description: nextT.description,
+                            imageUrl: nextT.battleImageUrl || nextT.imageUrl,
+                            battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
+                            synergies: nextT.synergies || [], tier: nextT.tier
+                        });
+                        u.level++;
+                    } else break;
                 }
+                if (u.level < finalTargetLvl) u.level = finalTargetLvl;
 
                 // Initial Base level might be forcefully bumped without template change if no evolution
                 if (u.level === 1 && enemyBaseLevel > 1) {
@@ -726,9 +677,6 @@ function App() {
                 if (game.difficultyScore >= turnScalingStart) {
                     let scaleFactor = 0.75;
                     if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.4;
-                    // Nerf scaleFactor for low difficulties
-                    if (difficulty === 'NORMAL') scaleFactor *= 0.4;
-                    else if (difficulty === 'GREAT') scaleFactor *= 0.6;
 
                     const turnScale = Math.floor(game.difficultyScore * scaleFactor);
                     u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);

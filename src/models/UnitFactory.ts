@@ -470,19 +470,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'sneasel', name: '狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/狃拉00.webp', battleImageUrl: 'assets/狃拉01.webp',
-        description: '攻擊時隨機再攻擊 1 個敵方，攻擊力不會被降低。', synergies: ['Claw', 'Snow'], evolveId: 'weavile'
+        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊力不會被降低。', synergies: ['Claw', 'Snow'], evolveId: 'weavile'
     },
     weavile: {
         id: 'weavile', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '攻擊時隨機再攻擊 1 個敵方，攻擊力不會被降低。', synergies: ['Claw', 'Snow'], evolveId: 'weavile_final', isHiddenFromShop: true
+        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊力不會被降低。', synergies: ['Claw', 'Snow'], evolveId: 'weavile_final', isHiddenFromShop: true
     },
     weavile_final: {
         id: 'weavile_final', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '攻擊時隨機再攻擊 1 個敵方，攻擊力不會被降低。', synergies: ['Claw', 'Snow'], isHiddenFromShop: true
+        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊力不會被降低。', synergies: ['Claw', 'Snow'], isHiddenFromShop: true
     },
 
     // 25. Shuppet (Tier 1)

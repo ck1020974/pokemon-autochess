@@ -256,6 +256,7 @@ export class HeadlessBattleSimulator {
     }
 
     private growUnit(unit: Unit, hp: number, atk: number, permanentTarget?: Unit | null, _silent: boolean = false) {
+        if (unit.family === 'sneasel' && atk < 0) atk = 0;
         if (hp === 0 && atk === 0) return;
         unit.addGrowth(hp, atk);
         if (permanentTarget) permanentTarget.addGrowth(hp, atk);
@@ -263,6 +264,7 @@ export class HeadlessBattleSimulator {
     }
 
     private buffAttack(unit: Unit, amount: number, _silent: boolean = false) {
+        if (unit.family === 'sneasel' && amount < 0) return; // Protection
         unit.addBuff(amount);
     }
 
@@ -645,12 +647,20 @@ export class HeadlessBattleSimulator {
             }
         }
         if (attacker.family === 'sneasel' && !s?.isSilenced) {
-            const { opTeam } = this.getTeams(attacker);
-            const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
-            if (liveEnemies.length > 0) {
-                const others = liveEnemies.filter(u => u !== defender);
-                const r = others.length > 0 ? others[Math.floor(Math.random() * others.length)] : defender;
-                promises.push(this.dealDamage(attacker, r, dmg));
+            if (Math.random() < 0.5) {
+                const { opTeam } = this.getTeams(attacker);
+                const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+                if (liveEnemies.length > 0) {
+                    const targetCount = attacker.level >= 3 ? 2 : 1;
+                    let potentialTargets = liveEnemies.filter(u => u !== defender);
+                    if (potentialTargets.length === 0) potentialTargets = [defender];
+
+                    // Shuffle and pick
+                    const finalTargets = [...potentialTargets].sort(() => 0.5 - Math.random()).slice(0, targetCount);
+                    for (const r of finalTargets) {
+                        promises.push(this.dealDamage(attacker, r, dmg));
+                    }
+                }
             }
         }
         if (attacker.family === 'totodile' && !s?.isSilenced) {

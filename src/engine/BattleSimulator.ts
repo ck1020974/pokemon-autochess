@@ -407,6 +407,7 @@ export class BattleSimulator {
     }
 
     private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string, permanentTarget?: Unit | null, silent: boolean = false) {
+        if (unit.family === 'sneasel' && atk < 0) atk = 0; // Protection
         if (hp === 0 && atk === 0) return;
         unit.addGrowth(hp, atk);
         if (permanentTarget) permanentTarget.addGrowth(hp, atk);
@@ -420,6 +421,10 @@ export class BattleSimulator {
     }
 
     private buffAttack(unit: Unit, amount: number, silent: boolean = false) {
+        if (unit.family === 'sneasel' && amount < 0) {
+            if (!silent) this.log(`${unit.name} 發動了銳利目光！`);
+            return; // Protection
+        }
         unit.addBuff(amount);
         if (!silent) {
             this.log(`${unit.name} ${amount >= 0 ? '提高' : '降低'}了 ${Math.abs(amount)} 攻擊！`);
@@ -465,7 +470,11 @@ export class BattleSimulator {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (unit.stats.hp <= 0) return;
-                if (e.source === unit && e.target && e.target.stats.hp > 0 && e.target.family !== 'sneasel') {
+                if (e.source === unit && e.target && e.target.stats.hp > 0) {
+                    if (e.target.family === 'sneasel') {
+                        this.log(`${e.target.name} 發動了銳利目光！`);
+                        return;
+                    }
                     const count = this.getSynergyCountForUnit(unit, 'Water');
                     const debuff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (debuff > 0 && e.target.stats.attack > 1) {
@@ -993,19 +1002,21 @@ export class BattleSimulator {
 
         // Sneasel: 1 extra random hit (Can hit same target if only 1 enemy)
         if (attacker.family === 'sneasel' && !this.unitStates.get(attacker)?.isSilenced) {
-            const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
-            const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
-            const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
-            if (liveEnemies.length > 0) {
-                const targetCount = attacker.level >= 3 ? 2 : 1;
-                let potentialTargets = liveEnemies.filter(u => u !== defender);
-                if (potentialTargets.length === 0) potentialTargets = [defender];
+            if (Math.random() < 0.5) {
+                const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
+                const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
+                const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+                if (liveEnemies.length > 0) {
+                    const targetCount = attacker.level >= 3 ? 2 : 1;
+                    let potentialTargets = liveEnemies.filter(u => u !== defender);
+                    if (potentialTargets.length === 0) potentialTargets = [defender];
 
-                // Shuffle and pick
-                const finalTargets = [...potentialTargets].sort(() => 0.5 - Math.random()).slice(0, targetCount);
-                for (const r of finalTargets) {
-                    this.log(`${attacker.name} 對 ${r.name} 發動了暗襲要害！`);
-                    attackPromises.push(this.dealDamage(attacker, r, dmg));
+                    // Shuffle and pick
+                    const finalTargets = [...potentialTargets].sort(() => 0.5 - Math.random()).slice(0, targetCount);
+                    for (const r of finalTargets) {
+                        this.log(`${attacker.name} 對 ${r.name} 發動了暗襲要害！`);
+                        attackPromises.push(this.dealDamage(attacker, r, dmg));
+                    }
                 }
             }
         }
