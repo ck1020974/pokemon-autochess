@@ -1056,61 +1056,60 @@ function App() {
                 <div className="startup-overlay"
                     style={{
                         position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
-                        background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
+                        background: '#0a0f1a',
                         zIndex: 10000, display: 'flex', flexDirection: 'column',
                         justifyContent: 'center', alignItems: 'center', gap: '30px'
                     }}>
-                    <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                    <div style={{ display: 'inline-block', textAlign: 'center' }}>
                         <h1 style={{
-                            fontSize: '5rem',
+                            fontSize: 'min(12vw, 120px)',
                             margin: '0',
-                            letterSpacing: '12px',
-                            background: 'linear-gradient(to bottom, #fff, #94a3b8)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
-                            fontWeight: 900
+                            letterSpacing: '0.15em',
+                            color: '#e2e8f0', // Slightly muted white
+                            fontWeight: 900,
+                            lineHeight: '1.2',
+                            textTransform: 'uppercase',
+                            fontFamily: "'Inter', sans-serif"
                         }}>
-                            POKEMON<br />AUTOCHESS
+                            POKEMON<br />
+                            AUTOCHESS
                         </h1>
-                    </div>
 
-                    <div className="loading-container" style={{ width: '600px', textAlign: 'center' }}>
                         <div className="loading-bar-wrapper" style={{
-                            width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)',
-                            borderRadius: '3px', overflow: 'hidden', marginBottom: '20px',
-                            border: '1px solid rgba(255,255,255,0.05)'
+                            width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)',
+                            borderRadius: '2px', overflow: 'hidden', marginTop: '20px', marginBottom: '10px'
                         }}>
                             <div className="loading-bar-fill" style={{
                                 width: `${loadingProgress}%`, height: '100%',
-                                background: 'linear-gradient(90deg, #60a5fa, #3b82f6)',
-                                transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                                boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)'
+                                background: '#3b82f6',
+                                transition: 'width 0.4s ease-out'
                             }} />
                         </div>
-                        <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
+                        <p style={{ color: '#64748b', fontSize: '0.9rem', letterSpacing: '4px', margin: '0', opacity: 0.8 }}>
                             {hasLoaded ? '系統就緒' : `資源載入中... ${loadingProgress}%`}
                         </p>
                     </div>
 
-                    <button
-                        className={`start-game-btn ${hasLoaded ? 'is-ready' : ''}`}
-                        disabled={!hasLoaded}
-                        onClick={() => {
-                            music.play('start', true);
-                            setHasStarted(true);
-                        }}
-                    >
-                        開始遊戲
-                    </button>
+                    <div style={{ marginTop: '40px' }}>
+                        <button
+                            className={`start-game-btn-new ${hasLoaded ? 'is-ready' : ''}`}
+                            disabled={!hasLoaded}
+                            onClick={() => {
+                                music.play('start', true);
+                                setHasStarted(true);
+                            }}
+                        >
+                            開 始 遊 戲
+                        </button>
+                    </div>
 
                     <p style={{
                         position: 'absolute',
                         bottom: '20px',
-                        color: 'rgba(148, 163, 184, 0.3)',
-                        fontSize: '0.7rem',
+                        color: 'rgba(148, 163, 184, 0.12)',
+                        fontSize: '0.6rem',
                         letterSpacing: '2px'
-                    }}>v4.8.6 - PREMIUM EDITION</p>
+                    }}>v4.8.7 - PREMIUM EDITION</p>
                 </div>
             )}
 
