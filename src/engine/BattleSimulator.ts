@@ -531,21 +531,13 @@ export class BattleSimulator {
                 }
             });
         }
-        // Cyndaquil: Before attack -> Growth & Splash neighbor
         if (unit.family === 'cyndaquil') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const kState = this.unitStates.get(unit) || {};
-                    const maxTimes = unit.level + 1;
-                    const used = kState.cyndaquilKills || 0;
-                    if (used < maxTimes) {
-                        kState.cyndaquilKills = used + 1;
-                        this.unitStates.set(unit, kState);
-                        const amt = unit.level >= 3 ? 4 : 2;
-                        this.growUnit(unit, amt, amt, '發動了噴火！');
-                        await this.notifySkill(unit, '發動了噴火！');
-                        await this.playAnimation(unit, 'jump', 300);
-                    }
+                    const amt = [0, 1, 2, 4][unit.level] || 1;
+                    this.growUnit(unit, amt, amt, '發動了噴火！');
+                    await this.notifySkill(unit, '發動了噴火！');
+                    await this.playAnimation(unit, 'jump', 300);
 
                     const splashDmg = [0, 2, 6, 12][unit.level] || 2;
                     const { opTeam } = this.getTeams(unit);
@@ -934,7 +926,7 @@ export class BattleSimulator {
                 const { side: mySide } = this.getTeams(unit);
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
                 if (e.source && mySide === sSide && e.source !== unit) {
-                    const buff = [0, 1, 2, 5][unit.level] || 1;
+                    const buff = [0, 1, 3, 5][unit.level] || 1;
                     await this.delay(150);
                     await this.notifySkill(unit, `對 ${e.source.name} 發動了甜甜香氣！`);
                     await this.playAnimation(unit, 'jump', 300);
