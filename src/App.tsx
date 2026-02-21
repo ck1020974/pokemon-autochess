@@ -351,10 +351,14 @@ function App() {
 
             if (game.wins >= 12) {
                 // Champion:
-                if (difficulty === 'NORMAL' || difficulty === 'GREAT') {
-                    // Normal/Great Champion: 3 Stars
+                if (difficulty === 'NORMAL') {
+                    // Normal Champion: 1 forced 3-star
                     enemyBaseLevel = 2;
-                    forcedStarCount = 3;
+                    forcedStarCount = 1;
+                } else if (difficulty === 'GREAT') {
+                    // Great Champion: 2 forced 3-stars
+                    enemyBaseLevel = 2;
+                    forcedStarCount = 2;
                 } else {
                     // Champion: All 5 Units 3-Star
                     enemyBaseLevel = 3;
@@ -363,10 +367,14 @@ function App() {
             } else if (game.wins >= 8) {
                 // Elite Four:
                 const eliteIndex = game.wins - 8; // 0, 1, 2, 3
-                if (difficulty === 'NORMAL' || difficulty === 'GREAT') {
-                    // Normal/Great Elite: First two (0,1) = 1 star, Last two (2,3) = 2 stars
+                if (difficulty === 'NORMAL') {
+                    // Normal Elite: No forced 3-stars
                     enemyBaseLevel = 2;
-                    forcedStarCount = eliteIndex < 2 ? 1 : 2;
+                    forcedStarCount = 0;
+                } else if (difficulty === 'GREAT') {
+                    // Great Elite: Rare 1 forced 3-star
+                    enemyBaseLevel = 2;
+                    forcedStarCount = eliteIndex >= 2 ? 1 : 0;
                 } else {
                     // Elite Four: Progressive 3-Stars (1, 2, 3, 4)
                     enemyBaseLevel = 2;
@@ -718,6 +726,10 @@ function App() {
                 if (game.difficultyScore >= turnScalingStart) {
                     let scaleFactor = 0.75;
                     if (difficulty === 'MASTER' && game.difficultyScore <= 4.5) scaleFactor = 0.4;
+                    // Nerf scaleFactor for low difficulties
+                    if (difficulty === 'NORMAL') scaleFactor *= 0.4;
+                    else if (difficulty === 'GREAT') scaleFactor *= 0.6;
+
                     const turnScale = Math.floor(game.difficultyScore * scaleFactor);
                     u.stats.hp += turnScale; u.stats.maxHp += turnScale; u.stats.attack += Math.floor(turnScale / 1.5);
 
