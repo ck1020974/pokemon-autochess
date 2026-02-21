@@ -185,6 +185,8 @@ export class GameLoop {
         // Update Difficulty Score: Loss protection (Slower increase on loss)
         if (result === 'LOSS') {
             this.difficultyScore += 0.25;
+        } else if (result === 'DRAW') {
+            this.difficultyScore += 0.5;
         } else {
             this.difficultyScore += 1.0;
         }
