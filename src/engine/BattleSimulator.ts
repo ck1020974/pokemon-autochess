@@ -641,31 +641,21 @@ export class BattleSimulator {
             });
         }
 
-        // Slowpoke Family: Heal below 50%
+        // Slowpoke Family: Regenerator (Percentage heal on first damage)
         if (unit.family === 'slowpoke') {
-            // Record original Battle-Start Max HP for heal cap
-            const state = this.unitStates.get(unit) || {};
-            state.originalMaxHp = unit.stats.maxHp;
-            this.unitStates.set(unit, state);
-
             this.eventBus.on('ON_HURT', (e) => {
                 if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const currentState = this.unitStates.get(unit) || {};
-                    if (!currentState.slowpokeHealUsed && unit.stats.hp > 0 && unit.stats.hp < unit.stats.maxHp * 0.5) {
-                        let amount = [0, 6, 12, 50][unit.level] || 6;
-                        // Feature: Heal cannot exceed original max HP (from start of battle)
-                        const cap = currentState.originalMaxHp || unit.stats.maxHp;
-                        const potentialNewHp = unit.stats.hp + amount;
-                        if (potentialNewHp > cap) {
-                            amount = Math.max(0, cap - unit.stats.hp);
-                        }
+                    const state = this.unitStates.get(unit) || {};
+                    if (!state.slowpokeHealUsed && unit.stats.hp > 0) {
+                        const percent = unit.level >= 3 ? 1.0 : 0.33;
+                        const amount = Math.floor(unit.stats.maxHp * percent);
 
                         if (amount > 0) {
                             this.heal(unit, amount);
                             this.log(`${unit.name} 發動了再生力！`);
                         }
-                        currentState.slowpokeHealUsed = true;
-                        this.unitStates.set(unit, currentState);
+                        state.slowpokeHealUsed = true;
+                        this.unitStates.set(unit, state);
                     }
                 }
             });
@@ -864,8 +854,8 @@ export class BattleSimulator {
                     await this.notifySkill(unit, '召喚了小老鼠');
                     await this.delay(100); // reduced from 200
                     const count = unit.level >= 3 ? 5 : 2;
-                    const bonus = [0, 0, 1, 2][unit.level];
-                    const stats = 1 + bonus; // Base 1 + Bonus
+                    // Fix: Match description. Lv1: 1/1, Lv2: 2/2, Lv3: 3/3
+                    const stats = [0, 1, 2, 3][unit.level] || 1;
                     for (let i = 0; i < count; i++) {
                         const { myTeam: currentTeam } = this.getTeams(unit);
                         const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;

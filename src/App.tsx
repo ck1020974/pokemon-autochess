@@ -746,16 +746,11 @@ function App() {
 
                     if (game.wins >= 8) {
                         const eIdx = game.wins - 7;
-                        let eBHp = eIdx * 3; let eBAtk = Math.ceil(eIdx * 1.5);
-                        // Nerf for high tier units to avoid oppressive stats
-                        if (u.tier === 5) { eBHp = Math.ceil(eBHp / 3); eBAtk = Math.ceil(eBAtk / 3); }
-                        else if (u.tier === 4) { eBHp = Math.ceil(eBHp / 2); eBAtk = Math.ceil(eBAtk / 2); }
+                        let eBHp = eIdx * 6; let eBAtk = eIdx * 3;
+                        // Tier-based scaling retention: T5 (50%), T4 (75%)
+                        if (u.tier === 5) { eBHp = Math.ceil(eBHp * 0.5); eBAtk = Math.ceil(eBAtk * 0.5); }
+                        else if (u.tier === 4) { eBHp = Math.ceil(eBHp * 0.75); eBAtk = Math.ceil(eBAtk * 0.75); }
                         u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
-                    }
-                    if (game.wins >= 12) {
-                        let wB = 12; let wA = 6;
-                        if (u.tier === 5) { wB = 4; wA = 2; } else if (u.tier === 4) { wB = 6; wA = 3; }
-                        u.stats.hp += wB; u.stats.maxHp += wB; u.stats.attack += wA;
                     }
                 }
 
