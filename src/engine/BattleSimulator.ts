@@ -1254,16 +1254,21 @@ export class BattleSimulator {
         }
 
         // 3. Process Killer Rewards ONLY if killer survived
-        if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
+        if (killer && killer.stats.hp > 0) {
             const executeReward = async () => {
                 // Critical: Re-check survival if reward was deferred
                 if (killer.stats.hp <= 0) return;
 
                 // Claw Synergy: Atk on kill (Permanent)
-                if (this.getSynergyCountForUnit(killer, 'Claw') >= 2 && killer.synergies.includes('Claw')) {
+                // Removed silence check for synergy-based rewards
+                if (killer.synergies.includes('Claw') && this.getSynergyCountForUnit(killer, 'Claw') >= 2) {
                     const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                    this.growUnit(killer, 0, 2, '發動了魔爪！', original);
+                    this.log(`${killer.name} 發動了磨爪！`);
+                    this.growUnit(killer, 0, 2, '磨爪', original, false);
                 }
+
+                // Check Silence for individual unit abilities
+                if (this.unitStates.get(killer)?.isSilenced) return;
 
                 // Charmander family: Stats on kill (Temporary)
                 if (killer.family === 'charmander') {
@@ -1278,8 +1283,8 @@ export class BattleSimulator {
                         else choice = Math.random() < 0.5 ? 'atk' : 'hp';
 
                         this.log(`${killer.name} 發動了蓄能焰襲！`);
-                        if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲強化');
-                        else this.growUnit(killer, buff, 0, '蓄能焰襲強化');
+                        if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲', null, false);
+                        else this.growUnit(killer, buff, 0, '蓄能焰襲', null, false);
                     } else {
                         const buff = killer.level;
                         const canAddAtk = killer.stats.attack < 50;
@@ -1295,14 +1300,10 @@ export class BattleSimulator {
                         }
 
                         this.log(`${killer.name} 發動了蓄能焰襲！`);
-                        if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲強化');
-                        else this.growUnit(killer, buff, 0, '蓄能焰襲強化');
+                        if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲', null, false);
+                        else this.growUnit(killer, buff, 0, '蓄能焰襲', null, false);
                     }
                 }
-
-                // Reward logic handled by event listeners in registerUnitAbilities
-
-                // Reward logic handled by event listeners in registerUnitAbilities
             };
 
             if (this.isSimulatingStep) {

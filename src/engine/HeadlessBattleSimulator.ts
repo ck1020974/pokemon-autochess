@@ -797,12 +797,17 @@ export class HeadlessBattleSimulator {
             const idx = this.enemyTeam.indexOf(unit);
             if (this.enemyTeam[idx] === unit || (this.enemyTeam[idx] && this.enemyTeam[idx].stats.hp <= 0)) this.enemyTeam[idx] = null as any;
         }
-        if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
+        if (killer && killer.stats.hp > 0) {
             const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id) || null;
 
-            if (this.getSynergyCountForUnit(killer, 'Claw') >= 2 && killer.synergies.includes('Claw')) {
-                this.growUnit(killer, 0, 2, original);
+            // Claw Synergy: Permanent Atk on kill
+            if (killer.synergies.includes('Claw') && this.getSynergyCountForUnit(killer, 'Claw') >= 2) {
+                this.growUnit(killer, 0, 2, original, true);
             }
+
+            // Silence check for unit abilities
+            if (this.unitStates.get(killer)?.isSilenced) return;
+
             if (killer.family === 'charmander') {
                 const buff = killer.level;
                 const canAddAtk = killer.stats.attack < 50;
