@@ -73,36 +73,33 @@ h3 {
   transform: scale(1.2);
 }
 
-.start-game-btn-new {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+.start-game-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #4b5563;
-  padding: 12px 60px;
-  border-radius: 50px;
+  /* Grey text when disabled */
+  padding: 14px 40px;
+  border-radius: 35px;
   font-size: 1.1rem;
-  letter-spacing: 6px;
-  text-indent: 6px;
+  letter-spacing: 8px;
+  text-indent: 8px;
   cursor: default;
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0.6;
   pointer-events: none;
   font-weight: 600;
 }
 
-.start-game-btn-new.is-ready {
+.start-game-btn.is-ready {
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.1);
+  /* White text when loaded */
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
   pointer-events: auto;
   opacity: 1;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
-}
-
-.start-game-btn-new.is-ready:hover {
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
-  transform: scale(1.05);
+  animation: pulse-glow 2s infinite ease-in-out;
 }
 
 @keyframes pulse-glow {
@@ -1575,5 +1572,63 @@ h3 {
   50% {
     filter: drop-shadow(0 0 20px rgba(173, 216, 230, 0.8));
     transform: scale(1.02);
+  }
+}
+/* Mobile Landscape Optimizations (Targeting Reference Image Style) */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .startup-overlay {
+    gap: 15px !important;
+  }
+
+  .startup-overlay h1 {
+    font-size: 3.2rem !important;
+    letter-spacing: 6px !important;
+    margin-bottom: 25px !important;
+    line-height: 1.1 !important;
+  }
+
+  .loading-container {
+    width: 85% !important;
+    max-width: 680px !important;
+  }
+
+  .loading-bar-wrapper {
+    height: 2px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: none !important;
+    margin-bottom: 15px !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+  }
+
+  .loading-bar-fill {
+    height: 100% !important;
+    background: #3b82f6 !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4) !important;
+  }
+
+  .loading-container p {
+    font-size: 0.8rem !important;
+    letter-spacing: 4px !important;
+    opacity: 0.35 !important;
+    text-transform: uppercase;
+  }
+
+  .start-game-btn {
+    margin-top: 40px !important;
+    padding: 12px 60px !important;
+    border-radius: 30px !important;
+    font-size: 1rem !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    letter-spacing: 8px !important;
+    text-indent: 8px !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .start-game-btn.is-ready {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.03) !important;
   }
 }
