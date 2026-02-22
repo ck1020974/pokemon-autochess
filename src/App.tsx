@@ -638,7 +638,7 @@ function App() {
                     for (let i = 0; i < randomCount; i++) {
                         const t = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
                         const u = new Unit(t);
-                        u.level = enemyBaseLevel;
+                        u.level = 1; // Start at 1 to allow evolution logic to work
                         candidateUnits.push(u);
                     }
 
@@ -675,7 +675,7 @@ function App() {
                         usedTemplateIds.add(t.family || t.id);
 
                         const u = new Unit(t);
-                        u.level = enemyBaseLevel;
+                        u.level = 1; // Start at 1 to allow evolution logic to work
                         candidateUnits.push(u);
                     }
                     // 4. Position Sort
@@ -690,7 +690,7 @@ function App() {
                 for (let i = 0; i < enemyCount; i++) {
                     const tempT = getRandomEnemyTemplate(allTemplates);
                     const unit = new Unit(tempT);
-                    unit.level = enemyBaseLevel;
+                    unit.level = 1; // Start at 1 to allow evolution logic to work
                     enemyTeam.push(unit);
                 }
                 while (enemyTeam.length < 5) enemyTeam.push(null);
