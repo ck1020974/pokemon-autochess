@@ -413,17 +413,38 @@ function App() {
             let forcedStarCount = 0; // How many units are forced to 3-Star
 
             if (game.wins >= 12) {
-                // Champion: All 5 Units 3-Star
-                enemyBaseLevel = 3;
-                forcedStarCount = 5;
+                // Champion: Base Level 2, with specific 3-Star counts per difficulty
+                enemyBaseLevel = 2; // Default to 2-star for lategame, let forcedStarCount push to 3-star
+                if (difficulty === 'NORMAL') forcedStarCount = 2;
+                else if (difficulty === 'GREAT') forcedStarCount = 3;
+                else if (difficulty === 'ULTRA') forcedStarCount = 4;
+                else {
+                    enemyBaseLevel = 3;
+                    forcedStarCount = 5; // Master: All 5 Units 3-Star
+                }
             } else if (game.wins >= 8) {
-                // Elite Four: Progressive 3-Stars (1, 2, 3, 4)
+                // Elite Four: Base Level 2, specific 3-Star progression
                 const eliteIndex = game.wins - 8; // 0, 1, 2, 3
                 enemyBaseLevel = 2;
-                forcedStarCount = eliteIndex + 1; // 1, 2, 3, 4
+
+                if (difficulty === 'NORMAL') {
+                    // Normal: 0, 1, 1, 2
+                    const progression = [0, 1, 1, 2];
+                    forcedStarCount = progression[eliteIndex];
+                } else if (difficulty === 'GREAT') {
+                    // Great: 1, 1, 2, 2
+                    const progression = [1, 1, 2, 2];
+                    forcedStarCount = progression[eliteIndex];
+                } else if (difficulty === 'ULTRA') {
+                    // Ultra: 1, 2, 3, 3
+                    const progression = [1, 2, 3, 3];
+                    forcedStarCount = progression[eliteIndex];
+                } else {
+                    // Master: 1, 2, 3, 4
+                    forcedStarCount = eliteIndex + 1;
+                }
             } else {
                 enemyBaseLevel = 1;
-
                 // Ensure NO 3-Star units in Gym phase (forcedStarCount remains 0)
             }
 
