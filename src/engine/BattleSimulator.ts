@@ -228,7 +228,7 @@ export class BattleSimulator {
 
         // Houndour: 4*Lv Dmg to lowest HP enemy
         if (unit.family === 'houndour') {
-            const times = [0, 1, 3, 5][unit.level] || 1;
+            const times = [0, 1, 2, 3][unit.level] || 1;
             const currentOpTeam = this.playerTeam.includes(unit) ? this.enemyTeam : this.playerTeam;
             const livingEnemies = currentOpTeam.filter(e => e && e.stats.hp > 0);
 
@@ -433,7 +433,11 @@ export class BattleSimulator {
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
             team.filter((u: Unit) => u && u.synergies.includes('Starter')).forEach(u => {
-                this.growUnit(u, 1, 1, 'Starter', null, true);
+                const isAtk = Math.random() < 0.5;
+                const hp = isAtk ? 0 : 1;
+                const atk = isAtk ? 1 : 0;
+                const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
+                this.growUnit(u, hp, atk, 'Starter', original, true);
             });
         }
 
@@ -694,7 +698,7 @@ export class BattleSimulator {
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = [0, 2, 3, 4][unit.level] || 2;
+                    const amount = 4;
                     const { side } = this.getTeams(unit);
                     if (!this.isCompacting) {
                         await this.notifySkill(unit, `發動了鐵壁！`);

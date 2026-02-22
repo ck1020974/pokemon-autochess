@@ -149,7 +149,7 @@ export class HeadlessBattleSimulator {
         }
 
         if (unit.family === 'houndour') {
-            const times = [0, 1, 3, 5][unit.level] || 1;
+            const times = [0, 1, 2, 3][unit.level] || 1;
             for (let i = 0; i < times; i++) {
                 const currentOpTeam = this.playerTeam.includes(unit) ? this.enemyTeam : this.playerTeam;
                 const livingEnemies = currentOpTeam.filter(e => e && e.stats.hp > 0);
@@ -240,7 +240,11 @@ export class HeadlessBattleSimulator {
             team.filter(u => u && u.synergies.includes('Triplets')).forEach(u => this.growUnit(u, 3, 3, null, true));
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
-            team.filter(u => u && u.synergies.includes('Starter')).forEach(u => this.growUnit(u, 1, 1, null, true));
+            team.filter(u => u && u.synergies.includes('Starter')).forEach(u => {
+                const isAtk = Math.random() < 0.5;
+                const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
+                this.growUnit(u, isAtk ? 0 : 1, isAtk ? 1 : 0, original, true);
+            });
         }
 
         const hasSnow = (this.playerSynergies.get('Snow') || 0) >= 2 || (this.enemySynergies.get('Snow') || 0) >= 2;
@@ -408,7 +412,7 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = unit.level >= 3 ? 4 : 2;
+                    const amount = 4;
                     this.growUnit(unit, amount, 0);
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                     if (original) original.addGrowth(amount, 0);

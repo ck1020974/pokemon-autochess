@@ -370,13 +370,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'onix', name: '大岩蛇', tier: 4, family: 'onix',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/大岩蛇00.webp', battleImageUrl: 'assets/大岩蛇01.webp',
-        description: '移動後，永久 +2 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix'
+        description: '移動後，永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix'
     },
     steelix: {
         id: 'steelix', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '移動後，永久 +3 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
+        description: '移動後，永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
     },
     steelix_final: {
         id: 'steelix_final', name: '大鋼蛇', tier: 4, family: 'onix',
@@ -410,19 +410,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'slowpoke', name: '呆呆獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/呆呆獸00.webp', battleImageUrl: 'assets/呆呆獸01.webp',
-        description: '受傷時，若生命 < 50%，回復 6 生命 (每場 1 次)。', synergies: ['Slow', 'Water'], evolveId: 'slowbro'
+        description: '首次受傷後，回復 33％ 生命值。', synergies: ['Slow', 'Water'], evolveId: 'slowbro'
     },
     slowbro: {
         id: 'slowbro', name: '呆殼獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/呆殼獸00.webp', battleImageUrl: 'assets/呆殼獸01.webp',
-        description: '受傷時，若生命 < 50%，回復 12 生命 (每場 1 次)。', synergies: ['Slow', 'Water'], evolveId: 'slowbro_final', isHiddenFromShop: true
+        description: '首次受傷後，回復 33％ 生命值。', synergies: ['Slow', 'Water'], evolveId: 'slowbro_final', isHiddenFromShop: true
     },
     slowbro_final: {
         id: 'slowbro_final', name: '呆殼獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/呆殼獸00.webp', battleImageUrl: 'assets/呆殼獸01.webp',
-        description: '受傷時，若生命 < 50%，回復 50 生命 (每場 1 次)。', synergies: ['Slow', 'Water'], isHiddenFromShop: true
+        description: '首次受傷後，回復 100％ 生命值。', synergies: ['Slow', 'Water'], isHiddenFromShop: true
     },
 
     // 22. Magnemite
@@ -456,13 +456,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'houndoom', name: '黑魯加', tier: 3, family: 'houndour',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/黑魯加00.webp', battleImageUrl: 'assets/黑魯加01.webp',
-        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 3 次)。', synergies: ['Angry', 'Fire'], evolveId: 'houndoom_final', isHiddenFromShop: true
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 2 次)。', synergies: ['Angry', 'Fire'], evolveId: 'houndoom_final', isHiddenFromShop: true
     },
     houndoom_final: {
         id: 'houndoom_final', name: '黑魯加', tier: 3, family: 'houndour',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/黑魯加00.webp', battleImageUrl: 'assets/黑魯加01.webp',
-        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 5 次)。', synergies: ['Angry', 'Fire'], isHiddenFromShop: true
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 3 次)。', synergies: ['Angry', 'Fire'], isHiddenFromShop: true
     },
 
     // 24. Sneasel

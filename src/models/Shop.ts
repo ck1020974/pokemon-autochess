@@ -15,8 +15,8 @@ export class Shop {
     public getTier(turn: number): number {
         if (turn <= 2) return 1;
         if (turn <= 5) return 2;
-        if (turn <= 8) return 3;
-        return 4;
+        if (turn <= 9) return 3; // Delayed turn 8 to turn 9
+        return 4; // Turn 10+
     }
 
     public roll(turn: number) {
@@ -36,8 +36,8 @@ export class Shop {
         const PROBS: Record<number, number[]> = {
             1: [80, 20, 0, 0, 0],       // Turn 1-2
             2: [60, 30, 10, 0, 0],      // Turn 3-5
-            3: [35, 37.5, 20, 7.5, 0],  // Turn 6-8
-            4: [15, 30, 32.5, 17.5, 5]  // Turn 9+
+            3: [35, 35, 20, 10, 0],     // Turn 6-9
+            4: [17.5, 25, 30, 20, 7.5]  // Turn 10+
         };
 
         const currentProbs = PROBS[tier];
