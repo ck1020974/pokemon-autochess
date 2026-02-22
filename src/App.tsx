@@ -1021,7 +1021,7 @@ function App() {
                 <div style={{
                     position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
                     background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
-                    zIndex: 9999,
+                    zIndex: 10001,
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                     color: '#fff', textAlign: 'center', padding: '20px',
                     backdropFilter: 'blur(20px)'
