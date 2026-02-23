@@ -433,11 +433,8 @@ export class BattleSimulator {
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
             team.filter((u: Unit) => u && u.synergies.includes('Starter')).forEach(u => {
-                const isAtk = Math.random() < 0.5;
-                const hp = isAtk ? 0 : 1;
-                const atk = isAtk ? 1 : 0;
                 const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
-                this.growUnit(u, hp, atk, 'Starter', original, true);
+                this.growUnit(u, 1, 1, 'Starter', original, true);
             });
         }
 
