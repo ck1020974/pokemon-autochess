@@ -180,9 +180,20 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
                                                 .sort((a, b) => a.tier - b.tier);
 
                                             return (
-                                                <div key={synId} className="synergy-icon" style={{ borderColor: syn.color, position: 'relative', width: '38px', height: '38px', fontSize: '1.4rem', margin: 0 }}>
+                                                <div key={synId} className="synergy-icon" style={{ borderColor: syn.color, position: 'relative', width: '38px', height: '38px', fontSize: '1.4rem', margin: 0, zIndex: activeTier === 5 ? 100 : 1 }}>
                                                     {syn.icon}
-                                                    <div className="synergy-tooltip is-enemy" style={{ position: 'absolute', top: '50%', left: '120%', zIndex: 1000, width: 'max-content', maxWidth: '250px', whiteSpace: 'normal', textAlign: 'left' }}>
+                                                    <div className="synergy-tooltip is-enemy" style={{
+                                                        position: 'absolute',
+                                                        bottom: '120%', /* Position ABOVE the icon */
+                                                        left: '50%',
+                                                        transform: 'translateX(-50%)', /* Center horizontally */
+                                                        zIndex: 20000, /* Extremely high to ensure it's on top of everything */
+                                                        width: 'max-content',
+                                                        maxWidth: '250px',
+                                                        whiteSpace: 'normal',
+                                                        textAlign: 'left',
+                                                        pointerEvents: 'none' /* Prevent tooltip from blocking clicks */
+                                                    }}>
                                                         <div style={{ fontWeight: 'bold', color: syn.color, marginBottom: '4px' }}>
                                                             {syn.icon} {syn.name}
                                                         </div>
