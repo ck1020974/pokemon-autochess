@@ -16,8 +16,8 @@
 .encyclopedia-modal {
     width: 90vw;
     max-width: 1000px;
-    height: auto;
-    /* Allow content to determine height up to a max */
+    height: 85vh;
+    /* Reverted to fixed height for consistency across tiers */
     max-height: 85vh;
     background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -80,7 +80,9 @@
 }
 
 .encyclopedia-tier-btn {
-    padding: 20px 10px;
+    flex: 1;
+    /* Evenly distribute vertical space */
+    padding: 10px;
     background: transparent;
     border: none;
     border-left: 4px solid transparent;
@@ -96,6 +98,9 @@
     /* Center offset for spacing */
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .encyclopedia-tier-btn:hover {
