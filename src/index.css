@@ -1310,6 +1310,67 @@ h3 {
   backdrop-filter: grayscale(0.4) brightness(0.9);
 }
 
+/* --- Mobile Portrait & Narrow Devices (e.g. iPhone 17) --- */
+@media (max-width: 480px) {
+  .shop-container {
+    padding: 10px 5px !important;
+    gap: 15px !important;
+  }
+
+  .shop-controls {
+    width: 65px !important;
+  }
+
+  .shop-slots-area {
+    padding-left: 0 !important;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+
+  .shop-slots {
+    gap: 4px !important;
+  }
+
+  .shop-slots .unit-card,
+  .shop-slots .slot-placeholder {
+    width: 55px !important;
+    height: 70px !important;
+    margin: 0 !important;
+    flex-shrink: 0;
+  }
+
+  .shop-slots .unit-image {
+    width: 45px !important;
+    height: 45px !important;
+  }
+
+  /* Make sure the team board can also scale down or wrap if needed, though they usually overlap */
+  .unit-card,
+  .slot-placeholder {
+    width: 60px;
+    height: 80px;
+    margin: 0 -8px;
+  }
+
+  .unit-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .btn-premium.btn-sell-action,
+  .btn-premium.btn-reroll {
+    font-size: 0.8rem !important;
+    padding: 4px !important;
+  }
+
+  /* Ensure details panel fits */
+  .detail-panel {
+    width: 90% !important;
+    right: 5% !important;
+    left: auto !important;
+  }
+}
+
 /* --- Difficulty Screen Enhancements --- */
 .difficulty-btn:hover:not(.loading) {
   transform: translateY(-8px) scale(1.02);
@@ -1677,8 +1738,11 @@ h3 {
    ========================================= */
 .tutorial-prompt-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   z-index: 10001;
   display: flex;
@@ -1688,13 +1752,13 @@ h3 {
 }
 
 .tutorial-prompt-box {
-  background: linear-gradient(135deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95));
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
   border: 1px solid rgba(96, 165, 250, 0.3);
   border-radius: 20px;
   padding: 40px;
   max-width: 500px;
   text-align: center;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(96, 165, 250, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(96, 165, 250, 0.1);
 }
 
 .tutorial-prompt-box h2 {
@@ -1750,7 +1814,7 @@ h3 {
   border-radius: 12px;
   padding: 20px 40px 20px 20px;
   z-index: 5000;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   pointer-events: auto;
@@ -1766,7 +1830,7 @@ h3 {
   border-radius: 16px;
   padding: 30px;
   z-index: 5000;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(12px);
   max-width: 450px;
   pointer-events: auto;
@@ -1829,22 +1893,47 @@ h3 {
 }
 
 @keyframes bounceArrow {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-15px); }
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-15px);
+  }
 }
 
 @keyframes bounceArrowRight {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-15px); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-15px);
+  }
 }
 
 @keyframes pulseHighlight {
-  0% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.8); }
-  70% { box-shadow: 0 0 0 15px rgba(96, 165, 250, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.8);
+  }
+
+  70% {
+    box-shadow: 0 0 0 15px rgba(96, 165, 250, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0);
+  }
 }
 
 @keyframes popIn {
-  from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  from {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
 }
