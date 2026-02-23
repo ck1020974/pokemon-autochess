@@ -30,19 +30,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'charmander', name: '小火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/小火龍00.webp', battleImageUrl: 'assets/小火龍01.webp',
-        description: '擊殺敵方後隨機 +1 攻擊 或 生命。', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
+        description: '擊殺敵方後隨機 +1 攻擊或生命。', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
     },
     charmeleon: {
         id: 'charmeleon', name: '火恐龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/火恐龍00.webp', battleImageUrl: 'assets/火恐龍01.webp',
-        description: '擊殺敵方後隨機 +2 攻擊 或 生命。', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
+        description: '擊殺敵方後隨機 +2 攻擊或生命。', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
     },
     charizard: {
         id: 'charizard', name: '噴火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/噴火龍00.webp', battleImageUrl: 'assets/噴火龍01.webp',
-        description: '擊殺敵方後 +5 攻擊 或 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '擊殺敵方後 +5 攻擊或生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 3. Squirtle
@@ -90,19 +90,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'chikorita', name: '菊草葉', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/菊草葉00.webp', battleImageUrl: 'assets/菊草葉01.webp',
-        description: '友軍召喚物 +1 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'bayleef'
+        description: '友軍召喚物 +1 攻擊與生命。', synergies: ['Starter', 'Grass'], evolveId: 'bayleef'
     },
     bayleef: {
         id: 'bayleef', name: '月桂葉', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/月桂葉00.webp', battleImageUrl: 'assets/月桂葉01.webp',
-        description: '友軍召喚物 +3 攻擊 與 生命。', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
+        description: '友軍召喚物 +3 攻擊與生命。', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
     },
     meganium: {
         id: 'meganium', name: '大竺葵', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/大竺葵00.webp', battleImageUrl: 'assets/大竺葵01.webp',
-        description: '友軍召喚物 +5 攻擊 與 生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '友軍召喚物 +5 攻擊與生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 6. Cyndaquil
@@ -110,19 +110,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'cyndaquil', name: '火球鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火球鼠00.webp', battleImageUrl: 'assets/火球鼠01.webp',
-        description: '攻擊前 +1 攻擊 與 +1 生命 (每場 2 次)。', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
+        description: '攻擊前 +1 攻擊與生命 (每場 2 次)。', synergies: ['Starter', 'Fire'], evolveId: 'quilava'
     },
     quilava: {
         id: 'quilava', name: '火岩鼠', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火岩鼠00.webp', battleImageUrl: 'assets/火岩鼠01.webp',
-        description: '攻擊前 +2 攻擊 與 +2 生命 (每場 3 次)。', synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
+        description: '攻擊前 +2 攻擊與生命 (每場 3 次)。', synergies: ['Starter', 'Fire'], evolveId: 'typhlosion', isHiddenFromShop: true
     },
     typhlosion: {
         id: 'typhlosion', name: '火爆獸', tier: 2, family: 'cyndaquil',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火爆獸00.webp', battleImageUrl: 'assets/火爆獸01.webp',
-        description: '攻擊前 +4 攻擊 與 +4 生命 (每場 4 次)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '攻擊前 +4 攻擊與生命 (每場 4 次)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 7. Totodile
@@ -210,19 +210,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'mudkip', name: '水躍魚', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/水躍魚00.webp', battleImageUrl: 'assets/水躍魚01.webp',
-        description: '前方友軍攻擊時，自身 +2 攻擊 與 生命。', synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
+        description: '前方友軍攻擊時，自身 +2 攻擊與生命。', synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
     },
     marshtomp: {
         id: 'marshtomp', name: '沼躍魚', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/沼躍魚00.webp', battleImageUrl: 'assets/沼躍魚01.webp',
-        description: '前方友軍攻擊時，自身 +4 攻擊 與 生命。', synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
+        description: '前方友軍攻擊時，自身 +4 攻擊與生命。', synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
     },
     swampert: {
         id: 'swampert', name: '巨沼怪', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/巨沼怪00.webp', battleImageUrl: 'assets/巨沼怪01.webp',
-        description: '前方友軍攻擊時，自身 +6 攻擊 與 生命。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '前方友軍攻擊時，自身 +6 攻擊與生命。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 12. Sprigatito
@@ -230,19 +230,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'sprigatito', name: '新葉喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/新葉喵00.webp', battleImageUrl: 'assets/新葉喵01.webp',
-        description: '友軍召喚後，友方全體永久 +1 攻擊 或 生命。', synergies: ['Starter', 'Grass'], evolveId: 'floragato'
+        description: '友軍召喚後，友方全體永久 +1 攻擊或生命。', synergies: ['Starter', 'Grass'], evolveId: 'floragato'
     },
     floragato: {
         id: 'floragato', name: '蒂蕾喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/蒂蕾喵00.webp', battleImageUrl: 'assets/蒂蕾喵01.webp',
-        description: '友軍召喚後，友方全體永久 +1 攻擊 或 生命。', synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
+        description: '友軍召喚後，友方全體永久 +1 攻擊或生命。', synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
     },
     meowscarada: {
         id: 'meowscarada', name: '魔幻假面喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/魔幻假面喵00.webp', battleImageUrl: 'assets/魔幻假面喵01.webp',
-        description: '友軍召喚後，友方全體永久 +2 攻擊 或 生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '友軍召喚後，友方全體永久 +2 攻擊或生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 13. Fuecoco
@@ -430,19 +430,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'magnemite', name: '小磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/小磁怪00.webp', battleImageUrl: 'assets/小磁怪01.webp',
-        description: '準備結束時，隨機 +2 攻擊 或 生命 (共 1 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton'
+        description: '準備結束時，隨機 +2 攻擊或生命 (共 1 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton'
     },
     magneton: {
         id: 'magneton', name: '三合一磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/三合一磁怪00.webp', battleImageUrl: 'assets/三合一磁怪01.webp',
-        description: '準備結束時，隨機 +2 攻擊 或 生命 (共 2 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton_final', isHiddenFromShop: true
+        description: '準備結束時，隨機 +2 攻擊或生命 (共 2 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton_final', isHiddenFromShop: true
     },
     magneton_final: {
         id: 'magneton_final', name: '三合一磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/三合一磁怪00.webp', battleImageUrl: 'assets/三合一磁怪01.webp',
-        description: '準備結束時，隨機 +2 攻擊 或 生命 (共 5 次)。', synergies: ['Triplets', 'Hard'], isHiddenFromShop: true
+        description: '準備結束時，隨機 +2 攻擊或生命 (共 5 次)。', synergies: ['Triplets', 'Hard'], isHiddenFromShop: true
     },
 
     // 23. Houndour
@@ -672,19 +672,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'gulpin', name: '溶食獸', tier: 2, family: 'gulpin',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/溶食獸00.webp', battleImageUrl: 'assets/溶食獸01.webp',
-        description: '戰鬥開始時，吞噬前方友軍並繼承其生命與攻擊。', synergies: ['Slow'], evolveId: 'swalot'
+        description: '戰鬥開始時，吞噬前方友軍並繼承生命與攻擊。', synergies: ['Slow'], evolveId: 'swalot'
     },
     swalot: {
         id: 'swalot', name: '吞食獸', tier: 2, family: 'gulpin',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/吞食獸00.webp', battleImageUrl: 'assets/吞食獸01.webp',
-        description: '戰鬥開始時，吞噬前方友軍並繼承其生命與攻擊。', synergies: ['Slow'], evolveId: 'swalot_final', isHiddenFromShop: true
+        description: '戰鬥開始時，吞噬前方友軍並繼承生命與攻擊。', synergies: ['Slow'], evolveId: 'swalot_final', isHiddenFromShop: true
     },
     swalot_final: {
         id: 'swalot_final', name: '吞食獸', tier: 2, family: 'gulpin',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/吞食獸00.webp', battleImageUrl: 'assets/吞食獸01.webp',
-        description: '戰鬥開始時，吞噬前方友軍並繼承其兩倍生命與攻擊。', synergies: ['Slow'], isHiddenFromShop: true
+        description: '戰鬥開始時，吞噬前方友軍並繼承兩倍生命與攻擊。', synergies: ['Slow'], isHiddenFromShop: true
     },
     heracross: {
         id: 'heracross', name: '赫拉克羅斯', tier: 4, family: 'heracross',

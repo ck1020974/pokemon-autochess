@@ -9,6 +9,7 @@ import { BattleSimulator } from './engine/BattleSimulator';
 import type { BattleLog } from './engine/BattleSimulator';
 import { UNIT_TEMPLATES, PREFERRED_POSITIONS } from './models/UnitFactory';
 import { SYNERGIES } from './models/Synergies';
+import { EncyclopediaModal } from './components/EncyclopediaModal';
 
 // Difficulty Icons
 import normalBall from './assets/普通.webp';
@@ -284,6 +285,9 @@ function App() {
         music.setMuted(nextMuted);
         setIsMuted(nextMuted);
     };
+
+    // Encyclopedia State
+    const [showEncyclopedia, setShowEncyclopedia] = useState(false);
 
     // Image Preloading - Systematically cache all unit assets on startup
     useEffect(() => {
@@ -1349,7 +1353,7 @@ function App() {
                     <span style={{ color: (game.wins >= 8 && game.wins < 12) ? '#fbbf24' : '#888' }}>⚔️ 四天王: {Math.max(0, Math.min(game.wins - 8, 4))}/4</span>
                     <span style={{ color: game.wins >= 12 ? '#f472b6' : '#888' }}>👑 冠軍: {Math.max(0, Math.min(game.wins - 12, 1))}/1</span>
                     {/* Help & Mute Toggle Buttons inside Header */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginLeft: '10px' }}>
                         <button
                             className={`mute-toggle-btn-header ${tutorialStep > 0 ? 'is-active' : ''}`}
                             onClick={() => {
@@ -1368,6 +1372,13 @@ function App() {
                         </button>
                         <button
                             className="mute-toggle-btn-header"
+                            onClick={() => setShowEncyclopedia(true)}
+                            title="圖鑑 / 小百科"
+                        >
+                            📖
+                        </button>
+                        <button
+                            className="mute-toggle-btn-header"
                             onClick={toggleMute}
                             title={isMuted ? "開啟聲音" : "靜音"}
                         >
@@ -1376,6 +1387,11 @@ function App() {
                     </div>
                 </div>
             </div>
+
+            {/* Encyclopedia Modal */}
+            {showEncyclopedia && (
+                <EncyclopediaModal onClose={() => setShowEncyclopedia(false)} />
+            )}
 
             {/* Battle Result Overlay */}
             {
