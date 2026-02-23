@@ -118,15 +118,17 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 24px 20px;
+    /* Precise top/bottom padding for visual equidistance */
     overflow-y: auto;
 }
 
 .encyclopedia-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 15px;
-    padding-bottom: 20px;
+    gap: 20px;
+    /* Wider gap for cleaner look */
+    padding: 0;
 }
 
 .encyclopedia-unit-card {
@@ -170,8 +172,9 @@
 
 .encyclopedia-unit-name {
     color: white;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: bold;
+    text-align: center;
 }
 
 .encyclopedia-unit-stats {
@@ -509,87 +512,81 @@
     .encyclopedia-modal {
         width: 88vw;
         height: 88vh;
-        /* Reduced height as requested */
+        /* Fixed height for consistent equidistance */
         max-height: 88vh;
+    }
+
+    .encyclopedia-main {
+        padding: 24px 15px;
+        /* Visual equidistance for mobile landscape */
     }
 
     .encyclopedia-tier-btn {
         flex: 1;
         /* Match PC: evenly distribute vertical space */
-        font-size: 1.1rem;
-        /* Increase text size */
-        letter-spacing: 4px;
-        text-indent: 4px;
+        font-size: 1.25rem;
+        /* Larger font size as requested */
+        letter-spacing: 6px;
+        text-indent: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
     .encyclopedia-unit-name {
-        font-size: 1rem;
-        /* Increase text size to be more readable */
+        font-size: 1.15rem;
+        /* Match PC readability */
+    }
+
+    .encyclopedia-unit-stats {
+        font-size: 0.95rem;
+    }
+
+    .encyclopedia-detail-modal {
+        width: auto !important;
+        max-width: 600px;
+        /* Extreme slim outer frame as requested */
+        background: rgba(0, 0, 0, 0.4);
     }
 
     .encyclopedia-detail-box {
-        max-width: 620px;
-        /* Narrower outer box as requested */
-        width: auto;
-        /* Stop using vw to prevent "full screen" look */
-        padding: 5px 10px;
-        max-height: 98vh;
-        border-radius: 20px;
+        max-width: 580px;
+        padding: 8px 10px;
     }
 
     .encyclopedia-detail-content {
-        gap: 4px;
-        padding: 6px 10px;
+        gap: 8px;
+        padding: 10px 15px;
     }
 
     .encyclopedia-evolution-path-container {
-        padding: 15px 10px;
-        /* Relaxed internal squeeze as requested */
-        max-width: 600px;
-        /* Force the interior black box to stay slim */
+        padding: 18px 20px;
+        /* PC-like breathing space inside the black box */
+        max-width: 540px;
         margin: 0 auto;
     }
 
     .encyclopedia-evolution-path {
-        gap: 8px;
-        /* Tighter arrow spacing */
+        gap: 10px;
     }
 
     .encyclopedia-evolution-stage {
         padding: 10px 8px;
-        /* Much tighter horizontal padding for the stage box */
         max-width: 180px;
-        /* Squeeze the box width as requested */
         flex: 0 1 auto;
-        /* Don't force growth */
     }
 
     .encyclopedia-stage-img {
         max-width: 120px;
-        /* Keep image size large as requested (01) */
         height: 90px;
-        /* Slightly shorter height */
-    }
-
-    .encyclopedia-evolution-arrow {
-        width: 16px;
-    }
-
-    .encyclopedia-evolution-arrow::after {
-        width: 10px;
-        height: 10px;
     }
 
     .encyclopedia-stage-desc {
         padding: 6px 10px;
         font-size: 0.85rem;
-        /* Larger font size as requested */
+        /* Matches PC readability */
         margin-top: 6px;
         line-height: 1.4;
         max-width: 150px;
-        /* Keep text width compact */
     }
 }

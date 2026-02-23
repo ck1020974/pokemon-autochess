@@ -1115,14 +1115,14 @@ h3 {
   }
 
   .shop-slots-area {
-    padding-left: 32px;
-    /* Further reduced from 40px to shift slots left */
+    padding-left: 36px;
+    /* Subtle mid-point between divider and slots */
     position: relative;
   }
 
   .shop-slots {
-    gap: 12px;
-    /* Tighter gap to avoid clipping */
+    gap: 13px;
+    /* Slightly tighter gap to avoid overlapping text on right */
   }
 
   .shop-slots .unit-card,
@@ -1137,9 +1137,9 @@ h3 {
   .reroll-icon-btn {
     font-size: 1.5rem !important;
     top: -10px !important;
-    left: -4px !important;
-    /* Shifted back LEFT to stay closer to divider */
-    /* Adjusted: divider width 80, slot start 32, button -4 */
+    left: 0px !important;
+    /* Centered between divider line and first slot */
+    /* Adjusted: divider width 80, slot start 36, button 0 */
   }
 
   /* Selection glow tweak for mobile: narrower width and reduced height */
