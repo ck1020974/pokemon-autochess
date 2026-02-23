@@ -248,7 +248,7 @@ function App() {
 
     // UI States
     const [showEncyclopedia, setShowEncyclopedia] = useState<boolean>(false);
-    const [showTutorial, setShowTutorial] = useState<boolean>(true);
+    const [showTutorial, setShowTutorial] = useState<boolean>(false);
 
     // Image Preloading - Systematically cache all unit assets on startup
     useEffect(() => {
@@ -328,12 +328,6 @@ function App() {
         music.stop(); // Stop 'start' music
         setDifficulty(lvl);
         game.setDifficulty(lvl);
-
-        // Tutorial Triggering Logic
-        const hasSeen = localStorage.getItem('hasSeenTutorial');
-        if (!hasSeen) {
-            setShowTutorial(true); // Open tutorial modal
-        }
 
         update(); // Ensure shop phase logic triggers music check
     };
@@ -1231,8 +1225,16 @@ function App() {
                     {difficulty && (
                         <div className={`difficulty-badge ${difficulty}`} style={{
                             display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px',
-                            background: 'rgba(255,255,255,0.05)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)'
-                        }}>
+                            background: 'rgba(255,255,255,0.05)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)',
+                            cursor: 'pointer', transition: 'all 0.2s'
+                        }}
+                            title="重新選擇難度"
+                            onClick={() => {
+                                if (window.confirm('確定重新選擇遊戲難度？')) {
+                                    setDifficulty(null);
+                                    handleRestart();
+                                }
+                            }}>
                             <img src={
                                 difficulty === 'NORMAL' ? normalBall :
                                     difficulty === 'GREAT' ? greatBall :
@@ -1320,7 +1322,14 @@ function App() {
                             alignItems: 'center',
                             cursor: 'pointer'
                         }}
-                        onClick={handleRestart}
+                        onClick={() => {
+                            if (game.phase === GamePhase.VICTORY) {
+                                setDifficulty(null);
+                                handleRestart();
+                            } else {
+                                handleRestart();
+                            }
+                        }}
                     >
                         {/* Main Message - Visual center of screen */}
                         <div className="result-content" style={{
