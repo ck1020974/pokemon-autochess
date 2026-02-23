@@ -370,9 +370,13 @@
     }
 
     .encyclopedia-tier-btn {
-        padding: 12px 10px;
-        font-size: 1rem;
-        letter-spacing: 1px;
+        padding: 16px 10px;
+        font-size: 1.15rem;
+        letter-spacing: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
     }
 
     .encyclopedia-main {
@@ -381,20 +385,20 @@
 
     .encyclopedia-grid {
         /* Enlarge unit container slightly to fit larger image */
-        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-        gap: 10px;
-        padding-bottom: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+        padding-bottom: 2px;
     }
 
     .encyclopedia-unit-card {
-        padding: 10px;
-        border-radius: 8px;
+        padding: 6px;
+        border-radius: 6px;
     }
 
     .encyclopedia-unit-img {
-        /* User requested enlarging right side unit image (00) */
-        width: 64px;
-        height: 64px;
+        /* Match a robust but relatively smaller size to prevent scrolling */
+        width: 56px;
+        height: 56px;
     }
 
     .encyclopedia-unit-name {
@@ -403,10 +407,10 @@
 
     /* Detail Popup Shrinking for Mobile */
     .encyclopedia-detail-box {
-        /* User requested making the detail box less wide/full */
-        width: 90%;
-        max-width: 480px;
-        padding: 15px;
+        width: 95%;
+        max-width: 680px;
+        /* Allows much wider than 480px! PC-like landscape style */
+        padding: 20px;
         max-height: 92vh;
         overflow-y: auto;
     }
@@ -435,12 +439,12 @@
     }
 
     .encyclopedia-evolution-stage {
-        /* User requested character bounding box not to be so wide/full */
-        padding: 6px;
+        padding: 8px;
         border-radius: 10px;
         flex: 1;
         min-width: 0;
-        /* allows shrinking */
+        max-width: 200px;
+        /* Don't be too full on widescreen tablets */
     }
 
     .encyclopedia-stage-stars {

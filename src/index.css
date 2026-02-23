@@ -1644,9 +1644,9 @@ h3 {
 @media (max-width: 1024px) and (orientation: landscape) {
   #root {
     /* Prevent UI from being too full/close to edges on modern mobile screens like iPhone 16 */
-    padding-left: calc(50px + env(safe-area-inset-left, 0px)) !important;
-    padding-right: calc(50px + env(safe-area-inset-right, 0px)) !important;
-    padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-left: calc(24px + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(24px + env(safe-area-inset-right, 0px)) !important;
+    padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .startup-overlay {
