@@ -16,8 +16,8 @@
 .encyclopedia-modal {
     width: 90vw;
     max-width: 1000px;
-    height: 560px;
-    /* Increased slightly for perfect two-row visual equidistance */
+    height: 580px;
+    /* Increased slightly for better equidistance room */
     /* Set a specific height that balances with the sidebar buttons */
     max-height: 85vh;
     background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
@@ -81,9 +81,9 @@
 }
 
 .encyclopedia-tier-btn {
-    flex: 1;
-    /* Evenly distribute vertical space */
-    padding: 10px;
+    /* flex: 1; Removed full-height distribution as requested */
+    padding: 20px 10px;
+    /* Fixed spacing */
     background: transparent;
     border: none;
     border-left: 4px solid transparent;
@@ -119,8 +119,8 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 28px 20px;
-    /* Balanced top/bottom padding for "visual equidistance" */
+    padding: 32px 20px;
+    /* Increased for equidistance with two rows */
     overflow-y: auto;
 }
 
@@ -512,19 +512,18 @@
 @media (max-width: 1024px) and (orientation: landscape) {
     .encyclopedia-modal {
         width: 88vw;
-        height: 82vh;
-        /* Reduced height for perfect mobile equidistance */
-        max-height: 82vh;
+        height: 80vh;
+        /* Slightly smaller as requested */
+        max-height: 80vh;
     }
 
     .encyclopedia-title {
-        font-size: 1.8rem;
-        /* Larger title for mobile as requested */
+        font-size: 1.6rem;
     }
 
     .encyclopedia-sidebar {
-        width: 110px;
-        /* Narrower sidebar as requested */
+        width: 95px;
+        /* Extremely narrow sidebar as requested */
     }
 
     .encyclopedia-main {
@@ -533,11 +532,10 @@
     }
 
     .encyclopedia-tier-btn {
-        flex: 1;
-        font-size: 1.1rem;
-        /* Balanced size for narrow sidebar */
-        letter-spacing: 4px;
-        text-indent: 4px;
+        padding: 15px 5px;
+        font-size: 1rem;
+        letter-spacing: 2px;
+        text-indent: 2px;
         display: flex;
         align-items: center;
         justify-content: center;
