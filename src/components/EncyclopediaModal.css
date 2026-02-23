@@ -508,28 +508,47 @@
 @media (max-width: 1024px) and (orientation: landscape) {
     .encyclopedia-modal {
         width: 88vw;
-        height: 94vh;
-        /* Increased to fill more vertical space */
-        max-height: 94vh;
+        height: 88vh;
+        /* Reduced height as requested */
+        max-height: 88vh;
+    }
+
+    .encyclopedia-tier-btn {
+        flex: 1;
+        /* Match PC: evenly distribute vertical space */
+        font-size: 1.1rem;
+        /* Increase text size */
+        letter-spacing: 4px;
+        text-indent: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .encyclopedia-unit-name {
+        font-size: 1rem;
+        /* Increase text size to be more readable */
     }
 
     .encyclopedia-detail-box {
-        max-width: 680px;
-        /* Squeezed significantly from 760px */
+        max-width: 620px;
+        /* Narrower outer box as requested */
         width: auto;
         /* Stop using vw to prevent "full screen" look */
-        padding: 10px 15px;
+        padding: 5px 10px;
         max-height: 98vh;
+        border-radius: 20px;
     }
 
     .encyclopedia-detail-content {
-        gap: 6px;
-        padding: 8px 12px;
+        gap: 4px;
+        padding: 6px 10px;
     }
 
     .encyclopedia-evolution-path-container {
-        padding: 8px;
-        max-width: 640px;
+        padding: 15px 10px;
+        /* Relaxed internal squeeze as requested */
+        max-width: 600px;
         /* Force the interior black box to stay slim */
         margin: 0 auto;
     }
@@ -566,11 +585,11 @@
 
     .encyclopedia-stage-desc {
         padding: 6px 10px;
-        font-size: 0.8rem;
-        /* Smaller font for tighter text width */
+        font-size: 0.85rem;
+        /* Larger font size as requested */
         margin-top: 6px;
-        line-height: 1.3;
-        max-width: 160px;
-        /* Limit text width specifically */
+        line-height: 1.4;
+        max-width: 150px;
+        /* Keep text width compact */
     }
 }
