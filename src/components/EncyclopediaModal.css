@@ -341,3 +341,132 @@
         transform: scale(1);
     }
 }
+
+/* ========================================= */
+/* Mobile / Small Screen Responsiveness      */
+/* ========================================= */
+@media (max-width: 800px),
+(max-height: 600px) {
+    .encyclopedia-modal {
+        width: 95vw;
+        height: 95vh;
+    }
+
+    .encyclopedia-header {
+        padding: 12px 20px;
+    }
+
+    .encyclopedia-title {
+        font-size: 1.4rem;
+    }
+
+    .encyclopedia-close-btn {
+        font-size: 1.6rem;
+    }
+
+    .encyclopedia-sidebar {
+        /* User felt left was too short/narrow relative to right side being too wide.
+           Let's give it a percentage or increase its relative footprint */
+        width: 110px;
+    }
+
+    .encyclopedia-tier-btn {
+        padding: 12px 10px;
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }
+
+    .encyclopedia-main {
+        padding: 12px;
+    }
+
+    .encyclopedia-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+        padding-bottom: 10px;
+    }
+
+    .encyclopedia-unit-card {
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .encyclopedia-unit-img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .encyclopedia-unit-name {
+        font-size: 0.95rem;
+    }
+
+    /* Detail Popup Shrinking for Mobile */
+    .encyclopedia-detail-box {
+        width: 96%;
+        max-width: 600px;
+        padding: 15px;
+        max-height: 92vh;
+        overflow-y: auto;
+    }
+
+    .encyclopedia-detail-close-btn {
+        top: 8px;
+        right: 12px;
+        font-size: 1.5rem;
+    }
+
+    .encyclopedia-detail-title {
+        font-size: 1.4rem;
+    }
+
+    .synergy-tooltip.is-enemy {
+        max-width: 200px;
+        font-size: 0.8rem;
+    }
+
+    .encyclopedia-evolution-path-container {
+        padding: 5px;
+    }
+
+    .encyclopedia-evolution-path {
+        gap: 5px;
+    }
+
+    .encyclopedia-evolution-stage {
+        padding: 8px;
+        border-radius: 10px;
+    }
+
+    .encyclopedia-stage-stars {
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+    }
+
+    .encyclopedia-stage-img {
+        max-width: 60px;
+        height: 60px;
+    }
+
+    .encyclopedia-evolution-arrow {
+        width: 12px;
+    }
+
+    .encyclopedia-evolution-arrow::after {
+        width: 8px;
+        height: 8px;
+    }
+
+    .encyclopedia-stage-name {
+        font-size: 1rem;
+    }
+
+    .encyclopedia-unit-stats {
+        margin: 4px 0 !important;
+        font-size: 0.8rem;
+    }
+
+    .encyclopedia-stage-desc {
+        font-size: 0.8rem;
+        line-height: 1.3;
+    }
+}
