@@ -33,9 +33,9 @@ export class GameLoop {
 
     public setDifficulty(level: 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER') {
         const multipliers = {
-            'NORMAL': 0.75,
-            'GREAT': 0.9,
-            'ULTRA': 1.25,
+            'NORMAL': 0.6,
+            'GREAT': 0.75,
+            'ULTRA': 1.1,
             'MASTER': 1.5
         };
         this.difficultyMultiplier = multipliers[level];

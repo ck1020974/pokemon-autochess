@@ -476,11 +476,11 @@ function App() {
             let synergyTargetCount = 0;
             let uniqueConstraint = false;
 
-            // Updated Elite Thresholds: Master (Win 3+), Ultra (Win 5+), Normal (Win 10+), Great (Win 8+)
+            // Updated Elite Thresholds: Master (Win 3+), Ultra (Win 5+), Great (Win 10+), Normal (Win 12+)
             const isEliteMatch = (difficulty === 'MASTER' && game.wins >= 3) ||
                 (difficulty === 'ULTRA' && game.wins >= 5) ||
-                (difficulty === 'NORMAL' && game.wins >= 10) ||
-                (difficulty === 'GREAT' && game.wins >= 8);
+                (difficulty === 'GREAT' && game.wins >= 10) ||
+                (difficulty === 'NORMAL' && game.wins >= 12);
 
             // --- Shared Generation Variables ---
             let enemyTeam: (Unit | null)[] = [];
