@@ -1343,7 +1343,6 @@ function App() {
                     )}
                     <span>❤️ 生命: {game.lives}</span>
                     <span>💰 金幣: {game.gold}</span>
-                    <span>📅 回合: {game.turn}</span>
                 </div>
                 <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
                     <span style={{ color: game.wins < 8 ? '#fff' : '#888' }}>🏅 道館: {Math.min(game.wins, 8)}/8</span>

@@ -189,7 +189,7 @@ export class BattleSimulator {
             if (unit.templateId === 'gengar') { // Stage 3
                 await this.notifySkill(unit, `耿鬼發動了詭計！`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                    this.buffAttack(u!, 5, true);
+                    this.buffAttack(u!, 10, true);
                     await this.delay(65);
                 }
             } else {
@@ -210,7 +210,7 @@ export class BattleSimulator {
             if (unit.templateId === 'wigglytuff') { // Stage 3
                 await this.notifySkill(unit, `胖可丁發動了治癒波動！`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                    this.growUnit(u!, 5, 0, 'Igglybuff', null, true);
+                    this.growUnit(u!, 10, 0, 'Igglybuff', null, true);
                     await this.delay(65);
                 }
             } else {
@@ -878,11 +878,24 @@ export class BattleSimulator {
                     const { opTeam } = this.getTeams(unit);
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
-                        const target = living[Math.floor(Math.random() * living.length)];
-                        await this.notifySkill(unit, `對目標使用了影子偷襲！`);
-                        await this.delay(200); // reduced from 400
-                        const dmg = [0, 4, 10, 99][unit.level] || 4;
-                        await this.dealDamage(unit, target, dmg, true);
+                        if (unit.level >= 3) {
+                            await this.notifySkill(unit, `發動了潛靈奇襲！\n造成了連續 5 次傷害`);
+                            await this.delay(200);
+
+                            for (let i = 0; i < 5; i++) {
+                                const currentLiving = opTeam.filter(u => u && u.stats.hp > 0);
+                                if (currentLiving.length === 0) break;
+                                const target = currentLiving[Math.floor(Math.random() * currentLiving.length)];
+                                await this.dealDamage(unit, target, 10, true, true);
+                                await this.delay(65);
+                            }
+                        } else {
+                            const target = living[Math.floor(Math.random() * living.length)];
+                            await this.notifySkill(unit, `對目標使用了影子偷襲！`);
+                            await this.delay(200);
+                            const dmg = [0, 4, 10, 99][unit.level] || 4;
+                            await this.dealDamage(unit, target, dmg, true);
+                        }
                     }
                 }
             });

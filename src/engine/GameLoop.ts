@@ -114,13 +114,20 @@ export class GameLoop {
             }
         }
 
-        // Beetle (2): Every Beetle unit -> +2/+2 Permanent
+        // Beetle (2): Every Beetle unit -> +5 HP or Attack (prioritize lower stat)
         const beetleUnits = this.playerTeam.filter(u => u && u.synergies.includes('Beetle')) as Unit[];
         const beetleCount = getUniqueCount(beetleUnits);
         if (beetleCount >= 2) {
             beetleUnits.forEach(u => {
-                applyBuff(u, 2, 'hp', 'Beetle');
-                applyBuff(u, 2, 'atk', 'Beetle');
+                const addAtk = u.stats.attack < u.stats.maxHp;
+                const addHp = u.stats.maxHp < u.stats.attack;
+
+                let choice: 'hp' | 'atk';
+                if (addAtk && !addHp) choice = 'atk';
+                else if (addHp && !addAtk) choice = 'hp';
+                else choice = Math.random() < 0.5 ? 'atk' : 'hp';
+
+                applyBuff(u, 5, choice, 'Beetle');
             });
         }
 

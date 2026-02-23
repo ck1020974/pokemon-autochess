@@ -82,7 +82,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'gengar', name: '耿鬼', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/耿鬼00.webp', battleImageUrl: 'assets/耿鬼01.webp',
-        description: '戰鬥開始時，全體友軍 +5 攻擊。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '戰鬥開始時，全體友軍 +10 攻擊。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 5. Chikorita
@@ -162,7 +162,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'wigglytuff', name: '胖可丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
         imageUrl: 'assets/胖可丁00.webp', battleImageUrl: 'assets/胖可丁01.webp',
-        description: '戰鬥開始時，全體友軍 +5 生命。', synergies: ['Normal'], isHiddenFromShop: true
+        description: '戰鬥開始時，全體友軍 +10 生命。', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 9. Treecko
@@ -502,7 +502,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'banette_final', name: '詛咒娃娃', tier: 1, family: 'shuppet',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/詛咒娃娃00.webp', battleImageUrl: 'assets/詛咒娃娃01.webp',
-        description: '死亡後對隨機敵方造成 99 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '死亡後對隨機敵方造成 10 傷害 ( 共 5 次 )。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 26. Drifloon (Renamed from Drifblim Base)
