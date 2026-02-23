@@ -1087,7 +1087,8 @@ h3 {
   .shop-container {
     padding: 12px 10px;
     min-height: 140px;
-    gap: 30px;
+    gap: 15px;
+    /* Reduced from 30px to bring shop area closer to controls */
   }
 
   .shop-controls {
@@ -1115,8 +1116,8 @@ h3 {
   }
 
   .shop-slots-area {
-    padding-left: 36px;
-    /* Subtle mid-point between divider and slots */
+    padding-left: 10px;
+    /* Reduced from 36px to shift slots further left */
     position: relative;
   }
 
@@ -1137,9 +1138,9 @@ h3 {
   .reroll-icon-btn {
     font-size: 1.5rem !important;
     top: -10px !important;
-    left: 0px !important;
-    /* Centered between divider line and first slot */
-    /* Adjusted: divider width 80, slot start 36, button 0 */
+    left: -20px !important;
+    /* Shifted further left to match reduced padding */
+    /* Adjusted to stay near the divider line */
   }
 
   /* Selection glow tweak for mobile: narrower width and reduced height */
