@@ -10,6 +10,7 @@ import type { BattleLog } from './engine/BattleSimulator';
 import { UNIT_TEMPLATES, PREFERRED_POSITIONS } from './models/UnitFactory';
 import { SYNERGIES } from './models/Synergies';
 import { EncyclopediaModal } from './components/EncyclopediaModal';
+import { TutorialModal } from './components/TutorialModal';
 
 // Difficulty Icons
 import normalBall from './assets/普通.webp';
@@ -132,44 +133,6 @@ function useForceUpdate() {
     return () => setTick((t: number) => t + 1);
 }
 
-// TutorialPopup Component
-function TutorialPopup({ step, onClose }: { step: number, onClose: () => void }) {
-    if (step === 0 || step === 1) return null; // 0=off, 1=prompt
-
-    let text = "";
-    if (step === 2) text = "點擊商店中的寶可夢進行招募！($3)";
-    if (step === 3) text = "將買到的寶可夢拖曳到上方戰場！";
-    if (step === 4) text = "準備好了嗎？點擊按鈕迎擊敵人！";
-
-    // Step 5 is the static advanced tip
-    if (step === 5) {
-        return (
-            <div className="tutorial-popup-advanced">
-                <button className="tutorial-close-btn" onClick={onClose}>×</button>
-                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '15px', color: '#60a5fa' }}>💡 進階技巧</div>
-                <div style={{ marginBottom: '10px' }}>⭐ 收集 3 隻完全一樣的寶可夢，將會自動「進化升星」！大幅提升戰鬥力！</div>
-                <div style={{ marginBottom: '10px' }}>🔗 上陣「屬性」相同的寶可夢，可以觸發強大「羈絆」效果！</div>
-                <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                    <button className="btn-premium" style={{ padding: '8px 20px', fontSize: '1rem' }} onClick={onClose}>我了解了</button>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="tutorial-popup-floating">
-            <button className="tutorial-close-btn" onClick={onClose}>×</button>
-            <div className={`tutorial-text step-${step}`}>
-                {text}
-            </div>
-
-            {/* Arrows are handled by rendering them inside the regular DOM near their targets, 
-                but we can also use absolute coordinates here. We'll use CSS classes on target elements 
-                for simpler positioning. */}
-        </div>
-    );
-}
-
 // Helper to calculate active synergies
 // Helper to calculate all synergies data
 function getSynergyStatus(team: (Unit | null)[]) {
@@ -271,9 +234,6 @@ function App() {
     const [loadingProgress, setLoadingProgress] = useState(0);
     const [isPortrait, setIsPortrait] = useState(false);
 
-    // --- Tutorial State ---
-    const [tutorialStep, setTutorialStep] = useState<number>(0);
-
     // Battle Paused State
     const [isPaused, setIsPaused] = useState(false);
     const isPausedRef = useRef(false);
@@ -286,8 +246,9 @@ function App() {
         setIsMuted(nextMuted);
     };
 
-    // Encyclopedia State
-    const [showEncyclopedia, setShowEncyclopedia] = useState(false);
+    // UI States
+    const [showEncyclopedia, setShowEncyclopedia] = useState<boolean>(false);
+    const [showTutorial, setShowTutorial] = useState<boolean>(true);
 
     // Image Preloading - Systematically cache all unit assets on startup
     useEffect(() => {
@@ -371,7 +332,7 @@ function App() {
         // Tutorial Triggering Logic
         const hasSeen = localStorage.getItem('hasSeenTutorial');
         if (!hasSeen) {
-            setTutorialStep(1); // Open prompt
+            setShowTutorial(true); // Open tutorial modal
         }
 
         update(); // Ensure shop phase logic triggers music check
@@ -904,49 +865,6 @@ function App() {
         }
     }, [game.phase]);
 
-    // --- Tutorial Progression Logic ---
-    useEffect(() => {
-        if (tutorialStep === 0 || tutorialStep === 1 || tutorialStep === 5) return;
-
-        // Step 2 (Buy): Player has no units on board, waiting to buy
-        if (tutorialStep === 2) {
-            // If player has bought a unit (it is on board) or moved a unit
-            const hasUnits = game.playerTeam.some(u => u !== null);
-            if (hasUnits) {
-                setTutorialStep(3);
-            }
-        }
-
-        // Step 3 (Battle): Player has bought units, waiting to start battle
-        if (tutorialStep === 3) {
-            if (game.phase === GamePhase.BATTLE) {
-                setTutorialStep(0); // Hide during battle
-
-                // Show advanced tips on turn 2
-                setTimeout(() => {
-                    if (game.turn === 2 && game.phase === GamePhase.SHOP) {
-                        setTutorialStep(5);
-                        localStorage.setItem('hasSeenTutorial', 'true');
-                    }
-                }, 100); // Check again once battle ends
-            }
-        }
-    }, [tutorialStep, game.playerTeam, game.phase, game.turn]);
-
-    // Auto-trigger advanced tips if we just reached turn 2 from a previous round
-    useEffect(() => {
-        if (game.turn === 2 && game.phase === GamePhase.SHOP) {
-            const hasSeen = localStorage.getItem('hasSeenTutorial');
-            // Check if we are actively in tutorial tracking or if they skipped but we still want to show
-            // Actually, if they skipped (hasSeen=true), we don't show step 5 automatically unless requested
-            if (!hasSeen) {
-                setTutorialStep(5);
-                localStorage.setItem('hasSeenTutorial', 'true');
-            }
-        }
-    }, [game.turn, game.phase]);
-    // ---------------------------------
-
     // Handle Battle Result Music
     useEffect(() => {
         if (battleResult === 'WIN') {
@@ -1132,27 +1050,9 @@ function App() {
 
     return (
         <div className="game-container" onClick={() => focusedDifficulty && setFocusedDifficulty(null)}>
-            {/* Tutorial Modals & Prompts */}
-            {tutorialStep === 1 && (
-                <div className="tutorial-prompt-overlay">
-                    <div className="tutorial-prompt-box">
-                        <h2>初次來到精靈自走棋？</h2>
-                        <p>建議您觀看新手教學，快速了解遊戲核心玩法！</p>
-                        <div className="tutorial-prompt-buttons">
-                            <button className="btn-premium" onClick={() => setTutorialStep(2)}>📝 開始教學</button>
-                            <button className="tutorial-close-btn-text" onClick={() => {
-                                setTutorialStep(0);
-                                localStorage.setItem('hasSeenTutorial', 'true');
-                            }}>跳過</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            <TutorialPopup step={tutorialStep} onClose={() => {
-                setTutorialStep(0);
-                localStorage.setItem('hasSeenTutorial', 'true');
-            }} />
+            {/* Modal Components */}
+            {showEncyclopedia && <EncyclopediaModal onClose={() => setShowEncyclopedia(false)} />}
+            {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} />}
 
             {/* Orientation Lock Overlay */}
             {isPortrait && (
@@ -1355,17 +1255,14 @@ function App() {
                     {/* Help & Mute Toggle Buttons inside Header */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginLeft: '10px' }}>
                         <button
-                            className={`mute-toggle-btn-header ${tutorialStep > 0 ? 'is-active' : ''}`}
-                            onClick={() => {
-                                if (tutorialStep > 0) setTutorialStep(0);
-                                else if (game.turn === 1) setTutorialStep(2);
-                                else setTutorialStep(5);
-                            }}
-                            title="新手教學"
+                            className={`mute-toggle-btn-header ${showTutorial ? 'is-active' : ''}`}
+                            onClick={() => setShowTutorial(true)}
+                            title="遊戲指南 (Tutorial)"
                             style={{
-                                color: tutorialStep > 0 ? '#60a5fa' : '#aaa',
-                                border: tutorialStep > 0 ? '1px solid #60a5fa' : '1px solid transparent',
-                                background: tutorialStep > 0 ? 'rgba(96,165,250,0.1)' : 'transparent',
+                                color: showTutorial ? '#facc15' : '#aaa',
+                                border: showTutorial ? '1px solid #facc15' : '1px solid transparent',
+                                background: showTutorial ? 'rgba(250,204,21,0.1)' : 'transparent',
+                                borderRadius: '50%'
                             }}
                         >
                             ❓
@@ -1387,11 +1284,6 @@ function App() {
                     </div>
                 </div>
             </div>
-
-            {/* Encyclopedia Modal */}
-            {showEncyclopedia && (
-                <EncyclopediaModal onClose={() => setShowEncyclopedia(false)} />
-            )}
 
             {/* Battle Result Overlay */}
             {
@@ -1574,12 +1466,8 @@ function App() {
 
                             {/* Row 2: Battle Button - Centered and Slimmer */}
                             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px', position: 'relative' }}>
-                                {/* Tutorial Arrow 3: Battle */}
-                                {tutorialStep === 3 && (
-                                    <div className="tutorial-arrow arrow-battle">➡️</div>
-                                )}
                                 <button
-                                    className={`btn-premium btn-battle ${tutorialStep === 3 ? 'tutorial-highlight' : ''}`}
+                                    className={`btn-premium btn-battle`}
                                     onClick={handleStartBattle}
                                     style={{ height: '50px', width: '60px' }}
                                 >
@@ -1590,12 +1478,6 @@ function App() {
 
                         {/* Right Shop Slots - Shifted right while button stays fixed */}
                         <div className="shop-slots-area" style={{ position: 'relative' }}>
-                            {/* Tutorial Arrow 2: Buy */}
-                            {tutorialStep === 2 && (
-                                <div className="tutorial-arrow arrow-buy">⬇️</div>
-                            )}
-
-                            {/* Reroll Button: Icon-only, Top-Left of Slot 1 - Moved down and left */}
                             <button
                                 className={`reroll-icon-btn ${game.gold < 1 ? 'btn-disabled' : ''}`}
                                 onClick={handleReroll}
