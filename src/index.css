@@ -1115,7 +1115,8 @@ h3 {
   }
 
   .shop-slots-area {
-    padding-left: 47px;
+    padding-left: 40px;
+    /* Reduced from 47px to shift slots left */
     position: relative;
   }
 
@@ -1135,8 +1136,9 @@ h3 {
   .reroll-icon-btn {
     font-size: 1.5rem !important;
     top: -10px !important;
-    left: -4px !important;
-    /* Adjusted: divider width 80, slot start 55, button -4 */
+    left: 4px !important;
+    /* Shifted RIGHT to be closer to slots */
+    /* Adjusted: divider width 80, slot start 40, button +4 */
   }
 
   /* Selection glow tweak for mobile: narrower width and reduced height */
