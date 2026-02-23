@@ -131,7 +131,7 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
                                 className={`encyclopedia-tier-btn ${activeTier === tier ? 'active' : ''}`}
                                 onClick={() => handleTierChange(tier)}
                             >
-                                {TIER_NAMES[tier as keyof typeof TIER_NAMES]} ({baseUnitsByTier[tier].length})
+                                {TIER_NAMES[tier as keyof typeof TIER_NAMES]}
                             </button>
                         ))}
                     </div>
