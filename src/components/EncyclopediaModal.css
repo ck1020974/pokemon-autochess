@@ -348,8 +348,8 @@
 @media (max-width: 800px),
 (max-height: 600px) {
     .encyclopedia-modal {
-        width: 95vw;
-        height: 95vh;
+        width: 90vw;
+        height: 88vh;
     }
 
     .encyclopedia-header {

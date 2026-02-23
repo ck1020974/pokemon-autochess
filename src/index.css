@@ -33,8 +33,11 @@ body {
 #root {
   width: 100%;
   max-width: 1200px;
-  /* Use env() to respect iOS safe areas (notch/dynamic island), falling back to original padding */
-  padding: env(safe-area-inset-top, 40px) env(safe-area-inset-right, 20px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 20px);
+  /* Use calc() to combine base aesthetic padding with iOS safe areas, preventing edges from getting blocked */
+  padding-top: calc(40px + env(safe-area-inset-top, 0px));
+  padding-right: calc(20px + env(safe-area-inset-right, 0px));
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  padding-left: calc(20px + env(safe-area-inset-left, 0px));
   box-sizing: border-box;
 }
 
