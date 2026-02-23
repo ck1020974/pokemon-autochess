@@ -1642,6 +1642,13 @@ h3 {
 
 /* Mobile Landscape Optimizations (Scaling PC Style) */
 @media (max-width: 1024px) and (orientation: landscape) {
+  #root {
+    /* Prevent UI from being too full/close to edges on modern mobile screens like iPhone 16 */
+    padding-left: calc(50px + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(50px + env(safe-area-inset-right, 0px)) !important;
+    padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
   .startup-overlay {
     gap: 1vh !important;
     /* Pull loading bar UP towards title */

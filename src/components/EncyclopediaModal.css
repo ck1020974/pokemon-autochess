@@ -348,8 +348,8 @@
 @media (max-width: 800px),
 (max-height: 600px) {
     .encyclopedia-modal {
-        width: 90vw;
-        height: 88vh;
+        width: 85vw;
+        height: 80vh;
     }
 
     .encyclopedia-header {
@@ -365,9 +365,8 @@
     }
 
     .encyclopedia-sidebar {
-        /* User felt left was too short/narrow relative to right side being too wide.
-           Let's give it a percentage or increase its relative footprint */
-        width: 110px;
+        /* User requested wider sidebar */
+        width: 140px;
     }
 
     .encyclopedia-tier-btn {
@@ -381,7 +380,8 @@
     }
 
     .encyclopedia-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        /* Enlarge unit container slightly to fit larger image */
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
         gap: 10px;
         padding-bottom: 10px;
     }
@@ -392,8 +392,9 @@
     }
 
     .encyclopedia-unit-img {
-        width: 48px;
-        height: 48px;
+        /* User requested enlarging right side unit image (00) */
+        width: 64px;
+        height: 64px;
     }
 
     .encyclopedia-unit-name {
@@ -402,8 +403,9 @@
 
     /* Detail Popup Shrinking for Mobile */
     .encyclopedia-detail-box {
-        width: 96%;
-        max-width: 600px;
+        /* User requested making the detail box less wide/full */
+        width: 90%;
+        max-width: 480px;
         padding: 15px;
         max-height: 92vh;
         overflow-y: auto;
@@ -433,8 +435,12 @@
     }
 
     .encyclopedia-evolution-stage {
-        padding: 8px;
+        /* User requested character bounding box not to be so wide/full */
+        padding: 6px;
         border-radius: 10px;
+        flex: 1;
+        min-width: 0;
+        /* allows shrinking */
     }
 
     .encyclopedia-stage-stars {
@@ -443,8 +449,9 @@
     }
 
     .encyclopedia-stage-img {
-        max-width: 60px;
-        height: 60px;
+        /* User requested enlarging evolution stage image (01) */
+        max-width: 76px;
+        height: 76px;
     }
 
     .encyclopedia-evolution-arrow {
@@ -466,7 +473,11 @@
     }
 
     .encyclopedia-stage-desc {
+        /* User requested text to wrap to 2-3 lines instead of forcing one line */
         font-size: 0.8rem;
-        line-height: 1.3;
+        line-height: 1.35;
+        white-space: normal;
+        /* Override any potential nowrap */
+        word-break: break-word;
     }
 }
