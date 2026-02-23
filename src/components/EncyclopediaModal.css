@@ -485,3 +485,45 @@
         word-break: break-word;
     }
 }
+
+/* Specific override for Mobile Landscape to strictly mimic PC Evolution UI */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .encyclopedia-detail-box {
+        max-width: 900px;
+        width: 95vw;
+        padding: 25px;
+    }
+
+    .encyclopedia-evolution-path-container {
+        padding: 20px;
+    }
+
+    .encyclopedia-evolution-path {
+        gap: 15px;
+    }
+
+    .encyclopedia-evolution-stage {
+        padding: 15px;
+        max-width: none;
+    }
+
+    .encyclopedia-stage-img {
+        max-width: 120px;
+        height: 100px;
+    }
+
+    .encyclopedia-evolution-arrow {
+        width: 20px;
+    }
+
+    .encyclopedia-evolution-arrow::after {
+        width: 12px;
+        height: 12px;
+    }
+
+    .encyclopedia-stage-desc {
+        padding: 10px;
+        font-size: 0.85rem;
+        margin-top: 10px;
+    }
+}
