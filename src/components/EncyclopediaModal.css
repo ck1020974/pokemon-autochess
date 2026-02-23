@@ -126,14 +126,19 @@
 
 .encyclopedia-unit-card {
     background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    /* Slightly brighter border */
+    border-radius: 16px;
+    /* Enhanced rounding on frame */
+    padding: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    /* Center vertically to avoid "broad shoulders" at bottom */
     cursor: pointer;
     transition: all 0.2s;
+    min-height: 110px;
 }
 
 .encyclopedia-unit-card:hover {
@@ -153,10 +158,9 @@
     width: 64px;
     height: 64px;
     object-fit: contain;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
-    border-radius: 12px;
-    /* Added roundness as requested */
+    /* Image rounding removed as requested, using frame rounding instead */
 }
 
 .encyclopedia-unit-name {
@@ -499,26 +503,30 @@
 @media (max-width: 1024px) and (orientation: landscape) {
     .encyclopedia-modal {
         width: 88vw;
-        height: 92vh;
-        /* Use more height to eliminate unnecessary grid scrolling */
+        height: 94vh;
+        /* Increased to fill more vertical space */
+        max-height: 94vh;
     }
 
     .encyclopedia-detail-box {
-        max-width: 760px;
-        /* Squeezed further from 820px */
-        width: 96vw;
+        max-width: 680px;
+        /* Squeezed significantly from 760px */
+        width: auto;
+        /* Stop using vw to prevent "full screen" look */
         padding: 10px 15px;
-        /* Thinner padding */
-        max-height: 96vh;
+        max-height: 98vh;
     }
 
     .encyclopedia-detail-content {
-        gap: 8px;
-        padding: 12px;
+        gap: 6px;
+        padding: 8px 12px;
     }
 
     .encyclopedia-evolution-path-container {
-        padding: 10px;
+        padding: 8px;
+        max-width: 640px;
+        /* Force the interior black box to stay slim */
+        margin: 0 auto;
     }
 
     .encyclopedia-evolution-path {
