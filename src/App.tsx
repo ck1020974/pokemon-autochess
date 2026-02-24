@@ -257,12 +257,8 @@ function App() {
     const [showTutorial, setShowTutorial] = useState<boolean>(false);
     const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
 
-    // Image Preloading - Split into Critical and Background
-    const [backgroundLoadingProgress, setBackgroundLoadingProgress] = useState(0);
-
     // Image Preloading - Split into Critical (Tier 1/2) and Background (Tier 3+)
     useEffect(() => {
-        let isCriticalLoaded = false;
 
         const loadAssets = async (urls: string[], isBackground: boolean = false) => {
             let loadedCount = 0;
@@ -272,9 +268,7 @@ function App() {
                     img.src = url;
                     const handleLoad = () => {
                         loadedCount++;
-                        if (isBackground) {
-                            setBackgroundLoadingProgress(Math.floor((loadedCount / urls.length) * 100));
-                        } else {
+                        if (!isBackground) {
                             setLoadingProgress(Math.floor((loadedCount / urls.length) * 100));
                         }
                         resolve(url);
