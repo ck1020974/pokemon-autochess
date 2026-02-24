@@ -355,6 +355,112 @@ h3 {
   backdrop-filter: blur(1px);
 }
 
+/* Premium Confirmation Overlay */
+.premium-confirm-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(10px);
+  z-index: 10002;
+  border-radius: var(--border-radius-lg);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.premium-confirm-box {
+  text-align: center;
+  color: white;
+  max-width: 85%;
+  animation: scaleIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.premium-confirm-title {
+  font-size: 4rem;
+  font-weight: 900;
+  margin-bottom: 20px;
+  text-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+  letter-spacing: 6px;
+  background: linear-gradient(to bottom, #fff, #94a3b8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.premium-confirm-description {
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 50px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  letter-spacing: 1px;
+}
+
+.premium-confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.premium-confirm-btn {
+  padding: 18px 50px;
+  font-size: 1.2rem;
+  font-weight: 900;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 3px;
+  border: none;
+  text-transform: uppercase;
+}
+
+.confirm-btn-yes {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+}
+
+.confirm-btn-yes:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 45px rgba(239, 68, 68, 0.6);
+  filter: brightness(1.1);
+}
+
+.confirm-btn-no {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+.confirm-btn-no:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 950px) or (max-height: 500px) {
+  .premium-confirm-title {
+    font-size: 2.2rem;
+    letter-spacing: 4px;
+  }
+
+  .premium-confirm-description {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+  }
+
+  .premium-confirm-btn {
+    padding: 12px 35px;
+    font-size: 1rem;
+    letter-spacing: 2px;
+  }
+}
+
 @keyframes countdown-pulse {
 
   0%,

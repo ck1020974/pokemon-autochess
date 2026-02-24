@@ -964,8 +964,8 @@ function App() {
     const handleStartBattle = () => {
         if (game.gold > 0) {
             setConfirmDialog({
-                message: `還有未花完的 ${game.gold} 金幣！`,
-                description: '確定要帶著金幣進入對戰嗎？（金幣在回合結束時不會產生利息）',
+                message: `進入對戰階段？`,
+                description: '未花完的 ' + game.gold + '$ ，將會直接消失！',
                 onConfirm: () => {
                     setConfirmDialog(null);
                     executeStartBattle();
@@ -1104,15 +1104,15 @@ function App() {
         <div className="game-container" onClick={() => focusedDifficulty && setFocusedDifficulty(null)}>
             {/* Modal Components */}
             {confirmDialog && (
-                <div className="custom-confirm-overlay" onClick={() => setConfirmDialog(null)}>
-                    <div className="custom-confirm-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="custom-confirm-content">
-                            <h3>{confirmDialog.message}</h3>
-                            {confirmDialog.description && <p>{confirmDialog.description}</p>}
-                        </div>
-                        <div className="custom-confirm-actions">
-                            <button className="confirm-btn-cancel" onClick={() => setConfirmDialog(null)}>取消</button>
-                            <button className="confirm-btn-ok" onClick={confirmDialog.onConfirm}>確定</button>
+                <div className="premium-confirm-overlay" onClick={() => setConfirmDialog(null)}>
+                    <div className="premium-confirm-box" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="premium-confirm-title">{confirmDialog.message}</h2>
+                        {confirmDialog.description && (
+                            <p className="premium-confirm-description">{confirmDialog.description}</p>
+                        )}
+                        <div className="premium-confirm-actions">
+                            <button className="premium-confirm-btn confirm-btn-yes" onClick={confirmDialog.onConfirm}>確定</button>
+                            <button className="premium-confirm-btn confirm-btn-no" onClick={() => setConfirmDialog(null)}>取消</button>
                         </div>
                     </div>
                 </div>
@@ -1303,8 +1303,8 @@ function App() {
                             title="重新選擇難度"
                             onClick={() => {
                                 setConfirmDialog({
-                                    message: '確定重新選擇遊戲難度？',
-                                    description: '這將會放棄目前的遊戲進度並重新開始大冒險！',
+                                    message: '重新選擇難度？',
+                                    description: '遊戲進度將被清除，並重新開始！',
                                     onConfirm: () => {
                                         setConfirmDialog(null);
                                         setDifficulty(null);
