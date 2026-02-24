@@ -1771,6 +1771,14 @@ h3 {
     padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
+  /* Specific fix for iPhone 17 and ultra-long screens (Aspect Ratio >= 2.1) */
+  @media (min-aspect-ratio: 21/10) {
+    #root {
+      padding-left: calc(45px + env(safe-area-inset-left, 0px)) !important;
+      padding-right: calc(45px + env(safe-area-inset-right, 0px)) !important;
+    }
+  }
+
   .startup-overlay {
     gap: 1vh !important;
     /* Pull loading bar UP towards title */
