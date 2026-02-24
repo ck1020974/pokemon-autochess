@@ -1765,17 +1765,36 @@ h3 {
 /* Mobile Landscape Optimizations (Scaling PC Style) */
 @media (max-width: 1024px) and (orientation: landscape) {
   #root {
-    /* Prevent UI from being too full/close to edges on modern mobile screens like iPhone 16 */
-    padding-left: calc(24px + env(safe-area-inset-left, 0px)) !important;
-    padding-right: calc(24px + env(safe-area-inset-right, 0px)) !important;
+    /* Widen the game area for high-aspect ratio devices (iPhone 17) */
+    max-width: 100% !important;
+    /* Controlled horizontal padding: enough for safety, not excessive to keep areas wide */
+    padding-left: calc(20px + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(20px + env(safe-area-inset-right, 0px)) !important;
     padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
-  /* Specific fix for iPhone 17 and ultra-long screens (Aspect Ratio >= 2.1) */
+  .board-container,
+  .shop-container {
+    width: 100% !important;
+    max-width: 1000px !important;
+    /* Allow more width than default 1200px restricted by root */
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Specific widening for ultra-long screens (Aspect Ratio >= 2.1) */
   @media (min-aspect-ratio: 21/10) {
-    #root {
-      padding-left: calc(45px + env(safe-area-inset-left, 0px)) !important;
-      padding-right: calc(45px + env(safe-area-inset-right, 0px)) !important;
+
+    .board-container,
+    .shop-container {
+      max-width: 1100px !important;
+      /* Let it breathe even more on iPhone 17 types */
+    }
+
+    .shop-slots-area {
+      padding-left: 30px !important;
+      /* Slightly more offset to shift away from notch/rounded corner */
     }
   }
 
