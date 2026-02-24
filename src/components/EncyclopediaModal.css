@@ -15,10 +15,10 @@
 
 .encyclopedia-modal {
     width: 90vw;
-    max-width: 1000px;
+    max-width: 1050px;
     height: 460px;
-    /* Adjusted height to minimize empty bottom areas */
-    max-height: 85vh;
+    /* Reverted to 460px as requested */
+    max-height: 90vh;
     background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 24px;
@@ -120,7 +120,8 @@
     flex-direction: column;
     padding: 32px 20px;
     /* Increased for equidistance with two rows */
-    overflow-y: auto;
+    overflow-y: hidden;
+    /* Disable scrolling */
 }
 
 .encyclopedia-grid {
@@ -221,10 +222,10 @@
 }
 
 .encyclopedia-detail-content {
-    padding: 30px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
 }
 
 .encyclopedia-detail-header-row {
@@ -232,7 +233,7 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 15px;
+    padding-bottom: 10px;
     position: relative;
     z-index: 200;
 }
@@ -253,8 +254,8 @@
 .encyclopedia-evolution-path-container {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 16px;
-    padding: 20px;
-    overflow-x: auto;
+    padding: 20px 15px;
+    overflow: hidden;
 }
 
 .encyclopedia-evolution-path {
@@ -272,14 +273,15 @@
     justify-content: flex-start;
     /* Stack from top to maintain layout consistency */
     background: rgba(255, 255, 255, 0.03);
-    padding: 30px 15px;
-    min-height: 180px;
+    padding: 12px 10px;
+    min-height: auto;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     flex: 1;
     box-sizing: border-box;
     position: relative;
     transition: all 0.2s;
+    align-self: stretch;
 }
 
 .encyclopedia-evolution-stage:hover {
@@ -323,8 +325,8 @@
 
 .encyclopedia-stage-img {
     width: 100%;
-    max-width: 140px;
-    height: 120px;
+    max-width: 100px;
+    height: 80px;
     object-fit: contain;
     filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
     transition: transform 0.3s ease;
@@ -338,20 +340,21 @@
     color: white;
     font-weight: bold;
     font-size: 1.3rem;
-    margin-top: 2px;
+    margin-top: 0px;
 }
 
 .encyclopedia-stage-desc {
     color: #cbd5e1;
-    font-size: 0.95rem;
-    text-align: center;
-    line-height: 1.5;
-    margin-top: 15px;
-    padding: 10px;
+    font-size: 0.85rem;
+    text-align: left;
+    line-height: 1.4;
+    margin-top: 8px;
+    padding: 6px 10px;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
-    width: 100%;
+    width: 95%;
     box-sizing: border-box;
+    /* Essential to prevent overflow */
 }
 
 @keyframes scaleUp {
@@ -450,13 +453,17 @@
     }
 
     .encyclopedia-tooltip {
-        max-width: 200px;
-        font-size: 0.8rem;
+        max-width: 250px;
+        font-size: 0.85rem;
         left: 110% !important;
         top: 10px !important;
         bottom: auto !important;
         transform: none !important;
         z-index: 99999 !important;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: rgba(10, 10, 10, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .encyclopedia-syn-icon:hover {
@@ -615,6 +622,7 @@
         bottom: auto !important;
         transform: none !important;
         z-index: 99999 !important;
+        max-width: 220px;
     }
 
     .encyclopedia-syn-icon:hover {

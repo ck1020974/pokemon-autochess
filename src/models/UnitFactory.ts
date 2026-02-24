@@ -370,19 +370,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'onix', name: '大岩蛇', tier: 4, family: 'onix',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/大岩蛇00.webp', battleImageUrl: 'assets/大岩蛇01.webp',
-        description: '移動後，永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix'
+        description: '移動後永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix'
     },
     steelix: {
         id: 'steelix', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '移動後，永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
+        description: '移動後永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
     },
     steelix_final: {
         id: 'steelix_final', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '移動後，永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], isHiddenFromShop: true
+        description: '移動後永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], isHiddenFromShop: true
     },
 
     // 20. Doduo

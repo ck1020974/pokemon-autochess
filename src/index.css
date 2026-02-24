@@ -805,9 +805,9 @@ h3 {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 5px;
-  z-index: 20;
-  pointer-events: none;
-  /* Let clicks pass through, but handle children pointer events? */
+  z-index: 2000;
+  /* Increased from 20 to ensure it's above character area but handle tooltip peaking */
+  pointer-events: auto;
 }
 
 .board-synergies .synergy-icon {
@@ -842,26 +842,33 @@ h3 {
 .synergy-tooltip {
   visibility: hidden;
   position: absolute;
-  top: 110%;
-  left: 20%;
+  top: 10px;
+  /* Align top for a "parallel" look */
+  left: 110%;
+  /* Right side */
   transform: none;
   background: rgba(10, 10, 10, 0.95);
   color: #fff;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  padding: 10px 14px;
+  /* Slightly more padding for premium feel */
+  border-radius: 12px;
+  /* Match modern borderRadius */
+  font-size: 0.85rem;
+  /* Slightly larger */
   white-space: pre-wrap;
   width: max-content;
-  max-width: 200px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 1000;
+  max-width: 240px;
+  /* Wider desktop tooltips */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 99999;
+  /* Highest layer */
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
   font-weight: normal;
   text-align: left;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .synergy-tooltip.is-enemy {

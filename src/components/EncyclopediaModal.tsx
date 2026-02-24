@@ -182,17 +182,7 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
                                             return (
                                                 <div key={synId} className="synergy-icon encyclopedia-syn-icon" style={{ borderColor: syn.color, position: 'relative', width: '38px', height: '38px', fontSize: '1.4rem', margin: 0 }}>
                                                     {syn.icon}
-                                                    <div className="synergy-tooltip encyclopedia-tooltip" style={{
-                                                        position: 'absolute',
-                                                        bottom: '120%', /* Position ABOVE the icon */
-                                                        left: '50%',
-                                                        transform: 'translateX(-50%)', /* Center horizontally */
-                                                        width: 'max-content',
-                                                        maxWidth: '250px',
-                                                        whiteSpace: 'normal',
-                                                        textAlign: 'left',
-                                                        pointerEvents: 'none' /* Prevent tooltip from blocking clicks */
-                                                    }}>
+                                                    <div className="synergy-tooltip encyclopedia-tooltip">
                                                         <div style={{ fontWeight: 'bold', color: syn.color, marginBottom: '4px' }}>
                                                             {syn.icon} {syn.name}
                                                         </div>
