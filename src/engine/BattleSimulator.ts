@@ -520,20 +520,19 @@ export class BattleSimulator {
             });
         }
 
-        // Mudkip Family: Stats on Front Ally Attack (Redirected from Start of Battle)
+        // Mudkip Family: Stats on Other Ally Attack
         if (unit.family === 'mudkip') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (unit.stats.hp <= 0) return;
                 const { myTeam } = this.getTeams(unit);
-                const idx = myTeam.indexOf(unit);
-                // Trigger when FRONT ally attacks
-                if (idx > 0 && myTeam[idx - 1] === e.source) {
-                    const buff = [0, 2, 4, 6][unit.level] || 2;
+                // Trigger when ANY OTHER ally attacks
+                if (e.source && e.source !== unit && myTeam.includes(e.source)) {
+                    const buffAmount = [0, 1, 3, 5][unit.level] || 1;
                     await this.delay(150); // Delay for visual pacing
                     await this.notifySkill(unit, `發動了健美！`);
                     await this.playAnimation(unit, 'jump', 200);
-                    this.growUnit(unit, buff, buff, '水躍魚技能');
+                    this.growUnit(unit, buffAmount, buffAmount, '水躍魚技能');
                 }
             });
         }
@@ -578,8 +577,7 @@ export class BattleSimulator {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
-                const idx = myTeam.indexOf(unit);
-                if (idx > 0 && myTeam[idx - 1] === e.source && e.target) {
+                if (e.source && e.source !== unit && myTeam.includes(e.source) && e.target) {
                     await this.delay(200); // Increased delay
                     this.log(`${unit.name} 發動了二連踢！`);
                     await this.playAnimation(unit, 'jump', 200);

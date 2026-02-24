@@ -447,9 +447,18 @@
         font-size: 1.4rem;
     }
 
-    .synergy-tooltip.is-enemy {
+    .encyclopedia-tooltip {
         max-width: 200px;
         font-size: 0.8rem;
+        left: 110% !important;
+        top: 10px !important;
+        bottom: auto !important;
+        transform: none !important;
+        z-index: 99999 !important;
+    }
+
+    .encyclopedia-syn-icon:hover {
+        z-index: 99999 !important;
     }
 
     .encyclopedia-evolution-path-container {
@@ -596,5 +605,17 @@
         margin-top: 6px;
         line-height: 1.35;
         max-width: 140px;
+    }
+
+    .encyclopedia-tooltip {
+        left: 110% !important;
+        top: 10px !important;
+        bottom: auto !important;
+        transform: none !important;
+        z-index: 99999 !important;
+    }
+
+    .encyclopedia-syn-icon:hover {
+        z-index: 99999 !important;
     }
 }

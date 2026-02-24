@@ -836,6 +836,7 @@ h3 {
 
 .synergy-icon:hover {
   transform: scale(1.2);
+  z-index: 99999 !important;
 }
 
 .synergy-tooltip {
@@ -1217,6 +1218,7 @@ h3 {
     top: 10px !important;
     transform: none !important;
     max-width: 180px !important;
+    z-index: 99999 !important;
   }
 
   /* Detail Panel Tooltip - Move to Top-Left of icon */
