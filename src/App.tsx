@@ -30,6 +30,12 @@ interface DraggedItemState {
     source: 'SHOP' | 'BOARD';
 }
 
+interface ConfirmDialogState {
+    message: string;
+    description?: string;
+    onConfirm: () => void;
+}
+
 // --- Helper Components ---
 
 // UnitCard with Direct Lock & Silence Support
@@ -249,44 +255,91 @@ function App() {
     // UI States
     const [showEncyclopedia, setShowEncyclopedia] = useState<boolean>(false);
     const [showTutorial, setShowTutorial] = useState<boolean>(false);
+    const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
 
-    // Image Preloading - Systematically cache all unit assets on startup
+    // Image Preloading - Split into Critical and Background
+    const [backgroundLoadingProgress, setBackgroundLoadingProgress] = useState(0);
+
+    // Image Preloading - Split into Critical (Tier 1/2) and Background (Tier 3+)
     useEffect(() => {
-        const preloadAllAssets = async () => {
-            const urls = new Set<string>();
-            Object.values(UNIT_TEMPLATES).forEach(t => {
-                if (t.imageUrl) urls.add(t.imageUrl);
-                if (t.battleImageUrl) urls.add(t.battleImageUrl);
-            });
-            // Ensure derived/token images are also preloaded if they differ
-            urls.add('assets/妙蛙種子01.webp');
-            urls.add('assets/小拉達01.webp');
-            urls.add('assets/飄飄球01.webp');
-            urls.add('assets/隨風球01.webp');
-            urls.add('assets/怨影娃娃01.webp');
-            urls.add('assets/詛咒娃娃01.webp');
+        let isCriticalLoaded = false;
 
-            const assetUrls = Array.from(urls);
+        const loadAssets = async (urls: string[], isBackground: boolean = false) => {
             let loadedCount = 0;
-
-            const promises = assetUrls.map(url => {
+            const promises = urls.map(url => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.src = url;
                     const handleLoad = () => {
                         loadedCount++;
-                        setLoadingProgress(Math.floor((loadedCount / assetUrls.length) * 100));
+                        if (isBackground) {
+                            setBackgroundLoadingProgress(Math.floor((loadedCount / urls.length) * 100));
+                        } else {
+                            setLoadingProgress(Math.floor((loadedCount / urls.length) * 100));
+                        }
                         resolve(url);
                     };
                     img.onload = handleLoad;
-                    img.onerror = handleLoad; // Count errors as "processed" to avoid stuck progress
+                    img.onerror = handleLoad;
                 });
             });
-
-            console.log(`[系統] 開始預載入 ${assetUrls.length} 個美術資源...`);
             await Promise.all(promises);
+        };
+
+        const preloadAllAssets = async () => {
+            // CRITICAL: Tier 1 and 2, plus basic UI tokens
+            const criticalUrls = new Set<string>();
+            const backgroundUrls = new Set<string>();
+
+            Object.values(UNIT_TEMPLATES).forEach(t => {
+                // Determine if critical (Tier 1, 2) or background (Tier 3+)
+                // For Sprout and initial tokens, include in critical
+                const isCritical = t.tier <= 2 || t.id === 'sprout';
+
+                const addUrl = (url: string) => {
+                    if (isCritical) criticalUrls.add(url);
+                    else backgroundUrls.add(url);
+                };
+
+                if (t.imageUrl) addUrl(t.imageUrl);
+                if (t.battleImageUrl) addUrl(t.battleImageUrl);
+            });
+
+            // Critical token/derived images
+            criticalUrls.add('assets/妙蛙種子01.webp');
+            criticalUrls.add('assets/小拉達01.webp');
+            criticalUrls.add('assets/飄飄球01.webp');
+            criticalUrls.add('assets/隨風球01.webp');
+            criticalUrls.add('assets/怨影娃娃01.webp');
+            criticalUrls.add('assets/詛咒娃娃01.webp');
+
+            // Preload critical audio
+            const preloadAudio = (name: string) => {
+                const audio = new Audio(`music/${name}.OGG`);
+                audio.load();
+            };
+            preloadAudio('start');
+            preloadAudio('pokemonmart');
+            preloadAudio('gymfight');
+
+            console.log(`[系統] 開始預載入關鍵資源 (${criticalUrls.size} 個)...`);
+            await loadAssets(Array.from(criticalUrls), false);
+
             setHasLoaded(true);
-            console.log(`[系統] 所有資源載入完成！`);
+            console.log(`[系統] 關鍵資源載入完成！`);
+
+            // Next frame background load
+            setTimeout(async () => {
+                console.log(`[系統] 開始背景載入剩餘資源 (${backgroundUrls.size} 個)...`);
+                preloadAudio('victoryroad');
+                preloadAudio('pokemoncenter');
+                preloadAudio('gymwin');
+                preloadAudio('level up');
+                preloadAudio('recover');
+
+                await loadAssets(Array.from(backgroundUrls), true);
+                console.log(`[系統] 背景資源載入完成！`);
+            }, 500);
         };
 
         preloadAllAssets();
@@ -916,9 +969,20 @@ function App() {
     };
     const handleStartBattle = () => {
         if (game.gold > 0) {
-            const confirmed = window.confirm(`您還有 ${game.gold} 金幣尚未花完，確定進入對戰？`);
-            if (!confirmed) return;
+            setConfirmDialog({
+                message: `還有未花完的 ${game.gold} 金幣！`,
+                description: '確定要帶著金幣進入對戰嗎？（金幣在回合結束時不會產生利息）',
+                onConfirm: () => {
+                    setConfirmDialog(null);
+                    executeStartBattle();
+                }
+            });
+            return;
         }
+        executeStartBattle();
+    };
+
+    const executeStartBattle = () => {
         music.stop(); // Stop prep music
         setSelected(null);
         setBattleResult(null);
@@ -1045,6 +1109,20 @@ function App() {
     return (
         <div className="game-container" onClick={() => focusedDifficulty && setFocusedDifficulty(null)}>
             {/* Modal Components */}
+            {confirmDialog && (
+                <div className="custom-confirm-overlay" onClick={() => setConfirmDialog(null)}>
+                    <div className="custom-confirm-box" onClick={(e) => e.stopPropagation()}>
+                        <div className="custom-confirm-content">
+                            <h3>{confirmDialog.message}</h3>
+                            {confirmDialog.description && <p>{confirmDialog.description}</p>}
+                        </div>
+                        <div className="custom-confirm-actions">
+                            <button className="confirm-btn-cancel" onClick={() => setConfirmDialog(null)}>取消</button>
+                            <button className="confirm-btn-ok" onClick={confirmDialog.onConfirm}>確定</button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {showEncyclopedia && <EncyclopediaModal onClose={() => setShowEncyclopedia(false)} />}
             {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} />}
 
@@ -1230,10 +1308,15 @@ function App() {
                         }}
                             title="重新選擇難度"
                             onClick={() => {
-                                if (window.confirm('確定重新選擇遊戲難度？')) {
-                                    setDifficulty(null);
-                                    handleRestart();
-                                }
+                                setConfirmDialog({
+                                    message: '確定重新選擇遊戲難度？',
+                                    description: '這將會放棄目前的遊戲進度並重新開始大冒險！',
+                                    onConfirm: () => {
+                                        setConfirmDialog(null);
+                                        setDifficulty(null);
+                                        handleRestart();
+                                    }
+                                });
                             }}>
                             <img src={
                                 difficulty === 'NORMAL' ? normalBall :
