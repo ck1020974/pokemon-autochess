@@ -1347,73 +1347,54 @@ h3 {
   }
 }
 
-/* Specific fix for VERY short landscape screens (e.g. 800x360) */
+/* Specific fix for VERY short landscape screens */
 @media (max-height: 380px) {
-
-  /* Unhide header so we can see if it's blocked, let flexbox handle it normally */
-  .header {
-    display: flex !important;
-    /* Force show, but minimal padding */
-    padding: 2px 5px !important;
-    font-size: 0.75rem !important;
-    /* Smaller text to save space */
-  }
-
-  .game-container {
-    gap: 5px !important;
-    /* Reduce overall spacing between major components */
-  }
 
   /* Step-based scaling for mobile landscape */
   .unit-card,
   .slot-placeholder {
-    width: 70px !important;
-    /* Slightly wider to fit increased image */
-    height: 90px !important;
-    /* Increased height to give image room */
+    width: 65px;
+    height: 80px;
     margin: 0 0px !important;
+    /* No overlap on very small screens */
   }
 
   .unit-image,
   .shop-slots .unit-image {
-    width: 65px !important;
-    /* Increased from 50px */
-    height: 65px !important;
-  }
-
-  .unit-visual-wrapper {
-    transform: translateY(0px) !important;
-    /* Re-center the larger image */
+    width: 50px;
+    height: 50px;
   }
 
   .shop-slots .unit-card,
   .shop-slots .slot-placeholder {
-    width: 65px !important;
-    height: 85px !important;
-    margin: 0 4px !important;
+    width: 60px;
+    height: 75px;
+    margin: 0 4px;
+    /* Wider gap for shop on very small screens */
+  }
+
+  .header {
+    display: none;
+    /* Hide header on extremely short screens to save space */
   }
 
   .board-container {
-    margin-bottom: 2px !important;
-    /* Reduced to avoid pushing up */
-    padding: 5px !important;
-    /* Tighter padding */
+    margin-bottom: 10px !important;
   }
 
   .shop-container {
-    margin-bottom: 2px !important;
-    padding: 6px 10px !important;
+    margin-bottom: 10px !important;
   }
 
   .detail-panel {
-    bottom: 5px !important;
+    bottom: 10px !important;
+    /* Raised to match the 10px gap rhythm */
     padding: 8px !important;
   }
 
   .btn-premium.btn-battle {
     width: 50px !important;
-    height: 40px !important;
-    /* Squat button */
+    /* Reduced width for battle button in mobile */
     padding: 0 !important;
     font-size: 1.1rem !important;
   }
