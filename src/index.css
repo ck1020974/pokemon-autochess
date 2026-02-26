@@ -1767,17 +1767,23 @@ h3 {
   #root {
     /* Widen the game area for high-aspect ratio devices (iPhone 17) */
     max-width: 100% !important;
+    width: 100vw !important;
     /* Controlled horizontal padding: enough for safety, not excessive to keep areas wide */
     padding-left: calc(20px + env(safe-area-inset-left, 0px)) !important;
     padding-right: calc(20px + env(safe-area-inset-right, 0px)) !important;
     padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
+  .game-container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
   .board-container,
   .shop-container {
     width: 100% !important;
-    max-width: 1000px !important;
-    /* Allow more width than default 1200px restricted by root */
+    max-width: 100% !important;
+    /* Allow FULL expansion */
     margin-left: auto !important;
     margin-right: auto !important;
     box-sizing: border-box !important;
@@ -1785,16 +1791,19 @@ h3 {
 
   /* Specific widening for ultra-long screens (Aspect Ratio >= 2.1) */
   @media (min-aspect-ratio: 21/10) {
-
-    .board-container,
-    .shop-container {
-      max-width: 1100px !important;
-      /* Let it breathe even more on iPhone 17 types */
+    .shop-slots-area {
+      padding-left: 40px !important;
+      /* Shift further away from edge controls */
     }
 
-    .shop-slots-area {
-      padding-left: 30px !important;
-      /* Slightly more offset to shift away from notch/rounded corner */
+    .shop-slots {
+      gap: 30px !important;
+      /* Spread slots more over new width */
+    }
+
+    .board-side {
+      justify-content: space-evenly !important;
+      /* Provide more breathing room for units */
     }
   }
 
