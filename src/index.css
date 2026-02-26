@@ -1803,7 +1803,7 @@ h3 {
 
     .board-side {
       justify-content: center !important;
-      gap: 10px !important;
+      gap: 2px !important;
       /* Re-adjusted controlled distance: Smaller gap for 6.1"/6.3" screens as requested */
     }
   }
@@ -1823,8 +1823,20 @@ h3 {
     .board-side {
       justify-content: center !important;
       /* Center alignment looks cleaner with explicit large gaps */
-      gap: 28px !important;
+      gap: 48px !important;
       /* Re-adjusted distance: Much larger explicit gap for massive screen rather than space-evenly which was too tight */
+    }
+
+    /* Scale up team characters to confidently fill the 6.9" screen */
+    .board-side .unit-card,
+    .board-side .slot-placeholder {
+      width: 100px !important;
+      height: 120px !important;
+    }
+
+    .board-side .unit-image {
+      width: 115px !important;
+      height: 115px !important;
     }
   }
 
