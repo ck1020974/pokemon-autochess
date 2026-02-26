@@ -1823,21 +1823,11 @@ h3 {
     .board-side {
       justify-content: center !important;
       /* Center alignment looks cleaner with explicit large gaps */
-      gap: 24px !important;
-      /* Reduced from 48px: A middle ground that provides a slight overlap (-4px effective) instead of massive separation */
+      gap: 8px !important;
+      /* Reduced from 24px: 8px gap + (-14px) margin = -20px effective overlap. Comfortably spaced without clipping off-screen. */
     }
 
-    /* Scale up team characters to confidently fill the 6.9" screen */
-    .board-side .unit-card,
-    .board-side .slot-placeholder {
-      width: 100px !important;
-      height: 120px !important;
-    }
-
-    .board-side .unit-image {
-      width: 115px !important;
-      height: 115px !important;
-    }
+    /* Scaling removed: Reverting to standard mobile unit sizes (88x105) to prevent horizontal overflow on a full board */
   }
 
   .startup-overlay {
