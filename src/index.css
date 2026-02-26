@@ -1816,15 +1816,15 @@ h3 {
     }
 
     .shop-slots {
-      gap: 36px !important;
-      /* Massive gap to fill the 6.9" screen and avoid cramping */
+      gap: 24px !important;
+      /* Reduced from 36px to bring shop items slightly closer */
     }
 
     .board-side {
       justify-content: center !important;
       /* Center alignment looks cleaner with explicit large gaps */
-      gap: 48px !important;
-      /* Re-adjusted distance: Much larger explicit gap for massive screen rather than space-evenly which was too tight */
+      gap: 24px !important;
+      /* Reduced from 48px: A middle ground that provides a slight overlap (-4px effective) instead of massive separation */
     }
 
     /* Scale up team characters to confidently fill the 6.9" screen */
