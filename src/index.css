@@ -1789,21 +1789,41 @@ h3 {
     box-sizing: border-box !important;
   }
 
-  /* Specific widening for ultra-long screens (Aspect Ratio >= 2.1) */
+  /* Specific widening for ultra-long screens (Aspect Ratio >= 2.1) - e.g. iPhone 16 Pro (6.1"/6.3") */
   @media (min-aspect-ratio: 21/10) {
     .shop-slots-area {
-      padding-left: 40px !important;
-      /* Shift further away from edge controls */
+      padding-left: 30px !important;
+      /* Shift away from edge controls, but not too aggressively */
     }
 
     .shop-slots {
-      gap: 30px !important;
-      /* Spread slots more over new width */
+      gap: 16px !important;
+      /* Reduced gap for 6.1"/6.3" screens to keep characters closer */
+    }
+
+    .board-side {
+      justify-content: center !important;
+      gap: 18px !important;
+      /* Controlled distance instead of space-evenly */
+    }
+  }
+
+  /* Extreme ultra-long AND wide screens - e.g. iPhone 16 Pro Max (6.9") */
+  @media (min-aspect-ratio: 21/10) and (min-width: 900px) {
+    .shop-slots-area {
+      padding-left: 45px !important;
+      /* Aggressive shift to fill the massive screen */
+    }
+
+    .shop-slots {
+      gap: 36px !important;
+      /* Massive gap to fill the 6.9" screen and avoid cramping */
     }
 
     .board-side {
       justify-content: space-evenly !important;
-      /* Provide more breathing room for units */
+      gap: 0 !important;
+      /* Space perfectly on massive screen */
     }
   }
 
