@@ -485,7 +485,7 @@ h3 {
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Left Controls */
@@ -814,11 +814,16 @@ h3 {
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-  z-index: 1000;
+  z-index: 10005;
   animation: slideInRight 0.2s ease-out;
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+/* Ensure detail panel is always above the tutorial mask when highlighted */
+.detail-panel.tutorial-highlight {
+  z-index: 10001 !important;
 }
 
 .detail-content {
@@ -1816,8 +1821,8 @@ h3 {
     }
 
     .shop-slots {
-      gap: 24px !important;
-      /* Reduced from 36px to bring shop items slightly closer */
+      gap: 12px !important;
+      /* Reduced from 24px to bring shop items closer on iPhone 16 Plus/Pro Max */
     }
 
     .board-side {
@@ -1923,4 +1928,194 @@ h3 {
     transform: translateY(-10px) !important;
     /* Move footer text UP to follow grid */
   }
+}
+
+/* --- Tutorial Mode --- */
+.tutorial-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9998;
+  pointer-events: auto;
+  /* blocks clicks on background */
+}
+
+/* Make it look premium, glowing light blue like system UI instead of harsh yellow */
+.tutorial-highlight {
+  position: relative !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+  border-radius: inherit;
+  animation: tutorialGlowPulse 1.5s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tutorial-highlight::after {
+  content: "👇";
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.5rem;
+  z-index: 100000;
+  pointer-events: none;
+  animation: pointer-bounce 0.6s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes pointer-bounce {
+  from {
+    transform: translate(-50%, 0);
+  }
+
+  to {
+    transform: translate(-50%, -15px);
+  }
+}
+
+@keyframes tutorialGlowPulse {
+  from {
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5), 0 0 10px rgba(96, 165, 250, 0.2) !important;
+  }
+
+  to {
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 1), 0 0 25px rgba(96, 165, 250, 0.6) !important;
+  }
+}
+
+/* Hide highlights during battle to avoid distraction */
+.is-battling .tutorial-highlight {
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+.tutorial-message-box {
+  position: absolute;
+  top: 35%;
+  right: 5%;
+  background: rgba(15, 23, 42, 0.60);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-top: 3px solid rgba(96, 165, 250, 0.6);
+  padding: 16px 32px;
+  border-radius: 12px;
+  z-index: 10000;
+  color: #f8fafc;
+  font-size: 1.3rem;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(96, 165, 250, 0.1);
+  pointer-events: none;
+  white-space: pre-wrap;
+  max-width: 80%;
+  line-height: 1.5;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.tutorial-text {
+  flex-grow: 1;
+}
+
+.tutorial-next-arrow {
+  display: none;
+  /* Removing the old arrow */
+}
+
+.tutorial-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.tutorial-btn-continue {
+  background: linear-gradient(to bottom, #3b82f6, #2563eb);
+  color: white;
+  border: 1px solid #60a5fa;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+  transition: all 0.2s;
+}
+
+.tutorial-btn-continue:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(59, 130, 246, 0.6);
+}
+
+.tutorial-btn-skip {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.tutorial-btn-skip:hover {
+  color: #f8fafc;
+}
+
+.shake-anim {
+  animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes shake {
+
+  10%,
+  90% {
+    transform: translateX(-1px);
+  }
+
+  20%,
+  80% {
+    transform: translateX(1px);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translateX(-2px);
+  }
+
+  40%,
+  60% {
+    transform: translateX(2px);
+  }
+}
+
+.tutorial-highlight.tutorial-pointer-left::after {
+  content: "👈";
+  top: 50%;
+  left: auto;
+  right: -55px;
+  transform: translateY(-50%);
+  animation: pointer-bounce-left 0.6s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+@keyframes pointer-bounce-left {
+  from {
+    transform: translate(0, -50%);
+  }
+
+  to {
+    transform: translate(-15px, -50%);
+  }
+}
+
+.tutorial-elevate {
+  z-index: 10000 !important;
+  position: relative;
 }
