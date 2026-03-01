@@ -646,6 +646,11 @@ h3 {
   animation: pulse-glow 2s infinite alternate;
 }
 
+.synergy-icon.is-checked {
+  border-color: #10b981 !important;
+  filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.8)) brightness(1.2) !important;
+}
+
 @keyframes pulse-glow {
   0% {
     filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.6)) brightness(1);

@@ -98,13 +98,13 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, isTutorialHighlighted }: any) {
+function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, isTutorialHighlighted, isChecked }: any) {
     let activeDesc = synergy.description;
     const isActive = count !== undefined && count >= synergy.tiers[0];
-    const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
+    const style = isActive ? { borderColor: isChecked ? '#10b981' : synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
 
     return (
-        <div className={`synergy-icon ${isTutorialHighlighted ? 'synthetic-glow tutorial-elevate' : ''}`} style={style} onMouseEnter={onMouseEnter}>
+        <div className={`synergy-icon ${isTutorialHighlighted ? 'synthetic-glow tutorial-elevate' : ''} ${isChecked ? 'is-checked' : ''}`} style={style} onMouseEnter={onMouseEnter}>
             {synergy.icon}
             {showCount && count !== undefined && <span style={{ position: 'absolute', bottom: -5, right: -5, fontSize: '0.7rem', background: '#000', borderRadius: '50%', padding: '0 4px', border: '1px solid #333', color: '#fff' }}>{count}</span>}
             <div className={`synergy-tooltip ${isEnemy ? 'is-enemy' : ''}`}>
@@ -306,12 +306,9 @@ function App() {
         }, 100);
     };
 
-    // Step 10 Synergy Check Effect
-    useEffect(() => {
-        if (tutorialStep === 10 && hoveredStarter && hoveredFire) {
-            setTutorialStep(11);
-        }
-    }, [tutorialStep, hoveredStarter, hoveredFire]);
+    // Step 10 Synergy Check
+    // We keep these states to highlight the icons, but we don't auto-advance anymore
+    // using useEffect to Step 11, because Step 10 now includes the battle task.
 
 
     // Progression Effect
@@ -567,7 +564,7 @@ function App() {
 
             if (tutorialStep > 0) {
                 // Fixed tutorial enemy team
-                if (tutorialStep === 11) {
+                if (tutorialStep === 10 || tutorialStep === 11) {
                     enemyTeam = [
                         new Unit(UNIT_TEMPLATES.charizard),
                         new Unit(UNIT_TEMPLATES.blastoise),
@@ -1103,7 +1100,7 @@ function App() {
         if (tutorialStep === 7) return actionType === 'START_BATTLE';
         if (tutorialStep === 8) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'charmander') || actionType === 'MOVE_BOARD' || (actionType === 'SELECT_BOARD' && payload === 'charmander');
         if (tutorialStep === 9) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'cyndaquil') || actionType === 'MOVE_BOARD' || actionType === 'SELECT_BOARD';
-        if (tutorialStep === 10) return actionType === 'CLICK_SYNERGY';
+        if (tutorialStep === 10) return actionType === 'CLICK_SYNERGY' || actionType === 'START_BATTLE';
         if (tutorialStep === 11) return actionType === 'START_BATTLE';
         if (tutorialStep === 12) return false;
         return false;
@@ -1186,7 +1183,7 @@ function App() {
             if (tutorialStep > 0) triggerShake();
             return;
         }
-        if (game.gold > 0) {
+        if (game.gold > 0 && tutorialStep === 0) {
             setConfirmDialog({
                 message: `進入對戰階段？`,
                 description: '未花完的 ' + game.gold + '$ ，將會直接消失！',
@@ -1214,7 +1211,7 @@ function App() {
             const hpBefore = game.lives;
             game.endBattle(battleResult);
 
-            if (tutorialStep === 11 && battleResult === 'LOSS') {
+            if ((tutorialStep === 10 || tutorialStep === 11) && battleResult === 'LOSS') {
                 setTutorialStep(12);
             }
 
@@ -1374,8 +1371,8 @@ function App() {
         setSelected(null);
     };
 
-    const displayPlayerTeam = game.phase === GamePhase.BATTLE ? simulatorRef.current?.playerTeam : game.playerTeam;
-    const displayEnemyTeam = game.phase === GamePhase.BATTLE ? simulatorRef.current?.enemyTeam : Array(5).fill(null);
+    const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
+    const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
     const [focusedDifficulty, setFocusedDifficulty] = useState<string | null>(null);
 
     // Calculate Synergies (All)
@@ -1424,7 +1421,7 @@ function App() {
                                 {tutorialStep === 7 && "準備完成後即可開始戰鬥\n🎯任務：點擊戰鬥並贏得勝利"}
                                 {tutorialStep === 8 && "拖曳或點擊相同角色合成\n🎯任務：購買並合成小火龍"}
                                 {tutorialStep === 9 && "每隻寶可夢擁有不同羈絆\n🎯任務：購買火球鼠來觸發羈絆"}
-                                {tutorialStep === 10 && "觸發羈絆來提升陣容強度\n🎯任務：請將游標滑過這兩個羈絆"}
+                                {tutorialStep === 10 && "觸發羈絆來提升陣容強度，滑過圖示可查看說明。\n🎯任務：滑過這兩個羈絆並點擊戰鬥"}
                                 {tutorialStep === 11 && "挑戰強大的對手成為冠軍\n🎯任務：點擊戰鬥並進行對戰"}
                                 {tutorialStep === 12 && "戰敗會扣愛心，歸零會結束。請努力成為冠軍！\n🎯任務：點擊結束教學"}
                             </div>
@@ -1801,6 +1798,7 @@ function App() {
                             units={syn.units}
                             activeFamilies={syn.activeFamilies}
                             isTutorialHighlighted={tutorialStep === 10 && (syn.id === 'Starter' || syn.id === 'Fire')}
+                            isChecked={(syn.id === 'Starter' && hoveredStarter) || (syn.id === 'Fire' && hoveredFire)}
                             onMouseEnter={() => {
                                 if (tutorialStep === 10 && (syn.id === 'Starter' || syn.id === 'Fire')) {
                                     if (syn.id === 'Starter') setHoveredStarter(true);
@@ -1835,7 +1833,7 @@ function App() {
 
                 {/* 4. Units Area */}
                 <div className="board-teams-horizontal" style={{
-                    filter: (tutorialStep > 0 && tutorialStep !== 2 && tutorialStep !== 3 && tutorialStep !== 4 && tutorialStep !== 7 && tutorialStep !== 8 && tutorialStep !== 9) ? 'grayscale(100%) brightness(50%)' : 'none'
+                    filter: (tutorialStep > 0 && tutorialStep !== 2 && tutorialStep !== 3 && tutorialStep !== 4 && tutorialStep !== 7 && tutorialStep !== 8 && tutorialStep !== 9 && tutorialStep !== 10 && tutorialStep !== 11) ? 'grayscale(100%) brightness(50%)' : 'none'
                 }}>
                     {/* Left Side: Player Team */}
                     <div className={`board-side player ${(tutorialStep === 8 || tutorialStep === 9) ? 'tutorial-elevate' : ''}`}>
@@ -1911,7 +1909,7 @@ function App() {
                                 <button
                                     className="btn-premium btn-battle"
                                     onClick={handleStartBattle}
-                                    style={{ height: '50px', width: '60px', zIndex: (tutorialStep === 7 || tutorialStep === 11) ? 10000 : 'auto' }}
+                                    style={{ height: '50px', width: '60px', zIndex: (tutorialStep === 7 || tutorialStep === 10 || tutorialStep === 11) ? 10000 : 'auto' }}
                                 >
                                     <span style={{ fontSize: '1.5rem' }}>⚔️</span>
                                 </button>
