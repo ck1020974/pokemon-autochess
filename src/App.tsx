@@ -264,6 +264,10 @@ function App() {
     const [goldErrorAnim, setGoldErrorAnim] = useState(false);
     const [hpLossAnim, setHpLossAnim] = useState(false);
 
+    // Tutorial Specific Interaction States
+    const [hoveredStarter, setHoveredStarter] = useState(false);
+    const [hoveredFire, setHoveredFire] = useState(false);
+
     const triggerShake = () => {
         setTutorialShake(true);
         setTimeout(() => setTutorialShake(false), 400);
@@ -1125,6 +1129,7 @@ function App() {
             }
             const shopUnit = game.shop.slots[selected.index];
             if (shopUnit && game.gold < shopUnit.tier) {
+                if (tutorialStep > 0) triggerShake();
                 setGoldErrorAnim(true);
                 setTimeout(() => setGoldErrorAnim(false), 400);
                 return;
@@ -1405,7 +1410,7 @@ function App() {
                                 {tutorialStep === 7 && "準備完成後即可開始戰鬥\n🎯任務：點擊戰鬥並贏得勝利"}
                                 {tutorialStep === 8 && "拖曳或點擊相同角色合成\n🎯任務：購買並合成小火龍"}
                                 {tutorialStep === 9 && "每隻寶可夢擁有不同羈絆\n🎯任務：購買火球鼠來觸發羈絆"}
-                                {tutorialStep === 10 && "觸發羈絆來提升陣容強度\n🎯任務：點擊羈絆來查看效果"}
+                                {tutorialStep === 10 && "觸發羈絆來提升陣容強度\n🎯任務：請將游標滑過這兩個羈絆"}
                                 {tutorialStep === 11 && "挑戰強大的對手成為冠軍\n🎯任務：點擊戰鬥並進行對戰"}
                                 {tutorialStep === 12 && "戰敗會扣愛心，歸零會結束。請努力成為冠軍！\n🎯任務：點擊結束教學"}
                             </div>
@@ -1784,15 +1789,26 @@ function App() {
                             isTutorialHighlighted={tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')}
                             onMouseEnter={() => {
                                 if (tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')) {
-                                    if (isTutorialActionAllowed('CLICK_SYNERGY')) {
-                                        setTutorialStep(11);
+                                    if (syn.id === 'starter') setHoveredStarter(true);
+                                    if (syn.id === 'fire') setHoveredFire(true);
+
+                                    // If both are now hovered (or this is the second one), advance step
+                                    if ((syn.id === 'starter' && hoveredFire) || (syn.id === 'fire' && hoveredStarter)) {
+                                        if (isTutorialActionAllowed('CLICK_SYNERGY')) {
+                                            setTutorialStep(11);
+                                        }
                                     }
                                 }
                             }}
                             onClick={() => {
                                 if (tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')) {
-                                    if (isTutorialActionAllowed('CLICK_SYNERGY')) {
-                                        setTutorialStep(11);
+                                    if (syn.id === 'starter') setHoveredStarter(true);
+                                    if (syn.id === 'fire') setHoveredFire(true);
+
+                                    if ((syn.id === 'starter' && hoveredFire) || (syn.id === 'fire' && hoveredStarter)) {
+                                        if (isTutorialActionAllowed('CLICK_SYNERGY')) {
+                                            setTutorialStep(11);
+                                        }
                                     }
                                 }
                             }}
@@ -1825,10 +1841,13 @@ function App() {
                         {Array.from({ length: 5 }).map((_, i) => {
                             const unit = displayPlayerTeam?.[i] || null;
                             const isInteractive = game.phase === GamePhase.SHOP;
+                            // Check for Step 8: if we are building Charmander evolution, highlight the existing board Charmander
+                            const step8CharmanderTarget = tutorialStep === 8 && unit?.family === 'charmander' && game.shop.slots.some(s => s?.family === 'charmander');
+
                             return (
                                 <div
                                     key={unit ? unit.id : `player-empty-${i}`}
-                                    className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''} ${(tutorialStep === 3 && unit?.family === 'gastly') || (tutorialStep === 4 && (unit?.family === 'gastly' || selected?.unit?.family === 'gastly')) ? 'tutorial-highlight' : ''}`}
+                                    className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''} ${((tutorialStep === 3 && unit?.family === 'gastly') || (tutorialStep === 4 && (unit?.family === 'gastly' || selected?.unit?.family === 'gastly')) || step8CharmanderTarget) ? 'tutorial-highlight' : ''}`}
                                     onDragOver={isInteractive ? onDragOver : undefined}
                                     onDrop={isInteractive ? (e) => onDrop(e, i) : undefined}
                                     onClick={(e) => {
