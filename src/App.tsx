@@ -306,6 +306,14 @@ function App() {
         }, 100);
     };
 
+    // Step 10 Synergy Check Effect
+    useEffect(() => {
+        if (tutorialStep === 10 && hoveredStarter && hoveredFire) {
+            setTutorialStep(11);
+        }
+    }, [tutorialStep, hoveredStarter, hoveredFire]);
+
+
     // Progression Effect
     useEffect(() => {
         if (tutorialStep === 0) return;
@@ -1797,25 +1805,12 @@ function App() {
                                 if (tutorialStep === 10 && (syn.id === 'Starter' || syn.id === 'Fire')) {
                                     if (syn.id === 'Starter') setHoveredStarter(true);
                                     if (syn.id === 'Fire') setHoveredFire(true);
-
-                                    // If both are now hovered (or this is the second one), advance step
-                                    if ((syn.id === 'Starter' && hoveredFire) || (syn.id === 'Fire' && hoveredStarter)) {
-                                        if (isTutorialActionAllowed('CLICK_SYNERGY')) {
-                                            setTutorialStep(11);
-                                        }
-                                    }
                                 }
                             }}
                             onClick={() => {
                                 if (tutorialStep === 10 && (syn.id === 'Starter' || syn.id === 'Fire')) {
                                     if (syn.id === 'Starter') setHoveredStarter(true);
                                     if (syn.id === 'Fire') setHoveredFire(true);
-
-                                    if ((syn.id === 'Starter' && hoveredFire) || (syn.id === 'Fire' && hoveredStarter)) {
-                                        if (isTutorialActionAllowed('CLICK_SYNERGY')) {
-                                            setTutorialStep(11);
-                                        }
-                                    }
                                 }
                             }}
                         />
@@ -1916,7 +1911,7 @@ function App() {
                                 <button
                                     className="btn-premium btn-battle"
                                     onClick={handleStartBattle}
-                                    style={{ height: '50px', width: '60px', zIndex: tutorialStep === 7 ? 10000 : 'auto' }}
+                                    style={{ height: '50px', width: '60px', zIndex: (tutorialStep === 7 || tutorialStep === 11) ? 10000 : 'auto' }}
                                 >
                                     <span style={{ fontSize: '1.5rem' }}>⚔️</span>
                                 </button>
