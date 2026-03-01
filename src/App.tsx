@@ -327,7 +327,7 @@ function App() {
                 setTutorialStep(8);
             }
         } else if (tutorialStep === 8) {
-            if (game.phase === GamePhase.SHOP && game.gold >= 10 && battleResult === null) {
+            if (game.phase === GamePhase.SHOP && battleResult === null) {
                 const hasLevel2Charmander = game.playerTeam.some(u => u?.family === 'charmander' && u.level >= 2);
                 if (hasLevel2Charmander) {
                     setTutorialStep(9);
@@ -1066,8 +1066,8 @@ function App() {
             return false;
         }
         if (tutorialStep === 7) return actionType === 'START_BATTLE';
-        if (tutorialStep === 8) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'charmander') || actionType === 'MOVE_BOARD';
-        if (tutorialStep === 9) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'cyndaquil') || actionType === 'MOVE_BOARD';
+        if (tutorialStep === 8) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'charmander') || actionType === 'MOVE_BOARD' || (actionType === 'SELECT_BOARD' && payload === 'charmander');
+        if (tutorialStep === 9) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'cyndaquil') || actionType === 'MOVE_BOARD' || actionType === 'SELECT_BOARD';
         return false;
     };
 
@@ -1351,7 +1351,7 @@ function App() {
                                 {tutorialStep === 5 && "花費1$可以刷新商店角色\n🎯任務：點擊按鈕刷新商店角色"}
                                 {tutorialStep === 6 && "鎖定角色能保留到下回合\n🎯任務：點擊鎖定所有小火龍"}
                                 {tutorialStep === 7 && "準備完成後即可開始戰鬥\n🎯任務：點擊戰鬥並贏得勝利"}
-                                {tutorialStep === 8 && "合成相同角色來提升能力\n🎯任務：購買並合成所有小火龍"}
+                                {tutorialStep === 8 && "拖曳或點擊相同角色合成\n🎯任務：購買並合成小火龍"}
                                 {tutorialStep === 9 && "觸發羈絆來提升陣容強度\n🎯任務：購買火球鼠來觸發羈絆"}
                             </div>
                         </div>
