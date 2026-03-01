@@ -332,8 +332,13 @@ function App() {
                 if (hasLevel2Charmander) {
                     setTutorialStep(9);
                 } else {
-                    if (game.shop.slots.length >= 3 && game.shop.slots[2]?.family !== 'cyndaquil') {
+                    if (game.shop.slots.length > 0 && game.shop.slots[2]?.family !== 'cyndaquil') {
+                        game.shop.slots[0] = new Unit(UNIT_TEMPLATES.charmander);
+                        game.shop.slots[1] = new Unit(UNIT_TEMPLATES.charmander);
                         game.shop.slots[2] = new Unit(UNIT_TEMPLATES.cyndaquil);
+                        game.shop.slots[3] = new Unit(UNIT_TEMPLATES.igglybuff);
+                        game.shop.slots.length = 4;
+                        game.shop.frozen = [false, false, false, false, false];
                         update();
                     }
                 }
@@ -1061,8 +1066,8 @@ function App() {
             return false;
         }
         if (tutorialStep === 7) return actionType === 'START_BATTLE';
-        if (tutorialStep === 8) return actionType === 'BUY' && game.shop.slots[payload]?.family === 'charmander';
-        if (tutorialStep === 9) return actionType === 'BUY' && game.shop.slots[payload]?.family === 'cyndaquil';
+        if (tutorialStep === 8) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'charmander') || actionType === 'MOVE_BOARD';
+        if (tutorialStep === 9) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'cyndaquil') || actionType === 'MOVE_BOARD';
         return false;
     };
 
@@ -1731,7 +1736,7 @@ function App() {
                     filter: (tutorialStep > 0 && tutorialStep !== 2 && tutorialStep !== 3 && tutorialStep !== 4 && tutorialStep !== 7 && tutorialStep !== 8 && tutorialStep !== 9) ? 'grayscale(100%) brightness(50%)' : 'none'
                 }}>
                     {/* Left Side: Player Team */}
-                    <div className="board-side player">
+                    <div className={`board-side player ${(tutorialStep === 8 || tutorialStep === 9) ? 'tutorial-elevate' : ''}`}>
                         {Array.from({ length: 5 }).map((_, i) => {
                             const unit = displayPlayerTeam?.[i] || null;
                             const isInteractive = game.phase === GamePhase.SHOP;
