@@ -98,13 +98,13 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onClick, isTutorialHighlighted }: any) {
+function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, isTutorialHighlighted }: any) {
     let activeDesc = synergy.description;
     const isActive = count !== undefined && count >= synergy.tiers[0];
     const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
 
     return (
-        <div className={`synergy-icon ${isTutorialHighlighted ? 'tutorial-highlight tutorial-elevate' : ''}`} style={style} onClick={onClick}>
+        <div className={`synergy-icon ${isTutorialHighlighted ? 'tutorial-highlight tutorial-elevate' : ''}`} style={style} onMouseEnter={onMouseEnter}>
             {synergy.icon}
             {showCount && count !== undefined && <span style={{ position: 'absolute', bottom: -5, right: -5, fontSize: '0.7rem', background: '#000', borderRadius: '50%', padding: '0 4px', border: '1px solid #333', color: '#fff' }}>{count}</span>}
             <div className={`synergy-tooltip ${isEnemy ? 'is-enemy' : ''}`}>
@@ -259,6 +259,10 @@ function App() {
     const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
     const [tutorialStep, setTutorialStep] = useState<number>(0);
     const [tutorialShake, setTutorialShake] = useState<boolean>(false);
+
+    // Animation States
+    const [goldErrorAnim, setGoldErrorAnim] = useState(false);
+    const [hpLossAnim, setHpLossAnim] = useState(false);
 
     const triggerShake = () => {
         setTutorialShake(true);
@@ -1120,6 +1124,12 @@ function App() {
                 return;
             }
             const shopUnit = game.shop.slots[selected.index];
+            if (shopUnit && game.gold < shopUnit.tier) {
+                setGoldErrorAnim(true);
+                setTimeout(() => setGoldErrorAnim(false), 400);
+                return;
+            }
+
             const targetIdx = game.buyUnit(selected.index);
             if (shopUnit && targetIdx !== null) {
                 const targetUnit = game.playerTeam[targetIdx];
@@ -1191,7 +1201,18 @@ function App() {
     const handleBattleResultClick = () => {
         if (battleResult) {
             music.stop(); // Stop victory music
+            const hpBefore = game.lives;
             game.endBattle(battleResult);
+
+            if (tutorialStep === 11 && battleResult === 'LOSS') {
+                setTutorialStep(12);
+            }
+
+            if (game.lives < hpBefore) {
+                setHpLossAnim(true);
+                setTimeout(() => setHpLossAnim(false), 800);
+            }
+
             simulatorRef.current = null;
             setBattleResult(null);
             update();
@@ -1223,6 +1244,12 @@ function App() {
                     if (!isTutorialActionAllowed('BUY', sourceIndex)) return;
                     // Try to Buy or Synthesize from Shop
                     const shopUnit = game.shop.slots[sourceIndex];
+                    if (shopUnit && game.gold < shopUnit.tier) {
+                        setGoldErrorAnim(true);
+                        setTimeout(() => setGoldErrorAnim(false), 400);
+                        return;
+                    }
+
                     const targetIdx = game.buyUnit(sourceIndex, index);
                     if (shopUnit && targetIdx !== null) {
                         const targetUnit = game.playerTeam[targetIdx];
@@ -1379,7 +1406,7 @@ function App() {
                                 {tutorialStep === 8 && "拖曳或點擊相同角色合成\n🎯任務：購買並合成小火龍"}
                                 {tutorialStep === 9 && "每隻寶可夢擁有不同羈絆\n🎯任務：購買火球鼠來觸發羈絆"}
                                 {tutorialStep === 10 && "觸發羈絆來提升陣容強度\n🎯任務：點擊羈絆來查看效果"}
-                                {tutorialStep === 11 && "戰敗時會扣除玩家生命值\n🎯任務：點擊戰鬥並進行對戰"}
+                                {tutorialStep === 11 && "挑戰強大的對手成為冠軍\n🎯任務：點擊戰鬥並進行對戰"}
                                 {tutorialStep === 12 && "戰敗會扣愛心，歸零會結束。請努力成為冠軍！\n🎯任務：點擊結束教學"}
                             </div>
                             {tutorialStep === 12 && (
@@ -1598,8 +1625,8 @@ function App() {
                     )}
                     {difficulty && (
                         <>
-                            <span>❤️ 生命: {game.lives}</span>
-                            <span className={tutorialStep === 2 ? 'tutorial-highlight tutorial-pointer-left' : ''} style={{ padding: tutorialStep === 2 ? '5px 10px' : '0', borderRadius: '8px', zIndex: 10000, position: 'relative' }}>💰 金幣: {game.gold}</span>
+                            <span className={`${hpLossAnim ? 'shake-anim' : ''} ${tutorialStep === 12 ? 'tutorial-elevate' : ''}`} style={{ color: hpLossAnim ? '#ef4444' : undefined, zIndex: tutorialStep === 12 ? 10005 : 'auto', position: 'relative' }}>❤️ 生命: {game.lives}</span>
+                            <span className={`${tutorialStep === 2 ? 'tutorial-highlight tutorial-pointer-left' : ''} ${goldErrorAnim ? 'shake-anim' : ''}`} style={{ padding: tutorialStep === 2 ? '5px 10px' : '0', color: goldErrorAnim ? '#ef4444' : undefined, borderRadius: '8px', zIndex: 10000, position: 'relative' }}>💰 金幣: {game.gold}</span>
                         </>
                     )}
                 </div>
@@ -1755,6 +1782,13 @@ function App() {
                             units={syn.units}
                             activeFamilies={syn.activeFamilies}
                             isTutorialHighlighted={tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')}
+                            onMouseEnter={() => {
+                                if (tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')) {
+                                    if (isTutorialActionAllowed('CLICK_SYNERGY')) {
+                                        setTutorialStep(11);
+                                    }
+                                }
+                            }}
                             onClick={() => {
                                 if (tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')) {
                                     if (isTutorialActionAllowed('CLICK_SYNERGY')) {
