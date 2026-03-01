@@ -639,6 +639,22 @@ h3 {
   }
 }
 
+/* Synthetic Glow for pure image glowing without arrow UI */
+.synthetic-glow .unit-image {
+  filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.9)) brightness(1.2);
+  animation: pulse-glow 2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+  0% {
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.6)) brightness(1);
+  }
+
+  100% {
+    filter: drop-shadow(0 0 25px rgba(250, 204, 21, 1)) brightness(1.3);
+  }
+}
+
 /* Drag & Flip Logic - REVISED: Flip Image Wrapper */
 
 /* Visual Wrapper for Flip/Transform Isolation */

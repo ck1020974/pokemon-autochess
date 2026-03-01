@@ -1128,7 +1128,7 @@ function App() {
                 return;
             }
             const shopUnit = game.shop.slots[selected.index];
-            if (shopUnit && game.gold < shopUnit.tier) {
+            if (shopUnit && game.gold < 3) {
                 if (tutorialStep > 0) triggerShake();
                 setGoldErrorAnim(true);
                 setTimeout(() => setGoldErrorAnim(false), 400);
@@ -1249,7 +1249,7 @@ function App() {
                     if (!isTutorialActionAllowed('BUY', sourceIndex)) return;
                     // Try to Buy or Synthesize from Shop
                     const shopUnit = game.shop.slots[sourceIndex];
-                    if (shopUnit && game.gold < shopUnit.tier) {
+                    if (shopUnit && game.gold < 3) {
                         setGoldErrorAnim(true);
                         setTimeout(() => setGoldErrorAnim(false), 400);
                         return;
@@ -1346,6 +1346,15 @@ function App() {
                     return;
                 }
                 const shopUnit = game.shop.slots[sourceIndex];
+
+                if (shopUnit && game.gold < 3) {
+                    setGoldErrorAnim(true);
+                    setTimeout(() => setGoldErrorAnim(false), 400);
+                    setDraggedItem(null);
+                    setSelected(null);
+                    return;
+                }
+
                 const targetIdx = game.buyUnit(sourceIndex, targetIndex);
                 if (shopUnit && targetIdx !== null) {
                     const targetUnit = game.playerTeam[targetIdx];
@@ -1786,14 +1795,14 @@ function App() {
                             count={syn.count}
                             units={syn.units}
                             activeFamilies={syn.activeFamilies}
-                            isTutorialHighlighted={tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')}
+                            isTutorialHighlighted={tutorialStep === 10 && (syn.id === 'Starter' || syn.id === 'Fire')}
                             onMouseEnter={() => {
-                                if (tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')) {
-                                    if (syn.id === 'starter') setHoveredStarter(true);
-                                    if (syn.id === 'fire') setHoveredFire(true);
+                                if (tutorialStep === 10 && (syn.id === 'Starter' || syn.id === 'Fire')) {
+                                    if (syn.id === 'Starter') setHoveredStarter(true);
+                                    if (syn.id === 'Fire') setHoveredFire(true);
 
                                     // If both are now hovered (or this is the second one), advance step
-                                    if ((syn.id === 'starter' && hoveredFire) || (syn.id === 'fire' && hoveredStarter)) {
+                                    if ((syn.id === 'Starter' && hoveredFire) || (syn.id === 'Fire' && hoveredStarter)) {
                                         if (isTutorialActionAllowed('CLICK_SYNERGY')) {
                                             setTutorialStep(11);
                                         }
@@ -1801,11 +1810,11 @@ function App() {
                                 }
                             }}
                             onClick={() => {
-                                if (tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')) {
-                                    if (syn.id === 'starter') setHoveredStarter(true);
-                                    if (syn.id === 'fire') setHoveredFire(true);
+                                if (tutorialStep === 10 && (syn.id === 'Starter' || syn.id === 'Fire')) {
+                                    if (syn.id === 'Starter') setHoveredStarter(true);
+                                    if (syn.id === 'Fire') setHoveredFire(true);
 
-                                    if ((syn.id === 'starter' && hoveredFire) || (syn.id === 'fire' && hoveredStarter)) {
+                                    if ((syn.id === 'Starter' && hoveredFire) || (syn.id === 'Fire' && hoveredStarter)) {
                                         if (isTutorialActionAllowed('CLICK_SYNERGY')) {
                                             setTutorialStep(11);
                                         }
@@ -1847,7 +1856,7 @@ function App() {
                             return (
                                 <div
                                     key={unit ? unit.id : `player-empty-${i}`}
-                                    className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''} ${((tutorialStep === 3 && unit?.family === 'gastly') || (tutorialStep === 4 && (unit?.family === 'gastly' || selected?.unit?.family === 'gastly')) || step8CharmanderTarget) ? 'tutorial-highlight' : ''}`}
+                                    className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''} ${((tutorialStep === 3 && unit?.family === 'gastly') || (tutorialStep === 4 && (unit?.family === 'gastly' || selected?.unit?.family === 'gastly'))) ? 'tutorial-highlight' : ''} ${(step8CharmanderTarget && game.phase === GamePhase.SHOP) ? 'synthetic-glow' : ''}`}
                                     onDragOver={isInteractive ? onDragOver : undefined}
                                     onDrop={isInteractive ? (e) => onDrop(e, i) : undefined}
                                     onClick={(e) => {
