@@ -1421,7 +1421,7 @@ function App() {
                                 {tutorialStep === 7 && "準備完成後即可開始戰鬥\n🎯任務：點擊戰鬥並贏得勝利"}
                                 {tutorialStep === 8 && "拖曳或點擊相同角色合成\n🎯任務：購買並合成小火龍"}
                                 {tutorialStep === 9 && "每隻寶可夢擁有不同羈絆\n🎯任務：購買火球鼠來觸發羈絆"}
-                                {tutorialStep === 10 && "觸發羈絆來提升陣容強度，滑過圖示可查看說明。\n🎯任務：滑過這兩個羈絆並點擊戰鬥"}
+                                {tutorialStep === 10 && "觸發羈絆來提升陣容強度\n🎯任務：查看御三家、燃燒羈絆"}
                                 {tutorialStep === 11 && "挑戰強大的對手成為冠軍\n🎯任務：點擊戰鬥並進行對戰"}
                                 {tutorialStep === 12 && "戰敗會扣愛心，歸零會結束。請努力成為冠軍！\n🎯任務：點擊結束教學"}
                             </div>
@@ -1789,7 +1789,7 @@ function App() {
 
             <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => setSelected(null)}>
                 {/* 1. Synergies (Player) */}
-                <div className="board-synergies" style={{ zIndex: tutorialStep === 10 ? 10005 : 10 }}>
+                <div className={`board-synergies ${(tutorialStep === 10 || tutorialStep === 11) ? 'tutorial-elevate' : ''}`}>
                     {synergyStatus.map(syn => (
                         <SynergyIcon
                             key={syn.id}
@@ -1832,11 +1832,12 @@ function App() {
                 )}
 
                 {/* 4. Units Area */}
-                <div className="board-teams-horizontal" style={{
+                <div className={`board-teams-horizontal ${(tutorialStep === 10 || tutorialStep === 11) ? 'tutorial-elevate' : ''}`} style={{
+                    zIndex: (tutorialStep === 10 || tutorialStep === 11) ? 9999 : 'auto',
                     filter: (tutorialStep > 0 && tutorialStep !== 2 && tutorialStep !== 3 && tutorialStep !== 4 && tutorialStep !== 7 && tutorialStep !== 8 && tutorialStep !== 9 && tutorialStep !== 10 && tutorialStep !== 11) ? 'grayscale(100%) brightness(50%)' : 'none'
                 }}>
                     {/* Left Side: Player Team */}
-                    <div className={`board-side player ${(tutorialStep === 8 || tutorialStep === 9) ? 'tutorial-elevate' : ''}`}>
+                    <div className={`board-side player ${(tutorialStep === 8 || tutorialStep === 9 || tutorialStep === 10 || tutorialStep === 11) ? 'tutorial-elevate' : ''}`}>
                         {Array.from({ length: 5 }).map((_, i) => {
                             const unit = displayPlayerTeam?.[i] || null;
                             const isInteractive = game.phase === GamePhase.SHOP;

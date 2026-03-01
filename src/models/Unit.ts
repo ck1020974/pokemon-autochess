@@ -36,7 +36,7 @@ export class Unit {
   public family: string;
 
   constructor(template: UnitTemplate) {
-    this.id = crypto.randomUUID();
+    this.id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
     this.templateId = template.id;
     this.name = template.name;
     this.tier = template.tier;
