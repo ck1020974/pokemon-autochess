@@ -98,13 +98,13 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy }: any) {
+function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onClick, isTutorialHighlighted }: any) {
     let activeDesc = synergy.description;
     const isActive = count !== undefined && count >= synergy.tiers[0];
     const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
 
     return (
-        <div className="synergy-icon" style={style}>
+        <div className={`synergy-icon ${isTutorialHighlighted ? 'tutorial-highlight tutorial-elevate' : ''}`} style={style} onClick={onClick}>
             {synergy.icon}
             {showCount && count !== undefined && <span style={{ position: 'absolute', bottom: -5, right: -5, fontSize: '0.7rem', background: '#000', borderRadius: '50%', padding: '0 4px', border: '1px solid #333', color: '#fff' }}>{count}</span>}
             <div className={`synergy-tooltip ${isEnemy ? 'is-enemy' : ''}`}>
@@ -1090,7 +1090,7 @@ function App() {
         if (tutorialStep === 7) return actionType === 'START_BATTLE';
         if (tutorialStep === 8) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'charmander') || actionType === 'MOVE_BOARD' || (actionType === 'SELECT_BOARD' && payload === 'charmander');
         if (tutorialStep === 9) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'cyndaquil') || actionType === 'MOVE_BOARD' || actionType === 'SELECT_BOARD';
-        if (tutorialStep === 10) return actionType === 'OPEN_ENCYCLOPEDIA';
+        if (tutorialStep === 10) return actionType === 'CLICK_SYNERGY';
         if (tutorialStep === 11) return actionType === 'START_BATTLE';
         if (tutorialStep === 12) return false;
         return false;
@@ -1358,24 +1358,12 @@ function App() {
             {/* Tutorial Message Box / Mask */}
             {tutorialStep > 0 && game.phase === GamePhase.SHOP && (
                 <>
-                    <div className="tutorial-mask" onClick={() => (tutorialStep === 1 || tutorialStep === 10 || tutorialStep === 12) ? handleTutorialNext() : null} />
-                    {tutorialStep === 1 || tutorialStep === 10 || tutorialStep === 12 ? (
+                    <div className="tutorial-mask" onClick={() => (tutorialStep === 1 || tutorialStep === 12) ? handleTutorialNext() : null} />
+                    {tutorialStep === 1 ? (
                         <div className="tutorial-message-box" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
-                            {tutorialStep === 10 && (
-                                <div className="tutorial-text" style={{ background: 'rgba(0,0,0,0.8)', padding: '20px', borderRadius: '12px', border: '1px solid #f59e0b', marginBottom: '20px' }}>
-                                    你已經開啟了屬性羈絆！(如上方面板)<br />
-                                    可點擊右上角「📖 寶可夢圖鑑」查看更多角色資料。
-                                </div>
-                            )}
-                            {tutorialStep === 12 && (
-                                <div className="tutorial-text" style={{ background: 'rgba(0,0,0,0.8)', padding: '20px', borderRadius: '12px', border: '1px solid #ef4444', marginBottom: '20px' }}>
-                                    戰鬥失敗會扣除愛心 (生命值)。<br />
-                                    歸零則遊戲結束。請努力擊敗所有對手，成為聯盟冠軍！
-                                </div>
-                            )}
-                            <div className="tutorial-actions" style={{ position: 'absolute', top: (tutorialStep === 10 || tutorialStep === 12) ? '160px' : '100px', right: '20px' }}>
+                            <div className="tutorial-actions" style={{ position: 'absolute', top: '100px', right: '20px' }}>
                                 <button className="tutorial-btn-continue" onClick={(e) => { e.stopPropagation(); handleTutorialNext(); }}>
-                                    {tutorialStep === 12 ? '結束教學 ⏭' : '點擊繼續 ⏭'}
+                                    點擊繼續 ⏭
                                 </button>
                             </div>
                         </div>
@@ -1390,8 +1378,15 @@ function App() {
                                 {tutorialStep === 7 && "準備完成後即可開始戰鬥\n🎯任務：點擊戰鬥並贏得勝利"}
                                 {tutorialStep === 8 && "拖曳或點擊相同角色合成\n🎯任務：購買並合成小火龍"}
                                 {tutorialStep === 9 && "觸發羈絆來提升陣容強度\n🎯任務：購買火球鼠來觸發羈絆"}
-                                {tutorialStep === 11 && "最後請試著迎戰超強的對手吧！\n🎯任務：點擊戰鬥"}
+                                {tutorialStep === 10 && "你剛開啟了屬性羈絆效果！\n🎯任務：點擊發光的羈絆查看圖鑑"}
+                                {tutorialStep === 11 && "最後請迎戰超強的對手吧！\n🎯任務：點擊戰鬥按鈕"}
+                                {tutorialStep === 12 && "戰敗會扣愛心，歸零會結束。請努力成為冠軍！\n🎯任務：點擊結束教學"}
                             </div>
+                            {tutorialStep === 12 && (
+                                <button className="tutorial-btn-continue" style={{ marginTop: '15px' }} onClick={(e) => { e.stopPropagation(); handleTutorialNext(); }}>
+                                    結束教學 ⏭
+                                </button>
+                            )}
                         </div>
                     )}
                 </>
@@ -1634,6 +1629,10 @@ function App() {
                         <button
                             className="mute-toggle-btn-header"
                             onClick={() => {
+                                if (tutorialStep > 0 && tutorialStep !== 10) {
+                                    triggerShake();
+                                    return;
+                                }
                                 setShowEncyclopedia(true);
                             }}
                             title="圖鑑 / 小百科"
