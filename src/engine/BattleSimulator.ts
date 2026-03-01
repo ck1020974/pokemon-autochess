@@ -563,8 +563,8 @@ export class BattleSimulator {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
                     const amt = [0, 1, 2, 4][unit.level] || 2;
-                    this.growUnit(unit, amt, amt, '發動了火焰輪');
-                    await this.notifySkill(unit, '發動了火焰輪！');
+                    this.growUnit(unit, amt, amt, '發動了蓄能焰襲');
+                    await this.notifySkill(unit, '發動了蓄能焰襲！');
                     await this.playAnimation(unit, 'jump', 200);
                 }
             });
@@ -1318,7 +1318,7 @@ export class BattleSimulator {
                 if (killer.synergies.includes('Claw') && this.getSynergyCountForUnit(killer, 'Claw') >= 2) {
                     const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
                     this.log(`${killer.name} 發動了磨爪！`);
-                    this.growUnit(killer, 0, 2, '磨爪', original, true);
+                    this.growUnit(killer, 0, 4, '磨爪', original, true);
                 }
 
                 // Check Silence for individual unit abilities
@@ -1335,9 +1335,9 @@ export class BattleSimulator {
                     else if (canAddHp && !canAddAtk) choice = 'hp';
                     else choice = Math.random() < 0.5 ? 'atk' : 'hp';
 
-                    this.log(`${killer.name} 發動了蓄能焰襲！`);
-                    if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲', null, false);
-                    else this.growUnit(killer, buff, 0, '蓄能焰襲', null, false);
+                    this.log(`${killer.name} 發動了火焰輪！`);
+                    if (choice === 'atk') this.growUnit(killer, 0, buff, '火焰輪', null, false);
+                    else this.growUnit(killer, buff, 0, '火焰輪', null, false);
                 }
             };
 

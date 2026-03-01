@@ -468,19 +468,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
     // 24. Sneasel
     sneasel: {
         id: 'sneasel', name: '狃拉', tier: 4, family: 'sneasel',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/狃拉00.webp', battleImageUrl: 'assets/狃拉01.webp',
         description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Claw', 'Snow'], evolveId: 'weavile'
     },
     weavile: {
         id: 'weavile', name: '瑪狃拉', tier: 4, family: 'sneasel',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
         description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Claw', 'Snow'], evolveId: 'weavile_final', isHiddenFromShop: true
     },
     weavile_final: {
         id: 'weavile_final', name: '瑪狃拉', tier: 4, family: 'sneasel',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
         description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Claw', 'Snow'], isHiddenFromShop: true
     },
@@ -569,19 +569,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
     // 30. Ditto
     ditto: {
         id: 'ditto', name: '百變怪', tier: 5, family: 'ditto',
-        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
         description: '變身為我方生命最高的角色。', synergies: ['Normal'], evolveId: 'ditto_2'
     },
     ditto_2: {
         id: 'ditto_2', name: '百變怪', tier: 5, family: 'ditto',
-        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
         description: '變身為我方生命最高的角色。', synergies: ['Normal'], evolveId: 'ditto_3', isHiddenFromShop: true
     },
     ditto_3: {
         id: 'ditto_3', name: '百變怪', tier: 5, family: 'ditto',
-        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
         description: '變身為我方生命最高的角色。', synergies: ['Normal'], isHiddenFromShop: true
     },
@@ -629,19 +629,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
     // 32. Mimikyu
     mimikyu: {
         id: 'mimikyu', name: '謎擬Ｑ', tier: 5, family: 'mimikyu',
-        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/謎擬Ｑ00.webp', battleImageUrl: 'assets/謎擬Ｑ01.webp',
         description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost'], evolveId: 'mimikyu_2'
     },
     mimikyu_2: {
         id: 'mimikyu_2', name: '謎擬Ｑ', tier: 5, family: 'mimikyu',
-        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/謎擬Ｑ00.webp', battleImageUrl: 'assets/謎擬Ｑ01.webp',
         description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost'], evolveId: 'mimikyu_3', isHiddenFromShop: true
     },
     mimikyu_3: {
         id: 'mimikyu_3', name: '謎擬Ｑ', tier: 5, family: 'mimikyu',
-        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/謎擬Ｑ00.webp', battleImageUrl: 'assets/謎擬Ｑ01.webp',
         description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost'], isHiddenFromShop: true
     },
@@ -663,7 +663,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
     // 33. Spiritomb
     spiritomb: {
         id: 'spiritomb', name: '花岩怪', tier: 5, family: 'spiritomb',
-        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/花岩怪00.webp', battleImageUrl: 'assets/花岩怪01.webp',
         description: '戰鬥開始時，使 2 個敵方角色的招式無效化。', synergies: ['Ghost']
     },
@@ -689,19 +689,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
     },
     heracross: {
         id: 'heracross', name: '赫拉克羅斯', tier: 4, family: 'heracross',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/赫拉克羅斯00.webp', battleImageUrl: 'assets/赫拉克羅斯01.webp',
         description: '首次受傷後，攻擊翻倍。', synergies: ['Beetle']
     },
     pinsir: {
         id: 'pinsir', name: '凱羅斯', tier: 4, family: 'pinsir',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/凱羅斯00.webp', battleImageUrl: 'assets/凱羅斯01.webp',
         description: '無視所有減傷和閃避效果。', synergies: ['Beetle']
     },
     farfetchd: {
         id: 'farfetchd', name: '大蔥鴨', tier: 5, family: 'farfetchd',
-        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/大蔥鴨00.webp', battleImageUrl: 'assets/大蔥鴨01.webp',
         description: '首次攻擊造成 99 傷害。', synergies: ['Normal']
     },
@@ -744,7 +744,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
     },
     mrmime: {
         id: 'mrmime', name: '魔牆人偶', tier: 5, family: 'mrmime',
-        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/魔牆人偶00.webp', battleImageUrl: 'assets/魔牆人偶01.webp',
         description: '我方受到的前 5 次傷害減半。', synergies: ['Psychic']
     }

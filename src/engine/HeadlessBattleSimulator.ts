@@ -814,7 +814,7 @@ export class HeadlessBattleSimulator {
 
             // Claw Synergy: Permanent Atk on kill
             if (killer.synergies.includes('Claw') && this.getSynergyCountForUnit(killer, 'Claw') >= 2) {
-                this.growUnit(killer, 0, 2, original, true);
+                this.growUnit(killer, 0, 4, original, true);
             }
 
             // Silence check for unit abilities
