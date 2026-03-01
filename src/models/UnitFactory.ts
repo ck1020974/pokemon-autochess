@@ -70,19 +70,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'gastly', name: '鬼斯', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/鬼斯00.webp', battleImageUrl: 'assets/鬼斯01.webp',
-        description: '戰鬥開始時，前方友軍 +2 攻擊。', synergies: ['Ghost'], evolveId: 'haunter'
+        description: '戰鬥開始時，前方友軍永久 +2 攻擊。', synergies: ['Ghost'], evolveId: 'haunter'
     },
     haunter: {
         id: 'haunter', name: '鬼斯通', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/鬼斯通00.webp', battleImageUrl: 'assets/鬼斯通01.webp',
-        description: '戰鬥開始時，前方友軍 +5 攻擊。', synergies: ['Ghost'], evolveId: 'gengar', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍永久 +5 攻擊。', synergies: ['Ghost'], evolveId: 'gengar', isHiddenFromShop: true
     },
     gengar: {
         id: 'gengar', name: '耿鬼', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/耿鬼00.webp', battleImageUrl: 'assets/耿鬼01.webp',
-        description: '戰鬥開始時，全體友軍 +10 攻擊。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '戰鬥開始時，全體友軍永久 +5 攻擊。', synergies: ['Ghost'], isHiddenFromShop: true
     },
 
     // 5. Chikorita
@@ -150,19 +150,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'igglybuff', name: '寶寶丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
         imageUrl: 'assets/寶寶丁00.webp', battleImageUrl: 'assets/寶寶丁01.webp',
-        description: '戰鬥開始時，前方友軍 +2 生命。', synergies: ['Normal'], evolveId: 'jigglypuff'
+        description: '戰鬥開始時，前方友軍永久 +2 生命。', synergies: ['Normal'], evolveId: 'jigglypuff'
     },
     jigglypuff: {
         id: 'jigglypuff', name: '胖丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
         imageUrl: 'assets/胖丁00.webp', battleImageUrl: 'assets/胖丁01.webp',
-        description: '戰鬥開始時，前方友軍 +5 生命。', synergies: ['Normal'], evolveId: 'wigglytuff', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍永久 +5 生命。', synergies: ['Normal'], evolveId: 'wigglytuff', isHiddenFromShop: true
     },
     wigglytuff: {
         id: 'wigglytuff', name: '胖可丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
         imageUrl: 'assets/胖可丁00.webp', battleImageUrl: 'assets/胖可丁01.webp',
-        description: '戰鬥開始時，全體友軍 +10 生命。', synergies: ['Normal'], isHiddenFromShop: true
+        description: '戰鬥開始時，全體友軍永久 +5 生命。', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 9. Treecko

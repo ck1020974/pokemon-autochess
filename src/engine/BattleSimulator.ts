@@ -192,7 +192,8 @@ export class BattleSimulator {
             if (unit.templateId === 'gengar') { // Stage 3
                 await this.notifySkill(unit, `耿鬼發動了詭計！`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                    this.buffAttack(u!, 10, true);
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === u!.id);
+                    this.growUnit(u!, 0, 5, '耿鬼技能', original, true);
                     await this.delay(65);
                 }
             } else {
@@ -201,7 +202,8 @@ export class BattleSimulator {
                     const front = myTeam[idx - 1];
                     if (front) {
                         const amount = unit.templateId === 'haunter' ? 5 : 2;
-                        this.growUnit(front, 0, amount, '能力提升', null, true);
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
+                        this.growUnit(front, 0, amount, '能力提升', original, true);
                         this.log(`${unit.name} 為 ${front.name} 提升了攻勢！`);
                     }
                 }
@@ -213,7 +215,8 @@ export class BattleSimulator {
             if (unit.templateId === 'wigglytuff') { // Stage 3
                 await this.notifySkill(unit, `胖可丁發動了治癒波動！`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                    this.growUnit(u!, 10, 0, 'Igglybuff', null, true);
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === u!.id);
+                    this.growUnit(u!, 5, 0, '胖可丁技能', original, true);
                     await this.delay(65);
                 }
             } else {
@@ -222,7 +225,8 @@ export class BattleSimulator {
                     const front = myTeam[idx - 1];
                     if (front) {
                         const amount = unit.templateId === 'jigglypuff' ? 5 : 2;
-                        this.growUnit(front, amount, 0, '能力提升', null, true);
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
+                        this.growUnit(front, amount, 0, '能力提升', original, true);
                         this.log(`${unit.name} 為 ${front.name} 恢復了生命！`);
                     }
                 }

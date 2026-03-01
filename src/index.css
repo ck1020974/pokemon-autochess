@@ -140,6 +140,12 @@ h3 {
   font-weight: 600;
 }
 
+.header-section {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
 /* --- Split Board Layout --- */
 .board-container {
   display: flex;
@@ -1170,6 +1176,11 @@ h3 {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
+  .header-section {
+    gap: 10px;
+    /* Shorten gap on mobile to prevent wrapping */
+  }
+
   .game-container {
     gap: 10px;
   }
@@ -1178,6 +1189,13 @@ h3 {
   .board-container {
     padding: 10px;
     min-height: auto;
+  }
+
+  .board-teams-horizontal {
+    gap: 30px;
+    /* Reduced from 100px */
+    padding-right: 80px;
+    /* Reduced from 150px */
   }
 
   .board-side {

@@ -1427,7 +1427,7 @@ function App() {
                                 {tutorialStep === 7 && "準備完成後即可開始戰鬥\n🎯任務：點擊戰鬥並贏得勝利"}
                                 {tutorialStep === 8 && "拖曳或點擊角色合成\n🎯任務：購買並合成小火龍"}
                                 {tutorialStep === 9 && "開啟羈絆來提升強度\n🎯任務：購買火球鼠"}
-                                {tutorialStep === 10 && "挑戰更強的對手\n🎯任務：查看羈絆並進行對戰"}
+                                {tutorialStep === 10 && "挑戰更強的對手\n🎯任務：查看羈絆後對戰"}
                                 {tutorialStep === 11 && "戰敗時將扣除生命值\n生命值歸零將結束遊戲‼️"}
                             </div>
                         </div>
@@ -1625,7 +1625,7 @@ function App() {
 
             {/* Header */}
             <div className="header">
-                <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
+                <div className="header-section">
                     {difficulty && (
                         <div className={`difficulty-badge ${difficulty}`} style={{
                             display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px',
@@ -1663,7 +1663,7 @@ function App() {
                         </>
                     )}
                 </div>
-                <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
+                <div className="header-section">
                     {difficulty && (
                         <>
                             <span style={{ color: game.wins < 8 ? '#fff' : '#888' }}>🏅 道館: {Math.min(game.wins, 8)}/8</span>
