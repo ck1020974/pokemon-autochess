@@ -283,20 +283,20 @@ export class BattleSimulator {
 
         // Ditto: Transform (Optimized timing)
         if (unit.family === 'ditto') {
-            const allies = myTeam.filter((u: Unit) => u && u !== unit && u.stats.hp > 0);
-            if (allies.length > 0) {
-                let target = allies[0];
-                for (const u of allies) {
-                    if (u.stats.hp > target.stats.hp) target = u;
-                }
+            const idx = myTeam.indexOf(unit);
+            let target: Unit | null = null;
+            if (idx > 0) {
+                target = myTeam[idx - 1];
+            }
 
+            if (target && target.stats.hp > 0) {
                 const originalName = unit.name;
 
                 // 1. Play animation (Start) - Don't await yet
                 const animPromise = this.playAnimation(unit, 'morph', 500);
 
                 // 2. Log skill first so it uses original name
-                this.log(`${originalName}(${unit.level}) 對 ${target.name} 使用了變身！`);
+                this.log(`${originalName} 對 ${target.name} 使用了變身！`);
 
                 // 3. Wait for the peak of the blur (250ms)
                 await this.delay(250);
@@ -304,13 +304,8 @@ export class BattleSimulator {
                 // 4. Perform the data transformation
                 unit.family = target.family;
 
-                // Find the correct template for this family at THIS level (Ditto's level)
-                let currentTemplate = UNIT_TEMPLATES[target.family] || UNIT_TEMPLATES[target.templateId];
-                for (let i = 1; i < unit.level; i++) {
-                    if (currentTemplate.evolveId && UNIT_TEMPLATES[currentTemplate.evolveId]) {
-                        currentTemplate = UNIT_TEMPLATES[currentTemplate.evolveId];
-                    }
-                }
+                // Directly copy the target's exact template (ignoring star level difference)
+                const currentTemplate = UNIT_TEMPLATES[target.templateId];
 
                 unit.templateId = currentTemplate.id;
                 unit.description = currentTemplate.description;

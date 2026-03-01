@@ -177,20 +177,17 @@ export class HeadlessBattleSimulator {
             }
         }
         if (unit.family === 'ditto') {
-            const allies = myTeam.filter(u => u && u !== unit && u.stats.hp > 0);
-            if (allies.length > 0) {
-                let target = allies[0];
-                for (const u of allies) if (u.stats.hp > target.stats.hp) target = u;
-
+            const idx = myTeam.indexOf(unit);
+            let target: Unit | null = null;
+            if (idx > 0) {
+                target = myTeam[idx - 1];
+            }
+            if (target && target.stats.hp > 0) {
                 unit.family = target.family;
 
-                // Mirror logic from BattleSimulator for level-appropriate template
-                let currentTemplate = UNIT_TEMPLATES[target.family] || UNIT_TEMPLATES[target.templateId];
-                for (let i = 1; i < unit.level; i++) {
-                    if (currentTemplate.evolveId && UNIT_TEMPLATES[currentTemplate.evolveId]) {
-                        currentTemplate = UNIT_TEMPLATES[currentTemplate.evolveId];
-                    }
-                }
+                // Directly copy the target's exact template (ignoring star level difference)
+                const currentTemplate = UNIT_TEMPLATES[target.templateId];
+
                 unit.templateId = currentTemplate.id;
                 unit.synergies = [...currentTemplate.synergies];
 

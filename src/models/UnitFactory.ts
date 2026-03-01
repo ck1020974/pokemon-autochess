@@ -571,19 +571,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'ditto', name: '百變怪', tier: 5, family: 'ditto',
         baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
-        description: '變身為我方生命最高的角色。', synergies: ['Normal'], evolveId: 'ditto_2'
+        description: '變身為前方角色並複製招式。', synergies: ['Normal'], evolveId: 'ditto_2'
     },
     ditto_2: {
         id: 'ditto_2', name: '百變怪', tier: 5, family: 'ditto',
         baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
-        description: '變身為我方生命最高的角色。', synergies: ['Normal'], evolveId: 'ditto_3', isHiddenFromShop: true
+        description: '變身為前方角色並複製招式。', synergies: ['Normal'], evolveId: 'ditto_3', isHiddenFromShop: true
     },
     ditto_3: {
         id: 'ditto_3', name: '百變怪', tier: 5, family: 'ditto',
         baseStats: { hp: 12, maxHp: 12, attack: 12 },
         imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
-        description: '變身為我方生命最高的角色。', synergies: ['Normal'], isHiddenFromShop: true
+        description: '變身為前方角色並複製招式。', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 31. Sableye
