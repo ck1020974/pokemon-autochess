@@ -559,22 +559,13 @@ export class BattleSimulator {
             });
         }
 
-        if (unit.family === 'cyndaquil') {
+        if (unit.family === 'charmander') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const state = this.unitStates.get(unit) || {};
-                    const useCount = state.cyndaquilUses || 0;
-                    const maxUses = [0, 2, 3, 4][unit.level] || 2;
-
-                    if (useCount < maxUses) {
-                        state.cyndaquilUses = useCount + 1;
-                        this.unitStates.set(unit, state);
-
-                        const amt = [0, 1, 2, 4][unit.level] || 2;
-                        this.growUnit(unit, amt, amt, '發動了火焰輪');
-                        await this.notifySkill(unit, '發動了火焰輪！');
-                        await this.playAnimation(unit, 'jump', 200);
-                    }
+                    const amt = [0, 1, 2, 4][unit.level] || 2;
+                    this.growUnit(unit, amt, amt, '發動了火焰輪');
+                    await this.notifySkill(unit, '發動了火焰輪！');
+                    await this.playAnimation(unit, 'jump', 200);
                 }
             });
         }
@@ -1333,39 +1324,20 @@ export class BattleSimulator {
                 // Check Silence for individual unit abilities
                 if (this.unitStates.get(killer)?.isSilenced) return;
 
-                // Charmander family: Stats on kill (Temporary)
-                if (killer.family === 'charmander') {
-                    if (killer.level >= 3) {
-                        const canAddAtk = killer.stats.attack < 50;
-                        const canAddHp = killer.stats.maxHp < 50;
-                        const buff = 5;
+                // Cyndaquil family: Stats on kill (Temporary)
+                if (killer.family === 'cyndaquil') {
+                    const buff = [0, 2, 4, 8][killer.level] || 2;
+                    const canAddAtk = killer.stats.attack < 50;
+                    const canAddHp = killer.stats.maxHp < 50;
 
-                        let choice: 'hp' | 'atk';
-                        if (canAddAtk && !canAddHp) choice = 'atk';
-                        else if (canAddHp && !canAddAtk) choice = 'hp';
-                        else choice = Math.random() < 0.5 ? 'atk' : 'hp';
+                    let choice: 'hp' | 'atk';
+                    if (canAddAtk && !canAddHp) choice = 'atk';
+                    else if (canAddHp && !canAddAtk) choice = 'hp';
+                    else choice = Math.random() < 0.5 ? 'atk' : 'hp';
 
-                        this.log(`${killer.name} 發動了蓄能焰襲！`);
-                        if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲', null, false);
-                        else this.growUnit(killer, buff, 0, '蓄能焰襲', null, false);
-                    } else {
-                        const buff = killer.level;
-                        const canAddAtk = killer.stats.attack < 50;
-                        const canAddHp = killer.stats.maxHp < 50;
-
-                        let choice: 'hp' | 'atk';
-                        if (canAddAtk && !canAddHp) {
-                            choice = 'atk';
-                        } else if (canAddHp && !canAddAtk) {
-                            choice = 'hp';
-                        } else {
-                            choice = Math.random() < 0.5 ? 'atk' : 'hp';
-                        }
-
-                        this.log(`${killer.name} 發動了蓄能焰襲！`);
-                        if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲', null, false);
-                        else this.growUnit(killer, buff, 0, '蓄能焰襲', null, false);
-                    }
+                    this.log(`${killer.name} 發動了蓄能焰襲！`);
+                    if (choice === 'atk') this.growUnit(killer, 0, buff, '蓄能焰襲', null, false);
+                    else this.growUnit(killer, buff, 0, '蓄能焰襲', null, false);
                 }
             };
 

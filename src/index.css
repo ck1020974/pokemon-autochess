@@ -1177,8 +1177,8 @@ h3 {
   }
 
   .header-section {
-    gap: 10px;
-    /* Shorten gap on mobile to prevent wrapping */
+    gap: 14px;
+    white-space: nowrap;
   }
 
   .game-container {
