@@ -195,6 +195,7 @@ function App() {
 
     const handleRestart = () => {
         gameRef.current = new GameLoop();
+        setDifficulty(null);
         // Force update to reflect new game instance
         update();
     };
@@ -268,9 +269,10 @@ function App() {
         if (tutorialStep === 1) {
             setTutorialStep(2);
         } else if (tutorialStep === 10) {
-            setTutorialStep(0); // End tutorial
-            game.gold = 10; // Give starting gold for real play
-            update();
+            setTutorialStep(11);
+        } else if (tutorialStep === 12) {
+            setTutorialStep(0); // End tutorial completely
+            handleRestart(); // Reset game back to intro screen
         } else {
             triggerShake();
         }
@@ -346,6 +348,10 @@ function App() {
                         update();
                     }
                 }
+            }
+        } else if (tutorialStep === 11) {
+            if (game.phase === GamePhase.SHOP) {
+                setTutorialStep(12);
             }
         }
     });
@@ -468,7 +474,7 @@ function App() {
         music.stop(); // Stop 'start' music
         setDifficulty(lvl);
         game.setDifficulty(lvl);
-
+        setShowTutorial(true); // Auto-prompt tutorial instead of going straight to the game
         update(); // Ensure shop phase logic triggers music check
     };
 
@@ -548,16 +554,28 @@ function App() {
 
             if (tutorialStep > 0) {
                 // Fixed tutorial enemy team
-                enemyTeam = [
-                    new Unit(UNIT_TEMPLATES.mankey),
-                    new Unit(UNIT_TEMPLATES.dwebble),
-                    new Unit(UNIT_TEMPLATES.charmander),
-                    null,
-                    null
-                ];
-                enemyTeam[0]!.level = 1;
-                enemyTeam[1]!.level = 1;
-                enemyTeam[2]!.level = 1;
+                if (tutorialStep === 11) {
+                    enemyTeam = [
+                        new Unit(UNIT_TEMPLATES.charizard),
+                        new Unit(UNIT_TEMPLATES.blastoise),
+                        new Unit(UNIT_TEMPLATES.venusaur),
+                        new Unit(UNIT_TEMPLATES.pikachu),
+                        new Unit(UNIT_TEMPLATES.gengar)
+                    ];
+                    // Overpowered team to ensure defeat
+                    enemyTeam.forEach(u => { if (u) u.level = 3; });
+                } else {
+                    enemyTeam = [
+                        new Unit(UNIT_TEMPLATES.mankey),
+                        new Unit(UNIT_TEMPLATES.dwebble),
+                        new Unit(UNIT_TEMPLATES.charmander),
+                        null,
+                        null
+                    ];
+                    enemyTeam[0]!.level = 1;
+                    enemyTeam[1]!.level = 1;
+                    enemyTeam[2]!.level = 1;
+                }
             } else {
 
                 // Respect Shop Tier
@@ -1072,7 +1090,9 @@ function App() {
         if (tutorialStep === 7) return actionType === 'START_BATTLE';
         if (tutorialStep === 8) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'charmander') || actionType === 'MOVE_BOARD' || (actionType === 'SELECT_BOARD' && payload === 'charmander');
         if (tutorialStep === 9) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'cyndaquil') || actionType === 'MOVE_BOARD' || actionType === 'SELECT_BOARD';
-        if (tutorialStep === 10) return false; // Lock interactions, it's just a text box
+        if (tutorialStep === 10) return actionType === 'OPEN_ENCYCLOPEDIA';
+        if (tutorialStep === 11) return actionType === 'START_BATTLE';
+        if (tutorialStep === 12) return false;
         return false;
     };
 
@@ -1338,18 +1358,24 @@ function App() {
             {/* Tutorial Message Box / Mask */}
             {tutorialStep > 0 && game.phase === GamePhase.SHOP && (
                 <>
-                    <div className="tutorial-mask" onClick={() => handleTutorialNext()} />
-                    {tutorialStep === 1 || tutorialStep === 10 ? (
+                    <div className="tutorial-mask" onClick={() => (tutorialStep === 1 || tutorialStep === 10 || tutorialStep === 12) ? handleTutorialNext() : null} />
+                    {tutorialStep === 1 || tutorialStep === 10 || tutorialStep === 12 ? (
                         <div className="tutorial-message-box" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
                             {tutorialStep === 10 && (
                                 <div className="tutorial-text" style={{ background: 'rgba(0,0,0,0.8)', padding: '20px', borderRadius: '12px', border: '1px solid #f59e0b', marginBottom: '20px' }}>
-                                    教學模式已全部完成！🎉<br />
-                                    現在可以自由發展你的陣容了。
+                                    你已經開啟了屬性羈絆！(如上方面板)<br />
+                                    可點擊右上角「📖 寶可夢圖鑑」查看更多角色資料。
                                 </div>
                             )}
-                            <div className="tutorial-actions" style={{ position: 'absolute', top: tutorialStep === 10 ? '160px' : '100px', right: '20px' }}>
+                            {tutorialStep === 12 && (
+                                <div className="tutorial-text" style={{ background: 'rgba(0,0,0,0.8)', padding: '20px', borderRadius: '12px', border: '1px solid #ef4444', marginBottom: '20px' }}>
+                                    戰鬥失敗會扣除愛心 (生命值)。<br />
+                                    歸零則遊戲結束。請努力擊敗所有對手，成為聯盟冠軍！
+                                </div>
+                            )}
+                            <div className="tutorial-actions" style={{ position: 'absolute', top: (tutorialStep === 10 || tutorialStep === 12) ? '160px' : '100px', right: '20px' }}>
                                 <button className="tutorial-btn-continue" onClick={(e) => { e.stopPropagation(); handleTutorialNext(); }}>
-                                    {tutorialStep === 10 ? '關閉教學 ⏭' : '點擊繼續 ⏭'}
+                                    {tutorialStep === 12 ? '結束教學 ⏭' : '點擊繼續 ⏭'}
                                 </button>
                             </div>
                         </div>
@@ -1364,6 +1390,7 @@ function App() {
                                 {tutorialStep === 7 && "準備完成後即可開始戰鬥\n🎯任務：點擊戰鬥並贏得勝利"}
                                 {tutorialStep === 8 && "拖曳或點擊相同角色合成\n🎯任務：購買並合成小火龍"}
                                 {tutorialStep === 9 && "觸發羈絆來提升陣容強度\n🎯任務：購買火球鼠來觸發羈絆"}
+                                {tutorialStep === 11 && "最後請試著迎戰超強的對手吧！\n🎯任務：點擊戰鬥"}
                             </div>
                         </div>
                     )}
