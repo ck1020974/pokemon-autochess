@@ -1377,9 +1377,9 @@ function App() {
                                 {tutorialStep === 6 && "鎖定角色能保留到下回合\n🎯任務：點擊鎖定所有小火龍"}
                                 {tutorialStep === 7 && "準備完成後即可開始戰鬥\n🎯任務：點擊戰鬥並贏得勝利"}
                                 {tutorialStep === 8 && "拖曳或點擊相同角色合成\n🎯任務：購買並合成小火龍"}
-                                {tutorialStep === 9 && "觸發羈絆來提升陣容強度\n🎯任務：購買火球鼠來觸發羈絆"}
-                                {tutorialStep === 10 && "你剛開啟了屬性羈絆效果！\n🎯任務：點擊發光的羈絆查看圖鑑"}
-                                {tutorialStep === 11 && "最後請迎戰超強的對手吧！\n🎯任務：點擊戰鬥按鈕"}
+                                {tutorialStep === 9 && "每隻寶可夢擁有不同羈絆\n🎯任務：購買火球鼠來觸發羈絆"}
+                                {tutorialStep === 10 && "觸發羈絆來提升陣容強度\n🎯任務：點擊羈絆來查看效果"}
+                                {tutorialStep === 11 && "戰敗時會扣除玩家生命值\n🎯任務：點擊戰鬥並進行對戰"}
                                 {tutorialStep === 12 && "戰敗會扣愛心，歸零會結束。請努力成為冠軍！\n🎯任務：點擊結束教學"}
                             </div>
                             {tutorialStep === 12 && (
@@ -1746,9 +1746,23 @@ function App() {
 
             <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => setSelected(null)}>
                 {/* 1. Synergies (Player) */}
-                <div className="board-synergies">
+                <div className="board-synergies" style={{ zIndex: tutorialStep === 10 ? 10005 : 10 }}>
                     {synergyStatus.map(syn => (
-                        <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeFamilies={syn.activeFamilies} />
+                        <SynergyIcon
+                            key={syn.id}
+                            synergy={syn}
+                            count={syn.count}
+                            units={syn.units}
+                            activeFamilies={syn.activeFamilies}
+                            isTutorialHighlighted={tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')}
+                            onClick={() => {
+                                if (tutorialStep === 10 && (syn.id === 'starter' || syn.id === 'fire')) {
+                                    if (isTutorialActionAllowed('CLICK_SYNERGY')) {
+                                        setTutorialStep(11);
+                                    }
+                                }
+                            }}
+                        />
                     ))}
                 </div>
 
