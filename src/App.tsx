@@ -267,6 +267,10 @@ function App() {
     const handleTutorialNext = () => {
         if (tutorialStep === 1) {
             setTutorialStep(2);
+        } else if (tutorialStep === 10) {
+            setTutorialStep(0); // End tutorial
+            game.gold = 10; // Give starting gold for real play
+            update();
         } else {
             triggerShake();
         }
@@ -1068,6 +1072,7 @@ function App() {
         if (tutorialStep === 7) return actionType === 'START_BATTLE';
         if (tutorialStep === 8) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'charmander') || actionType === 'MOVE_BOARD' || (actionType === 'SELECT_BOARD' && payload === 'charmander');
         if (tutorialStep === 9) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'cyndaquil') || actionType === 'MOVE_BOARD' || actionType === 'SELECT_BOARD';
+        if (tutorialStep === 10) return false; // Lock interactions, it's just a text box
         return false;
     };
 
@@ -1334,11 +1339,17 @@ function App() {
             {tutorialStep > 0 && game.phase === GamePhase.SHOP && (
                 <>
                     <div className="tutorial-mask" onClick={() => handleTutorialNext()} />
-                    {tutorialStep === 1 ? (
+                    {tutorialStep === 1 || tutorialStep === 10 ? (
                         <div className="tutorial-message-box" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
-                            <div className="tutorial-actions" style={{ position: 'absolute', top: '100px', right: '20px' }}>
+                            {tutorialStep === 10 && (
+                                <div className="tutorial-text" style={{ background: 'rgba(0,0,0,0.8)', padding: '20px', borderRadius: '12px', border: '1px solid #f59e0b', marginBottom: '20px' }}>
+                                    教學模式已全部完成！🎉<br />
+                                    現在可以自由發展你的陣容了。
+                                </div>
+                            )}
+                            <div className="tutorial-actions" style={{ position: 'absolute', top: tutorialStep === 10 ? '160px' : '100px', right: '20px' }}>
                                 <button className="tutorial-btn-continue" onClick={(e) => { e.stopPropagation(); handleTutorialNext(); }}>
-                                    點擊繼續 ⏭
+                                    {tutorialStep === 10 ? '關閉教學 ⏭' : '點擊繼續 ⏭'}
                                 </button>
                             </div>
                         </div>
