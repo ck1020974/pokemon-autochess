@@ -941,6 +941,8 @@ h3 {
   z-index: 2000;
   /* Increased from 20 to ensure it's above character area but handle tooltip peaking */
   pointer-events: auto;
+  position: absolute !important;
+  /* Force absolute even if tutorial-elevate is applied */
 }
 
 .board-synergies .synergy-icon {

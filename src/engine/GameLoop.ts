@@ -551,6 +551,7 @@ export class GameLoop {
         clone.battleImageUrl = unit.battleImageUrl;
         clone.evolveId = unit.evolveId;
         clone.synergies = [...unit.synergies];
+        clone.family = unit.family;
 
         return clone;
     }

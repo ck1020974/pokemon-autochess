@@ -117,7 +117,7 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
             <div className="encyclopedia-modal" onClick={e => e.stopPropagation()}>
                 {/* Header */}
                 <div className="encyclopedia-header">
-                    <h2 className="encyclopedia-title">📖 寶可夢小百科 </h2>
+                    <h2 className="encyclopedia-title">📖 寶可夢圖鑑</h2>
                     <button className="encyclopedia-close-btn" onClick={onClose}>×</button>
                 </div>
 

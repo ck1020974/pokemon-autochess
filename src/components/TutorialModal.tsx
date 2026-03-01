@@ -12,9 +12,9 @@ export function TutorialModal({ onClose, onStartTutorial }: TutorialModalProps) 
                 <h2 className="tutorial-title" style={{ marginBottom: '20px', fontSize: '2.2rem' }}>新手教學模式</h2>
                 <div style={{ color: '#cbd5e1', fontSize: '1.2rem', marginBottom: '35px', lineHeight: '1.8' }}>
                     學習如何遊玩寶可夢自走棋<br />
-                    從頭體驗完整的對戰流程！
+                    遊戲進度將被清除，並重新開始！
                 </div>
-                <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', gap: '30px', justifyContent: 'center' }}>
                     <button className="btn-premium" style={{
                         background: 'linear-gradient(to bottom, #3b82f6, #2563eb)',
                         borderColor: '#60a5fa',
