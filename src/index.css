@@ -640,7 +640,8 @@ h3 {
 }
 
 /* Synthetic Glow for pure image glowing without arrow UI */
-.synthetic-glow .unit-image {
+.synthetic-glow .unit-image,
+.synergy-icon.synthetic-glow {
   filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.9)) brightness(1.2);
   animation: pulse-glow 2s infinite alternate;
 }
