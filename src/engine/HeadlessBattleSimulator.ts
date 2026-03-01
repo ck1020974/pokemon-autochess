@@ -47,6 +47,9 @@ export class HeadlessBattleSimulator {
     public async init() {
         this.spiritombTriggered.clear();
         this.lightScreenActivated.clear();
+
+        await this.compactTeams();
+
         const allUnits: { unit: Unit, pos: number, isPlayer: boolean }[] = [];
         this.playerTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: true }); });
         this.enemyTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: false }); });
@@ -434,10 +437,11 @@ export class HeadlessBattleSimulator {
                 // Ensure unit is still alive and in the team array (not replaced by null)
                 if (unit.stats.hp <= 0 || s?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const amount = [0, 1, 1, 2][unit.level] || 1;
+                    const atkBuff = [0, 0, 1, 2][unit.level] || 0;
+                    const hpBuff = [0, 1, 1, 2][unit.level] || 1;
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, amount, 0, original, true);
+                        this.growUnit(ally, hpBuff, atkBuff, original, true);
                     }
                 }
             });
@@ -448,10 +452,11 @@ export class HeadlessBattleSimulator {
                 // Ensure unit is still alive and in the team array
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const amount = [0, 1, 1, 2][unit.level] || 1;
+                    const atkBuff = [0, 1, 1, 2][unit.level] || 1;
+                    const hpBuff = [0, 0, 1, 2][unit.level] || 0;
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, 0, amount, original, true);
+                        this.growUnit(ally, hpBuff, atkBuff, original, true);
                     }
                 }
             });
@@ -462,11 +467,16 @@ export class HeadlessBattleSimulator {
                 // Ensure unit is still alive and in the team array
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    const amount = [0, 1, 1, 2][unit.level] || 1;
                     for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                        const isAtk = Math.random() < 0.5;
                         const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, isAtk ? 0 : amount, isAtk ? amount : 0, original, true);
+                        if (unit.level === 1) {
+                            const isAtk = Math.random() < 0.5;
+                            this.growUnit(ally, isAtk ? 0 : 1, isAtk ? 1 : 0, original, true);
+                        } else if (unit.level === 2) {
+                            this.growUnit(ally, 1, 1, original, true);
+                        } else {
+                            this.growUnit(ally, 2, 2, original, true);
+                        }
                     }
                 }
             });
@@ -570,7 +580,7 @@ export class HeadlessBattleSimulator {
                 if (unit.stats.hp <= 0 || s?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    const buff = [0, 1, 2, 5][unit.level] || 1;
+                    const buff = [0, 1, 4, 8][unit.level] || 1;
                     this.growUnit(e.source, buff, buff);
                 }
             });
