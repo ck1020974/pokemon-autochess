@@ -1727,7 +1727,9 @@ function App() {
                 )}
 
                 {/* 4. Units Area */}
-                <div className="board-teams-horizontal">
+                <div className="board-teams-horizontal" style={{
+                    filter: (tutorialStep > 0 && tutorialStep !== 2 && tutorialStep !== 3 && tutorialStep !== 4 && tutorialStep !== 7 && tutorialStep !== 8 && tutorialStep !== 9) ? 'grayscale(100%) brightness(50%)' : 'none'
+                }}>
                     {/* Left Side: Player Team */}
                     <div className="board-side player">
                         {Array.from({ length: 5 }).map((_, i) => {
@@ -1843,10 +1845,11 @@ function App() {
                                         (tutorialStep === 8 && unit?.family === 'charmander') ||
                                         (tutorialStep === 9 && unit?.family === 'cyndaquil');
 
-                                    const isDimmed = !isHighlighted && tutorialStep > 0 && tutorialStep !== 6 && game.phase === GamePhase.SHOP;
+                                    // Do NOT dim in step 7 or 8 so the user can see the board and interact
+                                    const isDimmed = !isHighlighted && tutorialStep > 0 && tutorialStep !== 6 && tutorialStep !== 7 && tutorialStep !== 8 && game.phase === GamePhase.SHOP;
 
                                     return (
-                                        <div key={i} style={{ position: 'relative', filter: isDimmed ? 'grayscale(100%) brightness(50%)' : 'none', opacity: isDimmed ? 0.6 : 1 }} className={`${isHighlighted && tutorialStep !== 6 ? 'tutorial-highlight' : ''} ${tutorialStep === 6 ? 'tutorial-elevate' : ''}`}>
+                                        <div key={i} style={{ position: 'relative', filter: isDimmed ? 'grayscale(100%) brightness(50%)' : 'none', opacity: isDimmed ? 0.6 : 1 }} className={`${isHighlighted && tutorialStep !== 6 && tutorialStep !== 8 ? 'tutorial-highlight' : ''} ${(tutorialStep === 6 || tutorialStep === 8) && unit?.family === 'charmander' ? 'tutorial-elevate' : ''}`}>
                                             <UnitCard
                                                 unit={unit}
                                                 onClick={() => handleSelect(unit, i, 'SHOP')}
@@ -1857,7 +1860,7 @@ function App() {
                                                 onToggleFreeze={() => handleFreezeToggle(i)}
                                                 showMergeGlow={unit && (unit as any).isMergeable}
                                                 isEvolving={unit && evolvingUnitId === unit.id}
-                                                tutorialHighlightLock={tutorialStep === 6 && unit?.family === 'charmander'}
+                                                tutorialHighlightLock={false}
                                             />
                                         </div>
                                     );
