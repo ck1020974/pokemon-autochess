@@ -190,19 +190,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'torchic', name: '火稚雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/火稚雞00.webp', battleImageUrl: 'assets/火稚雞01.webp',
-        description: '前方友軍攻擊時，額外造成 3 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'combusken'
+        description: '其他友軍攻擊時，額外造成 2 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'combusken'
     },
     combusken: {
         id: 'combusken', name: '力壯雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/力壯雞00.webp', battleImageUrl: 'assets/力壯雞01.webp',
-        description: '前方友軍攻擊時，額外造成 5 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'blaziken', isHiddenFromShop: true
+        description: '其他友軍攻擊時，額外造成 5 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'blaziken', isHiddenFromShop: true
     },
     blaziken: {
         id: 'blaziken', name: '火焰雞', tier: 3, family: 'torchic',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/火焰雞00.webp', battleImageUrl: 'assets/火焰雞01.webp',
-        description: '前方友軍攻擊時，額外造成 10 傷害。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '其他友軍攻擊時，額外造成 10 傷害。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 11. Mudkip

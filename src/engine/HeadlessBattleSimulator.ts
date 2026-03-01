@@ -317,8 +317,7 @@ export class HeadlessBattleSimulator {
                 const s = this.unitStates.get(unit);
                 if (s?.isSilenced || unit.stats.hp <= 0) return;
                 const { myTeam } = this.getTeams(unit);
-                const idx = myTeam.indexOf(unit);
-                if (idx > 0 && myTeam[idx - 1] === e.source) {
+                if (e.source && e.source !== unit && myTeam.includes(e.source)) {
                     const buff = [0, 2, 4, 6][unit.level] || 2;
                     this.growUnit(unit, buff, buff);
                 }
@@ -329,8 +328,7 @@ export class HeadlessBattleSimulator {
                 const s = this.unitStates.get(unit);
                 if (unit.stats.hp <= 0 || s?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
-                const idx = myTeam.indexOf(unit);
-                if (idx > 0 && myTeam[idx - 1] === e.source && e.target) {
+                if (e.source && e.source !== unit && myTeam.includes(e.source) && e.target) {
                     const dmg = [0, 3, 5, 10][unit.level] || 3;
                     await this.dealDamage(unit, e.target, dmg);
                 }
