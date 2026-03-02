@@ -399,9 +399,9 @@ function App() {
             const backgroundUrls = new Set<string>();
 
             Object.values(UNIT_TEMPLATES).forEach(t => {
-                // Determine if critical (Tier 1, 2) or background (Tier 3+)
+                // Determine if critical (Tier 1) or background (Tier 2+)
                 // For Sprout and initial tokens, include in critical
-                const isCritical = t.tier <= 2 || t.id === 'sprout';
+                const isCritical = t.tier <= 1 || t.id === 'sprout';
 
                 const addUrl = (url: string) => {
                     if (isCritical) criticalUrls.add(url);
@@ -419,6 +419,12 @@ function App() {
             criticalUrls.add('assets/隨風球01.webp');
             criticalUrls.add('assets/怨影娃娃01.webp');
             criticalUrls.add('assets/詛咒娃娃01.webp');
+
+            // Critical difficulty icons
+            criticalUrls.add(normalBall);
+            criticalUrls.add(greatBall);
+            criticalUrls.add(ultraBall);
+            criticalUrls.add(masterBall);
 
             // Preload critical audio
             const preloadAudio = (name: string) => {
