@@ -114,7 +114,7 @@ export class GameLoop {
             }
         }
 
-        // Beetle (2): Every Beetle unit -> +5 HP or Attack (prioritize lower stat)
+        // Beetle (2): Every Beetle unit -> +4 HP or Attack (prioritize lower stat)
         const beetleUnits = this.playerTeam.filter(u => u && u.synergies.includes('Beetle')) as Unit[];
         const beetleCount = getUniqueCount(beetleUnits);
         if (beetleCount >= 2) {
@@ -127,7 +127,7 @@ export class GameLoop {
                 else if (addHp && !addAtk) choice = 'hp';
                 else choice = Math.random() < 0.5 ? 'atk' : 'hp';
 
-                applyBuff(u, 5, choice, 'Beetle');
+                applyBuff(u, 4, choice, 'Beetle');
             });
         }
 
@@ -502,7 +502,7 @@ export class GameLoop {
                 if (idx > 0) {
                     const front = team[idx - 1];
                     if (front) {
-                        const amount = unit.level === 2 ? 5 : 2;
+                        const amount = unit.level === 2 ? 3 : 1;
                         front.addBuff(amount);
                         console.log(`Mankey Family Merge: +${amount} Atk to ${front.name}`);
                     }
@@ -523,7 +523,7 @@ export class GameLoop {
                 if (idx > 0) {
                     const front = team[idx - 1];
                     if (front) {
-                        const amount = unit.level === 2 ? 5 : 2;
+                        const amount = unit.level === 2 ? 3 : 1;
                         front.addGrowth(amount, 0);
                         console.log(`Dwebble Family Merge: +${amount} HP to ${front.name}`);
                     }

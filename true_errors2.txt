@@ -1,0 +1,12 @@
+src/App.tsx(7,1): error TS6133: 'Tooltip' is declared but its value is never read.
+src/App.tsx(7,25): error TS2307: Cannot find module './components/Tooltip' or its corresponding type declarations.
+src/App.tsx(819,34): error TS2339: Property 'baseStats' does not exist on type 'Unit'.
+src/App.tsx(821,44): error TS2339: Property 'baseStats' does not exist on type 'Unit'.
+src/App.tsx(822,45): error TS2339: Property 'baseStats' does not exist on type 'Unit'.
+src/App.tsx(1094,29): error TS2345: Argument of type '{ id?: string | undefined; name: string; url: string; }' is not assignable to parameter of type 'SetStateAction<{ name: string; url: string; id: string; } | null>'.
+  Type '{ id?: string | undefined; name: string; url: string; }' is not assignable to type '{ name: string; url: string; id: string; }'.
+    Types of property 'id' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
+src/models/BossData.ts(1,1): error TS6133: 'UNIT_TEMPLATES' is declared but its value is never read.
+src/models/BossData.ts(2,1): error TS6133: 'Unit' is declared but its value is never read.

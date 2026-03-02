@@ -110,7 +110,7 @@ export class HeadlessBattleSimulator {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0) {
                     const front = myTeam[idx - 1];
-                    if (front) this.buffAttack(front, unit.templateId === 'haunter' ? 5 : 2);
+                    if (front) this.buffAttack(front, unit.templateId === 'haunter' ? 3 : 1);
                 }
             }
         }
@@ -122,7 +122,7 @@ export class HeadlessBattleSimulator {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0) {
                     const front = myTeam[idx - 1];
-                    if (front) this.growUnit(front, unit.templateId === 'jigglypuff' ? 5 : 2, 0);
+                    if (front) this.growUnit(front, unit.templateId === 'jigglypuff' ? 3 : 1, 0);
                 }
             }
         }
@@ -294,7 +294,7 @@ export class HeadlessBattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && myTeam.includes(unit)) {
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
-                    const healAmount = count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
+                    const healAmount = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (healAmount > 0) this.heal(unit, healAmount);
                 }
             });
@@ -410,7 +410,7 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = 4;
+                    const amount = 3;
                     this.growUnit(unit, amount, 0);
                     const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                     if (original) original.addGrowth(amount, 0);
@@ -588,7 +588,7 @@ export class HeadlessBattleSimulator {
                 if (unit.stats.hp <= 0 || s?.isSilenced) return;
                 const { myTeam, opTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    const dmg = [0, 3, 6, 12][unit.level] || 3;
+                    const dmg = [0, 2, 6, 12][unit.level] || 2;
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) await this.dealDamage(unit, living[0], dmg, true);
                 }
@@ -811,7 +811,7 @@ export class HeadlessBattleSimulator {
 
             // Claw Synergy: Permanent Atk on kill
             if (killer.synergies.includes('Claw') && this.getSynergyCountForUnit(killer, 'Claw') >= 2) {
-                this.growUnit(killer, 0, 4, original, true);
+                this.growUnit(killer, 0, 3, original, true);
             }
 
             // Silence check for unit abilities

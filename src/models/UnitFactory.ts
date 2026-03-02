@@ -70,13 +70,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'gastly', name: '鬼斯', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/鬼斯00.webp', battleImageUrl: 'assets/鬼斯01.webp',
-        description: '戰鬥開始時，前方友軍永久 +2 攻擊。', synergies: ['Ghost'], evolveId: 'haunter'
+        description: '戰鬥開始時，前方友軍永久 +1 攻擊。', synergies: ['Ghost'], evolveId: 'haunter'
     },
     haunter: {
         id: 'haunter', name: '鬼斯通', tier: 1, family: 'gastly',
         baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/鬼斯通00.webp', battleImageUrl: 'assets/鬼斯通01.webp',
-        description: '戰鬥開始時，前方友軍永久 +5 攻擊。', synergies: ['Ghost'], evolveId: 'gengar', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍永久 +3 攻擊。', synergies: ['Ghost'], evolveId: 'gengar', isHiddenFromShop: true
     },
     gengar: {
         id: 'gengar', name: '耿鬼', tier: 1, family: 'gastly',
@@ -150,13 +150,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'igglybuff', name: '寶寶丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
         imageUrl: 'assets/寶寶丁00.webp', battleImageUrl: 'assets/寶寶丁01.webp',
-        description: '戰鬥開始時，前方友軍永久 +2 生命。', synergies: ['Normal'], evolveId: 'jigglypuff'
+        description: '戰鬥開始時，前方友軍永久 +1 生命。', synergies: ['Normal'], evolveId: 'jigglypuff'
     },
     jigglypuff: {
         id: 'jigglypuff', name: '胖丁', tier: 1, family: 'igglybuff',
         baseStats: { hp: 3, maxHp: 3, attack: 1 },
         imageUrl: 'assets/胖丁00.webp', battleImageUrl: 'assets/胖丁01.webp',
-        description: '戰鬥開始時，前方友軍永久 +5 生命。', synergies: ['Normal'], evolveId: 'wigglytuff', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍永久 +3 生命。', synergies: ['Normal'], evolveId: 'wigglytuff', isHiddenFromShop: true
     },
     wigglytuff: {
         id: 'wigglytuff', name: '胖可丁', tier: 1, family: 'igglybuff',
@@ -170,7 +170,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'treecko', name: '木守宮', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/木守宮00.webp', battleImageUrl: 'assets/木守宮01.webp',
-        description: '召喚友軍後，對敵方造成 3 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'grovyle'
+        description: '召喚友軍後，對敵方造成 2 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'grovyle'
     },
     grovyle: {
         id: 'grovyle', name: '森林蜥蜴', tier: 3, family: 'treecko',
@@ -350,13 +350,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'mankey', name: '猴怪', tier: 1, family: 'mankey',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/猴怪00.webp', battleImageUrl: 'assets/猴怪01.webp',
-        description: '合成與出售時前方友軍 +2 攻擊。', synergies: ['Angry'], evolveId: 'primeape'
+        description: '合成與出售時前方友軍 +1 攻擊。', synergies: ['Angry'], evolveId: 'primeape'
     },
     primeape: {
         id: 'primeape', name: '火爆猴', tier: 1, family: 'mankey',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/火爆猴00.webp', battleImageUrl: 'assets/火爆猴01.webp',
-        description: '合成與出售時前方友軍 +5 攻擊。', synergies: ['Angry'], evolveId: 'primeape_final', isHiddenFromShop: true
+        description: '合成與出售時前方友軍 +3 攻擊。', synergies: ['Angry'], evolveId: 'primeape_final', isHiddenFromShop: true
     },
     primeape_final: {
         id: 'primeape_final', name: '火爆猴', tier: 1, family: 'mankey',
@@ -370,19 +370,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'onix', name: '大岩蛇', tier: 4, family: 'onix',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/大岩蛇00.webp', battleImageUrl: 'assets/大岩蛇01.webp',
-        description: '移動後永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix'
+        description: '移動後永久 +3 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix'
     },
     steelix: {
         id: 'steelix', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '移動後永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
+        description: '移動後永久 +3 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
     },
     steelix_final: {
         id: 'steelix_final', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '移動後永久 +4 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], isHiddenFromShop: true
+        description: '移動後永久 +3 生命；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], isHiddenFromShop: true
     },
 
     // 20. Doduo
@@ -531,13 +531,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'dwebble', name: '石居蟹', tier: 1, family: 'dwebble',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/石居蟹00.webp', battleImageUrl: 'assets/石居蟹01.webp',
-        description: '合成與出售時前方友軍 +2 生命。', synergies: ['Hard'], evolveId: 'crustle'
+        description: '合成與出售時前方友軍 +1 生命。', synergies: ['Hard'], evolveId: 'crustle'
     },
     crustle: {
         id: 'crustle', name: '岩殿居蟹', tier: 1, family: 'dwebble',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/岩殿居蟹00.webp', battleImageUrl: 'assets/岩殿居蟹01.webp',
-        description: '合成與出售時前方友軍 +5 生命。', synergies: ['Hard'], evolveId: 'crustle_final', isHiddenFromShop: true
+        description: '合成與出售時前方友軍 +3 生命。', synergies: ['Hard'], evolveId: 'crustle_final', isHiddenFromShop: true
     },
     crustle_final: {
         id: 'crustle_final', name: '岩殿居蟹', tier: 1, family: 'dwebble',

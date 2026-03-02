@@ -201,7 +201,7 @@ export class BattleSimulator {
                 if (idx > 0) {
                     const front = myTeam[idx - 1];
                     if (front) {
-                        const amount = unit.templateId === 'haunter' ? 5 : 2;
+                        const amount = unit.templateId === 'haunter' ? 3 : 1;
                         const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
                         this.growUnit(front, 0, amount, '能力提升', original, true);
                         this.log(`${unit.name} 為 ${front.name} 提升了攻勢！`);
@@ -224,7 +224,7 @@ export class BattleSimulator {
                 if (idx > 0) {
                     const front = myTeam[idx - 1];
                     if (front) {
-                        const amount = unit.templateId === 'jigglypuff' ? 5 : 2;
+                        const amount = unit.templateId === 'jigglypuff' ? 3 : 1;
                         const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
                         this.growUnit(front, amount, 0, '能力提升', original, true);
                         this.log(`${unit.name} 為 ${front.name} 恢復了生命！`);
@@ -492,7 +492,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && myTeam.includes(unit)) { // Ensure unit is still in team
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
-                    const heal = count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
+                    const heal = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (heal > 0 && unit.stats.hp > 0) {
                         this.heal(unit, heal);
                         this.log(`${unit.name} 吸取了 ${heal} 生命`);
@@ -686,7 +686,7 @@ export class BattleSimulator {
         if (unit.family === 'onix') {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = 4;
+                    const amount = 3;
                     const { side } = this.getTeams(unit);
                     if (!this.isCompacting) {
                         await this.notifySkill(unit, `發動了鐵壁！`);
@@ -959,7 +959,7 @@ export class BattleSimulator {
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
 
                 if (e.source && mySide === sSide && e.source !== unit) {
-                    const dmg = [0, 3, 5, 10][unit.level] || 3;
+                    const dmg = [0, 2, 5, 10][unit.level] || 2;
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[0];
@@ -1313,7 +1313,7 @@ export class BattleSimulator {
                 if (killer.synergies.includes('Claw') && this.getSynergyCountForUnit(killer, 'Claw') >= 2) {
                     const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
                     this.log(`${killer.name} 發動了磨爪！`);
-                    this.growUnit(killer, 0, 4, '磨爪', original, true);
+                    this.growUnit(killer, 0, 3, '磨爪', original, true);
                 }
 
                 // Check Silence for individual unit abilities

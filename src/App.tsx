@@ -4,13 +4,16 @@ import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { GameLoop, GamePhase } from './engine/GameLoop';
 import { music } from './engine/MusicManager';
-import { Unit } from './models/Unit';
+
+import { CHAMPIONS, ELITE_FOUR, GYM_LEADERS } from './models/BossData';
 import { BattleSimulator } from './engine/BattleSimulator';
 import type { BattleLog } from './engine/BattleSimulator';
 import { UNIT_TEMPLATES, PREFERRED_POSITIONS } from './models/UnitFactory';
+import type { PreferredPosition } from './models/UnitFactory';
 import { SYNERGIES } from './models/Synergies';
 import { EncyclopediaModal } from './components/EncyclopediaModal';
 import { TutorialModal } from './components/TutorialModal';
+import { Unit } from './models/Unit';
 
 // Difficulty Icons
 import normalBall from './assets/普通.webp';
@@ -256,10 +259,15 @@ function App() {
 
     // UI States
     const [showEncyclopedia, setShowEncyclopedia] = useState<boolean>(false);
-    const [showTutorial, setShowTutorial] = useState<boolean>(false);
+    const [showTutorial, setShowTutorial] = useState<boolean>(true); // Changed to true to auto-prompt tutorial
     const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
     const [tutorialStep, setTutorialStep] = useState<number>(0);
     const [tutorialShake, setTutorialShake] = useState<boolean>(false);
+
+    // Opponent Selection States
+    const [showOpponentSelect, setShowOpponentSelect] = useState(false);
+    const [opponentChoices, setOpponentChoices] = useState<{ name: string, url: string, id: string }[]>([]);
+    const [selectedOpponent, setSelectedOpponent] = useState<{ name: string, url: string, id: string } | null>(null);
 
     // Animation States
     const [goldErrorAnim, setGoldErrorAnim] = useState(false);
@@ -538,7 +546,7 @@ function App() {
     // Timer loop for timeout (using elapsed seconds for pause sync)
     useEffect(() => {
         let timer: any;
-        if (game.phase === GamePhase.BATTLE && !battleResult && !isPaused) {
+        if (game.phase === GamePhase.BATTLE && !battleResult) {
             timer = setInterval(() => {
                 setBattleElapsedSeconds((s: number) => s + 1);
             }, 1000);
@@ -550,15 +558,72 @@ function App() {
         if (game.phase === GamePhase.BATTLE && !simulatorRef.current) {
             // Init Battle
             // Init Battle
-            // 1. Enemy Count
-            // Turn 1 = 3. Turn 2 = 4. Turn 3+ = 5.
-            const enemyCount = game.turn === 1 ? 3 : (game.turn === 2 ? 4 : 5);
+            // Enemy Count Logic based on User Request
+            // Turn <= 1 = 3, Turn 2 = 4, Turn 3+ = 5
+            let enemyCount = 5;
+            if (game.turn <= 1) enemyCount = 3;
+            else if (game.turn === 2) enemyCount = 4;
+            else if (game.turn >= 3) enemyCount = 5;
 
             let enemyTeam: (Unit | null)[] = [];
+
+            // Helper to bias enemy generation towards higher tiers in mid/late game
+            const getRandomEnemyTemplate = (templates: any[]) => {
+                if (game.turn >= 8 && Math.random() < 0.6) {
+                    const maxTier = Math.max(...templates.map(t => t.tier));
+                    const highTierPool = templates.filter(t => t.tier >= maxTier - 1);
+                    if (highTierPool.length > 0) return highTierPool[Math.floor(Math.random() * highTierPool.length)];
+                }
+                return templates[Math.floor(Math.random() * templates.length)];
+            };
+
+            // 2. Progression Settings (Star Count & Level)
+            // Default settings for filler units
             let enemyBaseLevel = 1;
             let forcedStarCount = 0;
             let forcedTwoStarCount = 0;
+            let isBossMatch = false;
 
+            if (game.wins >= 12) {
+                isBossMatch = true;
+                enemyBaseLevel = 2; // Default to 2-star for lategame, let forcedStarCount push to 3-star
+                if (difficulty === 'NORMAL') forcedStarCount = 2;
+                else if (difficulty === 'GREAT') forcedStarCount = 3;
+                else if (difficulty === 'ULTRA') forcedStarCount = 4;
+                else {
+                    enemyBaseLevel = 3;
+                    forcedStarCount = 5; // Master: All 5 Units 3-Star
+                }
+            } else if (game.wins >= 8) {
+                isBossMatch = true;
+                const eliteIndex = game.wins - 8; // 0, 1, 2, 3
+                enemyBaseLevel = 2;
+                if (difficulty === 'NORMAL') {
+                    const progression = [0, 1, 1, 2];
+                    forcedStarCount = progression[eliteIndex];
+                } else if (difficulty === 'GREAT') {
+                    const progression = [1, 1, 2, 2];
+                    forcedStarCount = progression[eliteIndex];
+                } else if (difficulty === 'ULTRA') {
+                    const progression = [1, 2, 3, 3];
+                    forcedStarCount = progression[eliteIndex];
+                } else {
+                    forcedStarCount = eliteIndex + 1;
+                }
+            } else {
+                enemyBaseLevel = 1;
+                // Gym scaling
+                if (game.turn >= 7) {
+                    enemyBaseLevel = 2;
+                }
+            }
+
+            if (game.wins < 8 && game.turn >= 4 && game.turn < 7) {
+                forcedTwoStarCount = game.turn - 3;
+            }
+
+            // 3. Strategy / Synergy Selection
+            // Use selected opponent if available
             if (tutorialStep > 0) {
                 // Fixed tutorial enemy team
                 if (tutorialStep === 10 || tutorialStep === 11) {
@@ -583,365 +648,179 @@ function App() {
                     enemyTeam[1]!.level = 1;
                     enemyTeam[2]!.level = 1;
                 }
-            } else {
+            } else if (selectedOpponent && selectedOpponent.id) {
+                // Find def
+                let def = CHAMPIONS.find(c => c.id === selectedOpponent.id) ||
+                    ELITE_FOUR.find(e => e.id === selectedOpponent.id) ||
+                    GYM_LEADERS.find(g => g.id === selectedOpponent.id);
 
-                // Respect Shop Tier
-                const shopTier = game.shop.getTier(game.turn);
-                const allTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= shopTier);
-
-                // Helper to bias enemy generation towards higher tiers in mid/late game
-                const getRandomEnemyTemplate = (templates: typeof allTemplates) => {
-                    if (game.turn >= 8 && Math.random() < 0.6) {
-                        const maxTier = Math.max(...templates.map(t => t.tier));
-                        const highTierPool = templates.filter(t => t.tier >= maxTier - 1);
-                        if (highTierPool.length > 0) return highTierPool[Math.floor(Math.random() * highTierPool.length)];
-                    }
-                    return templates[Math.floor(Math.random() * templates.length)];
-                };
-
-                // 2. Progression Settings (Star Count & Level)
-
-                if (game.wins >= 12) {
-                    // Champion: Base Level 2, with specific 3-Star counts per difficulty
-                    enemyBaseLevel = 2; // Default to 2-star for lategame, let forcedStarCount push to 3-star
-                    if (difficulty === 'NORMAL') forcedStarCount = 2;
-                    else if (difficulty === 'GREAT') forcedStarCount = 3;
-                    else if (difficulty === 'ULTRA') forcedStarCount = 4;
-                    else {
-                        enemyBaseLevel = 3;
-                        forcedStarCount = 5; // Master: All 5 Units 3-Star
-                    }
-                } else if (game.wins >= 8) {
-                    // Elite Four: Base Level 2, specific 3-Star progression
-                    const eliteIndex = game.wins - 8; // 0, 1, 2, 3
-                    enemyBaseLevel = 2;
-
-                    if (difficulty === 'NORMAL') {
-                        // Normal: 0, 1, 1, 2
-                        const progression = [0, 1, 1, 2];
-                        forcedStarCount = progression[eliteIndex];
-                    } else if (difficulty === 'GREAT') {
-                        // Great: 1, 1, 2, 2
-                        const progression = [1, 1, 2, 2];
-                        forcedStarCount = progression[eliteIndex];
-                    } else if (difficulty === 'ULTRA') {
-                        // Ultra: 1, 2, 3, 3
-                        const progression = [1, 2, 3, 3];
-                        forcedStarCount = progression[eliteIndex];
-                    } else {
-                        // Master: 1, 2, 3, 4
-                        forcedStarCount = eliteIndex + 1;
-                    }
-                } else {
-                    enemyBaseLevel = 1;
-                    // Ensure NO 3-Star units in Gym phase (forcedStarCount remains 0)
-                }
-
-                // ... (Variable declarations)
-                if (game.wins < 8 && game.turn >= 4 && game.turn < 7) {
-                    forcedTwoStarCount = game.turn - 3;
-                }
-
-                // Apply Gym Difficulty Logic
-                if (game.wins < 8) {
-                    if (game.turn >= 7) {
-                        enemyBaseLevel = 2; // Full 2-Star team
-                    } else if (game.turn >= 4) {
-                        // Turn 4: 1 Lv 2, Turn 5: 2 Lv 2, Turn 6: 3 Lv 2
-                        // We'll use a new forcedTwoStarCount variable or just enemyBaseLevel
-                    }
-                }
-
-                // 3. Strategy / Synergy Selection
-                let coreSynergyId: string | null = null;
-                let synergyTargetCount = 0;
-                let uniqueConstraint = false;
-
-                // Updated Elite Thresholds: Master (Win 3+), Ultra (Win 5+), Great (Win 10+), Normal (Win 12+)
-                const isEliteMatch = (difficulty === 'MASTER' && game.wins >= 3) ||
-                    (difficulty === 'ULTRA' && game.wins >= 5) ||
-                    (difficulty === 'GREAT' && game.wins >= 10) ||
-                    (difficulty === 'NORMAL' && game.wins >= 12);
-
-                // --- Shared Generation Variables ---
-                enemyTeam = [];
-                let attempts = 0;
-                const MAX_ENEMY_ATTEMPTS = 5;
-
-                const sortTeamByPositions = (units: Unit[]): (Unit | null)[] | null => {
-                    const POS_CONSTRAINTS: Record<number, string[]> = {
-                        0: ['FRONT', 'FRONT_MID', 'ALL'],
-                        1: ['FRONT', 'MID', 'FRONT_MID', 'MID_BACK', 'ALL'],
-                        2: ['MID', 'FRONT_MID', 'MID_BACK', 'ALL'],
-                        3: ['MID', 'BACK', 'FRONT_MID', 'MID_BACK', 'ALL'],
-                        4: ['BACK', 'MID_BACK', 'ALL']
-                    };
-                    const result: (Unit | null)[] = new Array(5).fill(null);
-                    const usedUnitIdx = new Set<number>();
-                    const targetCount = units.length;
-
-                    const sortedByConstraint = [...units].sort((a, b) => {
-                        const getLen = (unit: Unit) => {
-                            const p = PREFERRED_POSITIONS[unit.family || unit.templateId] || 'ALL';
-                            if (p === 'ALL') return 5;
-                            if (p === 'FRONT' || p === 'BACK') return 2;
-                            if (p === 'MID') return 3;
-                            if (p === 'FRONT_MID') return 4;
-                            if (p === 'MID_BACK') return 4;
-                            return 5;
-                        };
-                        return getLen(a) - getLen(b);
-                    });
-
-                    const backtrack = (slotIdx: number): boolean => {
-                        if (slotIdx === 5) return true;
-                        if (slotIdx >= targetCount) return backtrack(slotIdx + 1);
-
-                        for (let i = 0; i < sortedByConstraint.length; i++) {
-                            if (usedUnitIdx.has(i)) continue;
-                            const u = sortedByConstraint[i];
-                            const pref = PREFERRED_POSITIONS[u.family || u.templateId] || 'ALL';
-                            if (POS_CONSTRAINTS[slotIdx].includes(pref)) {
-                                usedUnitIdx.add(i);
-                                result[slotIdx] = u;
-                                if (backtrack(slotIdx + 1)) return true;
-                                result[slotIdx] = null;
-                                usedUnitIdx.delete(i);
-                            }
-                        }
-                        return false;
-                    };
-
-                    if (backtrack(0)) return result;
-                    return null;
-                };
-
-                if (isEliteMatch) {
-                    // Elite/Champ Strategies Refined
-                    const stratRoll = Math.random();
-                    const shopTier = game.shop.getTier(game.turn);
-                    const eliteAllTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
-                    const availableTemplates = eliteAllTemplates.filter(t => t.tier <= shopTier);
-                    const t5Pool = availableTemplates.filter(u => u.tier === 5);
-
-                    let fixedTemplates: any[] = [];
-                    let randomCount = 0;
-
-                    // Helper to ensure template respects shop tier
-                    const ensureTier = (t: any) => {
-                        if (t.tier <= shopTier) return t;
-                        const tierPool = availableTemplates.filter(v => v.tier <= shopTier);
-                        return tierPool[Math.floor(Math.random() * tierPool.length)];
-                    };
-
-                    if (stratRoll < 0.15) {
-                        // (1) Starter: 3 Starters + 1 T4/T5 Starter + 1 Random
-                        const starterPool = eliteAllTemplates.filter(u => u.synergies.includes('Starter'));
-                        const availableHighStarter = starterPool.filter(u => u.tier >= 4 && u.tier <= shopTier);
-                        fixedTemplates = [
-                            ensureTier(starterPool[Math.floor(Math.random() * starterPool.length)]),
-                            ensureTier(starterPool[Math.floor(Math.random() * starterPool.length)]),
-                            ensureTier(starterPool[Math.floor(Math.random() * starterPool.length)])
-                        ];
-                        if (availableHighStarter.length > 0) {
-                            fixedTemplates.push(availableHighStarter[Math.floor(Math.random() * availableHighStarter.length)]);
-                        } else {
-                            const lowStarters = starterPool.filter(u => u.tier <= shopTier);
-                            fixedTemplates.push(lowStarters[Math.floor(Math.random() * lowStarters.length)]);
-                        }
-                        randomCount = 1;
-                        coreSynergyId = 'Starter'; synergyTargetCount = 4;
-                    } else if (stratRoll < 0.30) {
-                        // (2) Psychic: Natu, Ralts, Mr.Mime + 1 T5 + 1 Random
-                        const natu = eliteAllTemplates.find(u => u.family === 'natu');
-                        const ralts = eliteAllTemplates.find(u => u.family === 'ralts');
-                        const mrmime = eliteAllTemplates.find(u => u.family === 'mrmime');
-                        if (natu) fixedTemplates.push(ensureTier(natu));
-                        if (ralts) fixedTemplates.push(ensureTier(ralts));
-                        if (mrmime) fixedTemplates.push(ensureTier(mrmime));
-                        if (t5Pool.length > 0) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                        randomCount = 5 - fixedTemplates.length;
-                        coreSynergyId = 'Psychic'; synergyTargetCount = 3;
-                    } else if (stratRoll < 0.45) {
-                        // (3) Cave/Hard: Onix, Diglett + (50% Magneton) + 1 T5 + Random
-                        const onix = eliteAllTemplates.find(u => u.family === 'onix');
-                        const diglett = eliteAllTemplates.find(u => u.family === 'diglett');
-                        if (onix) fixedTemplates.push(ensureTier(onix));
-                        if (diglett) fixedTemplates.push(ensureTier(diglett));
-                        if (Math.random() < 0.5) {
-                            const mag = eliteAllTemplates.find(u => u.family === 'magnemite');
-                            if (mag) fixedTemplates.push(ensureTier(mag));
-                        }
-                        if (t5Pool.length > 0) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                        randomCount = 5 - fixedTemplates.length;
-                        coreSynergyId = 'Cave'; synergyTargetCount = 2;
-                    } else if (stratRoll < 0.60) {
-                        // (4) Snow: Weavile, Abomasnow + 1 T5 + 2 Random
-                        const sneasel = eliteAllTemplates.find(u => u.family === 'sneasel');
-                        const snover = eliteAllTemplates.find(u => u.family === 'snover');
-                        if (sneasel) fixedTemplates.push(ensureTier(sneasel));
-                        if (snover) fixedTemplates.push(ensureTier(snover));
-                        if (t5Pool.length > 0) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                        randomCount = 5 - fixedTemplates.length;
-                        coreSynergyId = 'Snow'; synergyTargetCount = 2;
-                    } else if (stratRoll < 0.75) {
-                        // (5) Triplets: Dugtrio, Dodrio, Magneton + 1 T5 + 1 Random
-                        const diglett = eliteAllTemplates.find(u => u.family === 'diglett');
-                        const doduo = eliteAllTemplates.find(u => u.family === 'doduo');
-                        const mag = eliteAllTemplates.find(u => u.family === 'magnemite');
-                        if (diglett) fixedTemplates.push(ensureTier(diglett));
-                        if (doduo) fixedTemplates.push(ensureTier(doduo));
-                        if (mag) fixedTemplates.push(ensureTier(mag));
-                        if (t5Pool.length > 0) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                        randomCount = 5 - fixedTemplates.length;
-                        coreSynergyId = 'Triplets'; synergyTargetCount = 3; uniqueConstraint = true;
-                    } else if (stratRoll < 0.85) {
-                        // (6) Slow: Swalot, Slowbro + 2 T5 + 1 Random
-                        const gulpin = eliteAllTemplates.find(u => u.family === 'gulpin');
-                        const slowpoke = eliteAllTemplates.find(u => u.family === 'slowpoke');
-                        if (gulpin) fixedTemplates.push(ensureTier(gulpin));
-                        if (slowpoke) fixedTemplates.push(ensureTier(slowpoke));
-                        if (t5Pool.length > 0) {
-                            fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                            if (t5Pool.length > 1) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                        }
-                        randomCount = 5 - fixedTemplates.length;
-                        coreSynergyId = 'Slow'; synergyTargetCount = 2;
-                    } else if (stratRoll < 0.95) {
-                        // (7) Beetle: Pinsir, Heracross + 2 T5 + 1 Random
-                        const pinsir = eliteAllTemplates.find(u => u.family === 'pinsir');
-                        const heracross = eliteAllTemplates.find(u => u.family === 'heracross');
-                        if (pinsir) fixedTemplates.push(ensureTier(pinsir));
-                        if (heracross) fixedTemplates.push(ensureTier(heracross));
-                        if (t5Pool.length > 0) {
-                            fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                            if (t5Pool.length > 1) fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                        }
-                        randomCount = 5 - fixedTemplates.length;
-                        coreSynergyId = 'Beetle'; synergyTargetCount = 2;
-                    } else {
-                        // (8) T5 Flow: 3 T5 + 2 Random
-                        if (t5Pool.length > 0) {
-                            for (let i = 0; i < Math.min(3, t5Pool.length); i++) {
-                                fixedTemplates.push(t5Pool[Math.floor(Math.random() * t5Pool.length)]);
-                            }
-                        }
-                        randomCount = 5 - fixedTemplates.length;
+                if (def) {
+                    // bossLevel for Core Units
+                    let bossLevel = enemyBaseLevel;
+                    if (isBossMatch) {
+                        if (difficulty === 'NORMAL') bossLevel = 1;
+                        else if (difficulty === 'GREAT') bossLevel = 2;
+                        else bossLevel = 3;
                     }
 
-                    while (attempts < MAX_ENEMY_ATTEMPTS) {
-                        const candidateUnits: Unit[] = [];
-                        // 1. Fill Fixed
-                        for (const t of fixedTemplates) {
-                            let finalT = t;
-                            let tempLevel = 1;
-                            while (tempLevel < enemyBaseLevel && finalT.evolveId) {
-                                const nextT = UNIT_TEMPLATES[finalT.evolveId];
-                                if (nextT) { finalT = nextT; tempLevel++; } else break;
-                            }
-                            const u = new Unit(finalT);
-                            u.level = enemyBaseLevel;
-                            candidateUnits.push(u);
-                        }
-                        // 2. Fill Random Slots
-                        for (let i = 0; i < randomCount; i++) {
-                            const t = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
+                    // 1. Create Core Units
+                    const candidateUnits: Unit[] = [];
+                    let coreCount = 0;
+                    for (const coreId of def.coreUnits) {
+                        if (coreCount >= enemyCount) break;
+                        const t = UNIT_TEMPLATES[coreId];
+                        if (t) {
                             const u = new Unit(t);
-                            u.level = 1; // Start at 1 to allow evolution logic to work
+                            u.level = bossLevel;
                             candidateUnits.push(u);
+                            coreCount++;
+                        }
+                    }
+
+                    // 2. Fill the rest based on their primary attributes/synergies
+                    let fillCount = enemyCount - candidateUnits.length;
+                    const mainSynergy = candidateUnits.length > 0 ? candidateUnits[0].synergies[0] : null;
+
+                    let attempts = 0;
+                    const MAX_ENEMY_ATTEMPTS = 5;
+                    const shopTier = game.shop.getTier(game.turn);
+
+                    while (fillCount > 0 && attempts < MAX_ENEMY_ATTEMPTS) {
+                        const availableTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= shopTier);
+                        let pool = availableTemplates;
+                        if (mainSynergy && Math.random() < 0.7) {
+                            const sPool = availableTemplates.filter(t => t.synergies.includes(mainSynergy));
+                            if (sPool.length > 0) pool = sPool;
                         }
 
-                        // 4. Position Sort
-                        const sorted = sortTeamByPositions(candidateUnits);
-                        if (sorted) { enemyTeam = sorted; break; }
+                        const t = getRandomEnemyTemplate(pool);
+                        const u = new Unit(t);
+                        u.level = bossLevel;
+                        candidateUnits.push(u);
+                        fillCount--;
                         attempts++;
                     }
-                } else {
-                    // Gym Strategy (Turn >= 2)
-                    if (game.turn >= 2) {
-                        const availableSynergies = Object.values(SYNERGIES).map(s => s.id);
-                        coreSynergyId = availableSynergies[Math.floor(Math.random() * availableSynergies.length)];
-                        synergyTargetCount = 3;
-                    }
 
-                    while (attempts < MAX_ENEMY_ATTEMPTS) {
-                        const candidateUnits: Unit[] = [];
-                        const usedTemplateIds = new Set<string>();
+                    const sortTeamByPositions = (unsortedUnits: Unit[]): Unit[] | null => {
+                        const result: (Unit | null)[] = [null, null, null, null, null];
+                        const usedUnitIdx = new Set<number>();
+                        const targetCount = unsortedUnits.length;
 
-                        for (let i = 0; i < enemyCount; i++) {
-                            let pool = allTemplates;
-                            if (i < synergyTargetCount && coreSynergyId) {
-                                const synergyPool = allTemplates.filter(u => u.synergies.includes(coreSynergyId!));
-                                if (uniqueConstraint) {
-                                    const uniquePool = synergyPool.filter(u => !usedTemplateIds.has(u.family || u.id));
-                                    pool = uniquePool.length > 0 ? uniquePool : synergyPool;
-                                } else {
-                                    pool = synergyPool.length > 0 ? synergyPool : allTemplates;
+                        // Positional mapping
+                        const POS_CONSTRAINTS: Record<number, PreferredPosition[]> = {
+                            0: ['ALL', 'FRONT', 'FRONT_MID', 'MID', 'MID_BACK', 'BACK'],
+                            1: ['ALL', 'FRONT', 'FRONT_MID', 'MID', 'MID_BACK', 'BACK'],
+                            2: ['ALL', 'FRONT_MID', 'MID', 'MID_BACK', 'BACK', 'FRONT'], // Slight bias for mid/back
+                            3: ['ALL', 'MID_BACK', 'BACK', 'MID', 'FRONT_MID', 'FRONT'],
+                            4: ['ALL', 'BACK', 'MID_BACK', 'MID', 'FRONT_MID', 'FRONT']
+                        };
+
+                        const sortedByConstraint = [...unsortedUnits].sort((a, b) => {
+                            const getLen = (unit: Unit) => {
+                                const p = PREFERRED_POSITIONS[unit.family || unit.templateId] || 'ALL';
+                                if (p === 'ALL') return 5;
+                                if (p === 'FRONT' || p === 'BACK') return 2;
+                                if (p === 'MID') return 3;
+                                if (p === 'FRONT_MID') return 4;
+                                if (p === 'MID_BACK') return 4;
+                                return 5;
+                            };
+                            return getLen(a) - getLen(b);
+                        });
+
+                        const backtrack = (slotIdx: number): boolean => {
+                            if (slotIdx === 5) return true;
+                            if (slotIdx >= targetCount) return backtrack(slotIdx + 1);
+
+                            for (let i = 0; i < sortedByConstraint.length; i++) {
+                                if (usedUnitIdx.has(i)) continue;
+                                const u = sortedByConstraint[i];
+                                const pref = PREFERRED_POSITIONS[u.family || u.templateId] || 'ALL';
+                                if (POS_CONSTRAINTS[slotIdx].includes(pref)) {
+                                    usedUnitIdx.add(i);
+                                    result[slotIdx] = u;
+                                    if (backtrack(slotIdx + 1)) return true;
+                                    result[slotIdx] = null;
+                                    usedUnitIdx.delete(i);
                                 }
                             }
-                            if (pool.length === 0) pool = allTemplates;
-                            let t = getRandomEnemyTemplate(pool);
-                            usedTemplateIds.add(t.family || t.id);
+                            return false;
+                        };
 
-                            const u = new Unit(t);
-                            u.level = 1; // Start at 1 to allow evolution logic to work
-                            candidateUnits.push(u);
-                        }
-                        // 4. Position Sort
-                        const sorted = sortTeamByPositions(candidateUnits);
-                        if (sorted) { enemyTeam = sorted; break; }
-                        attempts++;
+                        if (backtrack(0)) return result as Unit[];
+                        return null;
+                    };
+
+                    const sorted = sortTeamByPositions(candidateUnits);
+                    if (sorted) {
+                        enemyTeam = sorted;
+                    } else {
+                        // Fallback
+                        enemyTeam = candidateUnits.concat(Array(5 - candidateUnits.length).fill(null)).slice(0, 5) as unknown as Unit[];
+                    }
+                } else {
+                    // Fallback logic if ID not found (Should not happen)
+                    enemyTeam = [new Unit(UNIT_TEMPLATES.rattata), null, null, null, null];
+                }
+            } else {
+                // This block executes if there's NO selected opponent (e.g., debugging or not opening the modal)
+                const def = GYM_LEADERS[Math.floor(Math.random() * GYM_LEADERS.length)];
+                const fbCandidateUnits: Unit[] = [];
+                for (const coreId of def.coreUnits) {
+                    if (fbCandidateUnits.length >= enemyCount) break;
+                    const t = UNIT_TEMPLATES[coreId];
+                    if (t) {
+                        const u = new Unit(t);
+                        u.level = enemyBaseLevel;
+                        fbCandidateUnits.push(u);
                     }
                 }
-                if (enemyTeam.length === 0) {
-                    // Final fallback: just generate randomly if sorting keeps failing
-                    attempts = 0; // Reset for actual one-shot generation
-                    for (let i = 0; i < enemyCount; i++) {
-                        const tempT = getRandomEnemyTemplate(allTemplates);
-                        const unit = new Unit(tempT);
-                        unit.level = 1; // Start at 1 to allow evolution logic to work
-                        enemyTeam.push(unit);
-                    }
-                    while (enemyTeam.length < 5) enemyTeam.push(null);
-                }
-            } // end tutorial enemy override
-
-            // --- 5. Unified Enemy Scaling & Image Setup ---
-            enemyTeam.forEach((u, i) => {
-                if (!u) return;
-
-                // A. Apply forced stars (upgrades)
-                const targetLvl = (i < forcedStarCount) ? 3 : ((i < forcedTwoStarCount || enemyBaseLevel >= 2) ? 2 : 1);
-
-                // FIXED: Ensure it evolves up to the HIGHER of targetLvl or enemyBaseLevel.
-                const finalTargetLvl = Math.max(targetLvl, enemyBaseLevel);
-
-                while (u.level < finalTargetLvl && u.evolveId) {
-                    const nextT = UNIT_TEMPLATES[u.evolveId];
-                    if (nextT) {
-                        Object.assign(u, {
-                            templateId: nextT.id, name: nextT.name, description: nextT.description,
-                            imageUrl: nextT.battleImageUrl || nextT.imageUrl,
-                            battleImageUrl: nextT.battleImageUrl, evolveId: nextT.evolveId,
-                            synergies: nextT.synergies || [], tier: nextT.tier
-                        });
-                        u.level++;
-                    } else break;
-                }
-                if (u.level < finalTargetLvl) u.level = finalTargetLvl;
-
-                // Initial Base level might be forcefully bumped without template change if no evolution
-                if (u.level === 1 && enemyBaseLevel > 1) {
+                let fbFillCount = enemyCount - fbCandidateUnits.length;
+                const fbShopTier = game.shop.getTier(game.turn);
+                while (fbFillCount > 0) {
+                    const allT = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= fbShopTier);
+                    const t = getRandomEnemyTemplate(allT);
+                    const u = new Unit(t);
                     u.level = enemyBaseLevel;
+                    fbCandidateUnits.push(u);
+                    fbFillCount--;
                 }
 
-                // B. Base stat bonus for level 2 and 3
-                const baseStats = UNIT_TEMPLATES[u.family || u.templateId]?.baseStats || u.stats;
-                if (u.level === 2) {
-                    const bHp = baseStats.maxHp; const bAtk = baseStats.attack;
-                    u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
-                } else if (u.level >= 3) {
-                    const bHp = baseStats.maxHp * 2; const bAtk = baseStats.attack * 2;
+                enemyTeam = fbCandidateUnits.concat(Array(5 - fbCandidateUnits.length).fill(null)).slice(0, 5) as unknown as Unit[];
+            }
+
+            // A. Apply forced stars (upgrades)
+            let threeStarCount = enemyTeam.filter(u => u && u.level >= 3).length;
+            if (isBossMatch && threeStarCount < forcedStarCount) {
+                let needed = forcedStarCount - threeStarCount;
+                for (const u of enemyTeam) {
+                    if (needed <= 0) break;
+                    if (u && u.level < 3) {
+                        u.level = 3;
+                        needed--;
+                    }
+                }
+            }
+
+            if (forcedTwoStarCount > 0 && !isBossMatch) {
+                let needed = forcedTwoStarCount;
+                for (const u of enemyTeam) {
+                    if (needed <= 0) break;
+                    if (u && u.level === 1) {
+                        u.level = 2;
+                        needed--;
+                    }
+                }
+            }
+
+            // Emulate evolution stat growth up to Level 3
+            enemyTeam.forEach(u => {
+                if (!u) return;
+                const baseStats = UNIT_TEMPLATES[u.templateId]?.baseStats || u.stats;
+                u.stats = { ...baseStats };
+                for (let lv = 2; lv <= u.level; lv++) {
+                    let bHp = Math.floor(baseStats.hp * 0.5);
+                    let bAtk = Math.floor(baseStats.attack * 0.5);
                     u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
                 }
 
@@ -957,7 +836,6 @@ function App() {
                     if (game.wins >= 8) {
                         const eIdx = game.wins - 7;
                         let eBHp = eIdx * 6; let eBAtk = eIdx * 3;
-                        // Tier-based scaling retention: T5 (50%), T4 (75%)
                         if (u.tier === 5) { eBHp = Math.ceil(eBHp * 0.5); eBAtk = Math.ceil(eBAtk * 0.5); }
                         else if (u.tier === 4) { eBHp = Math.ceil(eBHp * 0.75); eBAtk = Math.ceil(eBAtk * 0.75); }
                         u.stats.hp += eBHp; u.stats.maxHp += eBHp; u.stats.attack += eBAtk;
@@ -967,13 +845,13 @@ function App() {
                 if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
             });
 
-            // Save initial state for UI Synergy (Before simulator modifies/removes dead units)
             setInitialEnemyTeam([...enemyTeam]);
 
-            // Master Turn 1 Balance: Ensure 1.0 multiplier for fairness
             const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
             simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, game.wins, battleSpeed);
-            simulatorRef.current.onUpdate = () => {
+            const currentSim = simulatorRef.current;
+
+            currentSim.onUpdate = () => {
                 if (simulatorRef.current) {
                     setLogs([...simulatorRef.current.logs]);
                 }
@@ -983,8 +861,6 @@ function App() {
 
             const runBattleLoop = async () => {
                 if (!simulatorRef.current || isPausedRef.current) return;
-
-                // Lock loop to prevent overlapping
                 if ((simulatorRef.current as any).isProcessing) return;
                 (simulatorRef.current as any).isProcessing = true;
 
@@ -995,8 +871,6 @@ function App() {
 
                     if (!keepGoing) {
                         if (interval) clearInterval(interval);
-
-                        // Restore visibility immediately for survivors
                         document.querySelectorAll('.death-anim, .hurt-anim, .clash-anim').forEach(el => {
                             el.classList.remove('death-anim', 'hurt-anim', 'clash-anim');
                             (el as HTMLElement).style.removeProperty('--clash-offset');
@@ -1008,8 +882,8 @@ function App() {
                                 setSelected(null);
                                 setBattleResult(result);
                             }
-                        }, 300 / battleSpeed); // Scaled settlement delay
-                        return; // Stop loop
+                        }, 300 / battleSpeed);
+                        return;
                     }
                 } finally {
                     if (simulatorRef.current) (simulatorRef.current as any).isProcessing = false;
@@ -1023,20 +897,16 @@ function App() {
             };
             initAndStart();
 
-            return () => {
-                if (interval) clearInterval(interval);
-            };
+            return () => clearInterval(interval);
+
         } else {
             // Cleanup leftover animation classes when entering SHOP phase
-            // This prevents reused DOM elements (units) from staying invisible or rotated if they were mid-animation
             setTimeout(() => {
                 document.querySelectorAll('.death-anim, .hurt-anim, .clash-anim').forEach(el => {
                     el.classList.remove('death-anim', 'hurt-anim', 'clash-anim');
                     (el as HTMLElement).style.removeProperty('--clash-offset');
                 });
-            }, 50); // Small delay to ensure render cycle complete if needed
-
-            // Reset Enemy Synergy Display when leaving battle
+            }, 50);
             setInitialEnemyTeam([]);
         }
     }, [game.phase]);
@@ -1198,7 +1068,36 @@ function App() {
         music.stop(); // Stop prep music
         setSelected(null);
         setBattleResult(null);
+
+        // Prepare opponent choices
+        // Determine which opponent pool to use based on game.wins
+        let npcPool: any[] = [];
+        if (game.wins >= 12) {
+            npcPool = CHAMPIONS;
+        } else if (game.wins >= 8) {
+            npcPool = ELITE_FOUR;
+        } else {
+            npcPool = GYM_LEADERS;
+        }
+
+        // We show opponent choices for Boss matches (Wins: 8~11 or 12) or special gym levels.
+        // Actually, user spec says: "這 4 場中，每場會在對手畫面跳出從四天王中挑選。 前八勝階段... 這些館主將出現在一般對戰中供玩家挑戰"
+        // Let's always show the opponent choice if we have a pool.
+        const ALL_NPCS = npcPool.map(boss => ({ id: boss.id, name: boss.name, url: boss.url }));
+
+        // Shuffle and pick 3
+        const shuffled = [...ALL_NPCS].sort(() => 0.5 - Math.random());
+        setOpponentChoices(shuffled.slice(0, 3));
+        setShowOpponentSelect(true);
+    };
+
+    const handleOpponentSelect = (opponent: { id?: string, name: string, url: string }) => {
+        setSelectedOpponent(opponent as { id: string, name: string, url: string });
+        setShowOpponentSelect(false);
         game.startBattlePhase();
+        setBattleResult(null);
+        setLogs([]);
+        setBattleTick(0);
         update();
     };
 
@@ -1811,6 +1710,86 @@ function App() {
                             paddingBottom: '5px'
                         }}>
                             [ 點擊任意處重新開始 ]
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* Opponent Selection Overlay */}
+            {
+                showOpponentSelect && (
+                    <div
+                        className="opponent-select-overlay"
+                        style={{
+                            position: 'fixed',
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            background: 'rgba(0,0,0,0.85)',
+                            backdropFilter: 'blur(8px)',
+                            zIndex: 10001,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            animation: 'fadeIn 0.3s ease-out'
+                        }}
+                    >
+                        <h2 style={{
+                            color: '#fff',
+                            fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+                            marginBottom: 'clamp(20px, 4vw, 40px)',
+                            textShadow: '0 2px 10px rgba(0,0,0,0.8)',
+                            letterSpacing: '4px'
+                        }}>
+                            請選擇你的對手
+                        </h2>
+
+                        <div className="opponent-cards-container" style={{
+                            display: 'flex',
+                            gap: 'clamp(20px, 5vw, 60px)',
+                            justifyContent: 'center',
+                            flexWrap: 'wrap'
+                        }}>
+                            {opponentChoices.map((npc, idx) => (
+                                <div
+                                    key={idx}
+                                    className="opponent-card"
+                                    onClick={() => handleOpponentSelect(npc)}
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        cursor: 'pointer',
+                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
+                                        padding: 'clamp(15px, 3vw, 25px)',
+                                        borderRadius: '16px',
+                                        border: '2px solid rgba(255,255,255,0.1)',
+                                        transition: 'all 0.2s',
+                                        width: 'clamp(130px, 25vw, 200px)'
+                                    }}
+                                >
+                                    <img
+                                        src={npc.url}
+                                        alt={npc.name}
+                                        style={{
+                                            width: 'clamp(100px, 20vw, 150px)',
+                                            height: 'clamp(100px, 20vw, 150px)',
+                                            objectFit: 'contain',
+                                            marginBottom: '15px',
+                                            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
+                                        }}
+                                    />
+                                    <div className="opponent-name" style={{
+                                        color: '#fff',
+                                        fontSize: 'clamp(1.2rem, 2.5vw, 1.8rem)',
+                                        fontWeight: 'bold',
+                                        letterSpacing: '2px',
+                                        textShadow: '1px 1px 3px rgba(0,0,0,0.8)',
+                                        textAlign: 'center'
+                                    }}>
+                                        {npc.name}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )
