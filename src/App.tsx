@@ -5,7 +5,7 @@ import './index.css';
 import { GameLoop, GamePhase } from './engine/GameLoop';
 import { music } from './engine/MusicManager';
 
-import { CHAMPIONS, ELITE_FOUR, GYM_LEADERS } from './models/BossData';
+import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS } from './models/BossData';
 import { BattleSimulator } from './engine/BattleSimulator';
 import type { BattleLog } from './engine/BattleSimulator';
 import { UNIT_TEMPLATES, PREFERRED_POSITIONS } from './models/UnitFactory';
@@ -399,9 +399,8 @@ function App() {
             const backgroundUrls = new Set<string>();
 
             Object.values(UNIT_TEMPLATES).forEach(t => {
-                // Determine if critical (Tier 1) or background (Tier 2+)
-                // For Sprout and initial tokens, include in critical
-                const isCritical = t.tier <= 1 || t.id === 'sprout';
+                // Determine if critical (Tier 1 & 2) or background (Tier 3+)
+                const isCritical = t.tier <= 2 || t.id === 'sprout';
 
                 const addUrl = (url: string) => {
                     if (isCritical) criticalUrls.add(url);
@@ -411,6 +410,10 @@ function App() {
                 if (t.imageUrl) addUrl(t.imageUrl);
                 if (t.battleImageUrl) addUrl(t.battleImageUrl);
             });
+
+            // Trainers: Only NOVICE are critical, others are background
+            NOVICE_OPPONENTS.forEach(op => criticalUrls.add(op.url));
+            [...INTERM_OPPONENTS, ...ADVANCED_OPPONENTS, ...ELITE_OPPONENTS].forEach(op => backgroundUrls.add(op.url));
 
             // Critical token/derived images
             criticalUrls.add('assets/妙蛙種子01.webp');
@@ -565,11 +568,10 @@ function App() {
             // Init Battle
             // Init Battle
             // Enemy Count Logic based on User Request
-            // Turn <= 1 = 3, Turn 2 = 4, Turn 3+ = 5
+            // Turn <= 1 = 3, Turn 2+ = 5
             let enemyCount = 5;
             if (game.turn <= 1) enemyCount = 3;
-            else if (game.turn === 2) enemyCount = 4;
-            else if (game.turn >= 3) enemyCount = 5;
+            else enemyCount = 5;
 
             let enemyTeam: (Unit | null)[] = [];
 
@@ -656,9 +658,10 @@ function App() {
                 }
             } else if (selectedOpponent && selectedOpponent.id) {
                 // Find def
-                let def = CHAMPIONS.find(c => c.id === selectedOpponent.id) ||
-                    ELITE_FOUR.find(e => e.id === selectedOpponent.id) ||
-                    GYM_LEADERS.find(g => g.id === selectedOpponent.id);
+                let def = ELITE_OPPONENTS.find(c => c.id === selectedOpponent.id) ||
+                    ADVANCED_OPPONENTS.find(e => e.id === selectedOpponent.id) ||
+                    INTERM_OPPONENTS.find(g => g.id === selectedOpponent.id) ||
+                    NOVICE_OPPONENTS.find(n => n.id === selectedOpponent.id);
 
                 if (def) {
                     // bossLevel for Core Units
@@ -669,13 +672,27 @@ function App() {
                         else bossLevel = 3;
                     }
 
+                    // Helper to dynamically evolve core units
+                    const getEvolvedTemplate = (t: any, targetLevel: number) => {
+                        let current = t;
+                        for (let i = 1; i < targetLevel; i++) {
+                            if (current && current.evolveId && UNIT_TEMPLATES[current.evolveId]) {
+                                current = UNIT_TEMPLATES[current.evolveId];
+                            } else {
+                                break;
+                            }
+                        }
+                        return current;
+                    };
+
                     // 1. Create Core Units
                     const candidateUnits: Unit[] = [];
                     let coreCount = 0;
                     for (const coreId of def.coreUnits) {
                         if (coreCount >= enemyCount) break;
-                        const t = UNIT_TEMPLATES[coreId];
-                        if (t) {
+                        const baseT = UNIT_TEMPLATES[coreId];
+                        if (baseT) {
+                            const t = getEvolvedTemplate(baseT, bossLevel);
                             const u = new Unit(t);
                             u.level = bossLevel;
                             candidateUnits.push(u);
@@ -699,7 +716,8 @@ function App() {
                             if (sPool.length > 0) pool = sPool;
                         }
 
-                        const t = getRandomEnemyTemplate(pool);
+                        const baseT = getRandomEnemyTemplate(pool);
+                        const t = getEvolvedTemplate(baseT, bossLevel);
                         const u = new Unit(t);
                         u.level = bossLevel;
                         candidateUnits.push(u);
@@ -770,7 +788,8 @@ function App() {
                 }
             } else {
                 // This block executes if there's NO selected opponent (e.g., debugging or not opening the modal)
-                const def = GYM_LEADERS[Math.floor(Math.random() * GYM_LEADERS.length)];
+                let fallbackPool = game.wins >= 12 ? ELITE_OPPONENTS : (game.wins >= 8 ? ADVANCED_OPPONENTS : (game.wins >= 4 ? INTERM_OPPONENTS : NOVICE_OPPONENTS));
+                const def = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
                 const fbCandidateUnits: Unit[] = [];
                 for (const coreId of def.coreUnits) {
                     if (fbCandidateUnits.length >= enemyCount) break;
@@ -1079,26 +1098,32 @@ function App() {
         // Determine which opponent pool to use based on game.wins
         let npcPool: any[] = [];
         if (game.wins >= 12) {
-            npcPool = CHAMPIONS;
+            npcPool = ELITE_OPPONENTS;
         } else if (game.wins >= 8) {
-            npcPool = ELITE_FOUR;
+            npcPool = ADVANCED_OPPONENTS;
+        } else if (game.wins >= 4) {
+            npcPool = INTERM_OPPONENTS;
         } else {
-            npcPool = GYM_LEADERS;
+            npcPool = NOVICE_OPPONENTS;
         }
 
         // We show opponent choices for Boss matches (Wins: 8~11 or 12) or special gym levels.
         // Actually, user spec says: "這 4 場中，每場會在對手畫面跳出從四天王中挑選。 前八勝階段... 這些館主將出現在一般對戰中供玩家挑戰"
         // Let's always show the opponent choice if we have a pool.
         const ALL_NPCS = npcPool.map(boss => ({ id: boss.id, name: boss.name, url: boss.url }));
+        const unseenNpCS = ALL_NPCS.filter(boss => !game.encounteredOpponentIds?.includes(boss.id));
+        const finalPool = unseenNpCS.length >= 3 ? unseenNpCS : ALL_NPCS;
 
-        // Shuffle and pick 3
-        const shuffled = [...ALL_NPCS].sort(() => 0.5 - Math.random());
+        const shuffled = [...finalPool].sort(() => 0.5 - Math.random());
         setOpponentChoices(shuffled.slice(0, 3));
         setShowOpponentSelect(true);
     };
 
     const handleOpponentSelect = (opponent: { id?: string, name: string, url: string }) => {
         setSelectedOpponent(opponent as { id: string, name: string, url: string });
+        if (opponent.id) {
+            game.encounteredOpponentIds.push(opponent.id);
+        }
         setShowOpponentSelect(false);
         game.startBattlePhase();
         setBattleResult(null);
@@ -1307,7 +1332,7 @@ function App() {
                     }}
                 />
             )}
-            {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} onStartTutorial={startTutorial} />}
+            {showTutorial && difficulty !== null && <TutorialModal onClose={() => setShowTutorial(false)} onStartTutorial={startTutorial} />}
 
             {/* Tutorial Message Box / Mask (Steps 1-11) */}
             {tutorialStep > 0 && tutorialStep <= 11 && (game.phase === GamePhase.SHOP || tutorialStep === 11) && (

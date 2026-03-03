@@ -25,6 +25,7 @@ export class GameLoop {
     public shop: Shop;
     public difficultyMultiplier: number = 1.0;
     public difficultyScore: number = 1.0; // Dynamic difficulty tracker
+    public encounteredOpponentIds: string[] = [];
 
     constructor() {
         this.shop = new Shop();
