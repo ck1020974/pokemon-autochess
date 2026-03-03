@@ -667,26 +667,6 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         imageUrl: 'assets/花岩怪00.webp', battleImageUrl: 'assets/花岩怪01.webp',
         description: '戰鬥開始時，使 2 個敵方角色的招式無效化。', synergies: ['Ghost']
     },
-
-    // 34. Gulpin
-    gulpin: {
-        id: 'gulpin', name: '被移除', tier: 1, family: 'gulpin',
-        baseStats: { hp: 1, maxHp: 1, attack: 1 },
-        imageUrl: '', battleImageUrl: '',
-        description: '已被移除的角色。', synergies: [], evolveId: 'swalot', isHiddenFromShop: true
-    },
-    swalot: {
-        id: 'swalot', name: '被移除', tier: 1, family: 'gulpin',
-        baseStats: { hp: 1, maxHp: 1, attack: 1 },
-        imageUrl: '', battleImageUrl: '',
-        description: '已被移除的角色。', synergies: [], evolveId: 'swalot_final', isHiddenFromShop: true
-    },
-    swalot_final: {
-        id: 'swalot_final', name: '被移除', tier: 1, family: 'gulpin',
-        baseStats: { hp: 1, maxHp: 1, attack: 1 },
-        imageUrl: '', battleImageUrl: '',
-        description: '已被移除的角色。', synergies: [], isHiddenFromShop: true
-    },
     heracross: {
         id: 'heracross', name: '赫拉克羅斯', tier: 3, family: 'heracross',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
@@ -785,7 +765,6 @@ export const PREFERRED_POSITIONS: Record<string, PreferredPosition> = {
     'sableye': 'ALL',
     'mimikyu': 'ALL',
     'spiritomb': 'ALL',
-    'gulpin': 'MID_BACK',
     'heracross': 'ALL',
     'pinsir': 'ALL',
     'farfetchd': 'FRONT',
