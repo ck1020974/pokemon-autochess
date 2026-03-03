@@ -50,16 +50,19 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
                     if (rankA !== rankB) return rankA - rankB;
                 }
 
-                // If neither are starters (or they are somehow exactly the same starter type), sort by first synergy definition order
-                const synA = a.synergies[0] || '';
-                const synB = b.synergies[0] || '';
-                if (synA !== synB) {
-                    const synergyOrder = Object.keys(SYNERGIES);
-                    const indexA = synergyOrder.indexOf(synA);
-                    const indexB = synergyOrder.indexOf(synB);
-                    const finalA = indexA !== -1 ? indexA : 999;
-                    const finalB = indexB !== -1 ? indexB : 999;
-                    return finalA - finalB;
+                // If neither are starters, sort by the highest priority synergy they possess
+                const synergyOrder = Object.keys(SYNERGIES);
+
+                const getBestSynergyIndex = (u: UnitTemplate) => {
+                    const indices = u.synergies.map(s => synergyOrder.indexOf(s)).filter(idx => idx !== -1);
+                    return indices.length > 0 ? Math.min(...indices) : 999;
+                };
+
+                const indexA = getBestSynergyIndex(a);
+                const indexB = getBestSynergyIndex(b);
+
+                if (indexA !== indexB) {
+                    return indexA - indexB;
                 }
 
                 // Fallback to name

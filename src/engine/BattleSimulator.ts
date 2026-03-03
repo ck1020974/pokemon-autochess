@@ -21,7 +21,6 @@ export class BattleSimulator {
     private lightScreenActivated: Set<string> = new Set();
     private initialPlayerSet: Set<Unit> = new Set();
     private spiritombTriggered: Set<string> = new Set();
-    private psychicTriggered: Set<string> = new Set();
     private originalPlayerTeam?: (Unit | null)[];
     private isCompacting = false;
     private houndoomLogged: Set<string> = new Set();
@@ -30,8 +29,6 @@ export class BattleSimulator {
     private isSimulatingStep = false;
     private queuedKillRewards: (() => Promise<void>)[] = [];
     private playerWins: number = 0;
-    private playerAttackCount: number = 0;
-    private enemyAttackCount: number = 0;
     // Cached Synergies (Persist through death)
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
@@ -335,27 +332,7 @@ export class BattleSimulator {
 
         // Mudkip Family: Logic moved to registerUnitAbilities
 
-        // Gulpin & Swalot: Swallow Front Ally
-        if (unit.family === 'gulpin') {
-            const idx = myTeam.indexOf(unit);
-            if (idx > 0) {
-                const front = myTeam[idx - 1];
-                if (front && front.stats.hp > 0) {
-                    await this.notifySkill(unit, `對 ${front.name} 使用了吞下`);
-                    await this.delay(400);
-                    const multiplier = unit.level >= 3 ? 2 : 1;
-                    this.growUnit(unit, front.stats.maxHp * multiplier, front.stats.attack * multiplier, '吞噬');
-                    const fState = this.unitStates.get(front) || {};
-                    fState.isSwallowed = true;
-                    this.unitStates.set(front, fState);
-                    front.stats.hp = 0;
-                    // Trigger death BEFORE removal/compaction so location is preserved for summons
-                    await this.eventBus.emit({ type: 'AFTER_DEATH', source: front, context: { killer: unit } });
-                    await this.compactTeams();
-                    if (this.onUpdate) this.onUpdate();
-                }
-            }
-        }
+        // Gulpin & Swalot: Swallow Front Ally (Removed)
 
         // Natu/Xatu: Swap enemy first and last
         if (unit.family === 'natu' && !this.natuLogged.has(side)) {
@@ -597,8 +574,22 @@ export class BattleSimulator {
             this.eventBus.on('ON_HURT', (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.target === unit) {
-                    if (this.getSynergyCountForUnit(unit, 'Angry') >= 2) {
-                        this.buffAttack(unit, 3);
+                    const count = this.getSynergyCountForUnit(unit, 'Angry');
+                    const buff = count >= 3 ? 5 : (count >= 2 ? 3 : 0);
+                    if (buff > 0) this.buffAttack(unit, buff);
+                }
+            });
+        }
+
+        // SwordDance: Atk on Move
+        if (unit.synergies.includes('SwordDance')) {
+            this.eventBus.on('ON_MOVE', async (e) => {
+                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
+                    const count = this.getSynergyCountForUnit(unit, 'SwordDance');
+                    const buff = count >= 3 ? 3 : (count >= 2 ? 2 : 0);
+                    if (buff > 0) {
+                        const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
+                        this.growUnit(unit, 0, buff, '劍舞', original, false);
                     }
                 }
             });
@@ -860,51 +851,37 @@ export class BattleSimulator {
             });
         }
 
-        // Shuppet/Banette: Death -> Dmg to random enemy
+        // Shuppet/Banette: Hurt -> Dmg to random enemy (Spite)
         if (unit.family === 'shuppet') {
-            this.eventBus.on('AFTER_DEATH', async (e) => {
+            this.eventBus.on('ON_HURT', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
-                if (e.source === unit) {
+                if (e.target === unit && unit.stats.hp > 0) {
                     const { opTeam } = this.getTeams(unit);
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
-                        if (unit.level >= 3) {
-                            await this.notifySkill(unit, `發動了潛靈奇襲！\n造成了連續 5 次傷害`);
-                            await this.delay(200);
-
-                            for (let i = 0; i < 5; i++) {
-                                const currentLiving = opTeam.filter(u => u && u.stats.hp > 0);
-                                if (currentLiving.length === 0) break;
-                                const target = currentLiving[Math.floor(Math.random() * currentLiving.length)];
-                                await this.dealDamage(unit, target, 10, true, true);
-                                await this.delay(65);
-                            }
-                        } else {
-                            const target = living[Math.floor(Math.random() * living.length)];
-                            await this.notifySkill(unit, `對目標使用了影子偷襲！`);
-                            await this.delay(200);
-                            const dmg = [0, 4, 10, 99][unit.level] || 4;
-                            await this.dealDamage(unit, target, dmg, true);
-                        }
+                        const target = living[Math.floor(Math.random() * living.length)];
+                        await this.notifySkill(unit, `發動了怨恨！`);
+                        await this.delay(100);
+                        const dmg = [0, 2, 5, 10][unit.level] || 2;
+                        await this.dealDamage(unit, target, dmg, true);
                     }
                 }
             });
         }
 
-        // Drifloon/Drifblim: Death -> AOE dmg
+        // Drifloon/Drifblim: Death -> AOE dmg (Explosion)
         if (unit.family === 'drifloon') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source === unit) {
                     const { myTeam, opTeam } = this.getTeams(unit);
 
-                    const dmg = [0, 2, 5, 15][unit.level] || 2;
+                    const dmg = [0, 2, 5, 10][unit.level] || 2;
                     await this.notifySkill(unit, `發動了自爆\n對全體造成了 ${dmg} 點傷害`);
                     // Affect EVERYONE else (myTeam and opTeam)
                     const allTargets = [...myTeam, ...opTeam].filter(u => u && u !== unit && u.stats.hp > 0);
                     for (const target of allTargets) {
                         await this.dealDamage(unit, target!, dmg, true, true); // silent=true
-                        await this.delay(65);
                     }
                 }
             });
@@ -1124,39 +1101,40 @@ export class BattleSimulator {
 
         await this.eventBus.emit({ type: 'AFTER_ATTACK', source: attacker, target: defender, context: {} });
 
-        // Psychic Synergy: "Future Sight"
-        const attackerIsEnemy = this.enemyTeam.includes(attacker);
-        if (attackerIsEnemy) {
-            this.enemyAttackCount++;
-            const psychicCount = this.playerSynergies.get('Psychic') || 0;
-            if (this.enemyAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('player')) {
-                this.psychicTriggered.add('player');
-                this.enemyAttackCount = 0;
-                this.log("敵方受到了預知未來的攻擊！");
-                const allEnemies = this.enemyTeam.filter(u => u && u.stats.hp > 0);
-                const dmg = 2 * this.playerWins;
-                for (const target of allEnemies) {
-                    await this.dealDamage(null, target, dmg, true, true); // silent damage for clutter control
+        // Psychic Synergy: "Global AOE"
+        const updatePsychic = async (isPlayer: boolean) => {
+            const side = isPlayer ? 'player' : 'enemy';
+            const count = (isPlayer ? this.playerSynergies : this.enemySynergies).get('Psychic') || 0;
+
+            if (count >= 2) {
+                const maxActivations = count >= 4 ? 5 : (count >= 3 ? 3 : 1);
+                const currentActivations = this.unitStates.get(this as any)?.[`psychicOccurred_${side}`] || 0;
+
+                if (currentActivations < maxActivations && this.turnCount % 2 === 0) {
+                    // Check if it's a new turn for this activation
+                    const lastTurn = this.unitStates.get(this as any)?.[`psychicLastTurn_${side}`];
+                    if (lastTurn !== this.turnCount) {
+                        const state = this.unitStates.get(this as any) || {};
+                        state[`psychicOccurred_${side}`] = currentActivations + 1;
+                        state[`psychicLastTurn_${side}`] = this.turnCount;
+                        this.unitStates.set(this as any, state);
+
+                        this.log(isPlayer ? "敵方受到了預知未來的攻擊！" : "我方受到了預知未來的攻擊！");
+                        const targets = isPlayer ? this.enemyTeam : this.playerTeam;
+                        const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
+                        const dmg = 2 + (isPlayer ? this.playerWins : 0);
+                        for (const target of livingEnemies) {
+                            await this.dealDamage(null, target, dmg, true, true);
+                        }
+                        if (this.onUpdate) this.onUpdate();
+                        await this.delay(300);
+                    }
                 }
-                if (this.onUpdate) this.onUpdate();
-                await this.delay(300);
             }
-        } else {
-            this.playerAttackCount++;
-            const psychicCount = this.enemySynergies.get('Psychic') || 0;
-            if (this.playerAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('enemy')) {
-                this.psychicTriggered.add('enemy');
-                this.playerAttackCount = 0;
-                this.log("我方受到了預知未來的攻擊！");
-                const allAllies = this.playerTeam.filter(u => u && u.stats.hp > 0);
-                const dmg = 2; // Default 2 for enemy psychic? Or based on turn? Let's use 2 as a base.
-                for (const target of allAllies) {
-                    await this.dealDamage(null, target, dmg, true, true);
-                }
-                if (this.onUpdate) this.onUpdate();
-                await this.delay(300);
-            }
-        }
+        };
+
+        await updatePsychic(true);
+        await updatePsychic(false);
     }
 
     private async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false, silent: boolean = false) {
@@ -1223,10 +1201,6 @@ export class BattleSimulator {
 
         // Pinsir/Sableye ignore reductions
         if (!isBypassing) {
-            // Slow: 33% damage reduction
-            if (this.getSynergyCountForUnit(target, 'Slow') >= 2 && target.synergies.includes('Slow')) {
-                amount = Math.max(1, Math.ceil(amount * 2 / 3));
-            }
             // Squirtle: Flat reduction
             if (target.family === 'squirtle' && amount > 0) {
                 amount = Math.max(1, amount - target.level);
@@ -1307,14 +1281,6 @@ export class BattleSimulator {
             const executeReward = async () => {
                 // Critical: Re-check survival if reward was deferred
                 if (killer.stats.hp <= 0) return;
-
-                // Claw Synergy: Atk on kill (Permanent)
-                // Removed silence check for synergy-based rewards
-                if (killer.synergies.includes('Claw') && this.getSynergyCountForUnit(killer, 'Claw') >= 2) {
-                    const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id);
-                    this.log(`${killer.name} 發動了磨爪！`);
-                    this.growUnit(killer, 0, 3, '磨爪', original, true);
-                }
 
                 // Check Silence for individual unit abilities
                 if (this.unitStates.get(killer)?.isSilenced) return;

@@ -1111,8 +1111,8 @@ function App() {
         // Actually, user spec says: "這 4 場中，每場會在對手畫面跳出從四天王中挑選。 前八勝階段... 這些館主將出現在一般對戰中供玩家挑戰"
         // Let's always show the opponent choice if we have a pool.
         const ALL_NPCS = npcPool.map(boss => ({ id: boss.id, name: boss.name, url: boss.url }));
-        const unseenNpCS = ALL_NPCS.filter(boss => !game.encounteredOpponentIds?.includes(boss.id));
-        const finalPool = unseenNpCS.length >= 3 ? unseenNpCS : ALL_NPCS;
+        const unseenNpCS = ALL_NPCS.filter(boss => !game.defeatedOpponentIds?.includes(boss.id));
+        const finalPool = unseenNpCS.length > 0 ? unseenNpCS : ALL_NPCS;
 
         const shuffled = [...finalPool].sort(() => 0.5 - Math.random());
         setOpponentChoices(shuffled.slice(0, 3));
@@ -1122,7 +1122,7 @@ function App() {
     const handleOpponentSelect = (opponent: { id?: string, name: string, url: string }) => {
         setSelectedOpponent(opponent as { id: string, name: string, url: string });
         if (opponent.id) {
-            game.encounteredOpponentIds.push(opponent.id);
+            game.currentOpponentId = opponent.id;
         }
         setShowOpponentSelect(false);
         game.startBattlePhase();

@@ -25,7 +25,8 @@ export class GameLoop {
     public shop: Shop;
     public difficultyMultiplier: number = 1.0;
     public difficultyScore: number = 1.0; // Dynamic difficulty tracker
-    public encounteredOpponentIds: string[] = [];
+    public defeatedOpponentIds: string[] = [];
+    public currentOpponentId: string | null = null;
 
     constructor() {
         this.shop = new Shop();
@@ -158,6 +159,9 @@ export class GameLoop {
     public endBattle(result: 'WIN' | 'LOSS' | 'DRAW') {
         this.lastResult = result;
         if (result === 'WIN') {
+            if (this.currentOpponentId) {
+                this.defeatedOpponentIds.push(this.currentOpponentId);
+            }
             this.wins++;
             if (this.wins === 4) {
                 this.lives++;
