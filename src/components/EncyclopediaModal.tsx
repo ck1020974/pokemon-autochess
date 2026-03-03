@@ -9,8 +9,12 @@ interface EncyclopediaModalProps {
     onClose: () => void;
 }
 
-// Map tier to text
-5: '菁英'
+const TIER_NAMES = {
+    1: '新手',
+    2: '初級',
+    3: '中級',
+    4: '高級',
+    5: '菁英'
 };
 
 // 顯式定義羈絆排序順序，確保排序邏輯萬無一失
