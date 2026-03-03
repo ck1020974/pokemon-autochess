@@ -1560,6 +1560,8 @@ export class BattleSimulator {
         await this.compactTeams();
 
         // 8. Victory Check with human-readable buffer
+        // Added a short additional wait to ensure all cascading death effects are resolved and visible
+        await this.delay(300);
         const result = this.getResult();
         if (result !== null) {
             // Before declaring victory, ensure we aren't mid-summoning
