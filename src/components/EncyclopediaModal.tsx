@@ -10,13 +10,27 @@ interface EncyclopediaModalProps {
 }
 
 // Map tier to text
-const TIER_NAMES = {
-    1: '新手',
-    2: '初級',
-    3: '中級',
-    4: '高級',
-    5: '菁英'
+5: '菁英'
 };
+
+// 顯式定義羈絆排序順序，確保排序邏輯萬無一失
+const SYNERGY_PRIORITY = [
+    'Starter',      // 御三家
+    'Normal',       // 守住
+    'Ghost',        // 詛咒
+    'Grass',        // 吸取
+    'Fire',         // 燃盡
+    'Water',        // 潮旋
+    'Triplets',     // 三胞胎
+    'Hard',         // 堅硬
+    'Cave',         // 挖洞
+    'Angry',        // 憤怒
+    'Snow',         // 降雪
+    'SwordDance',   // 劍舞
+    'Psychic'       // 念力
+];
+
+const ENCYCLOPEDIA_VERSION = '2026-03-04-0105'; // 版本標記，用於協助使用者確認是否為最新版
 
 export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
     const [activeTier, setActiveTier] = useState<number>(1);
@@ -50,11 +64,8 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
                     if (rankA !== rankB) return rankA - rankB;
                 }
 
-                // If neither are starters, sort by the highest priority synergy they possess
-                const synergyOrder = Object.keys(SYNERGIES);
-
                 const getBestSynergyIndex = (u: UnitTemplate) => {
-                    const indices = u.synergies.map(s => synergyOrder.indexOf(s)).filter(idx => idx !== -1);
+                    const indices = u.synergies.map(s => SYNERGY_PRIORITY.indexOf(s)).filter(idx => idx !== -1);
                     return indices.length > 0 ? Math.min(...indices) : 999;
                 };
 
@@ -120,7 +131,7 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
             <div className="encyclopedia-modal" onClick={e => e.stopPropagation()}>
                 {/* Header */}
                 <div className="encyclopedia-header">
-                    <h2 className="encyclopedia-title">📖 寶可夢圖鑑</h2>
+                    <h2 className="encyclopedia-title">📖 寶可夢圖鑑 <span style={{ fontSize: '0.8rem', opacity: 0.5, letterSpacing: 'normal' }}>v{ENCYCLOPEDIA_VERSION}</span></h2>
                     <button className="encyclopedia-close-btn" onClick={onClose}>×</button>
                 </div>
 
