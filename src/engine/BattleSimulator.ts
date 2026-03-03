@@ -1575,9 +1575,18 @@ export class BattleSimulator {
         const pAlive = this.playerTeam.some(u => u !== null && u.stats.hp > 0);
         const eAlive = this.enemyTeam.some(u => u !== null && u.stats.hp > 0);
 
-        if (!pAlive && !eAlive) return 'DRAW';
-        if (!pAlive) return 'LOSS';
-        if (!eAlive) return 'WIN';
+        if (!pAlive && !eAlive) {
+            console.log("Battle Result: DRAW (Both teams empty)");
+            return 'DRAW';
+        }
+        if (!pAlive) {
+            console.log("Battle Result: LOSS (Player team empty)");
+            return 'LOSS';
+        }
+        if (!eAlive) {
+            console.log("Battle Result: WIN (Enemy team empty)");
+            return 'WIN';
+        }
         return null;
     }
 
