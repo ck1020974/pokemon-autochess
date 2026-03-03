@@ -2,22 +2,20 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.95);
-    /* High opacity to block background info */
+    /* Use fixed for the overlay but absolute for content centering */
+    background: rgba(0, 0, 0, 0.88);
     backdrop-filter: blur(15px);
-    z-index: 20000;
-    /* Above everything including header (lives/gold) */
+    z-index: 10000;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0) 0;
+    /* Extra padding for mobile safe areas */
+    padding: env(safe-area-inset-top, 20px) 20px env(safe-area-inset-bottom, 20px);
     box-sizing: border-box;
-    overflow: hidden;
-    /* Prevent background scrolling */
+    overflow-y: auto;
+    /* Allow overlay scroll if modal is too tall */
     animation: fadeIn 0.3s ease-out forwards;
 }
 
