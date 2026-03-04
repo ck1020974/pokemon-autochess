@@ -451,7 +451,6 @@ export class BattleSimulator {
         // Grass: Lifesteal
         if (unit.synergies.includes('Grass')) {
             this.eventBus.on('AFTER_ATTACK', async (e) => {
-                if (this.unitStates.get(unit)?.isSilenced) return;
                 // Critical: Check HP AFTER attack completes to prevent dead units from healing
                 if (unit.stats.hp <= 0) return;
                 const { myTeam } = this.getTeams(unit);
@@ -469,7 +468,6 @@ export class BattleSimulator {
         // Water (Vortex): Reduce target attack before attack
         if (unit.synergies.includes('Water')) {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
-                if (this.unitStates.get(unit)?.isSilenced) return;
                 if (unit.stats.hp <= 0) return;
                 if (e.source === unit && e.target && e.target.stats.hp > 0) {
                     if (e.target.family === 'sneasel') {
@@ -548,7 +546,6 @@ export class BattleSimulator {
         // Fire: Atk Buff on Attack
         if (unit.synergies.includes('Fire')) {
             this.eventBus.on('BEFORE_ATTACK', (e) => {
-                if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
                     const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
@@ -560,7 +557,6 @@ export class BattleSimulator {
         // Angry: Atk on Hurt
         if (unit.synergies.includes('Angry')) {
             this.eventBus.on('ON_HURT', (e) => {
-                if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.target === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Angry');
                     const buff = count >= 3 ? 5 : (count >= 2 ? 3 : 0);
@@ -572,7 +568,7 @@ export class BattleSimulator {
         // SwordDance: Atk on Move
         if (unit.synergies.includes('SwordDance')) {
             this.eventBus.on('ON_MOVE', async (e) => {
-                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
+                if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'SwordDance');
                     const buff = count >= 3 ? 2 : (count >= 2 ? 1 : 0);
                     if (buff > 0) {
@@ -591,7 +587,7 @@ export class BattleSimulator {
         // Cave: Stat Buff on Move
         if (unit.synergies.includes('Cave')) {
             this.eventBus.on('ON_MOVE', async (e) => {
-                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
+                if (e.source === unit) {
                     if (this.getSynergyCountForUnit(unit, 'Cave') >= 2) {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, 2, 0, '挖洞', original, false);
