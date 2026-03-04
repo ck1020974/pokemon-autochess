@@ -429,9 +429,9 @@ export class HeadlessBattleSimulator {
             });
             this.eventBus.on('ON_HURT', async (e) => {
                 if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = e.context.amount;
-                    if (amount > 0) {
-                        await this.dealDamage(unit, e.source, amount, false);
+                    if (!e.context.isSkillDamage && e.context.amount > 0) {
+                        const reflectDmg = Math.ceil(e.context.amount * 2.0); // Unified to 200% reflect
+                        await this.dealDamage(unit, e.source, reflectDmg, true);
                     }
                 }
             });
@@ -795,7 +795,7 @@ export class HeadlessBattleSimulator {
             targetState.hardUsed = true;
             this.unitStates.set(target, targetState);
         }
-        await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount } });
+        await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount, isSkillDamage } });
         if (target.stats.hp <= 0) {
             await this.handleDeath(target, source || undefined);
         }

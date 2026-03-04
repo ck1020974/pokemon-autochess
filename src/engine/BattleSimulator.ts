@@ -653,15 +653,14 @@ export class BattleSimulator {
                 }
             });
 
-            // Reflect 200% of incoming damage
+            // Reflect 200% of incoming BASIC damage
             this.eventBus.on('ON_HURT', async (e) => {
                 if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = e.context.amount;
-                    if (amount > 0) {
-                        const reflectDmg = Math.ceil(amount * 2.0); // 200% reflect
+                    if (!e.context.isSkillDamage && e.context.amount > 0) {
+                        const reflectDmg = Math.ceil(e.context.amount * 2.0); // 200% reflect
                         this.log(`${unit.name} 反彈了 ${reflectDmg} 點傷害！`);
                         this.playAnimation(unit, 'jump', 200);
-                        await this.dealDamage(unit, e.source, reflectDmg, false, true);
+                        await this.dealDamage(unit, e.source, reflectDmg, true, true);
                     }
                 }
             });
@@ -1211,7 +1210,7 @@ export class BattleSimulator {
         }
 
         // Emit ON_HURT for triggers (like Steelix reflection) before checking survival effects
-        await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount } });
+        await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount, isSkillDamage } });
 
         if (target.stats.hp <= 0 && !isBypassing && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2 && !targetState.hardUsed) {
             target.stats.hp = 1;
