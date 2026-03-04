@@ -17,6 +17,10 @@ export const NOVICE_OPPONENTS: OpponentDefinition[] = [
     { id: 'novice_8', name: '琴音', url: 'gym/琴音.webp', coreUnits: ['chikorita'] },
     { id: 'novice_9', name: '青綠', url: 'gym/青綠01.webp', coreUnits: ['charmander', 'rattata'] },
     { id: 'novice_10', name: '松葉', url: 'gym/松葉.webp', coreUnits: ['shuppet', 'drifloon', 'gastly'] },
+    { id: 'novice_11', name: '杜娟', url: 'gym/杜娟.webp', coreUnits: ['dwebble', 'dwebble', 'diglett'] },
+    { id: 'novice_12', name: '藤樹', url: 'gym/藤樹.webp', coreUnits: ['mankey', 'mankey', 'mankey'] },
+    { id: 'novice_13', name: '馬志士', url: 'gym/馬志士.webp', coreUnits: ['magnemite', 'magnemite', 'magnemite'] },
+    { id: 'novice_14', name: '菜種', url: 'gym/菜種.webp', coreUnits: ['bulbasaur', 'bulbasaur', 'bulbasaur'] },
 ];
 
 export const INTERM_OPPONENTS: OpponentDefinition[] = [
@@ -32,6 +36,7 @@ export const INTERM_OPPONENTS: OpponentDefinition[] = [
     { id: 'interm_10', name: '莉佳', url: 'gym/莉佳.webp', coreUnits: ['bulbasaur', 'chikorita', 'snover'] },
     { id: 'interm_11', name: '亞堤', url: 'gym/亞堤.webp', coreUnits: ['dwebble', 'dwebble', 'pinsir', 'heracross'] },
     { id: 'interm_12', name: '希特隆', url: 'gym/希特隆.webp', coreUnits: ['magnemite', 'magnemite', 'magnemite', 'doduo', 'diglett'] },
+    { id: 'interm_13', name: '阿筆', url: 'gym/阿筆.webp', coreUnits: ['pinsir', 'heracross', 'dwebble', 'dwebble'] },
 ];
 
 export const ADVANCED_OPPONENTS: OpponentDefinition[] = [
@@ -65,6 +70,8 @@ export const ELITE_OPPONENTS: OpponentDefinition[] = [
     { id: 'elite_13', name: '大葉', url: 'elitefour/大葉.webp', coreUnits: ['drifloon', 'onix', 'torchic', 'houndour', 'fuecoco'] },
     { id: 'elite_14', name: '小剛', url: 'gym/小剛03.webp', coreUnits: ['mudkip', 'diglett', 'dwebble', 'onix', 'onix'] },
     { id: 'elite_15', name: '小霞', url: 'gym/小霞03.webp', coreUnits: ['mudkip', 'squirtle', 'slowpoke', 'totodile', 'quaxly'] },
+    { id: 'elite_16', name: '赤焰松', url: 'elitefour/赤焰松.webp', coreUnits: ['houndour', 'shuppet', 'torchic', 'charmander', 'fuecoco'] },
+    { id: 'elite_17', name: '水梧桐', url: 'elitefour/水梧桐.webp', coreUnits: ['totodile', 'sneasel', 'mudkip', 'squirtle', 'quaxly'] },
 ];
 
 export const CHAMPION_OPPONENTS: OpponentDefinition[] = [
