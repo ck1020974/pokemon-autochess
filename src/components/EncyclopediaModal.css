@@ -1,19 +1,13 @@
 .encyclopedia-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    /* Rendered inside #modal-root which is position:fixed;top:0;left:0;100vw;100vh */
+    /* Use absolute so it fills the portal container predictably */
+    position: absolute;
     inset: 0;
-    margin: 0;
     width: 100%;
     height: 100%;
-    max-width: none;
-    /* Override body flex centering when rendered via React Portal */
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    z-index: 999999;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -21,7 +15,6 @@
     padding: env(safe-area-inset-top, 20px) 20px env(safe-area-inset-bottom, 20px);
     box-sizing: border-box;
     overflow-y: auto;
-    /* Allow overlay scroll if modal is too tall */
     animation: fadeIn 0.3s ease-out forwards;
 }
 
