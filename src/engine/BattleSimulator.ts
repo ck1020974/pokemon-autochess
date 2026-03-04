@@ -655,12 +655,12 @@ export class BattleSimulator {
 
             // Reflect 200% of incoming BASIC damage
             this.eventBus.on('ON_HURT', async (e) => {
-                if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
+                if (e.target === unit && e.context.source && e.context.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     if (!e.context.isSkillDamage && e.context.amount > 0) {
-                        const reflectDmg = Math.ceil(e.context.amount * 2.0); // 200% reflect
+                        const reflectDmg = Math.ceil(e.context.amount * 1.0); // 100% reflect
                         this.log(`${unit.name} 反彈了 ${reflectDmg} 點傷害！`);
                         this.playAnimation(unit, 'jump', 200);
-                        await this.dealDamage(unit, e.source, reflectDmg, true, true);
+                        await this.dealDamage(unit, e.context.source, reflectDmg, true, true);
                     }
                 }
             });

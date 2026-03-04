@@ -81,7 +81,7 @@ export class HeadlessBattleSimulator {
         await this.applyBattleStartSynergies(this.playerTeam.filter(u => u !== null));
         await this.applyBattleStartSynergies(this.enemyTeam.filter(u => u !== null));
 
-        this.compactTeams();
+        await this.compactTeams();
         await this.eventBus.emit({ type: 'BATTLE_START', context: { simulator: this } });
     }
 
@@ -90,6 +90,7 @@ export class HeadlessBattleSimulator {
         const clone = new Unit(template);
         clone.stats = { ...unit.stats };
         clone.level = unit.level;
+        clone.id = unit.id; // CRITICAL FIX: Preserve ID for permanent growth
         clone.synergies = [...unit.synergies];
         clone.family = unit.family;
         // Cap stats like in main simulator
@@ -217,7 +218,7 @@ export class HeadlessBattleSimulator {
                     this.unitStates.set(front, fState);
                     front.stats.hp = 0;
                     await this.eventBus.emit({ type: 'AFTER_DEATH', source: front, context: { killer: unit } });
-                    this.compactTeams();
+                    await this.compactTeams();
                 }
             }
         }
@@ -388,12 +389,11 @@ export class HeadlessBattleSimulator {
             });
         }
         if (unit.synergies.includes('Cave')) {
-            this.eventBus.on('ON_MOVE', (e) => {
+            this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
                     if (this.getSynergyCountForUnit(unit, 'Cave') >= 2) {
-                        this.growUnit(unit, 2, 0);
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
-                        if (original) original.addGrowth(2, 0);
+                        this.growUnit(unit, 2, 0, original);
                     }
                 }
             });
@@ -422,16 +422,16 @@ export class HeadlessBattleSimulator {
                     if (idx !== -1 && idx < myTeam.length - 1) {
                         myTeam.splice(idx, 1);
                         myTeam.push(unit);
-                        this.compactTeams();
+                        await this.compactTeams();
                         await this.eventBus.emit({ type: 'ON_MOVE', source: unit, context: {} });
                     }
                 }
             });
             this.eventBus.on('ON_HURT', async (e) => {
-                if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
+                if (e.target === unit && e.context.source && e.context.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     if (!e.context.isSkillDamage && e.context.amount > 0) {
-                        const reflectDmg = Math.ceil(e.context.amount * 2.0); // Unified to 200% reflect
-                        await this.dealDamage(unit, e.source, reflectDmg, true);
+                        const reflectDmg = Math.ceil(e.context.amount * 1.0); // 100% reflect
+                        await this.dealDamage(unit, e.context.source, reflectDmg, true);
                     }
                 }
             });
@@ -514,7 +514,7 @@ export class HeadlessBattleSimulator {
                         await this.spawnUnit(currentTeam, deathIdx + i, 'sprout', 1, 1, 1, true);
                     }
                 }
-                this.compactTeams();
+                await this.compactTeams();
             });
         }
         if (unit.family === 'rattata' && unit.templateId !== 'mouse') {
@@ -534,7 +534,7 @@ export class HeadlessBattleSimulator {
                     const { myTeam: currentTeam } = this.getTeams(unit);
                     await this.spawnUnit(currentTeam, deathIdx + i, 'mouse', 1, stats, stats, true);
                 }
-                this.compactTeams();
+                await this.compactTeams();
             });
         }
         if (unit.family === 'shuppet') {
@@ -712,7 +712,7 @@ export class HeadlessBattleSimulator {
                     const behind = defTeam[idx + 1];
                     defTeam[idx] = behind!;
                     defTeam[idx + 1] = defender;
-                    this.compactTeams();
+                    await this.compactTeams();
                     await Promise.all([
                         this.eventBus.emit({ type: 'ON_MOVE', source: defender, context: {} }),
                         this.eventBus.emit({ type: 'ON_MOVE', source: behind!, context: {} })
@@ -842,7 +842,7 @@ export class HeadlessBattleSimulator {
                 else this.growUnit(killer, buff, 0);
             }
         }
-        this.compactTeams();
+        await this.compactTeams();
     }
 
     private async compactTeams() {
@@ -850,6 +850,11 @@ export class HeadlessBattleSimulator {
         [...this.playerTeam, ...this.enemyTeam].forEach((u, i) => { if (u) oldPos.set(u.id, i); });
         this.playerTeam = this.compactTeam(this.playerTeam);
         this.enemyTeam = this.compactTeam(this.enemyTeam);
+
+        // Update synergy cache after team changes (units dying or moving)
+        this.calculateCachedSynergies(this.playerTeam.filter(u => u !== null), this.playerSynergies);
+        this.calculateCachedSynergies(this.enemyTeam.filter(u => u !== null), this.enemySynergies);
+
         const allUnits = [...this.playerTeam, ...this.enemyTeam];
         for (let i = 0; i < allUnits.length; i++) {
             const u = allUnits[i];

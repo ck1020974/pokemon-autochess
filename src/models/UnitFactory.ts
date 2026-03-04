@@ -370,19 +370,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'onix', name: '大岩蛇', tier: 4, family: 'onix',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/大岩蛇00.webp', battleImageUrl: 'assets/大岩蛇01.webp',
-        description: '攻擊後，移動至隊伍最後方；反彈 200% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix'
+        description: '攻擊後，移動至隊伍最後方；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix'
     },
     steelix: {
         id: 'steelix', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '攻擊後，移動至隊伍最後方；反彈 200% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
+        description: '攻擊後，移動至隊伍最後方；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
     },
     steelix_final: {
         id: 'steelix_final', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '攻擊後，移動至隊伍最後方；反彈 200% 所受傷害。', synergies: ['Cave', 'Hard'], isHiddenFromShop: true
+        description: '攻擊後，移動至隊伍最後方；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], isHiddenFromShop: true
     },
 
     // 20. Doduo
