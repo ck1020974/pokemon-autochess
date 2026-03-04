@@ -1325,15 +1325,6 @@ function App() {
                 </div>
             )}
 
-            {showEncyclopedia && (
-                <EncyclopediaModal onClose={() => {
-                    setShowEncyclopedia(false);
-                    if (tutorialStep === 11) {
-                        setTutorialStep(12);
-                    }
-                }} />
-            )}
-
             {showTutorial && difficulty !== null && <TutorialModal onClose={() => setShowTutorial(false)} onStartTutorial={startTutorial} />}
 
             {/* Tutorial Message Box / Mask (Steps 1-11) */}
@@ -1627,10 +1618,6 @@ function App() {
                             className="mute-toggle-btn-header"
                             onClick={() => {
                                 if (game.phase === GamePhase.BATTLE) return;
-                                if (tutorialStep > 0) {
-                                    triggerShake();
-                                    return;
-                                }
                                 setShowEncyclopedia(true);
                             }}
                             title="圖鑑"
@@ -2185,6 +2172,16 @@ function App() {
                     </div>
                 )
             }
+
+            {/* Modal should be rendered at the very end of the DOM to ensure highest physical layering context */}
+            {showEncyclopedia && (
+                <EncyclopediaModal onClose={() => {
+                    setShowEncyclopedia(false);
+                    if (tutorialStep === 11) {
+                        setTutorialStep(12);
+                    }
+                }} />
+            )}
         </div >
     );
 }
