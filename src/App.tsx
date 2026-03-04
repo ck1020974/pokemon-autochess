@@ -2183,6 +2183,9 @@ function App() {
                     </div>
                 )
             }
+            {showEncyclopedia && (
+                <EncyclopediaModal onClose={() => setShowEncyclopedia(false)} />
+            )}
         </div >
     );
 }

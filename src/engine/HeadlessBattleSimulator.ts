@@ -378,19 +378,12 @@ export class HeadlessBattleSimulator {
             });
         }
         if (unit.synergies.includes('Cave')) {
-            this.eventBus.on('AFTER_ATTACK', async (e) => {
-                const s = this.unitStates.get(unit);
-                if (s?.isSilenced || unit.stats.hp <= 0) return;
-                if (e.source === unit && this.getSynergyCountForUnit(unit, 'Cave') >= 2) {
-                    const { myTeam } = this.getTeams(unit);
-                    const aliveCount = myTeam.filter(u => u && u.stats.hp > 0).length;
-                    if (aliveCount <= 1) return;
-                    const idx = myTeam.indexOf(unit);
-                    if (idx !== -1 && idx < myTeam.length - 1) {
-                        myTeam.splice(idx, 1);
-                        myTeam.push(unit);
-                        this.compactTeams();
-                        await this.eventBus.emit({ type: 'ON_MOVE', source: unit, context: {} });
+            this.eventBus.on('ON_MOVE', (e) => {
+                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
+                    if (this.getSynergyCountForUnit(unit, 'Cave') >= 2) {
+                        this.growUnit(unit, 2, 0);
+                        const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
+                        if (original) original.addGrowth(2, 0);
                     }
                 }
             });
@@ -408,21 +401,27 @@ export class HeadlessBattleSimulator {
             });
         }
         if (unit.family === 'onix') {
-            this.eventBus.on('ON_MOVE', (e) => {
-                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = 3;
-                    this.growUnit(unit, amount, 0);
-                    const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
-                    if (original) original.addGrowth(amount, 0);
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (s?.isSilenced || unit.stats.hp <= 0) return;
+                if (e.source === unit) {
+                    const { myTeam } = this.getTeams(unit);
+                    const aliveCount = myTeam.filter(u => u && u.stats.hp > 0).length;
+                    if (aliveCount <= 1) return;
+                    const idx = myTeam.indexOf(unit);
+                    if (idx !== -1 && idx < myTeam.length - 1) {
+                        myTeam.splice(idx, 1);
+                        myTeam.push(unit);
+                        this.compactTeams();
+                        await this.eventBus.emit({ type: 'ON_MOVE', source: unit, context: {} });
+                    }
                 }
             });
             this.eventBus.on('ON_HURT', async (e) => {
                 if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     const amount = e.context.amount;
                     if (amount > 0) {
-                        const multiplier = unit.templateId === 'onix' ? 0.5 : 1.0;
-                        const reflectDmg = Math.ceil(amount * multiplier);
-                        await this.dealDamage(unit, e.source, reflectDmg, false);
+                        await this.dealDamage(unit, e.source, amount, false);
                     }
                 }
             });
@@ -528,15 +527,17 @@ export class HeadlessBattleSimulator {
             });
         }
         if (unit.family === 'shuppet') {
-            this.eventBus.on('AFTER_DEATH', async (e) => {
+            this.eventBus.on('ON_HURT', async (e) => {
                 const s = this.unitStates.get(unit);
-                if (s?.isSilenced || e.source !== unit) return;
-                const { opTeam } = this.getTeams(unit);
-                const living = opTeam.filter(u => u && u.stats.hp > 0);
-                if (living.length > 0) {
-                    const target = living[Math.floor(Math.random() * living.length)];
-                    const dmg = [0, 4, 10, 99][unit.level] || 4;
-                    await this.dealDamage(unit, target, dmg, true);
+                if (s?.isSilenced) return;
+                if (e.target === unit) {
+                    const { opTeam } = this.getTeams(unit);
+                    const living = opTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const target = living[Math.floor(Math.random() * living.length)];
+                        const dmg = [0, 4, 10, 99][unit.level] || 4;
+                        await this.dealDamage(unit, target, dmg, true);
+                    }
                 }
             });
         }
@@ -783,10 +784,9 @@ export class HeadlessBattleSimulator {
             targetState.hardUsed = true;
             this.unitStates.set(target, targetState);
         }
+        await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount } });
         if (target.stats.hp <= 0) {
             await this.handleDeath(target, source || undefined);
-        } else {
-            await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount } });
         }
     }
 

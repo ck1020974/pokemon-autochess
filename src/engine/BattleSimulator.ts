@@ -405,18 +405,8 @@ export class BattleSimulator {
 
     private async applyBattleStartSynergies(team: Unit[]) {
         if (team.length === 0) return;
-        if (this.getSynergyCountForUnit(team[0], 'Triplets') >= 3) {
-            team.filter((u: Unit) => u && u.synergies.includes('Triplets')).forEach(u => {
-                this.growUnit(u, 3, 3, 'Triplets', null, true);
-            });
-        }
-        if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
-            team.filter((u: Unit) => u && u.synergies.includes('Starter')).forEach(u => {
-                const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
-                this.growUnit(u, 1, 1, 'Starter', original, true);
-            });
-        }
 
+        // Triplets and Starter synergies have been moved to End of Prep phase
     }
 
     private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string, permanentTarget?: Unit | null, silent: boolean = false) {
@@ -600,25 +590,13 @@ export class BattleSimulator {
             // No trigger logic needed here, handled as constant battle-start effect in Simulator
         }
 
-        // Cave: Move to Back
+        // Cave: Stat Buff on Move
         if (unit.synergies.includes('Cave')) {
-            this.eventBus.on('AFTER_ATTACK', async (e) => {
-                if (this.unitStates.get(unit)?.isSilenced) return;
-                if (e.source === unit && unit.stats.hp > 0) {
+            this.eventBus.on('ON_MOVE', async (e) => {
+                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
                     if (this.getSynergyCountForUnit(unit, 'Cave') >= 2) {
-                        const { myTeam } = this.getTeams(unit);
-                        const aliveCount = myTeam.filter(u => u && u.stats.hp > 0).length;
-                        if (aliveCount <= 1) return; // Don't move if alone
-
-                        const idx = myTeam.indexOf(unit);
-                        if (idx !== -1 && idx < myTeam.length - 1) {
-                            myTeam.splice(idx, 1); // Properly remove from current spot
-                            myTeam.push(unit); // Move to the end
-                            this.log(`${unit.name} 發動了挖洞！`);
-                            await this.compactTeams();
-                            await this.delay(250);
-                            await this.eventBus.emit({ type: 'ON_MOVE', source: unit, context: {} });
-                        }
+                        const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
+                        this.growUnit(unit, 2, 0, '挖洞', original, false);
                     }
                 }
             });
@@ -639,6 +617,40 @@ export class BattleSimulator {
                         }
                         state.slowpokeHealUsed = true;
                         this.unitStates.set(unit, state);
+                    }
+                }
+            });
+        }
+
+        // Onix: Reflect Damage and Move to Back
+        if (unit.family === 'onix') {
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
+                if (this.unitStates.get(unit)?.isSilenced) return;
+                if (e.source === unit && unit.stats.hp > 0) {
+                    const { myTeam } = this.getTeams(unit);
+                    const aliveCount = myTeam.filter(u => u && u.stats.hp > 0).length;
+                    if (aliveCount <= 1) return; // Don't move if alone
+
+                    const idx = myTeam.indexOf(unit);
+                    if (idx !== -1 && idx < myTeam.length - 1) {
+                        myTeam.splice(idx, 1);
+                        myTeam.push(unit);
+                        this.log(`${unit.name} 攻擊後退居後排！`);
+                        await this.compactTeams();
+                        await this.delay(250);
+                        await this.eventBus.emit({ type: 'ON_MOVE', source: unit, context: {} });
+                    }
+                }
+            });
+
+            this.eventBus.on('ON_HURT', async (e) => {
+                if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
+                    const amount = e.context.amount;
+                    if (amount > 0) {
+                        const reflectDmg = amount; // 100% reflect
+                        this.log(`${unit.name} 反彈了 ${reflectDmg} 點傷害！`);
+                        this.playAnimation(unit, 'jump', 200);
+                        await this.dealDamage(unit, e.source, reflectDmg, false, true); // true for silent log if want to skip regular hurt log
                     }
                 }
             });
@@ -855,7 +867,7 @@ export class BattleSimulator {
         if (unit.family === 'shuppet') {
             this.eventBus.on('ON_HURT', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
-                if (e.target === unit && unit.stats.hp > 0) {
+                if (e.target === unit) {
                     const { opTeam } = this.getTeams(unit);
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {

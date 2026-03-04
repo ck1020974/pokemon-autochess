@@ -133,6 +133,37 @@ export class GameLoop {
             });
         }
 
+        // Starter (3): Every Starter unit -> +1 Attack & HP Permanent
+        const starterUnits = this.playerTeam.filter(u => u && u.synergies.includes('Starter')) as Unit[];
+        const starterCount = getUniqueCount(starterUnits);
+        if (starterCount >= 3) {
+            starterUnits.forEach(u => {
+                applyBuff(u, 1, 'hp', 'Starter');
+                applyBuff(u, 1, 'atk', 'Starter');
+            });
+        }
+
+        // Triplets (3): Weakest Triplet (lowest combined attack & hp) -> +3 Attack & HP Permanent
+        const tripletsUnits = this.playerTeam.filter(u => u && u.synergies.includes('Triplets')) as Unit[];
+        const tripletsCount = getUniqueCount(tripletsUnits);
+        if (tripletsCount >= 3) {
+            let weakestTriplet: Unit | null = null;
+            let lowestStats = Infinity;
+
+            tripletsUnits.forEach(u => {
+                const totalStats = u.stats.attack + u.stats.hp;
+                if (totalStats < lowestStats) {
+                    lowestStats = totalStats;
+                    weakestTriplet = u;
+                }
+            });
+
+            if (weakestTriplet) {
+                applyBuff(weakestTriplet, 3, 'hp', 'Triplets');
+                applyBuff(weakestTriplet, 3, 'atk', 'Triplets');
+            }
+        }
+
         // --- Individual Unit End-of-Prep Abilities ---
         this.playerTeam.forEach(u => {
             if (!u) return;
