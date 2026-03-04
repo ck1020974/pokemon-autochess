@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 // Last updated: 2026-02-20 - Orientation Optimization Phase 4
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
@@ -2174,13 +2175,14 @@ function App() {
             }
 
             {/* Modal should be rendered at the very end of the DOM to ensure highest physical layering context */}
-            {showEncyclopedia && (
+            {showEncyclopedia && createPortal(
                 <EncyclopediaModal onClose={() => {
                     setShowEncyclopedia(false);
                     if (tutorialStep === 11) {
                         setTutorialStep(12);
                     }
-                }} />
+                }} />,
+                document.body
             )}
         </div >
     );
