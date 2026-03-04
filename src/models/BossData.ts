@@ -53,16 +53,18 @@ export const ELITE_OPPONENTS: OpponentDefinition[] = [
     { id: 'elite_1', name: '竹蘭', url: 'champion/竹蘭.webp', coreUnits: ['spiritomb', 'sneasel', 'snover', 'mimikyu', 'gastly'] },
     { id: 'elite_2', name: '卡露妮', url: 'champion/卡露妮.webp', coreUnits: ['ralts', 'natu', 'slowpoke', 'igglybuff', 'mrmime'] },
     { id: 'elite_3', name: '阿渡', url: 'champion/阿渡.webp', coreUnits: ['doduo', 'magnemite', 'diglett', 'charmander', 'onix'] },
-    { id: 'elite_4', name: '大吾', url: 'champion/大吾.webp', coreUnits: ['dwebble', 'onix', 'mudkip', 'torchic', 'sableye'] },
+    { id: 'elite_4', name: '大吾', url: 'champion/大吾.webp', coreUnits: ['dwebble', 'onix', 'mudkip', 'magnemite', 'sableye'] },
     { id: 'elite_5', name: '赤紅', url: 'champion/赤紅.webp', coreUnits: ['charmander', 'squirtle', 'bulbasaur', 'slowpoke', 'farfetchd'] },
     { id: 'elite_6', name: '丹帝', url: 'champion/丹帝.webp', coreUnits: ['charmander', 'gastly', 'heracross', 'pinsir', 'drifloon'] },
     { id: 'elite_7', name: '小智', url: 'champion/小智.webp', coreUnits: ['farfetchd', 'treecko', 'gastly', 'mrmime', 'charmander'] },
     { id: 'elite_8', name: '柯拿', url: 'elitefour/科拿.webp', coreUnits: ['slowpoke', 'snover', 'sneasel', 'squirtle', 'quaxly'] },
     { id: 'elite_9', name: '希巴', url: 'elitefour/希巴.webp', coreUnits: ['mankey', 'onix', 'onix', 'heracross', 'pinsir'] },
     { id: 'elite_10', name: '菊子', url: 'elitefour/菊子.webp', coreUnits: ['gastly', 'shuppet', 'gastly', 'mimikyu', 'drifloon'] },
-    { id: 'elite_11', name: '梨花', url: 'elitefour/梨花.webp', coreUnits: ['spiritomb', 'houndour', 'sneasel', 'gastly', 'drifloon'] },
+    { id: 'elite_11', name: '梨花', url: 'elitefour/梨花.webp', coreUnits: ['spiritomb', 'houndour', 'sneasel', 'gastly', 'houndour'] },
     { id: 'elite_12', name: '阿柳', url: 'elitefour/阿柳.webp', coreUnits: ['bulbasaur', 'chikorita', 'heracross', 'pinsir', 'dwebble'] },
     { id: 'elite_13', name: '大葉', url: 'elitefour/大葉.webp', coreUnits: ['drifloon', 'onix', 'torchic', 'houndour', 'fuecoco'] },
+    { id: 'elite_14', name: '小剛', url: 'gym/小剛03.webp', coreUnits: ['mudkip', 'diglett', 'dwebble', 'onix', 'onix'] },
+    { id: 'elite_15', name: '小霞', url: 'gym/小霞03.webp', coreUnits: ['mudkip', 'squirtle', 'slowpoke', 'totodile', 'quaxly'] },
 ];
 
 export const CHAMPION_OPPONENTS: OpponentDefinition[] = [
