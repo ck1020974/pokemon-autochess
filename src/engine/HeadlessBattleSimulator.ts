@@ -325,7 +325,7 @@ export class HeadlessBattleSimulator {
                 if (s?.isSilenced || unit.stats.hp <= 0) return;
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && e.source !== unit && myTeam.includes(e.source)) {
-                    const buff = [0, 2, 4, 6][unit.level] || 2;
+                    const buff = [0, 1, 2, 5][unit.level] || 1;
                     this.growUnit(unit, buff, buff);
                 }
             });
@@ -440,11 +440,13 @@ export class HeadlessBattleSimulator {
                 // Ensure unit is still alive and in the team array (not replaced by null)
                 if (unit.stats.hp <= 0 || s?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const atkBuff = [0, 0, 1, 2][unit.level] || 0;
-                    const hpBuff = [0, 1, 1, 2][unit.level] || 1;
-                    for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, hpBuff, atkBuff, original, true);
+                    const hpBuff = [0, 3, 6, 10][unit.level] || 3;
+                    // Buff one random living ally
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const target = living[Math.floor(Math.random() * living.length)];
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                        this.growUnit(target, hpBuff, 0, original, true);
                     }
                 }
             });
@@ -455,11 +457,13 @@ export class HeadlessBattleSimulator {
                 // Ensure unit is still alive and in the team array
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const atkBuff = [0, 1, 1, 2][unit.level] || 1;
-                    const hpBuff = [0, 0, 1, 2][unit.level] || 0;
-                    for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, hpBuff, atkBuff, original, true);
+                    const atkBuff = [0, 3, 6, 10][unit.level] || 3;
+                    // Buff one random living ally
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const target = living[Math.floor(Math.random() * living.length)];
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                        this.growUnit(target, 0, atkBuff, original, true);
                     }
                 }
             });
@@ -470,16 +474,13 @@ export class HeadlessBattleSimulator {
                 // Ensure unit is still alive and in the team array
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        if (unit.level === 1) {
-                            const isAtk = Math.random() < 0.5;
-                            this.growUnit(ally, isAtk ? 0 : 1, isAtk ? 1 : 0, original, true);
-                        } else if (unit.level === 2) {
-                            this.growUnit(ally, 1, 1, original, true);
-                        } else {
-                            this.growUnit(ally, 2, 2, original, true);
-                        }
+                    // Buff one random living ally
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const target = living[Math.floor(Math.random() * living.length)];
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                        const buff = [0, 1, 3, 5][unit.level] || 1;
+                        this.growUnit(target, buff, buff, original, true);
                     }
                 }
             });

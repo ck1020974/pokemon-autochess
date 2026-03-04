@@ -498,7 +498,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 // Trigger when ANY OTHER ally attacks
                 if (e.source && e.source !== unit && myTeam.includes(e.source)) {
-                    const buffAmount = [0, 1, 3, 5][unit.level] || 1;
+                    const buffAmount = [0, 1, 2, 5][unit.level] || 1;
                     await this.delay(150); // Delay for visual pacing
                     await this.notifySkill(unit, `發動了健美！`);
                     await this.playAnimation(unit, 'jump', 200);
@@ -577,7 +577,7 @@ export class BattleSimulator {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
                     const count = this.getSynergyCountForUnit(unit, 'SwordDance');
-                    const buff = count >= 3 ? 3 : (count >= 2 ? 2 : 0);
+                    const buff = count >= 3 ? 2 : (count >= 2 ? 1 : 0);
                     if (buff > 0) {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, 0, buff, '劍舞', original, false);
@@ -728,8 +728,7 @@ export class BattleSimulator {
                 // Ensure unit is still alive and in the team array (not replaced by null)
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const atkBuff = [0, 0, 1, 2][unit.level] || 0;
-                    const hpBuff = [0, 1, 1, 2][unit.level] || 1;
+                    const hpBuff = [0, 3, 6, 10][unit.level] || 3;
                     const now = Date.now();
                     const state = this.unitStates.get(unit) || {};
                     const lastGlow = state.lastGlobalGlowTime || 0;
@@ -748,23 +747,25 @@ export class BattleSimulator {
                         this.playTeamAnimation(myTeam, 'glow-pale-red', 1000);
                     }
 
-                    for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, hpBuff, atkBuff, '呆火鱷技能強化', original, true);
+                    // Buff one random living ally
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const target = living[Math.floor(Math.random() * living.length)];
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                        this.growUnit(target, hpBuff, 0, '呆火鱷技能強化', original, true);
                     }
                 }
             });
         }
 
-        // Quaxly: Friendly Kill -> All Perm HP
+        // Quaxly: Friendly Kill -> Random Ally Perm ATK
         if (unit.family === 'quaxly') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const { myTeam } = this.getTeams(unit);
                 // Ensure unit is still alive and in the team array
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const atkBuff = [0, 1, 1, 2][unit.level] || 1;
-                    const hpBuff = [0, 0, 1, 2][unit.level] || 0;
+                    const atkBuff = [0, 3, 6, 10][unit.level] || 3;
                     const now = Date.now();
                     const state = this.unitStates.get(unit) || {};
                     const lastGlow = state.lastGlobalGlowTime || 0;
@@ -781,9 +782,12 @@ export class BattleSimulator {
                         this.notifySkill(unit, `發動了流水旋舞！`);
                         this.playTeamAnimation(myTeam, 'glow-pale-blue', 1000);
                     }
-                    for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, hpBuff, atkBuff, '潤水鴨技能強化', original, true);
+                    // Buff one random living ally
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const target = living[Math.floor(Math.random() * living.length)];
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                        this.growUnit(target, 0, atkBuff, '潤水鴨技能強化', original, true);
                     }
                 }
             });
@@ -965,7 +969,7 @@ export class BattleSimulator {
 
         // Ralts Family: Logic moved to performAttack to prevent double attack bug (and nerf damage)
 
-        // Sprigatito Family: Gain stats on Summon for All
+        // Sprigatito Family: Buff one random ally on Summon
         if (unit.family === 'sprigatito') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 const { myTeam } = this.getTeams(unit);
@@ -988,16 +992,13 @@ export class BattleSimulator {
                         this.notifySkill(unit, `發動了千變萬花！`);
                         this.playTeamAnimation(myTeam, 'glow-pale-green', 1000);
                     }
-                    for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        if (unit.level === 1) {
-                            const isAtk = Math.random() < 0.5;
-                            this.growUnit(ally, isAtk ? 0 : 1, isAtk ? 1 : 0, '新葉喵技能強化', original, true);
-                        } else if (unit.level === 2) {
-                            this.growUnit(ally, 1, 1, '新葉喵技能強化', original, true);
-                        } else {
-                            this.growUnit(ally, 2, 2, '新葉喵技能強化', original, true);
-                        }
+                    // Buff one random living ally
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const target = living[Math.floor(Math.random() * living.length)];
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                        const buff = [0, 1, 3, 5][unit.level] || 1;
+                        this.growUnit(target, buff, buff, '新葉喵技能強化', original, true);
                     }
                 }
             });
@@ -1135,7 +1136,7 @@ export class BattleSimulator {
                         this.log(isPlayer ? "敵方受到了預知未來的攻擊！" : "我方受到了預知未來的攻擊！");
                         const targets = isPlayer ? this.enemyTeam : this.playerTeam;
                         const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
-                        const dmg = 2 + (isPlayer ? this.playerWins : 0);
+                        const dmg = Math.ceil((2 + (isPlayer ? this.playerWins : 0)) * 1.5);
                         for (const target of livingEnemies) {
                             await this.dealDamage(null, target, dmg, true, true);
                         }
