@@ -294,6 +294,21 @@ export class HeadlessBattleSimulator {
     }
 
     private registerUnitAbilities(unit: Unit) {
+        if (unit.synergies.includes('Fire')) {
+            this.eventBus.on('BEFORE_ATTACK', (e) => {
+                const s = this.unitStates.get(unit);
+                if (s?.isSilenced) return;
+                if (e.source === unit) {
+                    const count = this.getSynergyCountForUnit(unit, 'Fire');
+                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                    if (buff > 0 && unit.stats.hp > 1) {
+                        unit.stats.hp -= 1;
+                        this.buffAttack(unit, buff);
+                    }
+                }
+            });
+        }
+
         if (unit.synergies.includes('Grass')) {
             this.eventBus.on('AFTER_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
@@ -312,7 +327,7 @@ export class HeadlessBattleSimulator {
                 if (s?.isSilenced || unit.stats.hp <= 0) return;
                 if (e.source === unit && e.target && e.target.stats.hp > 0 && e.target.family !== 'sneasel') {
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const debuff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                    const debuff = count >= 4 ? 4 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
                     if (debuff > 0 && e.target.stats.attack > 1) {
                         e.target.stats.attack = Math.max(1, e.target.stats.attack - debuff);
                     }
@@ -341,19 +356,7 @@ export class HeadlessBattleSimulator {
                 }
             });
         }
-        if (unit.synergies.includes('Fire')) {
-            this.eventBus.on('BEFORE_ATTACK', (e) => {
-                const s = this.unitStates.get(unit);
-                if (s?.isSilenced) return;
-                if (e.source === unit) {
-                    const count = this.getSynergyCountForUnit(unit, 'Fire');
-                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
-                    if (buff > 0) this.buffAttack(unit, buff);
-
-                    // Cyndaquil family logic inside Fire or separately
-                }
-            });
-        }
+        // Fire logic moved to top of registerUnitAbilities
         if (unit.family === 'cyndaquil') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit) || {};

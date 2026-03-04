@@ -457,6 +457,21 @@ export class BattleSimulator {
 
     private registerUnitAbilities(unit: Unit) {
 
+        // Fire: Atk Buff on Attack (HP cost, triggers first)
+        if (unit.synergies.includes('Fire')) {
+            this.eventBus.on('BEFORE_ATTACK', (e) => {
+                if (e.source === unit) {
+                    const count = this.getSynergyCountForUnit(unit, 'Fire');
+                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                    if (buff > 0 && unit.stats.hp > 1) {
+                        unit.stats.hp -= 1;
+                        this.buffAttack(unit, buff);
+                        this.log(`${unit.name} 燃盡了 1 點生命！`);
+                    }
+                }
+            });
+        }
+
         // Grass: Lifesteal
         if (unit.synergies.includes('Grass')) {
             this.eventBus.on('AFTER_ATTACK', async (e) => {
@@ -484,7 +499,7 @@ export class BattleSimulator {
                         return;
                     }
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const debuff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                    const debuff = count >= 4 ? 4 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
                     if (debuff > 0 && e.target.stats.attack > 1) {
                         const amountReduced = Math.min(e.target.stats.attack - 1, debuff);
                         e.target.stats.attack -= amountReduced;
@@ -552,16 +567,7 @@ export class BattleSimulator {
             });
         }
 
-        // Fire: Atk Buff on Attack
-        if (unit.synergies.includes('Fire')) {
-            this.eventBus.on('BEFORE_ATTACK', (e) => {
-                if (e.source === unit) {
-                    const count = this.getSynergyCountForUnit(unit, 'Fire');
-                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
-                    if (buff > 0) this.buffAttack(unit, buff);
-                }
-            });
-        }
+        // Fire logic moved to top of registerUnitAbilities
 
         // Angry: Atk on Hurt
         if (unit.synergies.includes('Angry')) {
