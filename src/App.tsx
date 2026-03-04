@@ -1112,6 +1112,24 @@ function App() {
         setBattleResult(null);
 
         // Prepare opponent choices
+        if (tutorialStep > 0) {
+            if (tutorialStep < 10) {
+                setOpponentChoices([
+                    { id: 'novice_3', name: '小剛', url: 'gym/小剛01.webp' },
+                    { id: 'interm_4', name: '小剛', url: 'gym/小剛02.webp' },
+                    { id: 'elite_14', name: '小剛', url: 'gym/小剛03.webp' }
+                ]);
+            } else {
+                setOpponentChoices([
+                    { id: 'champion_4', name: '赤紅', url: 'champion/赤紅02.webp' },
+                    { id: 'champion_5', name: '丹帝', url: 'champion/丹帝02.webp' },
+                    { id: 'interm_6', name: '青綠', url: 'gym/青綠02.webp' }
+                ]);
+            }
+            setShowOpponentSelect(true);
+            return;
+        }
+
         // Determine which opponent pool to use based on game.wins
         let npcPool: any[] = [];
         if (game.wins >= 11) {
