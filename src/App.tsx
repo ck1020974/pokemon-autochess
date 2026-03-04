@@ -555,9 +555,11 @@ function App() {
     // Timer loop for timeout (using elapsed seconds for pause sync)
     useEffect(() => {
         let timer: any;
-        if (game.phase === GamePhase.BATTLE && !battleResult) {
+        if (game.phase === GamePhase.BATTLE && !battleResult && !isPaused) {
             timer = setInterval(() => {
-                setBattleElapsedSeconds((s: number) => s + 1);
+                if (!document.hidden) {
+                    setBattleElapsedSeconds((s: number) => s + 1);
+                }
             }, 1000);
         }
         return () => clearInterval(timer);

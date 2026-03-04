@@ -1025,10 +1025,10 @@ h3 {
 
 /* Detail Panel Override: Show right and slightly lower */
 .detail-panel .synergy-tooltip {
-  top: 10px;
-  bottom: auto;
-  left: 110%;
-  right: auto;
+  top: auto;
+  bottom: 110%;
+  left: auto;
+  right: 0;
   width: max-content;
   max-width: 250px;
   z-index: 99999;
@@ -1385,10 +1385,10 @@ h3 {
 
   /* Detail Panel Tooltip - Move to right side, slightly lower */
   .detail-panel .synergy-tooltip {
-    left: 110% !important;
-    right: auto !important;
-    top: 10px !important;
-    bottom: auto !important;
+    left: auto !important;
+    right: 0 !important;
+    top: auto !important;
+    bottom: 110% !important;
     transform: none !important;
     z-index: 99999 !important;
   }
