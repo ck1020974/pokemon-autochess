@@ -709,13 +709,14 @@ export class BattleSimulator {
                             }
                         });
                         this.notifySkill(unit, `發動了閃焰高歌！`); // Don't await so it doesn't block sync loops
-                        this.playTeamAnimation(myTeam, 'glow-pale-red', 1000);
                     }
 
                     // Buff one random living ally
                     const living = myTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[Math.floor(Math.random() * living.length)];
+                        // 只對被選中的目標播放特效
+                        this.playTeamAnimation([target], 'glow-pale-red', 1000);
                         const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
                         this.growUnit(target, hpBuff, 0, '呆火鱷技能強化', original, true);
                     }
@@ -745,12 +746,13 @@ export class BattleSimulator {
                             }
                         });
                         this.notifySkill(unit, `發動了流水旋舞！`);
-                        this.playTeamAnimation(myTeam, 'glow-pale-blue', 1000);
                     }
                     // Buff one random living ally
                     const living = myTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[Math.floor(Math.random() * living.length)];
+                        // 只對被選中的目標播放特效
+                        this.playTeamAnimation([target], 'glow-pale-blue', 1000);
                         const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
                         this.growUnit(target, 0, atkBuff, '潤水鴨技能強化', original, true);
                     }
@@ -955,12 +957,13 @@ export class BattleSimulator {
                             }
                         });
                         this.notifySkill(unit, `發動了千變萬花！`);
-                        this.playTeamAnimation(myTeam, 'glow-pale-green', 1000);
                     }
                     // Buff one random living ally
                     const living = myTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[Math.floor(Math.random() * living.length)];
+                        // 只對被選中的目標播放特效
+                        this.playTeamAnimation([target], 'glow-pale-green', 1000);
                         const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
                         const buff = [0, 1, 3, 5][unit.level] || 1;
                         this.growUnit(target, buff, buff, '新葉喵技能強化', original, true);
