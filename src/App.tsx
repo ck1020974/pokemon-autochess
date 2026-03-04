@@ -6,7 +6,7 @@ import './index.css';
 import { GameLoop, GamePhase } from './engine/GameLoop';
 import { music } from './engine/MusicManager';
 
-import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS } from './models/BossData';
+import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS, CHAMPION_OPPONENTS } from './models/BossData';
 import { BattleSimulator } from './engine/BattleSimulator';
 import type { BattleLog } from './engine/BattleSimulator';
 import { UNIT_TEMPLATES, PREFERRED_POSITIONS } from './models/UnitFactory';
@@ -414,7 +414,7 @@ function App() {
 
             // Trainers: Only NOVICE are critical, others are background
             NOVICE_OPPONENTS.forEach(op => criticalUrls.add(op.url));
-            [...INTERM_OPPONENTS, ...ADVANCED_OPPONENTS, ...ELITE_OPPONENTS].forEach(op => backgroundUrls.add(op.url));
+            [...INTERM_OPPONENTS, ...ADVANCED_OPPONENTS, ...ELITE_OPPONENTS, ...CHAMPION_OPPONENTS].forEach(op => backgroundUrls.add(op.url));
 
             // Critical token/derived images
             criticalUrls.add('assets/妙蛙種子01.webp');
@@ -595,7 +595,7 @@ function App() {
             let forcedTwoStarCount = 0;
             let isBossMatch = false;
 
-            if (game.wins >= 12) {
+            if (game.wins >= 11) {
                 isBossMatch = true;
                 enemyBaseLevel = 2; // Default to 2-star for lategame, let forcedStarCount push to 3-star
                 if (difficulty === 'NORMAL') forcedStarCount = 2;
@@ -661,7 +661,8 @@ function App() {
                 }
             } else if (selectedOpponent && selectedOpponent.id) {
                 // Find def
-                let def = ELITE_OPPONENTS.find(c => c.id === selectedOpponent.id) ||
+                let def = CHAMPION_OPPONENTS.find(c => c.id === selectedOpponent.id) ||
+                    ELITE_OPPONENTS.find(c => c.id === selectedOpponent.id) ||
                     ADVANCED_OPPONENTS.find(e => e.id === selectedOpponent.id) ||
                     INTERM_OPPONENTS.find(g => g.id === selectedOpponent.id) ||
                     NOVICE_OPPONENTS.find(n => n.id === selectedOpponent.id);
@@ -791,7 +792,7 @@ function App() {
                 }
             } else {
                 // This block executes if there's NO selected opponent (e.g., debugging or not opening the modal)
-                let fallbackPool = game.wins >= 12 ? ELITE_OPPONENTS : (game.wins >= 8 ? ADVANCED_OPPONENTS : (game.wins >= 4 ? INTERM_OPPONENTS : NOVICE_OPPONENTS));
+                let fallbackPool = game.wins >= 11 ? CHAMPION_OPPONENTS : (game.wins >= 8 ? ELITE_OPPONENTS : (game.wins >= 4 ? INTERM_OPPONENTS : NOVICE_OPPONENTS));
                 const def = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
                 const fbCandidateUnits: Unit[] = [];
                 for (const coreId of def.coreUnits) {
@@ -1100,10 +1101,10 @@ function App() {
         // Prepare opponent choices
         // Determine which opponent pool to use based on game.wins
         let npcPool: any[] = [];
-        if (game.wins >= 12) {
-            npcPool = ELITE_OPPONENTS;
+        if (game.wins >= 11) {
+            npcPool = CHAMPION_OPPONENTS;
         } else if (game.wins >= 8) {
-            npcPool = ADVANCED_OPPONENTS;
+            npcPool = ELITE_OPPONENTS;
         } else if (game.wins >= 4) {
             npcPool = INTERM_OPPONENTS;
         } else {
