@@ -132,7 +132,22 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
     };
 
     return (
-        <div className="encyclopedia-overlay" onClick={onClose}>
+        <div className="encyclopedia-overlay" onClick={onClose} style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            zIndex: 9999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '20px',
+            boxSizing: 'border-box',
+        }}>
             <div className="encyclopedia-modal" onClick={e => e.stopPropagation()}>
                 {/* Header */}
                 <div className="encyclopedia-header">
