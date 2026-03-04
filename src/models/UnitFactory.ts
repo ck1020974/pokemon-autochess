@@ -631,19 +631,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'mimikyu', name: '謎擬Ｑ', tier: 4, family: 'mimikyu',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/謎擬Ｑ00.webp', battleImageUrl: 'assets/謎擬Ｑ01.webp',
-        description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost'], evolveId: 'mimikyu_2'
+        description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost', 'SwordDance'], evolveId: 'mimikyu_2'
     },
     mimikyu_2: {
         id: 'mimikyu_2', name: '謎擬Ｑ', tier: 4, family: 'mimikyu',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/謎擬Ｑ00.webp', battleImageUrl: 'assets/謎擬Ｑ01.webp',
-        description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost'], evolveId: 'mimikyu_3', isHiddenFromShop: true
+        description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost', 'SwordDance'], evolveId: 'mimikyu_3', isHiddenFromShop: true
     },
     mimikyu_3: {
         id: 'mimikyu_3', name: '謎擬Ｑ', tier: 4, family: 'mimikyu',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/謎擬Ｑ00.webp', battleImageUrl: 'assets/謎擬Ｑ01.webp',
-        description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '抵擋每場戰鬥中的首次傷害。', synergies: ['Ghost', 'SwordDance'], isHiddenFromShop: true
     },
 
     // Misc

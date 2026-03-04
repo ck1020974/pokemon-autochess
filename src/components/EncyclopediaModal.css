@@ -7,7 +7,7 @@
     /* Use fixed for the overlay but absolute for content centering */
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(12px);
-    z-index: 10000;
+    z-index: 999999;
     display: flex;
     justify-content: center;
     align-items: center;
