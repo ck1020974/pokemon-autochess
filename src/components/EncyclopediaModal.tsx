@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import './EncyclopediaModal.css';
 import { UNIT_TEMPLATES } from '../models/UnitFactory';
 import { SYNERGIES } from '../models/Synergies';
@@ -177,8 +178,8 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
                 </div>
             </div>
 
-            {/* Selected Unit Details Modal (Popup within Popup) */}
-            {selectedTemplate && (
+            {/* Selected Unit Details Modal - Use Portal to escape overflow:hidden */}
+            {selectedTemplate && createPortal(
                 <div className="encyclopedia-detail-overlay" onClick={(e) => { e.stopPropagation(); setSelectedUnitId(null); }}>
                     <div className="encyclopedia-detail-modal" onClick={e => e.stopPropagation()}>
                         <button className="encyclopedia-close-btn" style={{ position: 'absolute', top: '15px', right: '20px', zIndex: 10 }} onClick={() => setSelectedUnitId(null)}>×</button>
@@ -248,7 +249,8 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.getElementById('modal-root')!
             )}
         </div>
     );
