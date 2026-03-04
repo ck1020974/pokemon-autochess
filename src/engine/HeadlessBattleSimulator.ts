@@ -190,6 +190,7 @@ export class HeadlessBattleSimulator {
             }
             if (target && target.stats.hp > 0) {
                 unit.family = target.family;
+                unit.level = target.level; // Skill intensity follows target's star level
 
                 // Directly copy the target's exact template (ignoring star level difference)
                 const currentTemplate = UNIT_TEMPLATES[target.templateId];
