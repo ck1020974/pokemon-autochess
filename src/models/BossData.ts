@@ -77,6 +77,7 @@ export const ELITE_OPPONENTS: OpponentDefinition[] = [
     { id: 'elite_19', name: '花月', url: 'elitefour/花月.webp', coreUnits: ['rattata', 'treecko', 'houndour', 'mimikyu', 'sneasel'] },
     { id: 'elite_20', name: '芙蓉', url: 'elitefour/芙蓉.webp', coreUnits: ['sableye', 'sableye', 'shuppet', 'shuppet', 'gastly'] },
     { id: 'elite_21', name: '一樹', url: 'elitefour/一樹.webp', coreUnits: ['natu', 'natu', 'slowpoke', 'ralts', 'mrmime'] },
+    { id: 'elite_22', name: '赤日', url: 'elitefour/赤日.webp', coreUnits: ['sneasel', 'houndour', 'houndour', 'abomasnow_final', 'spiritomb'] },
 ];
 
 export const CHAMPION_OPPONENTS: OpponentDefinition[] = [
