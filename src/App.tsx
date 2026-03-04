@@ -1324,7 +1324,16 @@ function App() {
                     </div>
                 </div>
             )}
-            {/* EncyclopediaModal removed from here, kept at the bottom of the component */}
+
+            {showEncyclopedia && (
+                <EncyclopediaModal onClose={() => {
+                    setShowEncyclopedia(false);
+                    if (tutorialStep === 11) {
+                        setTutorialStep(12);
+                    }
+                }} />
+            )}
+
             {showTutorial && difficulty !== null && <TutorialModal onClose={() => setShowTutorial(false)} onStartTutorial={startTutorial} />}
 
             {/* Tutorial Message Box / Mask (Steps 1-11) */}
@@ -2176,14 +2185,6 @@ function App() {
                     </div>
                 )
             }
-            {showEncyclopedia && (
-                <EncyclopediaModal onClose={() => {
-                    setShowEncyclopedia(false);
-                    if (tutorialStep === 11) {
-                        setTutorialStep(12);
-                    }
-                }} />
-            )}
         </div >
     );
 }
