@@ -341,6 +341,10 @@ export class BattleSimulator {
                 const totalNatu = myTeam.filter(u => u && u.family === 'natu' && u.stats.hp > 0).length;
                 const timesToExecute = totalNatu % 2 === 0 ? 2 : 1;
 
+                if (timesToExecute > 0) {
+                    await this.notifySkill(unit, `發動了瞬間移動！`);
+                }
+
                 for (let t = 0; t < timesToExecute; t++) {
                     // Re-fetch living enemies each time in case state changed (though unlikely at start)
                     const currentLiving = opTeam.filter(e => e && e.stats.hp > 0);
@@ -352,7 +356,6 @@ export class BattleSimulator {
                     const lastIdx = opTeam.indexOf(last);
 
                     if (firstIdx !== -1 && lastIdx !== -1 && firstIdx !== lastIdx) {
-                        await this.notifySkill(unit, `發動了瞬間移動！`);
                         await Promise.all([
                             this.playAnimation(first, 'teleport', 400),
                             this.playAnimation(last, 'teleport', 400)
@@ -360,7 +363,13 @@ export class BattleSimulator {
 
                         opTeam[firstIdx] = last;
                         opTeam[lastIdx] = first;
-                        this.log(`${first.name} 和 ${last.name} 互換了位置！`);
+
+                        if (t === 0) {
+                            this.log(`${first.name} 和 ${last.name} 互換了位置！`);
+                        } else {
+                            this.log(`${first.name} 和 ${last.name} 又換回了位置！`);
+                        }
+
                         await this.compactTeams();
                         await this.delay(300);
                         if (this.onUpdate) this.onUpdate();
