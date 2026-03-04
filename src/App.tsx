@@ -2182,7 +2182,7 @@ function App() {
                         setTutorialStep(12);
                     }
                 }} />,
-                document.body
+                document.getElementById('modal-root')!
             )}
         </div >
     );
