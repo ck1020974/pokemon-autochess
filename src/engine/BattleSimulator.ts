@@ -623,8 +623,9 @@ export class BattleSimulator {
             });
         }
 
-        // Onix: Reflect Damage and Move to Back
+        // Onix: Move to Back after attack, Stat on Move (Cave synergy only), and Reflect Damage
         if (unit.family === 'onix') {
+            // Move to back after attack
             this.eventBus.on('AFTER_ATTACK', async (e) => {
                 if (this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source === unit && unit.stats.hp > 0) {
@@ -644,14 +645,39 @@ export class BattleSimulator {
                 }
             });
 
+            // ON_MOVE: Gain HP only if Cave synergy is active
+            this.eventBus.on('ON_MOVE', async (e) => {
+                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
+                    if (this.getSynergyCountForUnit(unit, 'Cave') >= 2) {
+                        const amount = 3;
+                        const { side } = this.getTeams(unit);
+                        if (!this.isCompacting) {
+                            await this.notifySkill(unit, `發動了鐵壁！`);
+                            this.playTeamAnimation([unit], 'glow-pale-blue', 600);
+                            this.growUnit(unit, amount, 0, '鐵壁', null, true);
+                        } else {
+                            // Throttled log during compaction
+                            if (!this.onixLogged.has(side)) {
+                                this.log(`[大岩蛇] 發動了鐵壁！`);
+                                this.onixLogged.add(side);
+                            }
+                            this.growUnit(unit, amount, 0, '鐵壁', null, true);
+                        }
+                        const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
+                        if (original) original.addGrowth(amount, 0);
+                    }
+                }
+            });
+
+            // Reflect 200% of incoming damage
             this.eventBus.on('ON_HURT', async (e) => {
                 if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     const amount = e.context.amount;
                     if (amount > 0) {
-                        const reflectDmg = amount; // 100% reflect
+                        const reflectDmg = Math.ceil(amount * 2.0); // 200% reflect
                         this.log(`${unit.name} 反彈了 ${reflectDmg} 點傷害！`);
                         this.playAnimation(unit, 'jump', 200);
-                        await this.dealDamage(unit, e.source, reflectDmg, false, true); // true for silent log if want to skip regular hurt log
+                        await this.dealDamage(unit, e.source, reflectDmg, false, true);
                     }
                 }
             });
@@ -686,41 +712,7 @@ export class BattleSimulator {
             });
         }
 
-        // Onix: Stats on Move & Steelix Reflect
-        if (unit.family === 'onix') {
-            this.eventBus.on('ON_MOVE', async (e) => {
-                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = 3;
-                    const { side } = this.getTeams(unit);
-                    if (!this.isCompacting) {
-                        await this.notifySkill(unit, `發動了鐵壁！`);
-                        this.playTeamAnimation([unit], 'glow-pale-blue', 600);
-                        this.growUnit(unit, amount, 0, '鐵壁', null, true);
-                    } else {
-                        // Throttled log during compaction
-                        if (!this.onixLogged.has(side)) {
-                            this.log(`[大岩蛇] 發動了鐵壁！`);
-                            this.onixLogged.add(side);
-                        }
-                        this.growUnit(unit, amount, 0, '鐵壁', null, true);
-                    }
-                    const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
-                    if (original) original.addGrowth(amount, 0);
-                }
-            });
-
-            // Steelix (Evolved Onix) Reflect logic
-            this.eventBus.on('ON_HURT', async (e) => {
-                if (e.target === unit && e.source && e.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = e.context.amount;
-                    if (amount > 0) {
-                        const reflectDmg = Math.ceil(amount * 1.0);
-                        this.log(`${unit.name} 反彈了 ${reflectDmg} 點傷害！`);
-                        await this.dealDamage(unit, e.source, reflectDmg, false); // Use false to silence redundant amount log
-                    }
-                }
-            });
-        }
+        // Onix abilities are now all registered in the block above (lines 626+)
 
         if (unit.family === 'fuecoco') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
