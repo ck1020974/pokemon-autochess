@@ -789,8 +789,9 @@ export class HeadlessBattleSimulator {
         if (!isBypassing) {
             if (this.getSynergyCountForUnit(target, 'Slow') >= 2 && target.synergies.includes('Slow')) amount = Math.max(1, Math.ceil(amount * 2 / 3));
         }
+        const preHp = target.stats.hp;
         target.stats.hp -= amount;
-        if (target.stats.hp <= 0 && !isBypassing && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2 && !targetState.hardUsed) {
+        if (target.stats.hp <= 0 && preHp > 1 && !isBypassing && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2 && !targetState.hardUsed) {
             target.stats.hp = 1;
             targetState.hardUsed = true;
             this.unitStates.set(target, targetState);

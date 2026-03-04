@@ -1204,6 +1204,7 @@ export class BattleSimulator {
             }
         }
 
+        const preHp = target.stats.hp;
         target.stats.hp -= amount;
         if (isSkillDamage && !silent) {
             this.log(`${target.name} 受到 ${amount} 點傷害！`);
@@ -1212,7 +1213,7 @@ export class BattleSimulator {
         // Emit ON_HURT for triggers (like Steelix reflection) before checking survival effects
         await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount, isSkillDamage } });
 
-        if (target.stats.hp <= 0 && !isBypassing && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2 && !targetState.hardUsed) {
+        if (target.stats.hp <= 0 && preHp > 1 && !isBypassing && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2 && !targetState.hardUsed) {
             target.stats.hp = 1;
             targetState.hardUsed = true;
             this.unitStates.set(target, targetState);
