@@ -22,9 +22,7 @@ export class BattleSimulator {
     private initialPlayerSet: Set<Unit> = new Set();
     private spiritombTriggered: Set<string> = new Set();
     private originalPlayerTeam?: (Unit | null)[];
-    private isCompacting = false;
     private houndoomLogged: Set<string> = new Set();
-    private onixLogged: Set<string> = new Set();
     private natuLogged: Set<string> = new Set();
     private isSimulatingStep = false;
     private queuedKillRewards: (() => Promise<void>)[] = [];
@@ -68,7 +66,6 @@ export class BattleSimulator {
         this.spiritombTriggered.clear();
         this.lightScreenActivated.clear();
         this.houndoomLogged.clear();
-        this.onixLogged.clear();
         this.natuLogged.clear();
 
         await this.compactTeams();
@@ -623,7 +620,7 @@ export class BattleSimulator {
             });
         }
 
-        // Onix: Move to Back after attack, Stat on Move (Cave synergy only), and Reflect Damage
+        // Onix: Move to Back after attack and Reflect Damage
         if (unit.family === 'onix') {
             // Move to back after attack
             this.eventBus.on('AFTER_ATTACK', async (e) => {
@@ -641,30 +638,6 @@ export class BattleSimulator {
                         await this.compactTeams();
                         await this.delay(250);
                         await this.eventBus.emit({ type: 'ON_MOVE', source: unit, context: {} });
-                    }
-                }
-            });
-
-            // ON_MOVE: Gain HP only if Cave synergy is active
-            this.eventBus.on('ON_MOVE', async (e) => {
-                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    if (this.getSynergyCountForUnit(unit, 'Cave') >= 2) {
-                        const amount = 3;
-                        const { side } = this.getTeams(unit);
-                        if (!this.isCompacting) {
-                            await this.notifySkill(unit, `發動了鐵壁！`);
-                            this.playTeamAnimation([unit], 'glow-pale-blue', 600);
-                            this.growUnit(unit, amount, 0, '鐵壁', null, true);
-                        } else {
-                            // Throttled log during compaction
-                            if (!this.onixLogged.has(side)) {
-                                this.log(`[大岩蛇] 發動了鐵壁！`);
-                                this.onixLogged.add(side);
-                            }
-                            this.growUnit(unit, amount, 0, '鐵壁', null, true);
-                        }
-                        const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
-                        if (original) original.addGrowth(amount, 0);
                     }
                 }
             });
@@ -1321,7 +1294,6 @@ export class BattleSimulator {
     }
 
     private async compactTeams() {
-        this.isCompacting = true;
         // Track old positions to detect movement
         const oldPos = new Map<string, number>();
         [...this.playerTeam, ...this.enemyTeam].forEach((u, i) => {
@@ -1342,7 +1314,6 @@ export class BattleSimulator {
         }
 
         if (this.onUpdate) this.onUpdate();
-        this.isCompacting = false;
         await this.delay(100); // 0.1s delay after movement
     }
 
