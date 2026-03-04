@@ -37,13 +37,14 @@ export const INTERM_OPPONENTS: OpponentDefinition[] = [
     { id: 'interm_11', name: '亞堤', url: 'gym/亞堤.webp', coreUnits: ['dwebble', 'dwebble', 'pinsir', 'heracross'] },
     { id: 'interm_12', name: '希特隆', url: 'gym/希特隆.webp', coreUnits: ['magnemite', 'magnemite', 'magnemite', 'doduo', 'diglett'] },
     { id: 'interm_13', name: '阿筆', url: 'gym/阿筆.webp', coreUnits: ['pinsir', 'heracross', 'dwebble', 'dwebble'] },
+    { id: 'interm_13', name: '小茜', url: 'gym/小茜.webp', coreUnits: ['igglybuff', 'igglybuff', 'rattata', 'rattata'] },
 ];
 
 export const ADVANCED_OPPONENTS: OpponentDefinition[] = [
     { id: 'adv_1', name: '坂木', url: 'gym/坂木.webp', coreUnits: ['meowth', 'mankey', 'kangaskhan', 'onix'] },
     { id: 'adv_2', name: '小菘', url: 'gym/小菘.webp', coreUnits: ['snover', 'snover', 'sneasel'] },
     { id: 'adv_3', name: '阿蜜', url: 'gym/阿蜜.webp', coreUnits: ['magnemite', 'magnemite', 'onix', 'onix'] },
-    { id: 'adv_4', name: '小茜', url: 'gym/小茜.webp', coreUnits: ['kangaskhan', 'igglybuff', 'kangaskhan', 'igglybuff'] },
+    { id: 'adv_4', name: '千里', url: 'gym/千里.webp', coreUnits: ['kangaskhan', 'kangaskhan', 'rattata'] },
     { id: 'adv_5', name: '小青', url: 'gym/小青.webp', coreUnits: ['sprigatito', 'fuecoco'] },
     { id: 'adv_6', name: '小春', url: 'gym/小春.webp', coreUnits: ['fuecoco', 'quaxly'] },
     { id: 'adv_7', name: '妮莫', url: 'gym/妮莫.webp', coreUnits: ['sprigatito', 'quaxly'] },
@@ -55,12 +56,12 @@ export const ADVANCED_OPPONENTS: OpponentDefinition[] = [
 ];
 
 export const ELITE_OPPONENTS: OpponentDefinition[] = [
-    { id: 'elite_1', name: '竹蘭', url: 'champion/竹蘭.webp', coreUnits: ['spiritomb', 'sneasel', 'snover', 'mimikyu', 'gastly'] },
-    { id: 'elite_2', name: '卡露妮', url: 'champion/卡露妮.webp', coreUnits: ['ralts', 'natu', 'slowpoke', 'igglybuff', 'mrmime'] },
-    { id: 'elite_3', name: '阿渡', url: 'champion/阿渡.webp', coreUnits: ['doduo', 'magnemite', 'diglett', 'charmander', 'onix'] },
-    { id: 'elite_4', name: '大吾', url: 'champion/大吾.webp', coreUnits: ['dwebble', 'onix', 'mudkip', 'magnemite', 'sableye'] },
-    { id: 'elite_5', name: '赤紅', url: 'champion/赤紅.webp', coreUnits: ['charmander', 'squirtle', 'bulbasaur', 'slowpoke', 'farfetchd'] },
-    { id: 'elite_6', name: '丹帝', url: 'champion/丹帝.webp', coreUnits: ['charmander', 'gastly', 'heracross', 'pinsir', 'drifloon'] },
+    { id: 'elite_1', name: '竹蘭', url: 'champion/竹蘭01.webp', coreUnits: ['spiritomb', 'igglybuff', 'drifloon', 'mimikyu', 'gastly'] },
+    { id: 'elite_2', name: '卡露妮', url: 'champion/卡露妮01.webp', coreUnits: ['ralts', 'natu', 'slowpoke', 'igglybuff', 'igglybuff'] },
+    { id: 'elite_3', name: '阿渡', url: 'elitefour/阿渡.webp', coreUnits: ['doduo', 'magnemite', 'diglett', 'charmander', 'onix'] },
+    { id: 'elite_4', name: '大吾', url: 'champion/大吾01.webp', coreUnits: ['dwebble', 'onix', 'mudkip', 'magnemite', 'diglett'] },
+    { id: 'elite_5', name: '赤紅', url: 'champion/赤紅01.webp', coreUnits: ['charmander', 'squirtle', 'bulbasaur', 'slowpoke', 'farfetchd'] },
+    { id: 'elite_6', name: '丹帝', url: 'champion/丹帝01.webp', coreUnits: ['charmander', 'gastly', 'heracross', 'pinsir', 'drifloon'] },
     { id: 'elite_7', name: '小智', url: 'gym/小智.webp', coreUnits: ['farfetchd', 'treecko', 'gastly', 'mrmime', 'charmander'] },
     { id: 'elite_8', name: '柯拿', url: 'elitefour/科拿.webp', coreUnits: ['slowpoke', 'snover', 'sneasel', 'squirtle', 'quaxly'] },
     { id: 'elite_9', name: '希巴', url: 'elitefour/希巴.webp', coreUnits: ['mankey', 'onix', 'onix', 'heracross', 'pinsir'] },
@@ -72,13 +73,17 @@ export const ELITE_OPPONENTS: OpponentDefinition[] = [
     { id: 'elite_15', name: '小霞', url: 'gym/小霞03.webp', coreUnits: ['mudkip', 'squirtle', 'slowpoke', 'totodile', 'quaxly'] },
     { id: 'elite_16', name: '赤焰松', url: 'elitefour/赤焰松.webp', coreUnits: ['houndour', 'shuppet', 'torchic', 'charmander', 'fuecoco'] },
     { id: 'elite_17', name: '水梧桐', url: 'elitefour/水梧桐.webp', coreUnits: ['totodile', 'sneasel', 'mudkip', 'squirtle', 'quaxly'] },
+    { id: 'elite_18', name: '大木博士', url: 'elitefour/大木博士.webp', coreUnits: ['charmander', 'squirtle', 'bulbasaur', 'ditto', 'mrmime'] },
+    { id: 'elite_19', name: '花月', url: 'elitefour/花月.webp', coreUnits: ['rattata', 'treecko', 'houndour', 'mimikyu', 'sneasel'] },
+    { id: 'elite_20', name: '芙蓉', url: 'elitefour/芙蓉.webp', coreUnits: ['sableye', 'sableye', 'shuppet', 'shuppet', 'gastly'] },
+    { id: 'elite_21', name: '一樹', url: 'elitefour/一樹.webp', coreUnits: ['natu', 'natu', 'slowpoke', 'ralts', 'mrmime'] },
 ];
 
 export const CHAMPION_OPPONENTS: OpponentDefinition[] = [
-    { id: 'champion_1', name: '竹蘭', url: 'champion/竹蘭.webp', coreUnits: ['spiritomb', 'sneasel', 'snover', 'mimikyu', 'gastly'] },
-    { id: 'champion_2', name: '卡露妮', url: 'champion/卡露妮.webp', coreUnits: ['ralts', 'natu', 'slowpoke', 'igglybuff', 'mrmime'] },
-    { id: 'champion_3', name: '大吾', url: 'champion/大吾.webp', coreUnits: ['dwebble', 'onix', 'mudkip', 'torchic', 'sableye'] },
-    { id: 'champion_4', name: '赤紅', url: 'champion/赤紅.webp', coreUnits: ['charmander', 'squirtle', 'bulbasaur', 'slowpoke', 'farfetchd'] },
-    { id: 'champion_5', name: '丹帝', url: 'champion/丹帝.webp', coreUnits: ['charmander', 'gastly', 'heracross', 'pinsir', 'drifloon'] },
+    { id: 'champion_1', name: '竹蘭', url: 'champion/竹蘭02.webp', coreUnits: ['spiritomb', 'sneasel', 'snover', 'mimikyu', 'gastly'] },
+    { id: 'champion_2', name: '卡露妮', url: 'champion/卡露妮02.webp', coreUnits: ['ralts', 'natu', 'slowpoke', 'igglybuff', 'mrmime'] },
+    { id: 'champion_3', name: '大吾', url: 'champion/大吾02.webp', coreUnits: ['dwebble', 'onix', 'mudkip', 'torchic', 'sableye'] },
+    { id: 'champion_4', name: '赤紅', url: 'champion/赤紅02.webp', coreUnits: ['charmander', 'squirtle', 'bulbasaur', 'slowpoke', 'farfetchd'] },
+    { id: 'champion_5', name: '丹帝', url: 'champion/丹帝02.webp', coreUnits: ['charmander', 'gastly', 'heracross', 'farfetchd', 'drifloon'] },
     { id: 'champion_6', name: '小智', url: 'gym/小智.webp', coreUnits: ['farfetchd', 'treecko', 'gastly', 'mrmime', 'charmander'] },
 ];
