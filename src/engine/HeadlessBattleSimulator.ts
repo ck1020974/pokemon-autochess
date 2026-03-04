@@ -14,6 +14,7 @@ export class HeadlessBattleSimulator {
     private initialPlayerSet: Set<Unit> = new Set();
     private spiritombTriggered: Set<string> = new Set();
     private psychicTriggered: Set<string> = new Set();
+    private natuLogged: Set<string> = new Set();
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
     private originalPlayerTeam: (Unit | null)[] | null = null;
@@ -47,6 +48,7 @@ export class HeadlessBattleSimulator {
     public async init() {
         this.spiritombTriggered.clear();
         this.lightScreenActivated.clear();
+        this.natuLogged.clear();
 
         await this.compactTeams();
 
@@ -127,12 +129,16 @@ export class HeadlessBattleSimulator {
             }
         }
 
-        // Natu/Xatu: Swap enemy first and last
-        if (unit.family === 'natu') {
-            const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0);
-            if (livingEnemies.length >= 2) {
-                const first = livingEnemies[0];
-                const last = livingEnemies[livingEnemies.length - 1];
+        // Natu/Xatu: Swap enemy first and last (even count = 2 swaps, odd count = 1 swap)
+        if (unit.family === 'natu' && !this.natuLogged.has(side)) {
+            this.natuLogged.add(side);
+            const totalNatu = myTeam.filter(u => u && u.family === 'natu' && u.stats.hp > 0).length;
+            const timesToExecute = totalNatu % 2 === 0 ? 2 : 1;
+            for (let t = 0; t < timesToExecute; t++) {
+                const currentLiving = opTeam.filter(e => e && e.stats.hp > 0);
+                if (currentLiving.length < 2) break;
+                const first = currentLiving[0];
+                const last = currentLiving[currentLiving.length - 1];
                 const firstIdx = opTeam.indexOf(first);
                 const lastIdx = opTeam.indexOf(last);
                 if (firstIdx !== -1 && lastIdx !== -1 && firstIdx !== lastIdx) {
