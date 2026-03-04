@@ -871,6 +871,19 @@ function App() {
                     }
                 }
 
+                // --- Stat Normalization (Method B): Clamp to tier-based min/max ---
+                // Prevents weak-base units (e.g. Drifloon 1/1) from being too frail,
+                // and strong-base units (e.g. Sneasel 8/8) from being too dominant in the same tier.
+                const statRange = (() => {
+                    if (game.wins >= 11) return { minHp: 22, maxHp: 44, minAtk: 14, maxAtk: 28 }; // Champion
+                    if (game.wins >= 8) return { minHp: 16, maxHp: 34, minAtk: 10, maxAtk: 22 }; // Elite Four
+                    if (game.wins >= 4) return { minHp: 10, maxHp: 22, minAtk: 6, maxAtk: 15 }; // Intermediate
+                    return { minHp: 5, maxHp: 14, minAtk: 3, maxAtk: 9 }; // Novice
+                })();
+                u.stats.hp = Math.min(Math.max(u.stats.hp, statRange.minHp), statRange.maxHp);
+                u.stats.maxHp = Math.min(Math.max(u.stats.maxHp, statRange.minHp), statRange.maxHp);
+                u.stats.attack = Math.min(Math.max(u.stats.attack, statRange.minAtk), statRange.maxAtk);
+
                 if (u.battleImageUrl) u.imageUrl = u.battleImageUrl;
             });
 

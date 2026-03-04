@@ -56,7 +56,7 @@ export const ELITE_OPPONENTS: OpponentDefinition[] = [
     { id: 'elite_4', name: '大吾', url: 'champion/大吾.webp', coreUnits: ['dwebble', 'onix', 'mudkip', 'magnemite', 'sableye'] },
     { id: 'elite_5', name: '赤紅', url: 'champion/赤紅.webp', coreUnits: ['charmander', 'squirtle', 'bulbasaur', 'slowpoke', 'farfetchd'] },
     { id: 'elite_6', name: '丹帝', url: 'champion/丹帝.webp', coreUnits: ['charmander', 'gastly', 'heracross', 'pinsir', 'drifloon'] },
-    { id: 'elite_7', name: '小智', url: 'champion/小智.webp', coreUnits: ['farfetchd', 'treecko', 'gastly', 'mrmime', 'charmander'] },
+    { id: 'elite_7', name: '小智', url: 'gym/小智.webp', coreUnits: ['farfetchd', 'treecko', 'gastly', 'mrmime', 'charmander'] },
     { id: 'elite_8', name: '柯拿', url: 'elitefour/科拿.webp', coreUnits: ['slowpoke', 'snover', 'sneasel', 'squirtle', 'quaxly'] },
     { id: 'elite_9', name: '希巴', url: 'elitefour/希巴.webp', coreUnits: ['mankey', 'onix', 'onix', 'heracross', 'pinsir'] },
     { id: 'elite_10', name: '菊子', url: 'elitefour/菊子.webp', coreUnits: ['gastly', 'shuppet', 'gastly', 'mimikyu', 'drifloon'] },
@@ -73,5 +73,5 @@ export const CHAMPION_OPPONENTS: OpponentDefinition[] = [
     { id: 'champion_3', name: '大吾', url: 'champion/大吾.webp', coreUnits: ['dwebble', 'onix', 'mudkip', 'torchic', 'sableye'] },
     { id: 'champion_4', name: '赤紅', url: 'champion/赤紅.webp', coreUnits: ['charmander', 'squirtle', 'bulbasaur', 'slowpoke', 'farfetchd'] },
     { id: 'champion_5', name: '丹帝', url: 'champion/丹帝.webp', coreUnits: ['charmander', 'gastly', 'heracross', 'pinsir', 'drifloon'] },
-    { id: 'champion_6', name: '小智', url: 'champion/小智.webp', coreUnits: ['farfetchd', 'treecko', 'gastly', 'mrmime', 'charmander'] },
+    { id: 'champion_6', name: '小智', url: 'gym/小智.webp', coreUnits: ['farfetchd', 'treecko', 'gastly', 'mrmime', 'charmander'] },
 ];
