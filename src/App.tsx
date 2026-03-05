@@ -730,53 +730,26 @@ function App() {
                     }
 
                     const sortTeamByPositions = (unsortedUnits: Unit[]): Unit[] | null => {
-                        const result: (Unit | null)[] = [null, null, null, null, null];
-                        const usedUnitIdx = new Set<number>();
-                        const targetCount = unsortedUnits.length;
-
-                        // Positional mapping
-                        const POS_CONSTRAINTS: Record<number, PreferredPosition[]> = {
-                            0: ['ALL', 'FRONT', 'FRONT_MID', 'MID', 'MID_BACK', 'BACK'],
-                            1: ['ALL', 'FRONT', 'FRONT_MID', 'MID', 'MID_BACK', 'BACK'],
-                            2: ['ALL', 'FRONT_MID', 'MID', 'MID_BACK', 'BACK', 'FRONT'], // Slight bias for mid/back
-                            3: ['ALL', 'MID_BACK', 'BACK', 'MID', 'FRONT_MID', 'FRONT'],
-                            4: ['ALL', 'BACK', 'MID_BACK', 'MID', 'FRONT_MID', 'FRONT']
+                        const POS_SCORE: Record<PreferredPosition, number> = {
+                            'FRONT': 0,
+                            'FRONT_MID': 1,
+                            'ALL': 2,
+                            'MID': 2,
+                            'MID_BACK': 3,
+                            'BACK': 4
                         };
 
-                        const sortedByConstraint = [...unsortedUnits].sort((a, b) => {
-                            const getLen = (unit: Unit) => {
-                                const p = PREFERRED_POSITIONS[unit.family || unit.templateId] || 'ALL';
-                                if (p === 'ALL') return 5;
-                                if (p === 'FRONT' || p === 'BACK') return 2;
-                                if (p === 'MID') return 3;
-                                if (p === 'FRONT_MID') return 4;
-                                if (p === 'MID_BACK') return 4;
-                                return 5;
-                            };
-                            return getLen(a) - getLen(b);
+                        const sorted = [...unsortedUnits].sort((a, b) => {
+                            const prefA = PREFERRED_POSITIONS[a.family || a.templateId] || 'ALL';
+                            const prefB = PREFERRED_POSITIONS[b.family || b.templateId] || 'ALL';
+                            return POS_SCORE[prefA] - POS_SCORE[prefB];
                         });
 
-                        const backtrack = (slotIdx: number): boolean => {
-                            if (slotIdx === 5) return true;
-                            if (slotIdx >= targetCount) return backtrack(slotIdx + 1);
-
-                            for (let i = 0; i < sortedByConstraint.length; i++) {
-                                if (usedUnitIdx.has(i)) continue;
-                                const u = sortedByConstraint[i];
-                                const pref = PREFERRED_POSITIONS[u.family || u.templateId] || 'ALL';
-                                if (POS_CONSTRAINTS[slotIdx].includes(pref)) {
-                                    usedUnitIdx.add(i);
-                                    result[slotIdx] = u;
-                                    if (backtrack(slotIdx + 1)) return true;
-                                    result[slotIdx] = null;
-                                    usedUnitIdx.delete(i);
-                                }
-                            }
-                            return false;
-                        };
-
-                        if (backtrack(0)) return result as Unit[];
-                        return null;
+                        const result: (Unit | null)[] = [null, null, null, null, null];
+                        for (let i = 0; i < sorted.length; i++) {
+                            result[i] = sorted[i];
+                        }
+                        return result as unknown as Unit[];
                     };
 
                     const sorted = sortTeamByPositions(candidateUnits);
