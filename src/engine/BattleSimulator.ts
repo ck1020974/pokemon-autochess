@@ -1233,7 +1233,7 @@ export class BattleSimulator {
             const count = (isPlayer ? this.playerSynergies : this.enemySynergies).get('Psychic') || 0;
 
             if (count >= 2) {
-                const maxActivations = count >= 4 ? 5 : (count >= 3 ? 3 : 1);
+                const maxActivations = count >= 4 ? 3 : (count >= 3 ? 2 : 1);
                 const currentActivations = this.unitStates.get(this as any)?.[`psychicOccurred_${side}`] || 0;
 
                 if (currentActivations < maxActivations && this.turnCount % 2 === 0) {
@@ -1248,7 +1248,7 @@ export class BattleSimulator {
                         this.log(isPlayer ? "敵方受到了預知未來的攻擊！" : "我方受到了預知未來的攻擊！");
                         const targets = isPlayer ? this.enemyTeam : this.playerTeam;
                         const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
-                        const dmg = Math.ceil((2 + (isPlayer ? this.playerWins : 0)) * 1.5);
+                        const dmg = 2 + (isPlayer ? this.playerWins : 0);
                         for (const target of livingEnemies) {
                             await this.dealDamage(null, target, dmg, true, true);
                         }
