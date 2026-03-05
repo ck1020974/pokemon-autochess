@@ -188,13 +188,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'grovyle', name: '森林蜥蜴', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/森林蜥蜴00.webp', battleImageUrl: 'assets/森林蜥蜴01.webp',
-        description: '召喚友軍後，對敵方造成 5 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'sceptile', isHiddenFromShop: true
+        description: '召喚友軍後，對敵方造成 4 傷害。', synergies: ['Starter', 'Grass'], evolveId: 'sceptile', isHiddenFromShop: true
     },
     sceptile: {
         id: 'sceptile', name: '蜥蜴王', tier: 3, family: 'treecko',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/蜥蜴王00.webp', battleImageUrl: 'assets/蜥蜴王01.webp',
-        description: '召喚友軍後，對敵方造成 10 傷害。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '召喚友軍後，對敵方造成 8 傷害。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 10. Torchic

@@ -684,7 +684,7 @@ export class BattleSimulator {
                     await this.delay(200); // Increased delay
                     this.log(`${unit.name} 發動了二連踢！`);
                     await this.playAnimation(unit, 'jump', 200);
-                    const dmg = [0, 3, 5, 10][unit.level] || 3;
+                    const dmg = [0, 2, 5, 10][unit.level] || 2;
                     await this.dealDamage(unit, e.target, dmg);
                 }
             });
@@ -1059,7 +1059,7 @@ export class BattleSimulator {
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
 
                 if (e.source && mySide === sSide && e.source !== unit) {
-                    const dmg = [0, 2, 5, 10][unit.level] || 2;
+                    const dmg = [0, 2, 4, 8][unit.level] || 2;
                     const living = opTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const target = living[0];
