@@ -108,7 +108,7 @@ export class HeadlessBattleSimulator {
         // Gastly Family: Atk buff at start
         if (unit.family === 'gastly') {
             if (unit.templateId === 'gengar') {
-                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.buffAttack(u!, 5, true));
+                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.buffAttack(u!, 3, true));
             } else {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0) {
@@ -120,7 +120,7 @@ export class HeadlessBattleSimulator {
         // Igglybuff Family: HP buff at start
         if (unit.family === 'igglybuff') {
             if (unit.templateId === 'wigglytuff') {
-                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.growUnit(u!, 5, 0, null, true));
+                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.growUnit(u!, 3, 0, null, true));
             } else {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0) {

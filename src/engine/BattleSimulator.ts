@@ -203,7 +203,7 @@ export class BattleSimulator {
                 await this.notifySkill(unit, `耿鬼發動了詭計！`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === u!.id);
-                    this.growUnit(u!, 0, 5, '耿鬼技能', original, true);
+                    this.growUnit(u!, 0, 3, '耿鬼技能', original, true);
                     await this.delay(65);
                 }
             } else {
@@ -226,7 +226,7 @@ export class BattleSimulator {
                 await this.notifySkill(unit, `胖可丁發動了治癒波動！`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === u!.id);
-                    this.growUnit(u!, 5, 0, '胖可丁技能', original, true);
+                    this.growUnit(u!, 3, 0, '胖可丁技能', original, true);
                     await this.delay(65);
                 }
             } else {
