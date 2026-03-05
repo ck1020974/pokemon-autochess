@@ -30,19 +30,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'charmander', name: '小火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/小火龍00.webp', battleImageUrl: 'assets/小火龍01.webp',
-        description: '發動火焰漩渦：同時對目標後排敵人造成 2 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
+        description: '同時對目標後排敵人造成 2 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
     },
     charmeleon: {
         id: 'charmeleon', name: '火恐龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/火恐龍00.webp', battleImageUrl: 'assets/火恐龍01.webp',
-        description: '發動火焰漩渦：同時對目標後排敵人造成 4 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
+        description: '同時對目標後排敵人造成 4 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
     },
     charizard: {
         id: 'charizard', name: '噴火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/噴火龍00.webp', battleImageUrl: 'assets/噴火龍01.webp',
-        description: '發動火焰漩渦：同時對目標後排敵人造成 8 傷害。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '同時對目標後排敵人造成 8 傷害。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 3. Squirtle
@@ -83,11 +83,12 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         name: '耿鬼',
         tier: 3,
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
-        imageUrl: 'assets/耿鬼01.webp',
-        battleImageUrl: 'assets/耿鬼02.webp',
-        description: '發動[詭計]。戰鬥開始時，我方全體永久獲得 3 點攻擊。',
+        imageUrl: 'assets/耿鬼00.webp',
+        battleImageUrl: 'assets/耿鬼01.webp',
+        description: '戰鬥開始時，我方全體永久獲得 3 點攻擊。',
         synergies: ['Ghost', 'Poison'],
-        family: 'gastly'
+        family: 'gastly',
+        isHiddenFromShop: true
     },
 
     // 5. Chikorita
@@ -135,19 +136,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'totodile', name: '小鋸鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/小鋸鱷00.webp', battleImageUrl: 'assets/小鋸鱷01.webp',
-        description: '發動強壯之顎：戰鬥開始時，前方友軍獲得自身 33% 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'croconaw'
+        description: '戰鬥開始時，前方友軍獲得自身 33% 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'croconaw'
     },
     croconaw: {
         id: 'croconaw', name: '藍鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/藍鱷00.webp', battleImageUrl: 'assets/藍鱷01.webp',
-        description: '發動強壯之顎：戰鬥開始時，前方友軍獲得自身 50% 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍獲得自身 50% 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
     },
     feraligatr: {
         id: 'feraligatr', name: '大力鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/大力鱷00.webp', battleImageUrl: 'assets/大力鱷01.webp',
-        description: '發動強壯之顎：戰鬥開始時，前方友軍獲得自身 100% 攻擊值。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍獲得自身 100% 攻擊值。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 8. Igglybuff (New)
@@ -168,11 +169,12 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         name: '胖可丁',
         tier: 3,
         baseStats: { hp: 6, maxHp: 6, attack: 3 },
-        imageUrl: 'assets/胖可丁01.webp',
-        battleImageUrl: 'assets/胖可丁02.webp',
-        description: '發動[治癒波動]。戰鬥開始時，我方全體永久獲得 3 點生命。',
+        imageUrl: 'assets/胖可丁00.webp',
+        battleImageUrl: 'assets/胖可丁01.webp',
+        description: '戰鬥開始時，我方全體永久獲得 3 點生命。',
         synergies: ['Normal', 'Fairy'],
-        family: 'igglybuff'
+        family: 'igglybuff',
+        isHiddenFromShop: true
     },
 
     // 9. Treecko
