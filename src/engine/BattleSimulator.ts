@@ -513,15 +513,27 @@ export class BattleSimulator {
     private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string, permanentTarget?: Unit | null, silent: boolean = false) {
         if (unit.family === 'sneasel' && atk < 0) atk = 0; // Protection
         if (hp === 0 && atk === 0) return;
-        unit.addGrowth(hp, atk);
-        if (permanentTarget) permanentTarget.addGrowth(hp, atk);
+
+        // 1. Apply to Battle Clone
+        // Rule: If unit is dead (hp <= 0), don't add HP to it (no mid-battle revival)
+        // But always add MaxHP and Atk.
+        unit.stats.maxHp += hp;
+        if (unit.stats.hp > 0) {
+            unit.stats.hp += hp;
+        }
+        unit.stats.attack += atk;
+        unit.capStats();
+
+        // 2. Apply to Permanent Target (Always grow)
+        if (permanentTarget) {
+            permanentTarget.addGrowth(hp, atk);
+        }
 
         if (sourceName && !silent) {
             if (hp > 0 && atk > 0) this.log(`${unit.name} 提高了 ${atk} 攻擊與生命`);
             else if (hp > 0) this.log(`${unit.name} 提高了 ${hp} 生命！`);
             else if (atk > 0) this.log(`${unit.name} 提高了 ${atk} 攻擊！`);
         }
-
     }
 
     private buffAttack(unit: Unit, amount: number, silent: boolean = false) {
@@ -1387,12 +1399,9 @@ export class BattleSimulator {
             }
         }
 
-        // 3. Process Killer Rewards ONLY if killer survived
-        if (killer && killer.stats.hp > 0) {
+        // 3. Process Killer Rewards
+        if (killer) {
             const executeReward = async () => {
-                // Critical: Re-check survival if reward was deferred
-                if (killer.stats.hp <= 0) return;
-
                 // Check Silence for individual unit abilities
                 if (this.unitStates.get(killer)?.isSilenced) return;
 
@@ -1401,6 +1410,7 @@ export class BattleSimulator {
                 if (bugBiteCount >= 2 && killer.synergies.includes('BugBite')) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === killer.id);
                     this.log(`${killer.name} 發動了蟲咬`);
+                    // We call growUnit. It will handle the "don't revive if dead" logic internally.
                     this.growUnit(killer, 2, 0, '蟲咬', original, true);
                 }
             };
