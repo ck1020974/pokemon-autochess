@@ -75,16 +75,20 @@ export class BattleSimulator {
         this.playerTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: true }); });
         this.enemyTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: false }); });
 
-        // Helper for Category Rank
+        // Helper for Category Rank based on User Request Phases
         const getRank = (unit: Unit) => {
-            if (unit.family === 'spiritomb') return 3; // Priority 1: Silence
-            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin'];
-            if (utility.includes(unit.family)) return 2; // Priority 2: Utility/Transform
-            if (unit.family === 'houndour') return 1; // Priority 3: Damage
-            return 0;
+            if (unit.family === 'spiritomb') return 4; // Phase 1: Silence
+            if (unit.family === 'mrmime') return 3;    // Phase 2: Light Screen
+
+            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin', 'natu'];
+            const hasStartupSynergy = unit.synergies.includes('Thief') || unit.synergies.includes('Trick');
+            if (utility.includes(unit.family) || hasStartupSynergy) return 2; // Phase 3: Utility/Synergy
+
+            if (unit.family === 'houndour') return 1; // Phase 4: First Strike
+            return 0; // Totodile, etc.
         };
 
-        // Sort by Priority: Category (Desc) > Position (Asc) > Attack (Desc) > HP (Desc) > Random
+        // Sort by Priority: Rank (Desc) > Position (Asc) > Attack (Desc) > HP (Desc) > Random
         allUnits.sort((a, b) => {
             const rankA = getRank(a.unit);
             const rankB = getRank(b.unit);
@@ -103,8 +107,48 @@ export class BattleSimulator {
             return Math.random() - 0.5;
         });
 
-        // Run global start of battle sequence
-        await this.runGlobalStartOfBattleAbilities(allUnits.map(item => item.unit));
+        const executePhaseQueue = async (rank: number) => {
+            const phaseUnits = allUnits.filter(item => getRank(item.unit) === rank);
+            for (const item of phaseUnits) {
+                await this.executeUnitStartOfBattleAbility(item.unit);
+                if (this.onUpdate) this.onUpdate();
+            }
+        };
+
+        // --- PHASE 1: Spiritomb ---
+        await executePhaseQueue(4);
+
+        // --- PHASE 2: Environment & Weather (Snow, then Light Screen) ---
+        const hasSnow = (this.playerSynergies.get('Snow') || 0) >= 2 || (this.enemySynergies.get('Snow') || 0) >= 2;
+        if (hasSnow) {
+            this.log("開始下冰雹了！");
+            await this.delay(500);
+            const alive = [...this.playerTeam, ...this.enemyTeam].filter((u: Unit) => u !== null && u.stats.hp > 0);
+            for (const target of alive) {
+                if (target.synergies.includes('Snow')) continue;
+                let dmg = Math.ceil(target.stats.maxHp * 0.33);
+                if (dmg >= target.stats.hp) dmg = Math.max(0, target.stats.hp - 1);
+                if (dmg > 0) {
+                    await this.dealDamage(null, target, dmg, true, true);
+                }
+                if (this.onUpdate) this.onUpdate();
+                await this.delay(100);
+            }
+            this.log("冰雹襲擊了雙方隊伍！");
+            await this.delay(400);
+        }
+
+        // Phase 2 Part 2: Mr. Mime (Light Screen)
+        await executePhaseQueue(3);
+
+        // --- PHASE 3: Character & Synergy Function/Enhancement ---
+        await executePhaseQueue(2);
+
+        // --- PHASE 4: Houndour (First Strike) ---
+        await executePhaseQueue(1);
+
+        // --- OTHERS: (Totodile, etc.) ---
+        await executePhaseQueue(0);
 
         await this.applyBattleStartSynergies(this.playerTeam.filter(u => u !== null));
         await this.applyBattleStartSynergies(this.enemyTeam.filter(u => u !== null));
@@ -113,33 +157,6 @@ export class BattleSimulator {
         const hasPsychic = (this.playerSynergies.get('Psychic') || 0) >= 2 || (this.enemySynergies.get('Psychic') || 0) >= 2;
         if (hasPsychic) {
             this.log("預知了未來的攻擊…");
-        }
-
-        // 7. Global Weather: Snow (Only triggers once even if both sides have it)
-        const hasSnow = (this.playerSynergies.get('Snow') || 0) >= 2 || (this.enemySynergies.get('Snow') || 0) >= 2;
-        if (hasSnow) {
-            this.log("開始下冰雹了！");
-            await this.delay(500);
-            const allUnits = [...this.playerTeam, ...this.enemyTeam].filter((u: Unit) => u !== null && u.stats.hp > 0);
-            for (const target of allUnits) {
-                if (target.synergies.includes('Snow')) continue;
-
-                // User Request: 33% of lifetime Max HP
-                let dmg = Math.ceil(target.stats.maxHp * 0.33);
-                // Feature: Snow damage cannot kill a unit (minimum 1 HP remaining)
-                if (dmg >= target.stats.hp) {
-                    dmg = Math.max(0, target.stats.hp - 1);
-                }
-
-                if (dmg > 0) {
-                    // Silent set to true to avoid individual "受到 N 點傷害" logs
-                    await this.dealDamage(null, target, dmg, true, true);
-                }
-                if (this.onUpdate) this.onUpdate();
-                await this.delay(100);
-            }
-            this.log("冰雹襲擊了雙方隊伍！");
-            await this.delay(400);
         }
 
         // Initial compaction to ensure everyone is at the front
@@ -163,12 +180,6 @@ export class BattleSimulator {
         return clone;
     }
 
-    private async runGlobalStartOfBattleAbilities(queue: Unit[]) {
-        for (const unit of queue) {
-            await this.executeUnitStartOfBattleAbility(unit);
-            if (this.onUpdate) this.onUpdate(); // Update UI after each ability
-        }
-    }
 
     private async executeUnitStartOfBattleAbility(unit: Unit) {
         if (unit.stats.hp <= 0) return;
