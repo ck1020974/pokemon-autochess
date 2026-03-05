@@ -181,6 +181,22 @@ export class BattleSimulator {
             return;
         }
 
+        // Totodile Family: Buff front ally (Rework)
+        if (unit.family === 'totodile') {
+            const idx = myTeam.indexOf(unit);
+            if (idx > 0) {
+                const front = myTeam[idx - 1];
+                if (front && front.stats.hp > 0) {
+                    const ratio = [0, 0.33, 0.5, 1.0][unit.level] || 0.33;
+                    const buffAtk = Math.ceil(unit.stats.attack * ratio);
+                    await this.notifySkill(unit, `發動了強壯之顎！`);
+                    this.buffAttack(front, buffAtk);
+                    this.playTeamAnimation([front], 'level-up-anim', 600);
+                    this.log(`${unit.name} 發動了強壯之顎，提升了 ${front.name} 的攻擊力！`);
+                }
+            }
+        }
+
         // Gastly Family: Atk buff at start (Swapped from Mankey)
         if (unit.family === 'gastly') {
             if (unit.templateId === 'gengar') { // Stage 3
@@ -541,13 +557,19 @@ export class BattleSimulator {
             });
         }
 
-        if (unit.family === 'charmander') {
+
+        // Cyndaquil rework: Team AOE before attack
+        if (unit.family === 'cyndaquil') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const amt = [0, 1, 2, 4][unit.level] || 2;
-                    this.growUnit(unit, amt, amt, '發動了蓄能焰襲');
-                    await this.notifySkill(unit, '發動了蓄能焰襲！');
+                    const dmg = [0, 1, 2, 5][unit.level] || 1;
+                    await this.notifySkill(unit, '發動了噴火！');
                     await this.playAnimation(unit, 'jump', 200);
+
+                    const allUnits = [...this.playerTeam, ...this.enemyTeam].filter(u => u && u !== unit && u.stats.hp > 0);
+                    for (const target of allUnits) {
+                        await this.dealDamage(unit, target, dmg, true, true);
+                    }
                 }
             });
         }
@@ -1049,8 +1071,8 @@ export class BattleSimulator {
             }
         }
 
-        // Totodile: Splash to neighbor (Fixed 2, 4, 6 dmg)
-        if (attacker.family === 'totodile' && !this.unitStates.get(attacker)?.isSilenced) {
+        // Charmander (Revised): Splash to neighbor (Inherited from old Totodile)
+        if (attacker.family === 'charmander' && !this.unitStates.get(attacker)?.isSilenced) {
             const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
             const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
             const idx = opTeam.indexOf(defender);
@@ -1058,7 +1080,7 @@ export class BattleSimulator {
                 const neighbor = opTeam[idx + 1];
                 if (neighbor && neighbor.stats.hp > 0) {
                     const splashDmg = [0, 2, 4, 8][attacker.level] || 2;
-                    await this.notifySkill(attacker, `對 ${neighbor.name} 使用了咬住！`);
+                    await this.notifySkill(attacker, `發動了火焰漩渦！`);
                     attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
                 }
             }
@@ -1153,12 +1175,19 @@ export class BattleSimulator {
         // source === null means it's an environment effect or synergy effect, which we treat as enemy for the defender
         const isEnemySource = source ? this.getTeams(source).side !== side : true;
 
-        if (isEnemySource && !isBypassing) {
+        if (isEnemySource) {
             const aliveMimes = myTeam.filter(u => u && u.family === 'mrmime' && u.stats.hp > 0);
             for (const mime of aliveMimes) {
                 const mState = this.unitStates.get(mime);
                 if (mState && mState.lightScreen > 0) {
-                    amount = Math.ceil(amount / 2);
+                    // "Ignore but still deduct": If bypassing, don't reduce amount but still consume charge
+                    if (!isBypassing) {
+                        amount = Math.ceil(amount / 2);
+                    } else if (source && source.family === 'pinsir') {
+                        // Keep the "Bypassing" message consistent if it hits a screen
+                        this.log(`${source.name} 的破格穿透了光牆！`);
+                    }
+
                     mState.lightScreen--;
                     this.playTeamAnimation([target], 'light-screen-anim', 400);
                     if (mState.lightScreen === 0) {
@@ -1300,9 +1329,9 @@ export class BattleSimulator {
                     else if (canAddHp && !canAddAtk) choice = 'hp';
                     else choice = Math.random() < 0.5 ? 'atk' : 'hp';
 
-                    this.log(`${killer.name} 發動了火焰輪！`);
-                    if (choice === 'atk') this.growUnit(killer, 0, buff, '火焰輪', null, false);
-                    else this.growUnit(killer, buff, 0, '火焰輪', null, false);
+                    this.log(`${killer.name} 發動了噴火！`);
+                    if (choice === 'atk') this.growUnit(killer, 0, buff, '噴火', null, false);
+                    else this.growUnit(killer, buff, 0, '噴火', null, false);
                 }
             };
 

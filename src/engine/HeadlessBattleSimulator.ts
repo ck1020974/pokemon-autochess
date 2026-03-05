@@ -183,6 +183,17 @@ export class HeadlessBattleSimulator {
                 this.spiritombTriggered.add(side);
             }
         }
+        if (unit.family === 'totodile') {
+            const idx = myTeam.indexOf(unit);
+            if (idx > 0) {
+                const front = myTeam[idx - 1];
+                if (front && front.stats.hp > 0) {
+                    const ratio = [0, 0.33, 0.5, 1.0][unit.level] || 0.33;
+                    const buffAtk = Math.ceil(unit.stats.attack * ratio);
+                    this.buffAttack(front, buffAtk);
+                }
+            }
+        }
         if (unit.family === 'ditto') {
             const idx = myTeam.indexOf(unit);
             let target: Unit | null = null;
@@ -202,7 +213,7 @@ export class HeadlessBattleSimulator {
                 this.calculateCachedSynergies(this.playerTeam.filter(u => u !== null), this.playerSynergies);
                 this.calculateCachedSynergies(this.enemyTeam.filter(u => u !== null), this.enemySynergies);
                 this.registerUnitAbilities(unit);
-                const startAbilities = ['gastly', 'igglybuff', 'houndour', 'spiritomb', 'mudkip', 'gulpin'];
+                const startAbilities = ['gastly', 'igglybuff', 'houndour', 'spiritomb', 'mudkip', 'gulpin', 'totodile'];
                 if (startAbilities.includes(unit.family)) await this.executeUnitStartOfBattleAbility(unit);
             }
         }
@@ -358,25 +369,16 @@ export class HeadlessBattleSimulator {
             });
         }
         // Fire logic moved to top of registerUnitAbilities
+        // Cyndaquil rework: Team AOE before attack
         if (unit.family === 'cyndaquil') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
-                const s = this.unitStates.get(unit) || {};
-                if (s.isSilenced) return;
+                const s = this.unitStates.get(unit);
+                if (s?.isSilenced) return;
                 if (e.source === unit) {
-                    const used = s.cyndaquilKills || 0;
-                    const max = unit.level + 1;
-                    if (used < max) {
-                        s.cyndaquilKills = used + 1;
-                        this.unitStates.set(unit, s);
-                        const amt = unit.level >= 3 ? 4 : 2;
-                        this.growUnit(unit, amt, amt);
-                    }
-                    const splashDmg = [0, 2, 6, 12][unit.level] || 2;
-                    const { opTeam } = this.getTeams(unit);
-                    const tIdx = e.target ? opTeam.indexOf(e.target) : -1;
-                    if (tIdx !== -1 && tIdx < opTeam.length - 1) {
-                        const neighbor = opTeam[tIdx + 1];
-                        if (neighbor && neighbor.stats.hp > 0) await this.dealDamage(unit, neighbor, splashDmg, true);
+                    const dmg = [0, 1, 2, 5][unit.level] || 1;
+                    const allUnits = [...this.playerTeam, ...this.enemyTeam].filter(u => u && u !== unit && u.stats.hp > 0);
+                    for (const target of allUnits) {
+                        await this.dealDamage(unit, target, dmg, true, true);
                     }
                 }
             });
@@ -690,11 +692,12 @@ export class HeadlessBattleSimulator {
                 }
             }
         }
-        if (attacker.family === 'totodile' && !s?.isSilenced) {
+        // Charmander rework: Splash to neighbor (Inherited from old Totodile)
+        if (attacker.family === 'charmander' && !s?.isSilenced) {
             const { opTeam } = this.getTeams(attacker);
             const idx = opTeam.indexOf(defender);
             if (idx !== -1 && idx < opTeam.length - 1 && opTeam[idx + 1] && opTeam[idx + 1]!.stats.hp > 0) {
-                const splashDmg = [0, 2, 4, 6][attacker.level] || 2;
+                const splashDmg = [0, 2, 4, 8][attacker.level] || 2;
                 promises.push(this.dealDamage(attacker, opTeam[idx + 1]!, splashDmg, true));
             }
         }
@@ -764,12 +767,14 @@ export class HeadlessBattleSimulator {
 
         // --- Light Screen Logic ---
         const isEnemySource = source ? this.getTeams(source).side !== side : true;
-        if (isEnemySource && !isBypassing) {
+        if (isEnemySource) {
             const aliveMimes = myTeam.filter(u => u && u.family === 'mrmime' && u.stats.hp > 0);
             for (const mime of aliveMimes) {
                 const mState = this.unitStates.get(mime);
                 if (mState && mState.lightScreen > 0) {
-                    amount = Math.ceil(amount / 2);
+                    if (!isBypassing) {
+                        amount = Math.ceil(amount / 2);
+                    }
                     mState.lightScreen--;
                     break;
                 }
