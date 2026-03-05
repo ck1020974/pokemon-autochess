@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-// Last updated: 2026-02-20 - Orientation Optimization Phase 4
+// Last updated: 2026-03-06 - Balance Fix Deploy
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { GameLoop, GamePhase } from './engine/GameLoop';
@@ -2198,6 +2198,8 @@ function App() {
 }
 
 export default App;
-/ /  
- t r i g g e r  
+/ / 
+ 
+ t r i g g e r 
+ 
  
