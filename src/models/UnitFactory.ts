@@ -382,19 +382,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'onix', name: '大岩蛇', tier: 4, family: 'onix',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/大岩蛇00.webp', battleImageUrl: 'assets/大岩蛇01.webp',
-        description: '攻擊後，移動至隊伍最後方；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix'
+        description: '攻擊後，移動至隊伍最後方；反彈 100% 所受傷害。', synergies: ['Hard', 'Cave'], evolveId: 'steelix'
     },
     steelix: {
         id: 'steelix', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '攻擊後，移動至隊伍最後方；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], evolveId: 'steelix_final', isHiddenFromShop: true
+        description: '攻擊後，移動至隊伍最後方；反彈 100% 所受傷害。', synergies: ['Hard', 'Cave'], evolveId: 'steelix_final', isHiddenFromShop: true
     },
     steelix_final: {
         id: 'steelix_final', name: '大鋼蛇', tier: 4, family: 'onix',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/大鋼蛇00.webp', battleImageUrl: 'assets/大鋼蛇01.webp',
-        description: '攻擊後，移動至隊伍最後方；反彈 100% 所受傷害。', synergies: ['Cave', 'Hard'], isHiddenFromShop: true
+        description: '攻擊後，移動至隊伍最後方；反彈 100% 所受傷害。', synergies: ['Hard', 'Cave'], isHiddenFromShop: true
     },
 
     // 20. Doduo
@@ -462,19 +462,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'houndour', name: '戴魯比', tier: 3, family: 'houndour',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/戴魯比00.webp', battleImageUrl: 'assets/戴魯比01.webp',
-        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 1 次)。', synergies: ['Thief', 'Fire'], evolveId: 'houndoom'
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 1 次)。', synergies: ['Fire', 'Thief'], evolveId: 'houndoom'
     },
     houndoom: {
         id: 'houndoom', name: '黑魯加', tier: 3, family: 'houndour',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/黑魯加00.webp', battleImageUrl: 'assets/黑魯加01.webp',
-        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 2 次)。', synergies: ['Thief', 'Fire'], evolveId: 'houndoom_final', isHiddenFromShop: true
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 2 次)。', synergies: ['Fire', 'Thief'], evolveId: 'houndoom_final', isHiddenFromShop: true
     },
     houndoom_final: {
         id: 'houndoom_final', name: '黑魯加', tier: 3, family: 'houndour',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/黑魯加00.webp', battleImageUrl: 'assets/黑魯加01.webp',
-        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 3 次)。', synergies: ['Thief', 'Fire'], isHiddenFromShop: true
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 3 次)。', synergies: ['Fire', 'Thief'], isHiddenFromShop: true
     },
 
     // 24. Sneasel
@@ -482,19 +482,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'sneasel', name: '狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/狃拉00.webp', battleImageUrl: 'assets/狃拉01.webp',
-        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['SwordDance', 'Snow'], evolveId: 'weavile'
+        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], evolveId: 'weavile'
     },
     weavile: {
         id: 'weavile', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['SwordDance', 'Snow'], evolveId: 'weavile_final', isHiddenFromShop: true
+        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], evolveId: 'weavile_final', isHiddenFromShop: true
     },
     weavile_final: {
         id: 'weavile_final', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['SwordDance', 'Snow'], isHiddenFromShop: true
+        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], isHiddenFromShop: true
     },
 
     // 25. Shuppet (Tier 1)
@@ -719,19 +719,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'ralts', name: '拉魯拉絲', tier: 3, family: 'ralts',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/拉魯拉絲00.webp', battleImageUrl: 'assets/拉魯拉絲01.webp',
-        description: '攻擊時，同時對敵方末位造成 50% 傷害。', synergies: ['Psychic'], evolveId: 'kirlia'
+        description: '攻擊時，同時對敵方末位造成 50% 傷害。', synergies: ['Psychic', 'Thief'], evolveId: 'kirlia'
     },
     kirlia: {
         id: 'kirlia', name: '奇魯莉安', tier: 3, family: 'ralts',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/奇魯莉安00.webp', battleImageUrl: 'assets/奇魯莉安01.webp',
-        description: '攻擊時，同時對敵方末位造成 50% 傷害。', synergies: ['Psychic'], evolveId: 'gardevoir', isHiddenFromShop: true
+        description: '攻擊時，同時對敵方末位造成 50% 傷害。', synergies: ['Psychic', 'Thief'], evolveId: 'gardevoir', isHiddenFromShop: true
     },
     gardevoir: {
         id: 'gardevoir', name: '沙奈朵', tier: 3, family: 'ralts',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/沙奈朵00.webp', battleImageUrl: 'assets/沙奈朵01.webp',
-        description: '攻擊時，同時對敵方末位造成 100% 傷害。', synergies: ['Psychic'], isHiddenFromShop: true
+        description: '攻擊時，同時對敵方末位造成 100% 傷害。', synergies: ['Psychic', 'Thief'], isHiddenFromShop: true
     },
     mrmime: {
         id: 'mrmime', name: '魔牆人偶', tier: 5, family: 'mrmime',
