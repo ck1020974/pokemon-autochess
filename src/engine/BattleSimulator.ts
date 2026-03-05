@@ -79,12 +79,12 @@ export class BattleSimulator {
         const getRank = (unit: Unit) => {
             if (unit.family === 'spiritomb') return 4; // Phase 1: Silence
             if (unit.family === 'mrmime') return 3;    // Phase 2: Light Screen
+            if (unit.family === 'houndour') return 1;  // Phase 4: First Strike (Ensure they are last even if they have Thief)
 
             const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin', 'natu'];
             const hasStartupSynergy = unit.synergies.includes('Thief') || unit.synergies.includes('Trick');
             if (utility.includes(unit.family) || hasStartupSynergy) return 2; // Phase 3: Utility/Synergy
 
-            if (unit.family === 'houndour') return 1; // Phase 4: First Strike
             return 0; // Totodile, etc.
         };
 
