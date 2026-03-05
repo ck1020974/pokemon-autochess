@@ -841,18 +841,7 @@ export class HeadlessBattleSimulator {
             // Silence check for unit abilities
             if (this.unitStates.get(killer)?.isSilenced) return;
 
-            if (killer.family === 'charmander') {
-                const buff = killer.level;
-                const canAddAtk = killer.stats.attack < 50;
-                const canAddHp = killer.stats.maxHp < 50;
-                let choice: 'hp' | 'atk';
-                if (canAddAtk && !canAddHp) choice = 'atk';
-                else if (canAddHp && !canAddAtk) choice = 'hp';
-                else choice = Math.random() < 0.5 ? 'atk' : 'hp';
 
-                if (choice === 'atk') this.growUnit(killer, 0, buff);
-                else this.growUnit(killer, buff, 0);
-            }
         }
         await this.compactTeams();
     }

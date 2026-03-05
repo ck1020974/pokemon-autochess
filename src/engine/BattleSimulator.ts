@@ -1318,21 +1318,7 @@ export class BattleSimulator {
                 // Check Silence for individual unit abilities
                 if (this.unitStates.get(killer)?.isSilenced) return;
 
-                // Cyndaquil family: Stats on kill (Temporary)
-                if (killer.family === 'cyndaquil') {
-                    const buff = [0, 2, 4, 8][killer.level] || 2;
-                    const canAddAtk = killer.stats.attack < 50;
-                    const canAddHp = killer.stats.maxHp < 50;
 
-                    let choice: 'hp' | 'atk';
-                    if (canAddAtk && !canAddHp) choice = 'atk';
-                    else if (canAddHp && !canAddAtk) choice = 'hp';
-                    else choice = Math.random() < 0.5 ? 'atk' : 'hp';
-
-                    this.log(`${killer.name} 發動了噴火！`);
-                    if (choice === 'atk') this.growUnit(killer, 0, buff, '噴火', null, false);
-                    else this.growUnit(killer, buff, 0, '噴火', null, false);
-                }
             };
 
             if (this.isSimulatingStep) {
