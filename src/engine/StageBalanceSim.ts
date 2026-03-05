@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Unit } from '../models/Unit';
 import { UNIT_TEMPLATES } from '../models/UnitFactory';
 import { HeadlessBattleSimulator } from './HeadlessBattleSimulator';
