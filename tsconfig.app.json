@@ -33,6 +33,7 @@
   ],
   "exclude": [
     "src/engine/SimBatch.ts",
-    "src/engine/StageBalanceSim.ts"
+    "src/engine/StageBalanceSim.ts",
+    "src/engine/UnitBalanceSim.ts"
   ]
 }

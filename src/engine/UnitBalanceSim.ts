@@ -166,7 +166,7 @@ async function runUnitBalanceSim() {
     for (const [key, stat] of sortedStats) {
         if (stat.total < 20) continue; // 樣本數過低不計入
         const winRate = (stat.wins / stat.total) * 100;
-        const [family, level] = key.split('_');
+        const [_, level] = key.split('_');
 
         let diagnostic = '✅ 正常';
         if (winRate > 70) diagnostic = '🔥 強力 (Overperforming)';
