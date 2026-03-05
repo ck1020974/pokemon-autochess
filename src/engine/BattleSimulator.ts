@@ -700,17 +700,16 @@ export class BattleSimulator {
         if (unit.family === 'fuecoco') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const { myTeam } = this.getTeams(unit);
-                // Ensure unit is still alive and in the team array (not replaced by null)
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const hpBuff = [0, 3, 6, 10][unit.level] || 3;
+                    const hpBuff = 3;
+                    const targetCount = unit.level; // 1, 2, or 3
                     const now = Date.now();
                     const state = this.unitStates.get(unit) || {};
                     const lastGlow = state.lastGlobalGlowTime || 0;
 
                     if (now - lastGlow > 500 && !(e.context as any).fuecocoAnimTriggered) {
                         (e.context as any).fuecocoAnimTriggered = true;
-                        // Mark all fuecocos on my team so they don't spam glow
                         myTeam.filter(u => u?.family === 'fuecoco').forEach(u => {
                             if (u) {
                                 const us = this.unitStates.get(u) || {};
@@ -718,17 +717,20 @@ export class BattleSimulator {
                                 this.unitStates.set(u, us);
                             }
                         });
-                        this.notifySkill(unit, `發動了閃焰高歌！`); // Don't await so it doesn't block sync loops
+                        this.notifySkill(unit, `發動了閃焰高歌！`);
                     }
 
-                    // Buff one random living ally
-                    const living = myTeam.filter(u => u && u.stats.hp > 0);
-                    if (living.length > 0) {
-                        const target = living[Math.floor(Math.random() * living.length)];
-                        // 只對被選中的目標播放特效
-                        this.playTeamAnimation([target], 'glow-pale-red', 1000);
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
-                        this.growUnit(target, hpBuff, 0, '呆火鱷技能強化', original, true);
+                    // Buff random living allies who are under HP limit
+                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && u.stats.maxHp < 50);
+                    if (livingEligible.length > 0) {
+                        const shuffled = [...livingEligible].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+
+                        targets.forEach(target => {
+                            this.playTeamAnimation([target], 'glow-pale-red', 1000);
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                            this.growUnit(target, hpBuff, 0, '呆火鱷技能強化', original, true);
+                        });
                     }
                 }
             });
@@ -738,10 +740,10 @@ export class BattleSimulator {
         if (unit.family === 'quaxly') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const { myTeam } = this.getTeams(unit);
-                // Ensure unit is still alive and in the team array
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const atkBuff = [0, 3, 6, 10][unit.level] || 3;
+                    const atkBuff = 3;
+                    const targetCount = unit.level; // 1, 2, or 3
                     const now = Date.now();
                     const state = this.unitStates.get(unit) || {};
                     const lastGlow = state.lastGlobalGlowTime || 0;
@@ -757,14 +759,18 @@ export class BattleSimulator {
                         });
                         this.notifySkill(unit, `發動了流水旋舞！`);
                     }
-                    // Buff one random living ally
-                    const living = myTeam.filter(u => u && u.stats.hp > 0);
-                    if (living.length > 0) {
-                        const target = living[Math.floor(Math.random() * living.length)];
-                        // 只對被選中的目標播放特效
-                        this.playTeamAnimation([target], 'glow-pale-blue', 1000);
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
-                        this.growUnit(target, 0, atkBuff, '潤水鴨技能強化', original, true);
+
+                    // Buff random living allies who are under ATK limit
+                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && u.stats.attack < 50);
+                    if (livingEligible.length > 0) {
+                        const shuffled = [...livingEligible].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+
+                        targets.forEach(target => {
+                            this.playTeamAnimation([target], 'glow-pale-blue', 1000);
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                            this.growUnit(target, 0, atkBuff, '潤水鴨技能強化', original, true);
+                        });
                     }
                 }
             });
@@ -950,9 +956,10 @@ export class BattleSimulator {
         if (unit.family === 'sprigatito') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 const { myTeam } = this.getTeams(unit);
-                // Ensure unit is still alive and in the team array (not replaced by null)
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
+                    const buff = 1;
+                    const targetCount = unit.level; // 1, 2, or 3
                     const now = Date.now();
                     const state = this.unitStates.get(unit) || {};
                     const lastGlow = state.lastGlobalGlowTime || 0;
@@ -968,15 +975,18 @@ export class BattleSimulator {
                         });
                         this.notifySkill(unit, `發動了千變萬花！`);
                     }
-                    // Buff one random living ally
-                    const living = myTeam.filter(u => u && u.stats.hp > 0);
-                    if (living.length > 0) {
-                        const target = living[Math.floor(Math.random() * living.length)];
-                        // 只對被選中的目標播放特效
-                        this.playTeamAnimation([target], 'glow-pale-green', 1000);
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
-                        const buff = [0, 1, 3, 5][unit.level] || 1;
-                        this.growUnit(target, buff, buff, '新葉喵技能強化', original, true);
+
+                    // Buff random living allies who are under BOTH limits
+                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && (u.stats.maxHp < 50 || u.stats.attack < 50));
+                    if (livingEligible.length > 0) {
+                        const shuffled = [...livingEligible].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+
+                        targets.forEach(target => {
+                            this.playTeamAnimation([target], 'glow-pale-green', 1000);
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                            this.growUnit(target, buff, buff, '新葉喵技能強化', original, true);
+                        });
                     }
                 }
             });
@@ -1072,7 +1082,8 @@ export class BattleSimulator {
         // Snover: Knockback
         if (attacker.family === 'snover' && !this.unitStates.get(attacker)?.isSilenced) {
             const buffAtk = [0, 1, 2, 5][attacker.level] || 1;
-            this.growUnit(attacker, 0, buffAtk, attacker.name);
+            const original = this.originalPlayerTeam?.find(u => u && u.id === attacker.id);
+            this.growUnit(attacker, 0, buffAtk, attacker.name, original);
             if (defender.stats.hp > 0) {
                 const team = this.playerTeam.includes(defender) ? this.playerTeam : this.enemyTeam;
                 const idx = team.indexOf(defender);

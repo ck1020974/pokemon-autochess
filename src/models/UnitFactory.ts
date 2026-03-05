@@ -230,19 +230,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'sprigatito', name: '新葉喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/新葉喵00.webp', battleImageUrl: 'assets/新葉喵01.webp',
-        description: '召喚友軍後，隨機友軍永久 +1 攻擊與生命。', synergies: ['Starter', 'Grass'], evolveId: 'floragato'
+        description: '召喚友軍後，隨機 1 位友軍永久 +1 攻擊與生命。', synergies: ['Starter', 'Grass'], evolveId: 'floragato'
     },
     floragato: {
         id: 'floragato', name: '蒂蕾喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/蒂蕾喵00.webp', battleImageUrl: 'assets/蒂蕾喵01.webp',
-        description: '召喚友軍後，隨機友軍永久 +3 攻擊與生命。', synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
+        description: '召喚友軍後，隨機 2 位友軍永久 +1 攻擊與生命。', synergies: ['Starter', 'Grass'], evolveId: 'meowscarada', isHiddenFromShop: true
     },
     meowscarada: {
         id: 'meowscarada', name: '魔幻假面喵', tier: 4, family: 'sprigatito',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/魔幻假面喵00.webp', battleImageUrl: 'assets/魔幻假面喵01.webp',
-        description: '召喚友軍後，隨機友軍永久 +5 攻擊與生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '召喚友軍後，隨機 3 位友軍永久 +1 攻擊與生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 13. Fuecoco
@@ -250,19 +250,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'fuecoco', name: '呆火鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/呆火鱷00.webp', battleImageUrl: 'assets/呆火鱷01.webp',
-        description: '友軍擊殺後，隨機友軍永久 +3 生命。', synergies: ['Starter', 'Fire'], evolveId: 'crocalor'
+        description: '友軍擊殺後，隨機 1 位友軍永久 +3 生命。', synergies: ['Starter', 'Fire'], evolveId: 'crocalor'
     },
     crocalor: {
         id: 'crocalor', name: '炙燙鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/炙燙鱷00.webp', battleImageUrl: 'assets/炙燙鱷01.webp',
-        description: '友軍擊殺後，隨機友軍永久 +6 生命。', synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 2 位友軍永久 +3 生命。', synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
     },
     skeledirge: {
         id: 'skeledirge', name: '骨紋巨聲鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/骨紋巨聲鱷00.webp', battleImageUrl: 'assets/骨紋巨聲鱷01.webp',
-        description: '友軍擊殺後，隨機友軍永久 +10 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 3 位友軍永久 +3 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 14. Quaxly
@@ -270,19 +270,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'quaxly', name: '潤水鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/潤水鴨00.webp', battleImageUrl: 'assets/潤水鴨01.webp',
-        description: '友軍擊殺後，隨機友軍永久 +3 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
+        description: '友軍擊殺後，隨機 1 位友軍永久 +3 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
     },
     quaxwell: {
         id: 'quaxwell', name: '湧躍鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/湧躍鴨00.webp', battleImageUrl: 'assets/湧躍鴨01.webp',
-        description: '友軍擊殺後，隨機友軍永久 +6 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 2 位友軍永久 +3 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
     },
     quaquaval: {
         id: 'quaquaval', name: '狂歡浪舞鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/狂歡浪舞鴨00.webp', battleImageUrl: 'assets/狂歡浪舞鴨01.webp',
-        description: '友軍擊殺後，隨機友軍永久 +10 攻擊。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 3 位友軍永久 +3 攻擊值。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 15. Rattata (Loop same name for stage 3)
@@ -607,23 +607,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
     },
 
     // moved: 27. Snover
-    snover: {
-        id: 'snover', name: '雪笠怪', tier: 3, family: 'snover',
-        baseStats: { hp: 3, maxHp: 3, attack: 5 },
-        imageUrl: 'assets/雪笠怪00.webp', battleImageUrl: 'assets/雪笠怪01.webp',
-        description: '攻擊後 +1 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], evolveId: 'abomasnow'
-    },
+    description: '攻擊後永久 +1 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], evolveId: 'abomasnow'
+},
     abomasnow: {
         id: 'abomasnow', name: '暴雪王', tier: 3, family: 'snover',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/暴雪王00.webp', battleImageUrl: 'assets/暴雪王01.webp',
-        description: '攻擊後 +2 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], evolveId: 'abomasnow_final', isHiddenFromShop: true
+        description: '攻擊後永久 +2 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], evolveId: 'abomasnow_final', isHiddenFromShop: true
     },
     abomasnow_final: {
         id: 'abomasnow_final', name: '暴雪王', tier: 3, family: 'snover',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/暴雪王00.webp', battleImageUrl: 'assets/暴雪王01.webp',
-        description: '攻擊後 +5 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], isHiddenFromShop: true
+        description: '攻擊後永久 +5 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], isHiddenFromShop: true
     },
 
     // 32. Mimikyu

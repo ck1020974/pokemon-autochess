@@ -440,16 +440,18 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const s = this.unitStates.get(unit);
                 const { myTeam } = this.getTeams(unit);
-                // Ensure unit is still alive and in the team array (not replaced by null)
                 if (unit.stats.hp <= 0 || s?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const hpBuff = [0, 3, 6, 10][unit.level] || 3;
-                    // Buff one random living ally
-                    const living = myTeam.filter(u => u && u.stats.hp > 0);
-                    if (living.length > 0) {
-                        const target = living[Math.floor(Math.random() * living.length)];
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
-                        this.growUnit(target, hpBuff, 0, original, true);
+                    const hpBuff = 3;
+                    const targetCount = unit.level;
+                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && u.stats.maxHp < 50);
+                    if (livingEligible.length > 0) {
+                        const shuffled = [...livingEligible].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+                        targets.forEach(target => {
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                            this.growUnit(target, hpBuff, 0, original, true);
+                        });
                     }
                 }
             });
@@ -457,16 +459,18 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'quaxly') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const { myTeam } = this.getTeams(unit);
-                // Ensure unit is still alive and in the team array
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const atkBuff = [0, 3, 6, 10][unit.level] || 3;
-                    // Buff one random living ally
-                    const living = myTeam.filter(u => u && u.stats.hp > 0);
-                    if (living.length > 0) {
-                        const target = living[Math.floor(Math.random() * living.length)];
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
-                        this.growUnit(target, 0, atkBuff, original, true);
+                    const atkBuff = 3;
+                    const targetCount = unit.level;
+                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && u.stats.attack < 50);
+                    if (livingEligible.length > 0) {
+                        const shuffled = [...livingEligible].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+                        targets.forEach(target => {
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                            this.growUnit(target, 0, atkBuff, original, true);
+                        });
                     }
                 }
             });
@@ -474,16 +478,18 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'sprigatito') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 const { myTeam } = this.getTeams(unit);
-                // Ensure unit is still alive and in the team array
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    // Buff one random living ally
-                    const living = myTeam.filter(u => u && u.stats.hp > 0);
-                    if (living.length > 0) {
-                        const target = living[Math.floor(Math.random() * living.length)];
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
-                        const buff = [0, 1, 3, 5][unit.level] || 1;
-                        this.growUnit(target, buff, buff, original, true);
+                    const buff = 1;
+                    const targetCount = unit.level;
+                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && (u.stats.maxHp < 50 || u.stats.attack < 50));
+                    if (livingEligible.length > 0) {
+                        const shuffled = [...livingEligible].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+                        targets.forEach(target => {
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                            this.growUnit(target, buff, buff, original, true);
+                        });
                     }
                 }
             });
@@ -704,7 +710,8 @@ export class HeadlessBattleSimulator {
         }
         await Promise.all(promises);
         if (attacker.family === 'snover' && !s?.isSilenced) {
-            this.growUnit(attacker, 0, 1);
+            const original = this.originalPlayerTeam?.find(u => u && u.id === attacker.id);
+            this.growUnit(attacker, 0, 1, original);
             if (defender.stats.hp > 0) {
                 const { myTeam: defTeam } = this.getTeams(defender);
                 const idx = defTeam.indexOf(defender);
