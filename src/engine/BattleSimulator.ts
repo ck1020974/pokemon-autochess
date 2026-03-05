@@ -404,6 +404,84 @@ export class BattleSimulator {
             this.lightScreenActivated.add(side);
             await this.delay(200);
         }
+
+        // --- New Synergies ---
+
+        // Thief Synergy: Steal Attack
+        if (unit.synergies.includes('Thief')) {
+            const count = this.getSynergyCountForUnit(unit, 'Thief');
+            if (count >= 2) {
+                const buff = count >= 4 ? 5 : (count >= 3 ? 3 : 2);
+                const candidates = opTeam.filter(e => e && e.stats.hp > 0);
+                if (candidates.length > 0) {
+                    // Find strongest: sum of HP and Attack
+                    let strongest = candidates[0];
+                    let maxPower = strongest.stats.hp + strongest.stats.attack;
+                    for (const e of candidates) {
+                        const power = e.stats.hp + e.stats.attack;
+                        if (power > maxPower) {
+                            strongest = e;
+                            maxPower = power;
+                        }
+                    }
+
+                    this.log(`${unit.name} 對 ${strongest.name} 發動了小偷`);
+                    await this.notifySkill(unit, `發動了小偷！`);
+
+                    const stealAmt = Math.min(strongest.stats.attack - 1, buff);
+                    if (stealAmt > 0) {
+                        strongest.stats.attack -= stealAmt;
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
+                        // Permanent increase for player's unit
+                        this.growUnit(unit, 0, stealAmt, '小偷', original, true);
+                    }
+                    this.playAnimation(unit, 'jump', 200);
+                }
+            }
+        }
+
+        // Trick Synergy: Swap HP (Temporary)
+        if (unit.synergies.includes('Trick')) {
+            const count = this.getSynergyCountForUnit(unit, 'Trick');
+            if (count >= 2) {
+                const candidates = opTeam.filter(e => e && e.stats.hp > 0);
+                if (candidates.length > 0) {
+                    const target = candidates[Math.floor(Math.random() * candidates.length)];
+                    this.log(`${unit.name} 對 ${target.name} 發動了戲法空間`);
+                    await this.notifySkill(unit, `發動了戲法空間！`);
+
+                    const myHp = unit.stats.hp;
+                    const myMaxHp = unit.stats.maxHp;
+                    const opHp = target.stats.hp;
+                    const opMaxHp = target.stats.maxHp;
+
+                    // Swap without growUnit (no permanent target provided, so it's temporary for clones only)
+                    unit.stats.hp = opHp;
+                    unit.stats.maxHp = opMaxHp;
+                    target.stats.hp = myHp;
+                    target.stats.maxHp = myMaxHp;
+
+                    // Mark as swapped for UI
+                    const myState = this.unitStates.get(unit) || {};
+                    myState.hpSwapped = true;
+                    this.unitStates.set(unit, myState);
+
+                    const opState = this.unitStates.get(target) || {};
+                    opState.hpSwapped = true;
+                    this.unitStates.set(target, opState);
+
+                    unit.capStats();
+                    target.capStats();
+
+                    await Promise.all([
+                        this.playAnimation(unit, 'teleport', 400),
+                        this.playAnimation(target, 'teleport', 400)
+                    ]);
+                    await this.delay(400);
+                    if (this.onUpdate) this.onUpdate();
+                }
+            }
+        }
     }
 
     private getSynergyCountForUnit(unit: Unit, synergyId: string): number {
@@ -607,7 +685,7 @@ export class BattleSimulator {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'SwordDance');
-                    const buff = count >= 3 ? 2 : (count >= 2 ? 1 : 0);
+                    const buff = count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
                     if (buff > 0) {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, 0, buff, '劍舞', original, false);
@@ -1318,7 +1396,13 @@ export class BattleSimulator {
                 // Check Silence for individual unit abilities
                 if (this.unitStates.get(killer)?.isSilenced) return;
 
-
+                // BugBite Synergy: Kill Reward
+                const bugBiteCount = this.getSynergyCountForUnit(killer, 'BugBite');
+                if (bugBiteCount >= 2) {
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === killer.id);
+                    this.log(`${killer.name} 發動了蟲咬`);
+                    this.growUnit(killer, 2, 0, '蟲咬', original, true);
+                }
             };
 
             if (this.isSimulatingStep) {

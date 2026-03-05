@@ -43,7 +43,7 @@ interface ConfirmDialogState {
 // --- Helper Components ---
 
 // UnitCard with Direct Lock & Silence Support
-function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock }: any) {
+function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock }: any) {
     if (!unit || unit.stats.hp <= 0) {
         return (
             <div className="slot-placeholder">
@@ -95,7 +95,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 
             <div className="unit-stats">
                 <span className="stat-atk">{unit.stats.attack}</span>
-                <span className="stat-hp">{unit.stats.hp}</span>
+                <span className="stat-hp" style={{ color: hpSwapped ? '#a855f7' : undefined }}>{unit.stats.hp}</span>
             </div>
         </div>
     );
@@ -1885,6 +1885,7 @@ function App() {
                                         isInteractive={isInteractive}
                                         isSelected={selected?.unit === unit && selected?.source === 'BOARD'}
                                         silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
+                                        hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
                                         isEvolving={unit && evolvingUnitId === unit.id}
                                     />
                                 </div>
@@ -1905,6 +1906,7 @@ function App() {
                                         onClick={() => handleSelect(unit, i, 'ENEMY')}
                                         flipped={true}
                                         silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
+                                        hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
                                         isEvolving={unit && evolvingUnitId === unit.id}
                                     />
                                 </div>

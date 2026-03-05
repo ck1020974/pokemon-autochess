@@ -342,19 +342,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'meowth', name: '喵喵', tier: 2, family: 'meowth',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/喵喵00.webp', battleImageUrl: 'assets/喵喵01.webp',
-        description: '準備階段時 +1 金幣。', synergies: ['Normal'], evolveId: 'persian'
+        description: '準備階段時 +1 金幣。', synergies: ['Normal', 'Thief'], evolveId: 'persian'
     },
     persian: {
         id: 'persian', name: '貓老大', tier: 2, family: 'meowth',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/貓老大00.webp', battleImageUrl: 'assets/貓老大01.webp',
-        description: '準備階段時 +3 金幣。', synergies: ['Normal'], evolveId: 'persian_final', isHiddenFromShop: true
+        description: '準備階段時 +3 金幣。', synergies: ['Normal', 'Thief'], evolveId: 'persian_final', isHiddenFromShop: true
     },
     persian_final: {
         id: 'persian_final', name: '貓老大', tier: 2, family: 'meowth',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/貓老大00.webp', battleImageUrl: 'assets/貓老大01.webp',
-        description: '準備階段時 +5 金幣。', synergies: ['Normal'], isHiddenFromShop: true
+        description: '準備階段時 +5 金幣。', synergies: ['Normal', 'Thief'], isHiddenFromShop: true
     },
 
     // 18. Mankey (Tier 1)
@@ -462,19 +462,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'houndour', name: '戴魯比', tier: 3, family: 'houndour',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/戴魯比00.webp', battleImageUrl: 'assets/戴魯比01.webp',
-        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 1 次)。', synergies: ['Angry', 'Fire'], evolveId: 'houndoom'
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 1 次)。', synergies: ['Thief', 'Fire'], evolveId: 'houndoom'
     },
     houndoom: {
         id: 'houndoom', name: '黑魯加', tier: 3, family: 'houndour',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/黑魯加00.webp', battleImageUrl: 'assets/黑魯加01.webp',
-        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 2 次)。', synergies: ['Angry', 'Fire'], evolveId: 'houndoom_final', isHiddenFromShop: true
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 2 次)。', synergies: ['Thief', 'Fire'], evolveId: 'houndoom_final', isHiddenFromShop: true
     },
     houndoom_final: {
         id: 'houndoom_final', name: '黑魯加', tier: 3, family: 'houndour',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/黑魯加00.webp', battleImageUrl: 'assets/黑魯加01.webp',
-        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 3 次)。', synergies: ['Angry', 'Fire'], isHiddenFromShop: true
+        description: '戰鬥開始時，對生命最少敵方造成 4 傷害 (共 3 次)。', synergies: ['Thief', 'Fire'], isHiddenFromShop: true
     },
 
     // 24. Sneasel
@@ -502,19 +502,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'shuppet', name: '怨影娃娃', tier: 2, family: 'shuppet',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/怨影娃娃00.webp', battleImageUrl: 'assets/怨影娃娃01.webp',
-        description: '受傷後對隨機敵方造成 2 傷害。', synergies: ['Ghost'], evolveId: 'banette'
+        description: '受傷後對隨機敵方造成 2 傷害。', synergies: ['Ghost', 'Trick'], evolveId: 'banette'
     },
     banette: {
         id: 'banette', name: '詛咒娃娃', tier: 2, family: 'shuppet',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/詛咒娃娃00.webp', battleImageUrl: 'assets/詛咒娃娃01.webp',
-        description: '受傷後對隨機敵方造成 5 傷害。', synergies: ['Ghost'], evolveId: 'banette_final', isHiddenFromShop: true
+        description: '受傷後對隨機敵方造成 5 傷害。', synergies: ['Ghost', 'Trick'], evolveId: 'banette_final', isHiddenFromShop: true
     },
     banette_final: {
         id: 'banette_final', name: '詛咒娃娃', tier: 2, family: 'shuppet',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/詛咒娃娃00.webp', battleImageUrl: 'assets/詛咒娃娃01.webp',
-        description: '受傷後對隨機敵方造成 10 傷害。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '受傷後對隨機敵方造成 10 傷害。', synergies: ['Ghost', 'Trick'], isHiddenFromShop: true
     },
 
     // 26. Drifloon (Renamed from Drifblim Base)
@@ -583,19 +583,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'ditto', name: '百變怪', tier: 5, family: 'ditto',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
-        description: '變身為前方角色並複製招式。', synergies: ['Normal'], evolveId: 'ditto_2'
+        description: '變身為前方角色並複製招式。', synergies: ['Normal', 'Trick'], evolveId: 'ditto_2'
     },
     ditto_2: {
         id: 'ditto_2', name: '百變怪', tier: 5, family: 'ditto',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
-        description: '變身為前方角色並複製招式。', synergies: ['Normal'], evolveId: 'ditto_3', isHiddenFromShop: true
+        description: '變身為前方角色並複製招式。', synergies: ['Normal', 'Trick'], evolveId: 'ditto_3', isHiddenFromShop: true
     },
     ditto_3: {
         id: 'ditto_3', name: '百變怪', tier: 5, family: 'ditto',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/百變怪00.webp', battleImageUrl: 'assets/百變怪01.webp',
-        description: '變身為前方角色並複製招式。', synergies: ['Normal'], isHiddenFromShop: true
+        description: '變身為前方角色並複製招式。', synergies: ['Normal', 'Trick'], isHiddenFromShop: true
     },
 
     // 31. Sableye
@@ -603,19 +603,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'sableye', name: '勾魂眼', tier: 5, family: 'sableye',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
-        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], evolveId: 'sableye_2'
+        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost', 'Thief'], evolveId: 'sableye_2'
     },
     sableye_2: {
         id: 'sableye_2', name: '勾魂眼', tier: 5, family: 'sableye',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
-        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], evolveId: 'sableye_3', isHiddenFromShop: true
+        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost', 'Thief'], evolveId: 'sableye_3', isHiddenFromShop: true
     },
     sableye_3: {
         id: 'sableye_3', name: '勾魂眼', tier: 5, family: 'sableye',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
-        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost'], isHiddenFromShop: true
+        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost', 'Thief'], isHiddenFromShop: true
     },
 
     snover: {
@@ -676,44 +676,44 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'spiritomb', name: '花岩怪', tier: 5, family: 'spiritomb',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/花岩怪00.webp', battleImageUrl: 'assets/花岩怪01.webp',
-        description: '戰鬥開始時，使 2 個敵方角色的招式無效化。', synergies: ['Ghost']
+        description: '戰鬥開始時，使 2 個敵方角色的招式無效化。', synergies: ['Ghost', 'Thief']
     },
     heracross: {
         id: 'heracross', name: '赫拉克羅斯', tier: 3, family: 'heracross',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/赫拉克羅斯00.webp', battleImageUrl: 'assets/赫拉克羅斯01.webp',
-        description: '首次受傷後，攻擊翻倍。', synergies: ['SwordDance']
+        description: '首次受傷後，攻擊翻倍。', synergies: ['SwordDance', 'BugBite']
     },
     pinsir: {
         id: 'pinsir', name: '凱羅斯', tier: 3, family: 'pinsir',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/凱羅斯00.webp', battleImageUrl: 'assets/凱羅斯01.webp',
-        description: '無視所有減傷和閃避效果。', synergies: ['SwordDance']
+        description: '無視所有減傷和閃避效果。', synergies: ['SwordDance', 'BugBite']
     },
     farfetchd: {
         id: 'farfetchd', name: '大蔥鴨', tier: 5, family: 'farfetchd',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/大蔥鴨00.webp', battleImageUrl: 'assets/大蔥鴨01.webp',
-        description: '首次攻擊造成 99 傷害。', synergies: ['Normal']
+        description: '首次攻擊造成 99 傷害。', synergies: ['Normal', 'SwordDance']
     },
     // --- New Psychic Units ---
     natu: {
         id: 'natu', name: '天然雀', tier: 2, family: 'natu',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/天然雀00.webp', battleImageUrl: 'assets/天然雀01.webp',
-        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic'], evolveId: 'xatu'
+        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Trick'], evolveId: 'xatu'
     },
     xatu: {
         id: 'xatu', name: '天然鳥', tier: 2, family: 'natu',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/天然鳥00.webp', battleImageUrl: 'assets/天然鳥01.webp',
-        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic'], evolveId: 'xatu_final', isHiddenFromShop: true
+        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Trick'], evolveId: 'xatu_final', isHiddenFromShop: true
     },
     xatu_final: {
         id: 'xatu_final', name: '天然鳥', tier: 2, family: 'natu',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/天然鳥00.webp', battleImageUrl: 'assets/天然鳥01.webp',
-        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic'], isHiddenFromShop: true
+        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Trick'], isHiddenFromShop: true
     },
     ralts: {
         id: 'ralts', name: '拉魯拉絲', tier: 3, family: 'ralts',
@@ -737,7 +737,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'mrmime', name: '魔牆人偶', tier: 5, family: 'mrmime',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/魔牆人偶00.webp', battleImageUrl: 'assets/魔牆人偶01.webp',
-        description: '我方受到的前 5 次傷害減半。', synergies: ['Psychic']
+        description: '我方受到的前 5 次傷害減半。', synergies: ['Psychic', 'Trick']
     }
 };
 
