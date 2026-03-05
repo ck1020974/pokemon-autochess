@@ -1398,7 +1398,7 @@ export class BattleSimulator {
 
                 // BugBite Synergy: Kill Reward
                 const bugBiteCount = this.getSynergyCountForUnit(killer, 'BugBite');
-                if (bugBiteCount >= 2) {
+                if (bugBiteCount >= 2 && killer.synergies.includes('BugBite')) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === killer.id);
                     this.log(`${killer.name} 發動了蟲咬`);
                     this.growUnit(killer, 2, 0, '蟲咬', original, true);
