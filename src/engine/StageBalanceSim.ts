@@ -11,11 +11,11 @@ const MAX_STEPS = 200;
 
 // 定義各階段資訊
 const STAGES = [
-    { name: 'Novice (新手期)', data: NOVICE_OPPONENTS, id: 'Novice' },
-    { name: 'Intermediate (中期)', data: INTERM_OPPONENTS, id: 'Intermediate' },
-    { name: 'Advanced (進階期)', data: ADVANCED_OPPONENTS, id: 'Advanced' },
-    { name: 'Elite (四天王)', data: ELITE_OPPONENTS, id: 'Elite' },
-    { name: 'Champion (冠軍)', data: CHAMPION_OPPONENTS, id: 'Champion' }
+    { name: 'Novice (新手期)', data: NOVICE_OPPONENTS, id: 'Novice', minWin: 80, maxWin: 95 },
+    { name: 'Intermediate (中期)', data: INTERM_OPPONENTS, id: 'Intermediate', minWin: 60, maxWin: 75 },
+    { name: 'Advanced (進階期)', data: ADVANCED_OPPONENTS, id: 'Advanced', minWin: 45, maxWin: 60 },
+    { name: 'Elite (四天王)', data: ELITE_OPPONENTS, id: 'Elite', minWin: 30, maxWin: 45 },
+    { name: 'Champion (冠軍)', data: CHAMPION_OPPONENTS, id: 'Champion', minWin: 10, maxWin: 25 }
 ];
 
 // --- 輔助函數：模擬星級升級數值 ---
@@ -163,15 +163,16 @@ async function runStageBalanceSim() {
 
     for (const stage of STAGES) {
         console.log(`\n--- 測試階段: ${stage.name} ---`);
-        report += `## ${stage.name}\n`;
-        report += `| 對手名稱 | ID | 陣容預覽 | 玩家勝率 | 平均存活單位 | 診斷 |\n`;
-        report += `| :--- | :--- | :--- | :--- | :--- | :--- |\n`;
+        report += `## ${stage.name} (期望勝率: ${stage.minWin}% ~ ${stage.maxWin}%)\n`;
+        report += `| 對手名稱 | ID | 陣容預覽 | 玩家勝率 | 平均存活 | 平均回合 | 診斷 |\n`;
+        report += `| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n`;
 
         for (const boss of stage.data) {
             let wins = 0;
             let losses = 0;
             let draws = 0;
             let totalSurvivingUnits = 0;
+            let totalTurns = 0;
 
             // Get the boss team names once for the report
             const previewTeam = constructBossTeam(boss, stage.id);
@@ -190,6 +191,7 @@ async function runStageBalanceSim() {
                     active = await simulator.simulateStep();
                     steps++;
                 }
+                totalTurns += simulator.turnCount;
 
                 const result = simulator.getResult();
                 if (result === 'WIN') {
@@ -202,14 +204,15 @@ async function runStageBalanceSim() {
 
             const winRate = (wins / SIMS_PER_BOSS) * 100;
             const avgSurviving = wins > 0 ? (totalSurvivingUnits / wins).toFixed(1) : '0.0';
+            const avgTurns = (totalTurns / SIMS_PER_BOSS).toFixed(1);
 
-            // 診斷分析
-            let diagnostic = '✅ 正常';
-            if (winRate < 30) diagnostic = '⚠️ 過難 (難點)';
-            else if (winRate > 80) diagnostic = '⛔ 過易 (割草)';
+            // 診斷分析 (基於設計者期望)
+            let diagnostic = '✅ 合格';
+            if (winRate < stage.minWin) diagnostic = '🔴 過難 (建議削弱)';
+            else if (winRate > stage.maxWin) diagnostic = '🟢 過易 (建議加強)';
 
-            console.log(`[${stage.name}] ${boss.name} - 勝率: ${winRate.toFixed(1)}%`);
-            report += `| ${boss.name} | \`${boss.id}\` | ${teamNames} | **${winRate.toFixed(1)}%** | ${avgSurviving} | ${diagnostic} |\n`;
+            console.log(`[${stage.name}] ${boss.name} - 勝率: ${winRate.toFixed(1)}%, 回合: ${avgTurns}`);
+            report += `| ${boss.name} | \`${boss.id}\` | ${teamNames} | **${winRate.toFixed(1)}%** | ${avgSurviving} | ${avgTurns} | ${diagnostic} |\n`;
         }
         report += `\n`;
     }

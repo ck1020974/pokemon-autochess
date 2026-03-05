@@ -765,7 +765,7 @@ function App() {
                 }
             } else {
                 // This block executes if there's NO selected opponent (e.g., debugging or not opening the modal)
-                let fallbackPool = game.wins >= 11 ? CHAMPION_OPPONENTS : (game.wins >= 8 ? ELITE_OPPONENTS : (game.wins >= 4 ? INTERM_OPPONENTS : NOVICE_OPPONENTS));
+                let fallbackPool = game.wins >= 12 ? CHAMPION_OPPONENTS : (game.wins >= 8 ? ELITE_OPPONENTS : (game.wins >= 5 ? ADVANCED_OPPONENTS : (game.wins >= 3 ? INTERM_OPPONENTS : NOVICE_OPPONENTS)));
                 const def = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
                 const fbCandidateUnits: Unit[] = [];
                 for (const coreId of def.coreUnits) {
@@ -1105,11 +1105,13 @@ function App() {
 
         // Determine which opponent pool to use based on game.wins
         let npcPool: any[] = [];
-        if (game.wins >= 11) {
+        if (game.wins >= 12) {
             npcPool = CHAMPION_OPPONENTS;
         } else if (game.wins >= 8) {
             npcPool = ELITE_OPPONENTS;
-        } else if (game.wins >= 4) {
+        } else if (game.wins >= 5) {
+            npcPool = ADVANCED_OPPONENTS;
+        } else if (game.wins >= 3) {
             npcPool = INTERM_OPPONENTS;
         } else {
             npcPool = NOVICE_OPPONENTS;
