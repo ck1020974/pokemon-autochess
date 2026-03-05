@@ -541,21 +541,7 @@ export class BattleSimulator {
                 }
             });
         }
-        // Squirtle Family: Damage Reduction
-        if (unit.family === 'squirtle') {
-            this.eventBus.on('BEFORE_HURT', (e) => {
-                if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    const reduction = [0, 1, 2, 3][unit.level] || 1;
-                    const oldAmt = e.context.amount;
-                    if (oldAmt > 1) {
-                        e.context.amount = Math.max(1, oldAmt - reduction);
-                        if (e.context.amount < oldAmt) {
-                            this.log(`${unit.name} 的縮殼減輕了傷害！`);
-                        }
-                    }
-                }
-            });
-        }
+
 
 
         // Cyndaquil rework: Team AOE before attack
