@@ -755,7 +755,8 @@ export class HeadlessBattleSimulator {
                 this.psychicTriggered.add('player');
                 this.enemyAttackCount = 0;
                 const allEnemies = this.enemyTeam.filter(u => u && u.stats.hp > 0);
-                const dmg = 2 * this.playerWins;
+                // In Headless, we use playerWins as a proxy for 'N' scaling
+                const dmg = 2 + this.playerWins * 2;
                 for (const target of allEnemies) await this.dealDamage(null, target, dmg, true, true);
             }
         } else {
@@ -765,7 +766,8 @@ export class HeadlessBattleSimulator {
                 this.psychicTriggered.add('enemy');
                 this.playerAttackCount = 0;
                 const allAllies = this.playerTeam.filter(u => u && u.stats.hp > 0);
-                for (const target of allAllies) await this.dealDamage(null, target, 2, true, true);
+                const dmg = 2 + this.playerWins * 2; // Assuming symmetrical logic for enemy psychic if any
+                for (const target of allAllies) await this.dealDamage(null, target, dmg, true, true);
             }
         }
     }

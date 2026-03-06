@@ -29,10 +29,10 @@ export class BattleSimulator {
     // Cached Synergies (Persist through death)
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
-    private psychicN: number = 1;
+    private psychicN: number = 2;
     private speed: number = 1;
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 1) {
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 2) {
         this.speed = speed;
         this.originalPlayerTeam = originalPlayerTeam;
         this.psychicN = psychicN;

@@ -23,7 +23,7 @@ export class GameLoop {
 
     public charmanderN: number = 1;
     public charmanderCounter: number = 0;
-    public psychicN: number = 1;
+    public psychicN: number = 2;
 
     public playerTeam: (Unit | null)[] = [null, null, null, null, null];
     public savedTeam: (Unit | null)[] = []; // Store original team before battle
@@ -71,7 +71,7 @@ export class GameLoop {
         }
 
         // --- Psychic Scaling ---
-        this.psychicN = 2 + (this.turn - 1);
+        this.psychicN = 2 + (this.turn - 1) * 2;
 
         // --- Refresh Descriptions ---
         this.refreshSpecialDescriptions();
