@@ -265,10 +265,11 @@ export class HeadlessBattleSimulator {
             });
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
+            const count = this.getSynergyCountForUnit(team[0], 'Starter');
+            const buff = count >= 5 ? 3 : 1;
             team.filter(u => u && u.synergies.includes('Starter')).forEach(u => {
-                const isAtk = Math.random() < 0.5;
                 const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
-                this.growUnit(u, isAtk ? 0 : 1, isAtk ? 1 : 0, original, true);
+                this.growUnit(u, buff, buff, original, true);
             });
         }
 
@@ -318,7 +319,7 @@ export class HeadlessBattleSimulator {
                 if (s?.isSilenced) return;
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
-                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                    const buff = count >= 5 ? 10 : (count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0)));
                     if (buff > 0 && unit.stats.hp > 1) {
                         unit.stats.hp -= 1;
                         this.buffAttack(unit, buff);
@@ -334,7 +335,7 @@ export class HeadlessBattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && myTeam.includes(unit)) {
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
-                    const healAmount = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                    const healAmount = count >= 5 ? 10 : (count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
                     if (healAmount > 0) this.heal(unit, healAmount);
                 }
             });
@@ -345,7 +346,7 @@ export class HeadlessBattleSimulator {
                 if (s?.isSilenced || unit.stats.hp <= 0) return;
                 if (e.source === unit && e.target && e.target.stats.hp > 0 && e.target.family !== 'sneasel') {
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const debuff = count >= 4 ? 4 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
+                    const debuff = count >= 5 ? 5 : (count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0)));
                     if (debuff > 0 && e.target.stats.attack > 1) {
                         e.target.stats.attack = Math.max(1, e.target.stats.attack - debuff);
                     }
@@ -393,7 +394,14 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('ON_HURT', (e) => {
                 const s = this.unitStates.get(unit);
                 if (s?.isSilenced) return;
-                if (e.target === unit && this.getSynergyCountForUnit(unit, 'Angry') >= 2) this.buffAttack(unit, 3);
+                if (e.target === unit && this.getSynergyCountForUnit(unit, 'Angry') >= 2) {
+                    const count = this.getSynergyCountForUnit(unit, 'Angry');
+                    const buff = count >= 4 ? 8 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
+                    const { myTeam } = this.getTeams(unit);
+                    myTeam.forEach(u => {
+                        if (u && u.stats.hp > 0) this.buffAttack(u, buff);
+                    });
+                }
             });
         }
         if (unit.synergies.includes('Cave')) {

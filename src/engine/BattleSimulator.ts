@@ -583,7 +583,7 @@ export class BattleSimulator {
             this.eventBus.on('BEFORE_ATTACK', (e) => {
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
-                    const buff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                    const buff = count >= 5 ? 10 : (count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0)));
                     if (buff > 0 && unit.stats.hp > 1) {
                         unit.stats.hp -= 1;
                         this.buffAttack(unit, buff);
@@ -601,7 +601,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && myTeam.includes(unit)) { // Ensure unit is still in team
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
-                    const heal = count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
+                    const heal = count >= 5 ? 10 : (count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
                     if (heal > 0 && unit.stats.hp > 0) {
                         this.heal(unit, heal);
                         this.log(`${unit.name} 吸取了 ${heal} 生命`);
@@ -620,7 +620,7 @@ export class BattleSimulator {
                         return;
                     }
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const debuff = count >= 4 ? 4 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
+                    const debuff = count >= 5 ? 5 : (count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0)));
                     if (debuff > 0 && e.target.stats.attack > 1) {
                         const amountReduced = Math.min(e.target.stats.attack - 1, debuff);
                         e.target.stats.attack -= amountReduced;
@@ -701,7 +701,7 @@ export class BattleSimulator {
             this.eventBus.on('ON_HURT', (e) => {
                 if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
                     const count = this.getSynergyCountForUnit(unit, 'Angry');
-                    const buff = count >= 3 ? 5 : (count >= 2 ? 3 : 0);
+                    const buff = count >= 4 ? 8 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
                     if (buff > 0) {
                         const { myTeam } = this.getTeams(unit);
                         myTeam.forEach(u => {
@@ -721,7 +721,7 @@ export class BattleSimulator {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'SwordDance');
-                    const buff = count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0));
+                    const buff = count >= 5 ? 4 : (count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0)));
                     if (buff > 0) {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, 0, buff, '劍舞', original, false);
@@ -1666,7 +1666,7 @@ export class BattleSimulator {
         const triggerWater = async (attacker: Unit, defender: Unit) => {
             if (attacker.synergies.includes('Water')) {
                 const count = this.getSynergyCountForUnit(attacker, 'Water');
-                const debuff = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                const debuff = count >= 5 ? 5 : (count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0)));
                 if (debuff > 0 && defender.stats.attack > 1 && !this.unitStates.get(attacker)?.isSilenced) {
                     const amountReduced = Math.min(defender.stats.attack - 1, debuff);
                     defender.stats.attack -= amountReduced;

@@ -162,7 +162,7 @@ export class GameLoop {
         const normalUnits = this.playerTeam.filter(u => u && u.synergies.includes('Normal')) as Unit[];
         const normalCount = getUniqueCount(normalUnits);
         if (normalCount >= 2) {
-            const buff = normalCount >= 4 ? 6 : (normalCount >= 3 ? 4 : 2);
+            const buff = normalCount >= 5 ? 10 : (normalCount >= 4 ? 6 : (normalCount >= 3 ? 4 : 2));
             const frontUnit = this.playerTeam.find(u => u !== null);
             if (frontUnit) {
                 applyBuff(frontUnit, buff, 'hp', 'Normal');
@@ -173,7 +173,7 @@ export class GameLoop {
         const ghostUnits = this.playerTeam.filter(u => u && u.synergies.includes('Ghost')) as Unit[];
         const ghostCount = getUniqueCount(ghostUnits);
         if (ghostCount >= 2) {
-            const buff = ghostCount >= 4 ? 6 : (ghostCount >= 3 ? 4 : 2);
+            const buff = ghostCount >= 5 ? 10 : (ghostCount >= 4 ? 6 : (ghostCount >= 3 ? 4 : 2));
             const frontUnit = this.playerTeam.find(u => u !== null);
             if (frontUnit) {
                 applyBuff(frontUnit, buff, 'atk', 'Ghost');
@@ -201,9 +201,10 @@ export class GameLoop {
         const starterUnits = this.playerTeam.filter(u => u && u.synergies.includes('Starter')) as Unit[];
         const starterCount = getUniqueCount(starterUnits);
         if (starterCount >= 3) {
+            const buff = starterCount >= 5 ? 3 : 1;
             starterUnits.forEach(u => {
-                applyBuff(u, 1, 'hp', 'Starter');
-                applyBuff(u, 1, 'atk', 'Starter');
+                applyBuff(u, buff, 'hp', 'Starter');
+                applyBuff(u, buff, 'atk', 'Starter');
             });
         }
 
