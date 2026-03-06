@@ -102,13 +102,13 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter }: any) {
+function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, className }: any) {
     let activeDesc = synergy.description;
     const isActive = count !== undefined && count >= synergy.tiers[0];
     const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
 
     return (
-        <div className="synergy-icon" style={style} onMouseEnter={onMouseEnter}>
+        <div className={`synergy-icon ${className || ''}`} style={style} onMouseEnter={onMouseEnter} onClick={(e) => e.stopPropagation()}>
             {synergy.icon}
             {showCount && count !== undefined && <span style={{ position: 'absolute', bottom: -5, right: -5, fontSize: '0.7rem', background: '#000', borderRadius: '50%', padding: '0 4px', border: '1px solid #333', color: '#fff' }}>{count}</span>}
             <div className={`synergy-tooltip ${isEnemy ? 'is-enemy' : ''}`}>
@@ -1833,6 +1833,7 @@ function App() {
                             count={syn.count}
                             units={syn.units}
                             activeFamilies={syn.activeFamilies}
+                            className={tutorialStep === 10 ? 'tutorial-highlight' : ''}
                         />
                     ))}
                 </div>
