@@ -71,12 +71,7 @@ export class GameLoop {
         }
 
         // --- Psychic Scaling ---
-        const psychicUnits = this.playerTeam.filter(u => u && u.synergies.includes('Psychic')) as Unit[];
-        const psychicFamilies = new Set(psychicUnits.map(u => u.family));
-        if (psychicFamilies.size >= 2) {
-            // Synergy active, increment N every round
-            this.psychicN++;
-        }
+        this.psychicN = 2 + (this.turn - 1);
 
         // --- Refresh Descriptions ---
         this.refreshSpecialDescriptions();
@@ -116,7 +111,7 @@ export class GameLoop {
         });
 
         // Update Psychic synergy description
-        SYNERGIES.Psychic.description = `[2/3/4] 第二次碰撞後，對全體敵方造成 ${this.psychicN} 點傷害 (共 1/2/3 次)`;
+        SYNERGIES.Psychic.description = `[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 ${this.psychicN} 點傷害 (每場戰鬥後增強)`;
     }
 
     public startBattlePhase() {

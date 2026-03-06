@@ -1237,30 +1237,33 @@ export class BattleSimulator {
 
         await this.eventBus.emit({ type: 'AFTER_ATTACK', source: attacker, target: defender, context: {} });
 
-        // Psychic Synergy: "Global AOE"
+        // Psychic Synergy: "Global AOE" (Random Targets)
         const updatePsychic = async (isPlayer: boolean) => {
             const side = isPlayer ? 'player' : 'enemy';
             const count = (isPlayer ? this.playerSynergies : this.enemySynergies).get('Psychic') || 0;
 
             if (count >= 2) {
-                const maxActivations = count >= 4 ? 3 : (count >= 3 ? 2 : 1);
-                const currentActivations = this.unitStates.get(this as any)?.[`psychicOccurred_${side}`] || 0;
-
-                if (currentActivations < maxActivations && this.turnCount % 2 === 0) {
-                    // Check if it's a new turn for this activation
+                // "兩回合後" means Turn 3, then every 2 turns (3, 5, 7...)
+                if (this.turnCount >= 3 && this.turnCount % 2 !== 0) {
                     const lastTurn = this.unitStates.get(this as any)?.[`psychicLastTurn_${side}`];
                     if (lastTurn !== this.turnCount) {
                         const state = this.unitStates.get(this as any) || {};
-                        state[`psychicOccurred_${side}`] = currentActivations + 1;
                         state[`psychicLastTurn_${side}`] = this.turnCount;
                         this.unitStates.set(this as any, state);
 
                         this.log(isPlayer ? "敵方受到了預知未來的攻擊！" : "我方受到了預知未來的攻擊！");
                         const targets = isPlayer ? this.enemyTeam : this.playerTeam;
                         const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
-                        const dmg = this.psychicN;
-                        for (const target of livingEnemies) {
-                            await this.dealDamage(null, target, dmg, true, true);
+
+                        if (livingEnemies.length > 0) {
+                            const targetCount = count >= 4 ? 4 : (count >= 3 ? 3 : 2);
+                            const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
+                            const selectedTargets = shuffled.slice(0, targetCount);
+
+                            const dmg = this.psychicN;
+                            for (const target of selectedTargets) {
+                                await this.dealDamage(null, target, dmg, true, true);
+                            }
                         }
                         if (this.onUpdate) this.onUpdate();
                         await this.delay(300);
