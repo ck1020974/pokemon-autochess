@@ -104,6 +104,14 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 // Synergy Icon Component
 function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, className }: any) {
     const [isForcedOpen, setIsForcedOpen] = useState(false);
+
+    useEffect(() => {
+        if (isForcedOpen) {
+            const timer = setTimeout(() => setIsForcedOpen(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [isForcedOpen]);
+
     let activeDesc = synergy.description;
     const isActive = count !== undefined && count >= synergy.tiers[0];
     const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };

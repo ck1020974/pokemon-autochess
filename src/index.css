@@ -973,11 +973,14 @@ h3 {
   align-items: center;
   justify-content: center;
   transition: transform 0.2s;
+  will-change: transform;
 }
 
-.synergy-icon:hover {
-  transform: scale(1.2);
-  z-index: 99999 !important;
+@media (hover: hover) {
+  .synergy-icon:hover {
+    transform: scale(1.2);
+    z-index: 99999 !important;
+  }
 }
 
 .synergy-tooltip {
@@ -2179,7 +2182,8 @@ h3 {
  . o p p o n e n t - c a r d : h o v e r   . o p p o n e n t - n a m e   { 
          c o l o r :   # f f d 7 0 0   ! i m p o r t a n t ; 
  } 
-  
+ 
+ 
  
 .tutorial-highlight.no-arrow::after { content: none !important; }
 .synergy-icon.force-visible .synergy-tooltip { visibility: visible !important; opacity: 1 !important; }
