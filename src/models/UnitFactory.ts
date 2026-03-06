@@ -30,19 +30,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'charmander', name: '小火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/小火龍00.webp', battleImageUrl: 'assets/小火龍01.webp',
-        description: '同時對目標與後排敵人造成 [N] 傷害 (每三回合增強)。', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
+        description: '同時對後排敵方造成 [N] 傷害 (每三場對戰後增強)。', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
     },
     charmeleon: {
         id: 'charmeleon', name: '火恐龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/火恐龍00.webp', battleImageUrl: 'assets/火恐龍01.webp',
-        description: '同時對目標與後排敵人造成 [N] 傷害 (每兩回合增強)。', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
+        description: '同時對後排敵方造成 [N] 傷害 (每兩場對戰後增強)。', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
     },
     charizard: {
         id: 'charizard', name: '噴火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/噴火龍00.webp', battleImageUrl: 'assets/噴火龍01.webp',
-        description: '同時對目標與後排敵人造成 [N] 傷害 (每一回合增強)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '同時對後排敵方造成 [N] 傷害 (每場對戰後增強)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 3. Squirtle
