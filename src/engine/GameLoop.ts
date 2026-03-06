@@ -93,8 +93,8 @@ export class GameLoop {
 
     private refreshSpecialDescriptions() {
         // Update templates so shop shows CURRENT N value and correct frequency
-        UNIT_TEMPLATES.charmander.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (每三場對戰後增強)。`;
-        UNIT_TEMPLATES.charmeleon.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (每兩場對戰後增強)。`;
+        UNIT_TEMPLATES.charmander.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (三場對戰後增強)。`;
+        UNIT_TEMPLATES.charmeleon.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (兩場對戰後增強)。`;
         UNIT_TEMPLATES.charizard.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (每場對戰後增強)。`;
 
         // Sync static template scaling values to current global N
@@ -107,12 +107,13 @@ export class GameLoop {
             if (u && u.family === 'charmander') {
                 u.scalingValue = this.charmanderN;
                 const freq = [0, '三', '兩', '一'][u.level] || '三';
-                u.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (每${freq}場對戰後增強)。`;
+                const prefix = u.level === 3 ? '每' : '';
+                u.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場對戰後增強)。`;
             }
         });
 
         // Update Psychic synergy description
-        SYNERGIES.Psychic.description = `[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 ${this.psychicN} 點傷害 (每場戰鬥後增強)`;
+        SYNERGIES.Psychic.description = `[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 ${this.psychicN} 點傷害 (每場對戰後增強)`;
     }
 
     public startBattlePhase() {
