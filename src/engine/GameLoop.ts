@@ -52,7 +52,7 @@ export class GameLoop {
         this.phase = GamePhase.SHOP;
         this.gold = 10;
 
-        // --- Charmander Scaling ---
+        // --- Charmander Scaling (Shared, based on max level) ---
         let maxCharmanderLevel = 0;
         this.playerTeam.forEach(u => {
             if (u && u.family === 'charmander') {
@@ -66,6 +66,7 @@ export class GameLoop {
             if (this.charmanderCounter >= threshold) {
                 this.charmanderN++;
                 this.charmanderCounter = 0;
+                console.log(`小火龍家族技能增強！目前威力：${this.charmanderN}`);
             }
         }
 
@@ -96,19 +97,24 @@ export class GameLoop {
     }
 
     private refreshSpecialDescriptions() {
-        // Update templates so shop shows current value with generic "per level" hint
-        const genericCharmanderDesc = `同時對目標與後排敵人造成 N 傷害 (依星級每 3/2/1 回合增強)。目前 N = ${this.charmanderN}`;
+        // Update templates so shop shows CURRENT N value
+        const genericCharmanderDesc = `同時對目標與後排敵人造成 [N] 傷害 (依星級每 3/2/1 回合增強)。`;
         UNIT_TEMPLATES.charmander.description = genericCharmanderDesc;
         UNIT_TEMPLATES.charmeleon.description = genericCharmanderDesc;
         UNIT_TEMPLATES.charizard.description = genericCharmanderDesc;
 
-        // Update current units on board with specific threshold
+        // Sync static template scaling values to current global N
+        (UNIT_TEMPLATES.charmander as any).scalingValue = this.charmanderN;
+        (UNIT_TEMPLATES.charmeleon as any).scalingValue = this.charmanderN;
+        (UNIT_TEMPLATES.charizard as any).scalingValue = this.charmanderN;
+
+        // Sync player's units on board
         this.playerTeam.forEach(u => {
             if (u && u.family === 'charmander') {
-                const threshold = [0, 3, 2, 1][u.level] || 3;
-                u.description = `同時對目標與後排敵人造成 ${this.charmanderN} 傷害 (每 ${threshold} 回合增強)。`;
+                u.scalingValue = this.charmanderN;
             }
         });
+
         // Update Psychic synergy description
         SYNERGIES.Psychic.description = `[2/3/4] 第二次碰撞後，對全體敵方造成 ${this.psychicN} 點傷害 (共 1/2/3 次)`;
     }
@@ -464,6 +470,8 @@ export class GameLoop {
             target.battleImageUrl = source.battleImageUrl;
         }
 
+        target.scalingValue = Math.max(target.scalingValue, source.scalingValue);
+
         const totalExp = target.exp + source.exp;
         const oldLevel = target.level;
         let predictedLevel = 1;
@@ -492,7 +500,6 @@ export class GameLoop {
             target.addGrowth(source.exp, source.exp);
             console.log(`${target.name} absorbs ${source.exp} exp. +${source.exp}/+${source.exp} Stats.`);
         }
-
         target.exp = totalExp;
         console.log(`${target.name} Merged: Exp ${totalExp} (Level ${target.level})`);
     }
@@ -518,7 +525,7 @@ export class GameLoop {
             unit.tier = newTemplate.tier;
             unit.level += 1;
 
-            console.log(`Evolution! ${unit.name} (Stage ${unit.level}) with Bonus +${bonus.maxHp}/+${bonus.attack}`);
+            console.log(`Evolution! ${unit.name} (Stage ${unit.level}) with Bonus + ${bonus.maxHp}/+${bonus.attack}`);
         }
     }
 
@@ -576,6 +583,7 @@ export class GameLoop {
         clone.evolveId = unit.evolveId;
         clone.synergies = [...unit.synergies];
         clone.family = unit.family;
+        clone.scalingValue = unit.scalingValue;
 
         return clone;
     }

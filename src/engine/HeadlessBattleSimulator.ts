@@ -93,6 +93,7 @@ export class HeadlessBattleSimulator {
         clone.id = unit.id; // CRITICAL FIX: Preserve ID for permanent growth
         clone.synergies = [...unit.synergies];
         clone.family = unit.family;
+        clone.scalingValue = unit.scalingValue;
         // Cap stats like in main simulator
         clone.capStats();
         this.unitStates.set(clone, {});
@@ -697,7 +698,7 @@ export class HeadlessBattleSimulator {
             const { opTeam } = this.getTeams(attacker);
             const idx = opTeam.indexOf(defender);
             if (idx !== -1 && idx < opTeam.length - 1 && opTeam[idx + 1] && opTeam[idx + 1]!.stats.hp > 0) {
-                const splashDmg = [0, 2, 4, 8][attacker.level] || 2;
+                const splashDmg = attacker.scalingValue;
                 promises.push(this.dealDamage(attacker, opTeam[idx + 1]!, splashDmg, true));
             }
         }

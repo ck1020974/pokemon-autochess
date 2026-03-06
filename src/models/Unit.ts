@@ -34,6 +34,7 @@ export class Unit {
   public evolveId?: string;
   public synergies: string[];
   public family: string;
+  public scalingValue: number = 1;
 
   constructor(template: UnitTemplate) {
     this.id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
@@ -60,7 +61,10 @@ export class Unit {
     // 2. Replace remaining "Lv" with current level
     desc = desc.replace(/Lv/g, this.level.toString());
 
-    // 3. Remove brackets [] from tags
+    // 3. Replace [N] with scalingValue
+    desc = desc.replace(/\[N\]/g, this.scalingValue.toString());
+
+    // 4. Remove brackets [] from tags
     desc = desc.replace(/\[(.*?)\]/g, '$1');
 
     return desc;

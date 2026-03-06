@@ -863,7 +863,7 @@ function App() {
             setInitialEnemyTeam([...enemyTeam]);
 
             const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
-            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.charmanderN, game.psychicN);
+            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN);
             const currentSim = simulatorRef.current;
 
             currentSim.onUpdate = () => {

@@ -30,13 +30,11 @@ export class BattleSimulator {
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
     private psychicN: number = 1;
-    private charmanderN: number = 1;
     private speed: number = 1;
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, charmanderN: number = 1, psychicN: number = 1) {
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 1) {
         this.speed = speed;
         this.originalPlayerTeam = originalPlayerTeam;
-        this.charmanderN = charmanderN;
         this.psychicN = psychicN;
         // Preserve 5-slot architecture to match UI indices exactly
         this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
@@ -177,6 +175,7 @@ export class BattleSimulator {
         clone.imageUrl = unit.imageUrl;
         clone.battleImageUrl = unit.battleImageUrl;
         clone.family = unit.family;
+        clone.scalingValue = unit.scalingValue;
 
         this.unitStates.set(clone, {});
         return clone;
@@ -1191,7 +1190,7 @@ export class BattleSimulator {
             if (idx !== -1 && idx < opTeam.length - 1) {
                 const neighbor = opTeam[idx + 1];
                 if (neighbor && neighbor.stats.hp > 0) {
-                    const splashDmg = this.charmanderN;
+                    const splashDmg = attacker.scalingValue;
                     await this.notifySkill(attacker, `發動了噴射火焰！`);
                     attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
                 }
