@@ -103,7 +103,8 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 
 // Synergy Icon Component
 function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, className, activeSynergyId, setActiveSynergyId }: any) {
-    const isForcedOpen = activeSynergyId === synergy.id;
+    const [localOpen, setLocalOpen] = useState(false);
+    const isForcedOpen = setActiveSynergyId ? (activeSynergyId === synergy.id) : localOpen;
 
     let activeDesc = synergy.description;
     const isActive = count !== undefined && count >= synergy.tiers[0];
@@ -118,6 +119,8 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
                 e.stopPropagation();
                 if (setActiveSynergyId) {
                     setActiveSynergyId(isForcedOpen ? null : synergy.id);
+                } else {
+                    setLocalOpen(!isForcedOpen);
                 }
             }}
         >
@@ -2213,7 +2216,7 @@ function App() {
                                         {selected.unit.synergies.map((synId: string) => {
                                             const syn = SYNERGIES[synId];
                                             if (!syn) return null;
-                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />;
+                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} />;
                                         })}
                                     </div>
                                 </div>
