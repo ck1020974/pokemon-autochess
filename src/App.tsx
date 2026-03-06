@@ -207,10 +207,23 @@ function App() {
     }, []);
 
     const handleRestart = () => {
+        // 1. Reset Core Engine
         gameRef.current = new GameLoop();
+
+        // 2. Clear Primary States
         setDifficulty(null);
         setTutorialStep(0);
-        // Force update to reflect new game instance
+        setHasStarted(false);
+        setBattleResult(null);
+        setInitialEnemyTeam([]);
+
+        // 3. Clear Interaction States
+        setSelected(null);
+        setDraggedItem(null);
+        setLogs([]);
+        setBattleElapsedSeconds(0);
+
+        // 4. Force UI Update
         update();
     };
 
@@ -276,8 +289,8 @@ function App() {
 
     // Opponent Selection States
     const [showOpponentSelect, setShowOpponentSelect] = useState(false);
-    const [opponentChoices, setOpponentChoices] = useState<{ name: string, url: string, id: string }[]>([]);
-    const [selectedOpponent, setSelectedOpponent] = useState<{ name: string, url: string, id: string } | null>(null);
+    const [opponentChoices, setOpponentChoices] = useState<{ name: string, url: string, id: string, difficulty?: string }[]>([]);
+    const [selectedOpponent, setSelectedOpponent] = useState<{ name: string, url: string, id: string, difficulty?: string } | null>(null);
 
     // Animation States
     const [goldErrorAnim, setGoldErrorAnim] = useState(false);
@@ -643,39 +656,23 @@ function App() {
             }
 
             // 3. Strategy / Synergy Selection
-            // Use selected opponent if available
-            if (tutorialStep > 0) {
-                // Fixed tutorial enemy team
-                if (tutorialStep === 10 || tutorialStep === 11) {
-                    enemyTeam = [
-                        new Unit(UNIT_TEMPLATES.charizard),
-                        new Unit(UNIT_TEMPLATES.blastoise),
-                        new Unit(UNIT_TEMPLATES.venusaur),
-                        new Unit(UNIT_TEMPLATES.skeledirge),
-                        new Unit(UNIT_TEMPLATES.gengar)
-                    ];
-                    // Overpowered team to ensure defeat
-                    enemyTeam.forEach(u => { if (u) u.level = 3; });
-                } else {
-                    enemyTeam = [
-                        new Unit(UNIT_TEMPLATES.mankey),
-                        new Unit(UNIT_TEMPLATES.dwebble),
-                        new Unit(UNIT_TEMPLATES.charmander),
-                        null,
-                        null
-                    ];
-                    enemyTeam[0]!.level = 1;
-                    enemyTeam[1]!.level = 1;
-                    enemyTeam[2]!.level = 1;
-                }
+            if (tutorialStep > 0 && tutorialStep < 10) {
+                // Tutorial Battle 1: Use Brock (novice_3)'s team exactly
+                const brock = NOVICE_OPPONENTS.find(n => n.id === 'novice_3')!;
+                enemyTeam = brock.coreUnits.map(id => {
+                    const t = UNIT_TEMPLATES[id];
+                    if (!t) return null;
+                    const u = new Unit(t);
+                    u.level = 1;
+                    return u;
+                }).concat(Array(5).fill(null)).slice(0, 5) as Unit[];
             } else if (selectedOpponent && selectedOpponent.id) {
-                // Find def
+                // Real gameplay OR Tutorial Battle 2: Use chosen opponent's team
                 let def = CHAMPION_OPPONENTS.find(c => c.id === selectedOpponent.id) ||
                     ELITE_OPPONENTS.find(c => c.id === selectedOpponent.id) ||
                     ADVANCED_OPPONENTS.find(e => e.id === selectedOpponent.id) ||
                     INTERM_OPPONENTS.find(g => g.id === selectedOpponent.id) ||
                     NOVICE_OPPONENTS.find(n => n.id === selectedOpponent.id);
-
                 if (def) {
                     // bossLevel for Core Units
                     let bossLevel = enemyBaseLevel;
@@ -683,6 +680,10 @@ function App() {
                         if (difficulty === 'NORMAL') bossLevel = 1;
                         else if (difficulty === 'GREAT') bossLevel = 2;
                         else bossLevel = 3;
+                    }
+                    if (tutorialStep >= 10) {
+                        // Ensure defeat in tutorial second battle
+                        bossLevel = 3;
                     }
 
                     // Helper to dynamically evolve core units
@@ -1096,17 +1097,16 @@ function App() {
         // Prepare opponent choices
         if (tutorialStep > 0) {
             if (tutorialStep < 10) {
+                // First tutorial opponent: Brock Easter Egg (Three ways to face Brock!)
                 setOpponentChoices([
-                    { id: 'novice_3', name: '小剛', url: 'gym/小剛01.webp' },
-                    { id: 'interm_4', name: '小剛', url: 'gym/小剛02.webp' },
-                    { id: 'elite_14', name: '小剛', url: 'gym/小剛03.webp' }
+                    { id: 'novice_3', name: '小剛', url: 'gym/小剛01.webp', difficulty: 'EASY' },
+                    { id: 'novice_3', name: '小剛', url: 'gym/小剛02.webp', difficulty: 'NORMAL' },
+                    { id: 'novice_3', name: '小剛', url: 'gym/小剛03.webp', difficulty: 'HARD' }
                 ]);
             } else {
-                setOpponentChoices([
-                    { id: 'champion_4', name: '赤紅', url: 'champion/赤紅02.webp' },
-                    { id: 'champion_5', name: '丹帝', url: 'champion/丹帝02.webp' },
-                    { id: 'interm_6', name: '青綠', url: 'gym/青綠02.webp' }
-                ]);
+                // Second tutorial: Force Champions to ensure player defeat
+                const shuffledChampions = [...CHAMPION_OPPONENTS].sort(() => 0.5 - Math.random());
+                setOpponentChoices(shuffledChampions.slice(0, 3));
             }
             setShowOpponentSelect(true);
             return;
@@ -1129,7 +1129,7 @@ function App() {
         // We show opponent choices for Boss matches (Wins: 8~11 or 12) or special gym levels.
         // Actually, user spec says: "這 4 場中，每場會在對手畫面跳出從四天王中挑選。 前八勝階段... 這些館主將出現在一般對戰中供玩家挑戰"
         // Let's always show the opponent choice if we have a pool.
-        const ALL_NPCS = npcPool.map(boss => ({ id: boss.id, name: boss.name, url: boss.url }));
+        const ALL_NPCS = npcPool;
         const unseenNpCS = ALL_NPCS.filter(boss => !game.defeatedOpponentIds?.includes(boss.id));
         const finalPool = unseenNpCS.length > 0 ? unseenNpCS : ALL_NPCS;
 
@@ -1359,15 +1359,15 @@ function App() {
                     ) : (
                         <div className={`tutorial-message-box ${tutorialShake ? 'shake-anim' : ''}`}>
                             <div className="tutorial-text">
-                                {tutorialStep === 2 && "每回合開始都會獲得10$\n🎯任務：購買寶可夢"}
-                                {tutorialStep === 3 && "每隻寶可夢都有專屬招式\n🎯任務：查看招式並關閉面板"}
-                                {tutorialStep === 4 && "可以自由調整隊伍陣行\n🎯任務：將鬼斯移動到其他位置"}
-                                {tutorialStep === 5 && "花費1$可以刷新商店角色\n🎯任務：點擊按鈕刷新商店角色"}
-                                {tutorialStep === 6 && "鎖定角色能保留到下回合\n🎯任務：點擊鎖定所有小火龍"}
-                                {tutorialStep === 7 && "準備完成後即可開始戰鬥\n🎯任務：點擊戰鬥並贏得勝利"}
-                                {tutorialStep === 8 && "拖曳或點擊角色合成\n🎯任務：購買並合成小火龍"}
+                                {tutorialStep === 2 && "每回合都會獲得10$\n🎯任務：購買寶可夢"}
+                                {tutorialStep === 3 && "認識每隻寶可夢\n🎯任務：查看招式並關閉面板"}
+                                {tutorialStep === 4 && "調整隊伍陣行\n🎯任務：將鬼斯移動到其他位置"}
+                                {tutorialStep === 5 && "花費1$刷新商店\n🎯任務：點擊按鈕刷新商店角色"}
+                                {tutorialStep === 6 && "鎖定角色保留到下回合\n🎯任務：點擊鎖定所有小火龍"}
+                                {tutorialStep === 7 && "選擇要挑戰的訓練家\n🎯任務：點擊對戰按鈕"}
+                                {tutorialStep === 8 && "點擊或拖曳角色合成\n🎯任務：購買並合成小火龍"}
                                 {tutorialStep === 9 && "開啟羈絆來提升強度\n🎯任務：購買火球鼠"}
-                                {tutorialStep === 10 && "挑戰更強的對手\n🎯任務：查看羈絆後對戰"}
+                                {tutorialStep === 10 && "挑戰更強的訓練家\n🎯任務：查看羈絆後對戰"}
                                 {tutorialStep === 11 && "戰敗時將扣除生命值\n生命值歸零將結束遊戲‼️"}
                             </div>
                         </div>
@@ -1786,7 +1786,7 @@ function App() {
                             justifyContent: 'center',
                             flexWrap: 'wrap'
                         }}>
-                            {opponentChoices.map((npc, idx) => (
+                            {opponentChoices.map((npc: any, idx) => (
                                 <div
                                     key={idx}
                                     className="opponent-card"
@@ -1801,9 +1801,35 @@ function App() {
                                         borderRadius: '16px',
                                         border: '2px solid rgba(255,255,255,0.1)',
                                         transition: 'all 0.2s',
-                                        width: 'clamp(130px, 25vw, 200px)'
+                                        width: 'clamp(130px, 25vw, 200px)',
+                                        position: 'relative'
                                     }}
                                 >
+                                    {/* Difficulty Badge */}
+                                    {npc.difficulty && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '10px',
+                                            left: '10px',
+                                            padding: '4px 10px',
+                                            borderRadius: '6px',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '900',
+                                            color: '#fff',
+                                            zIndex: 20,
+                                            backgroundColor:
+                                                npc.difficulty === 'EASY' ? '#22c55e' :
+                                                    npc.difficulty === 'NORMAL' ? '#0ea5e9' :
+                                                        npc.difficulty === 'HARD' ? '#f97316' : '#ef4444',
+                                            boxShadow: '0 4px 8px rgba(0,0,0,0.4)',
+                                            textTransform: 'uppercase',
+                                            border: '1px solid rgba(255,255,255,0.3)',
+                                            letterSpacing: '1px'
+                                        }}>
+                                            {npc.difficulty === 'VERY_HARD' ? 'EXTREME' : npc.difficulty}
+                                        </div>
+                                    )}
+
                                     <img
                                         src={npc.url}
                                         alt={npc.name}
@@ -1834,7 +1860,7 @@ function App() {
 
             <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => setSelected(null)}>
                 {/* 1. Synergies (Player) */}
-                <div className={`board-synergies ${[2, 3, 4, 7, 8, 9, 10, 11].includes(tutorialStep) ? 'tutorial-elevate' : ''}`}>
+                <div className={`board-synergies ${([2, 3, 4, 7, 8, 9, 10, 11].includes(tutorialStep) && game.phase !== GamePhase.BATTLE) ? 'tutorial-elevate' : ''}`}>
                     {synergyStatus.map(syn => (
                         <SynergyIcon
                             key={syn.id}
@@ -1842,7 +1868,7 @@ function App() {
                             count={syn.count}
                             units={syn.units}
                             activeFamilies={syn.activeFamilies}
-                            className={`${tutorialStep === 10 ? 'tutorial-highlight no-arrow' : ''}`}
+                            className=""
                         />
                     ))}
                 </div>
@@ -1864,12 +1890,12 @@ function App() {
                 )}
 
                 {/* 4. Units Area */}
-                <div className={`board-teams-horizontal ${tutorialStep === 10 ? 'tutorial-elevate' : ''}`} style={{
-                    zIndex: tutorialStep === 10 ? 9999 : 'auto',
+                <div className={`board-teams-horizontal ${(tutorialStep === 10 && game.phase === GamePhase.SHOP) ? 'tutorial-elevate' : ''}`} style={{
+                    zIndex: (tutorialStep === 10 && game.phase === GamePhase.SHOP) ? 9999 : 'auto',
                     filter: (game.phase === GamePhase.BATTLE) ? 'none' : (tutorialStep > 0 && tutorialStep !== 2 && tutorialStep !== 3 && tutorialStep !== 4 && tutorialStep !== 7 && tutorialStep !== 8 && tutorialStep !== 9 && tutorialStep !== 10 && tutorialStep !== 11) ? 'grayscale(100%) brightness(50%)' : 'none'
                 }}>
                     {/* Left Side: Player Team */}
-                    <div className={`board-side player ${(tutorialStep === 8 || tutorialStep === 9 || tutorialStep === 10) ? 'tutorial-elevate' : ''}`}>
+                    <div className={`board-side player ${(tutorialStep === 8 || tutorialStep === 9 || tutorialStep === 10) && game.phase === GamePhase.SHOP ? 'tutorial-elevate' : ''}`}>
                         {Array.from({ length: 5 }).map((_, i) => {
                             const unit = displayPlayerTeam?.[i] || null;
                             const isInteractive = game.phase === GamePhase.SHOP;
@@ -1879,7 +1905,7 @@ function App() {
                             return (
                                 <div
                                     key={unit ? unit.id : `player-empty-${i}`}
-                                    className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''} ${((tutorialStep === 3 && unit?.family === 'gastly') || (tutorialStep === 4 && (unit?.family === 'gastly' || selected?.unit?.family === 'gastly'))) ? 'tutorial-highlight' : ''} ${(step8CharmanderTarget && game.phase === GamePhase.SHOP) ? 'synthetic-glow' : ''}`}
+                                    className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''} ${((tutorialStep === 3 && unit?.family === 'gastly') || (tutorialStep === 4 && (unit?.family === 'gastly' || selected?.unit?.family === 'gastly'))) && game.phase === GamePhase.SHOP ? 'tutorial-highlight' : ''} ${(step8CharmanderTarget && game.phase === GamePhase.SHOP) ? 'synthetic-glow' : ''}`}
                                     onDragOver={isInteractive ? onDragOver : undefined}
                                     onDrop={isInteractive ? (e) => onDrop(e, i) : undefined}
                                     onClick={(e) => {
