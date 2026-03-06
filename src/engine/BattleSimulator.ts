@@ -1243,8 +1243,8 @@ export class BattleSimulator {
             const count = (isPlayer ? this.playerSynergies : this.enemySynergies).get('Psychic') || 0;
 
             if (count >= 2) {
-                // "兩回合後" means Turn 3, then every 2 turns (3, 5, 7...)
-                if (this.turnCount >= 3 && this.turnCount % 2 !== 0) {
+                // "兩回合後" means exactly start of Turn 3, and only once.
+                if (this.turnCount === 3) {
                     const lastTurn = this.unitStates.get(this as any)?.[`psychicLastTurn_${side}`];
                     if (lastTurn !== this.turnCount) {
                         const state = this.unitStates.get(this as any) || {};
