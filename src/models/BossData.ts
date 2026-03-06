@@ -82,7 +82,7 @@ export const ELITE_OPPONENTS: OpponentDefinition[] = [
     { id: 'elite_9', name: '希巴', url: 'elitefour/希巴.webp', coreUnits: ['mankey', 'farfetchd', 'onix', 'heracross', 'pinsir'], difficulty: 'EASY' },
     { id: 'elite_10', name: '菊子', url: 'elitefour/菊子.webp', coreUnits: ['gastly', 'shuppet', 'gastly', 'mimikyu', 'drifloon'], difficulty: 'NORMAL' },
     { id: 'elite_11', name: '梨花', url: 'elitefour/梨花.webp', coreUnits: ['spiritomb', 'houndour', 'sneasel', 'gastly'], difficulty: 'HARD' },
-    { id: 'elite_12', name: '阿柳', url: 'elitefour/阿柳.webp', coreUnits: ['ivysaur', 'ivysaur', 'pinsir', 'heracross', 'crustle'], difficulty: 'EASY' },
+    { id: 'elite_12', name: '阿柳', url: 'elitefour/阿柳.webp', coreUnits: ['ivysaur', 'grovyle', 'pinsir', 'heracross', 'crustle'], difficulty: 'EASY' },
     { id: 'elite_13', name: '大葉', url: 'elitefour/大葉.webp', coreUnits: ['drifloon', 'onix', 'torchic', 'houndour', 'fuecoco'], difficulty: 'HARD' },
     { id: 'elite_14', name: '小剛', url: 'gym/小剛03.webp', coreUnits: ['mudkip', 'diglett', 'dwebble', 'onix', 'onix'], difficulty: 'NORMAL' },
     { id: 'elite_15', name: '小霞', url: 'gym/小霞03.webp', coreUnits: ['mudkip', 'squirtle', 'slowpoke', 'totodile', 'quaxly'], difficulty: 'NORMAL' },
@@ -99,7 +99,7 @@ export const CHAMPION_OPPONENTS: OpponentDefinition[] = [
     { id: 'champion_1', name: '竹蘭', url: 'champion/竹蘭02.webp', coreUnits: ['spiritomb', 'sneasel', 'snover', 'mimikyu', 'gastly'], difficulty: 'VERY_HARD' },
     { id: 'champion_2', name: '卡露妮', url: 'champion/卡露妮02.webp', coreUnits: ['ralts', 'natu', 'slowpoke', 'igglybuff', 'mrmime'], difficulty: 'VERY_HARD' },
     { id: 'champion_3', name: '大吾', url: 'champion/大吾02.webp', coreUnits: ['dwebble', 'onix', 'mudkip', 'torchic', 'sableye'], difficulty: 'VERY_HARD' },
-    { id: 'champion_4', name: '赤紅', url: 'champion/赤紅02.webp', coreUnits: ['charmeleon', 'wartortle', 'ivysaur', 'slowpoke', 'kangaskhan'], difficulty: 'NORMAL' },
+    { id: 'champion_4', name: '赤紅', url: 'champion/赤紅02.webp', coreUnits: ['charmeleon', 'wartortle', 'ivysaur', 'farfetchd', 'ditto', 'kangaskhan'], difficulty: 'NORMAL' },
     { id: 'champion_5', name: '丹帝', url: 'champion/丹帝02.webp', coreUnits: ['charmander', 'gastly', 'heracross', 'farfetchd', 'drifloon'], difficulty: 'HARD' },
     { id: 'champion_6', name: '小智', url: 'gym/小智.webp', coreUnits: ['farfetchd', 'treecko', 'gastly', 'mrmime', 'charmander'], difficulty: 'HARD' },
 ];
