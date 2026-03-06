@@ -442,19 +442,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'magnemite', name: '小磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/小磁怪00.webp', battleImageUrl: 'assets/小磁怪01.webp',
-        description: '準備結束時，隨機 +2 攻擊或生命 (共 1 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton'
+        description: '準備結束時，隨機 +1 攻擊或生命 (共 1 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton'
     },
     magneton: {
         id: 'magneton', name: '三合一磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/三合一磁怪00.webp', battleImageUrl: 'assets/三合一磁怪01.webp',
-        description: '準備結束時，隨機 +2 攻擊或生命 (共 2 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton_final', isHiddenFromShop: true
+        description: '準備結束時，隨機 +1 攻擊或生命 (共 2 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton_final', isHiddenFromShop: true
     },
     magneton_final: {
         id: 'magneton_final', name: '三合一磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/三合一磁怪00.webp', battleImageUrl: 'assets/三合一磁怪01.webp',
-        description: '準備結束時，隨機 +2 攻擊或生命 (共 5 次)。', synergies: ['Triplets', 'Hard'], isHiddenFromShop: true
+        description: '準備結束時，隨機 +1 攻擊或生命 (共 3 次)。', synergies: ['Triplets', 'Hard'], isHiddenFromShop: true
     },
 
     // 23. Houndour

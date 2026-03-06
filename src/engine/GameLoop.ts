@@ -211,11 +211,11 @@ export class GameLoop {
         // --- Individual Unit End-of-Prep Abilities ---
         this.playerTeam.forEach(u => {
             if (!u) return;
-            // Magnemite: Random +2 Atk or +2 HP (x Lv times)
+            // Magnemite: Random +1 Atk or +1 HP (x Lv times)
             if (u.family === 'magnemite') {
-                const maxTimes = [0, 1, 2, 5][u.level] || u.level;
+                const maxTimes = [0, 1, 2, 3][u.level] || u.level;
                 for (let i = 0; i < maxTimes; i++) {
-                    const amount = 2;
+                    const amount = 1;
                     const canAddAtk = u.stats.attack < 50;
                     const canAddHp = u.stats.maxHp < 50;
 

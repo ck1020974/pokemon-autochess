@@ -57,10 +57,13 @@ export class HeadlessBattleSimulator {
         this.enemyTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: false }); });
 
         const getRank = (unit: Unit) => {
-            if (unit.family === 'spiritomb') return 3;
+            if (unit.family === 'spiritomb') return 5;
+            if (unit.family === 'mrmime') return 4;
+            if (unit.family === 'natu') return 3;
+            if (unit.family === 'houndour') return 1;
+
             const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin'];
             if (utility.includes(unit.family)) return 2;
-            if (unit.family === 'houndour') return 1;
             return 0;
         };
 
@@ -134,8 +137,7 @@ export class HeadlessBattleSimulator {
         // Natu/Xatu: Swap enemy first and last (even count = 2 swaps, odd count = 1 swap)
         if (unit.family === 'natu' && !this.natuLogged.has(side)) {
             this.natuLogged.add(side);
-            const totalNatu = myTeam.filter(u => u && u.family === 'natu' && u.stats.hp > 0).length;
-            const timesToExecute = totalNatu % 2 === 0 ? 2 : 1;
+            const timesToExecute = 1;
             for (let t = 0; t < timesToExecute; t++) {
                 const currentLiving = opTeam.filter(e => e && e.stats.hp > 0);
                 if (currentLiving.length < 2) break;
@@ -257,7 +259,10 @@ export class HeadlessBattleSimulator {
     private async applyBattleStartSynergies(team: Unit[]) {
         if (team.length === 0) return;
         if (this.getSynergyCountForUnit(team[0], 'Triplets') >= 3) {
-            team.filter(u => u && u.synergies.includes('Triplets')).forEach(u => this.growUnit(u, 3, 3, null, true));
+            team.filter(u => u && u.synergies.includes('Triplets')).forEach(u => {
+                const isAtk = Math.random() < 0.5;
+                this.growUnit(u, isAtk ? 0 : 3, isAtk ? 3 : 0, null, true);
+            });
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
             team.filter(u => u && u.synergies.includes('Starter')).forEach(u => {

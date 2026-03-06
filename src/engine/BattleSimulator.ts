@@ -77,11 +77,12 @@ export class BattleSimulator {
 
         // Helper for Category Rank based on User Request Phases
         const getRank = (unit: Unit) => {
-            if (unit.family === 'spiritomb') return 4; // Phase 1: Silence
-            if (unit.family === 'mrmime') return 3;    // Phase 2: Light Screen
+            if (unit.family === 'spiritomb') return 5; // Phase 1: Silence
+            if (unit.family === 'mrmime') return 4;    // Phase 2 Part 2: Light Screen
+            if (unit.family === 'natu') return 3;      // Phase 2 Part 3: Swap
             if (unit.family === 'houndour') return 1;  // Phase 4: First Strike (Ensure they are last even if they have Thief)
 
-            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin', 'natu'];
+            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin'];
             const hasStartupSynergy = unit.synergies.includes('Thief') || unit.synergies.includes('Trick');
             if (utility.includes(unit.family) || hasStartupSynergy) return 2; // Phase 3: Utility/Synergy
 
@@ -116,7 +117,7 @@ export class BattleSimulator {
         };
 
         // --- PHASE 1: Spiritomb ---
-        await executePhaseQueue(4);
+        await executePhaseQueue(5);
 
         // --- PHASE 2: Environment & Weather (Snow, then Light Screen) ---
         const hasSnow = (this.playerSynergies.get('Snow') || 0) >= 2 || (this.enemySynergies.get('Snow') || 0) >= 2;
@@ -139,6 +140,9 @@ export class BattleSimulator {
         }
 
         // Phase 2 Part 2: Mr. Mime (Light Screen)
+        await executePhaseQueue(4);
+
+        // Phase 2 Part 3: Natu
         await executePhaseQueue(3);
 
         // --- PHASE 3: Character & Synergy Function/Enhancement ---
@@ -366,8 +370,7 @@ export class BattleSimulator {
             const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0);
             if (livingEnemies.length >= 2) {
                 // Determine how many times to teleport based on total Natu/Xatu in team
-                const totalNatu = myTeam.filter(u => u && u.family === 'natu' && u.stats.hp > 0).length;
-                const timesToExecute = totalNatu % 2 === 0 ? 2 : 1;
+                const timesToExecute = 1;
 
                 if (timesToExecute > 0) {
                     await this.notifySkill(unit, `發動了瞬間移動！`);
@@ -1415,9 +1418,8 @@ export class BattleSimulator {
             const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
             if (original) {
                 this.log(`${unit.name} 發動了三胞胎！`);
-                // Use growUnit to apply growth to original. 
-                // Note: Battle clone 'unit' is already dead index-wise but we can still call growUnit on its record.
-                this.growUnit(unit, 3, 3, '三胞胎', original, true);
+                const isAtk = Math.random() < 0.5;
+                this.growUnit(unit, isAtk ? 0 : 3, isAtk ? 3 : 0, '三胞胎', original, true);
             }
         }
 

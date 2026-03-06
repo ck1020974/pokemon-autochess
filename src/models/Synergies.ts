@@ -16,7 +16,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Grass': { id: 'Grass', name: '吸取', icon: '🌿', description: '[2/3/4] 攻擊後回復 2/4/6 生命', tiers: [2, 3, 4], color: '#4ade80' },
     'Fire': { id: 'Fire', name: '燃盡', icon: '🔥', description: '[2/3/4] 攻擊前 -1 生命(最低為 1)， +1/+3/+5 攻擊', tiers: [2, 3, 4], color: '#ef4444' },
     'Water': { id: 'Water', name: '潮旋', icon: '💧', description: '[2/3/4] 攻擊前使目標 -1/-2/-4 攻擊力 (最低為 1)', tiers: [2, 3, 4], color: '#60a5fa' },
-    'Triplets': { id: 'Triplets', name: '三胞胎', icon: '👨‍👧‍👦', description: '[3] 死亡後永久 +3 攻擊與生命', tiers: [3], color: '#fcd34d' },
+    'Triplets': { id: 'Triplets', name: '三胞胎', icon: '👨‍👧‍👦', description: '[3] 死亡後永久 +3 攻擊與生命 (單項達50止)', tiers: [3], color: '#fcd34d' },
     'Hard': { id: 'Hard', name: '堅硬', icon: '🛡️', description: '[2] 抵擋首次死亡，保留 1 生命', tiers: [2], color: '#9ca3af' },
     'Cave': { id: 'Cave', name: '挖洞', icon: '🕳️', description: '[2] 移動後永久 +2 生命', tiers: [2], color: '#78350f' },
     'Angry': { id: 'Angry', name: '憤怒', icon: '💢', description: '[2/3] 受傷後，全體友軍 +3/+5 攻擊', tiers: [2, 3], color: '#dc2626' },
