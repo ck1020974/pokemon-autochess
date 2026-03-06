@@ -1372,14 +1372,14 @@ function App() {
                             <div className="tutorial-text">
                                 {tutorialStep === 2 && "每回合都會獲得10$\n🎯任務：購買寶可夢"}
                                 {tutorialStep === 3 && "認識每隻寶可夢\n🎯任務：查看招式並關閉面板"}
-                                {tutorialStep === 4 && "調整隊伍陣行\n🎯任務：將鬼斯移動到其他位置"}
+                                {tutorialStep === 4 && "調整陣容順序\n🎯任務：將鬼斯移動到其他位置"}
                                 {tutorialStep === 5 && "花費1$刷新商店\n🎯任務：點擊按鈕刷新商店角色"}
                                 {tutorialStep === 6 && "鎖定角色保留到下回合\n🎯任務：點擊鎖定所有小火龍"}
                                 {tutorialStep === 7 && "選擇要挑戰的訓練家\n🎯任務：點擊對戰按鈕"}
                                 {tutorialStep === 8 && "點擊或拖曳角色合成\n🎯任務：購買並合成小火龍"}
-                                {tutorialStep === 9 && "開啟羈絆來提升強度\n🎯任務：購買火球鼠"}
+                                {tutorialStep === 9 && "開啟羈絆來提高強度\n🎯任務：購買火球鼠"}
                                 {tutorialStep === 10 && "挑戰更強的訓練家\n🎯任務：點擊對戰按鈕"}
-                                {tutorialStep === 11 && "戰敗時將扣除生命值\n生命值歸零將結束遊戲‼️"}
+                                {tutorialStep === 11 && "戰敗時將減少生命值\n生命值歸零將結束遊戲‼️"}
                             </div>
                         </div>
                     )}
