@@ -71,7 +71,7 @@ export class GameLoop {
         }
 
         // --- Psychic Scaling ---
-        this.psychicN = 2 + (this.turn - 1) * 2;
+        this.psychicN = 2 + (this.turn - 1);
 
         // --- Refresh Descriptions ---
         this.refreshSpecialDescriptions();
