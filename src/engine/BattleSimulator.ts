@@ -598,7 +598,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && myTeam.includes(unit)) { // Ensure unit is still in team
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
-                    const heal = count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
+                    const heal = count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
                     if (heal > 0 && unit.stats.hp > 0) {
                         this.heal(unit, heal);
                         this.log(`${unit.name} 吸取了 ${heal} 生命`);
