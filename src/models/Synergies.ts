@@ -19,7 +19,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Triplets': { id: 'Triplets', name: '三胞胎', icon: '👨‍👧‍👦', description: '[3] 準備結束時，最弱小的三胞胎永久 +3 攻擊與生命', tiers: [3], color: '#fcd34d' },
     'Hard': { id: 'Hard', name: '堅硬', icon: '🛡️', description: '[2] 抵擋首次死亡，保留 1 生命', tiers: [2], color: '#9ca3af' },
     'Cave': { id: 'Cave', name: '挖洞', icon: '🕳️', description: '[2] 移動後永久 +2 生命', tiers: [2], color: '#78350f' },
-    'Angry': { id: 'Angry', name: '憤怒', icon: '💢', description: '[2/3] 受傷後 +3/+5 攻擊', tiers: [2, 3], color: '#dc2626' },
+    'Angry': { id: 'Angry', name: '憤怒', icon: '💢', description: '[2/3] 生物受傷後，全體友軍 +3/+5 攻擊', tiers: [2, 3], color: '#dc2626' },
     'Snow': { id: 'Snow', name: '降雪', icon: '❄️', description: '[2] 戰鬥開始時，其他角色受到生命 33% 傷害', tiers: [2], color: '#bae6fd' },
     'SwordDance': { id: 'SwordDance', name: '劍舞', icon: '⚔️', description: '[2/3/4] 移動後永久 +1/2/3 攻擊', tiers: [2, 3, 4], color: '#fca5a5' },
     'Psychic': { id: 'Psychic', name: '念力', icon: '👁️', description: '[2/3/4] 第二次碰撞後，對全體敵方造成 N 點傷害 (共 1/2/3 次)', tiers: [2, 3, 4], color: '#a855f7' },

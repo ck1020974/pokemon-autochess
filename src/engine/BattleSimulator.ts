@@ -694,13 +694,22 @@ export class BattleSimulator {
 
         // Fire logic moved to top of registerUnitAbilities
 
-        // Angry: Atk on Hurt
+        // Angry: Atk on Hurt (Buff All Allies)
         if (unit.synergies.includes('Angry')) {
             this.eventBus.on('ON_HURT', (e) => {
-                if (e.target === unit) {
+                if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
                     const count = this.getSynergyCountForUnit(unit, 'Angry');
                     const buff = count >= 3 ? 5 : (count >= 2 ? 3 : 0);
-                    if (buff > 0) this.buffAttack(unit, buff);
+                    if (buff > 0) {
+                        const { myTeam } = this.getTeams(unit);
+                        myTeam.forEach(u => {
+                            if (u && u.stats.hp > 0) {
+                                this.buffAttack(u, buff, true);
+                            }
+                        });
+                        this.log(`${unit.name} 激怒了全體友軍！`);
+                        if (this.onUpdate) this.onUpdate();
+                    }
                 }
             });
         }
@@ -1138,7 +1147,7 @@ export class BattleSimulator {
             // Re-check survival after the first hit and its consequences (like reflect)
             if (defender.stats.hp > 0 && attacker.stats.hp > 0) {
                 await this.notifySkill(attacker, `對 ${defender.name} 發動了親子愛！`);
-                const secondHit = this.dealDamage(attacker, defender, attacker.stats.attack, false);
+                const secondHit = this.dealDamage(attacker, defender, attacker.stats.attack, true);
                 attackPromises.push(secondHit);
             }
         }
