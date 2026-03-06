@@ -482,19 +482,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'sneasel', name: '狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/狃拉00.webp', battleImageUrl: 'assets/狃拉01.webp',
-        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], evolveId: 'weavile'
+        description: '攻擊時 33% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], evolveId: 'weavile'
     },
     weavile: {
         id: 'weavile', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], evolveId: 'weavile_final', isHiddenFromShop: true
+        description: '攻擊時 33% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], evolveId: 'weavile_final', isHiddenFromShop: true
     },
     weavile_final: {
         id: 'weavile_final', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '攻擊時 50% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], isHiddenFromShop: true
+        description: '攻擊時 33% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], isHiddenFromShop: true
     },
 
     // 25. Shuppet (Tier 1)
@@ -563,19 +563,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'kangaskhan', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '若敵方已進化，額外發動一次無視反彈的攻擊。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_2'
+        description: '若敵方已進化，額外再攻擊一次。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_2'
     },
     kangaskhan_2: {
         id: 'kangaskhan_2', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '若敵方已進化，額外發動一次無視反彈的攻擊。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
+        description: '若敵方已進化，額外再攻擊一次。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
     },
     kangaskhan_3: {
         id: 'kangaskhan_3', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '若敵方已進化，額外發動一次無視反彈的攻擊。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
+        description: '若敵方已進化，額外再攻擊一次。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
     },
 
     // 30. Ditto

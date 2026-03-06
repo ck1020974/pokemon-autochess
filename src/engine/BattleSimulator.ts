@@ -1164,7 +1164,7 @@ export class BattleSimulator {
 
         // Sneasel: 1 extra random hit (Can hit same target if only 1 enemy)
         if (attacker.family === 'sneasel' && !this.unitStates.get(attacker)?.isSilenced) {
-            if (Math.random() < 0.5) {
+            if (Math.random() < 0.33) {
                 const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
                 const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
                 const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
