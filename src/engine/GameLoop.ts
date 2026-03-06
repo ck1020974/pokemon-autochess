@@ -102,6 +102,16 @@ export class GameLoop {
         (UNIT_TEMPLATES.charmeleon as any).scalingValue = this.charmanderN;
         (UNIT_TEMPLATES.charizard as any).scalingValue = this.charmanderN;
 
+        // Sync units in shop (including frozen ones)
+        this.shop.slots.forEach(u => {
+            if (u && u.family === 'charmander') {
+                u.scalingValue = this.charmanderN;
+                const freq = [0, '三', '兩', '一'][u.level] || '三';
+                const prefix = u.level === 3 ? '每' : '';
+                u.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場對戰後增強)。`;
+            }
+        });
+
         // Sync player's units on board
         this.playerTeam.forEach(u => {
             if (u && u.family === 'charmander') {
@@ -197,26 +207,6 @@ export class GameLoop {
             });
         }
 
-        // Triplets (3): Weakest Triplet (lowest combined attack & hp) -> +3 Attack & HP Permanent
-        const tripletsUnits = this.playerTeam.filter(u => u && u.synergies.includes('Triplets')) as Unit[];
-        const tripletsCount = getUniqueCount(tripletsUnits);
-        if (tripletsCount >= 3) {
-            let weakestTriplet: Unit | null = null;
-            let lowestStats = Infinity;
-
-            tripletsUnits.forEach(u => {
-                const totalStats = u.stats.attack + u.stats.hp;
-                if (totalStats < lowestStats) {
-                    lowestStats = totalStats;
-                    weakestTriplet = u;
-                }
-            });
-
-            if (weakestTriplet) {
-                applyBuff(weakestTriplet, 3, 'hp', 'Triplets');
-                applyBuff(weakestTriplet, 3, 'atk', 'Triplets');
-            }
-        }
 
         // --- Individual Unit End-of-Prep Abilities ---
         this.playerTeam.forEach(u => {

@@ -1140,12 +1140,12 @@ export class BattleSimulator {
         // Base attack
         attackPromises.push(this.dealDamage(attacker, defender, dmg, false));
 
-        // Kangaskhan: Second hit if defender is evolved AND attacker/defender both survive the first hit
-        if (attacker.family === 'kangaskhan' && (defender.templateId !== defender.family) && !this.unitStates.get(attacker)?.isSilenced) {
+        // Kangaskhan: Second hit if attacker survives the first hit
+        if (attacker.family === 'kangaskhan' && !this.unitStates.get(attacker)?.isSilenced) {
             await Promise.all(attackPromises); // Wait for the first hit and any triggers
             // Re-check survival after the first hit and its consequences (like reflect)
-            if (defender.stats.hp > 0 && attacker.stats.hp > 0) {
-                await this.notifySkill(attacker, `對 ${defender.name} 發動了親子愛！`);
+            if (attacker.stats.hp > 0) {
+                await this.notifySkill(attacker, `發動了親子愛！`);
                 const secondHit = this.dealDamage(attacker, defender, attacker.stats.attack, true);
                 attackPromises.push(secondHit);
             }
@@ -1409,6 +1409,17 @@ export class BattleSimulator {
         const { myTeam } = this.getTeams(unit);
         const deathIdx = myTeam.indexOf(unit);
         await this.eventBus.emit({ type: 'AFTER_DEATH', source: unit, context: { killer, deathIdx } });
+
+        // Triplets Synergy: Permanent growth on death
+        if (unit.synergies.includes('Triplets') && this.getSynergyCountForUnit(unit, 'Triplets') >= 3 && !this.unitStates.get(unit)?.isSilenced) {
+            const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
+            if (original) {
+                this.log(`${unit.name} 發動了三胞胎！`);
+                // Use growUnit to apply growth to original. 
+                // Note: Battle clone 'unit' is already dead index-wise but we can still call growUnit on its record.
+                this.growUnit(unit, 3, 3, '三胞胎', original, true);
+            }
+        }
 
         // 2. Remove from team (Victim is gone)
         if (this.playerTeam.includes(unit)) {
