@@ -30,19 +30,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'charmander', name: '小火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/小火龍00.webp', battleImageUrl: 'assets/小火龍01.webp',
-        description: '同時對目標後排敵人造成 2 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
+        description: '同時對目標與後排敵人造成 1 傷害 (每三回合增強)。', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
     },
     charmeleon: {
         id: 'charmeleon', name: '火恐龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/火恐龍00.webp', battleImageUrl: 'assets/火恐龍01.webp',
-        description: '同時對目標後排敵人造成 4 傷害。', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
+        description: '同時對目標與後排敵人造成 1 傷害 (每兩回合增強)。', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
     },
     charizard: {
         id: 'charizard', name: '噴火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/噴火龍00.webp', battleImageUrl: 'assets/噴火龍01.webp',
-        description: '同時對目標後排敵人造成 8 傷害。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '同時對目標與後排敵人造成 1 傷害 (每一回合增強)。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 3. Squirtle
@@ -262,19 +262,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'fuecoco', name: '呆火鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/呆火鱷00.webp', battleImageUrl: 'assets/呆火鱷01.webp',
-        description: '友軍擊殺後，隨機 1 位友軍永久 +3 生命。', synergies: ['Starter', 'Fire'], evolveId: 'crocalor'
+        description: '友軍擊殺後，隨機 1 位友軍永久 +2 生命。', synergies: ['Starter', 'Fire'], evolveId: 'crocalor'
     },
     crocalor: {
         id: 'crocalor', name: '炙燙鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/炙燙鱷00.webp', battleImageUrl: 'assets/炙燙鱷01.webp',
-        description: '友軍擊殺後，隨機 2 位友軍永久 +3 生命。', synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 2 位友軍永久 +2 生命。', synergies: ['Starter', 'Fire'], evolveId: 'skeledirge', isHiddenFromShop: true
     },
     skeledirge: {
         id: 'skeledirge', name: '骨紋巨聲鱷', tier: 4, family: 'fuecoco',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/骨紋巨聲鱷00.webp', battleImageUrl: 'assets/骨紋巨聲鱷01.webp',
-        description: '友軍擊殺後，隨機 3 位友軍永久 +3 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 3 位友軍永久 +2 生命。', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 14. Quaxly
@@ -282,19 +282,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'quaxly', name: '潤水鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/潤水鴨00.webp', battleImageUrl: 'assets/潤水鴨01.webp',
-        description: '友軍擊殺後，隨機 1 位友軍永久 +3 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
+        description: '友軍擊殺後，隨機 1 位友軍永久 +2 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
     },
     quaxwell: {
         id: 'quaxwell', name: '湧躍鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/湧躍鴨00.webp', battleImageUrl: 'assets/湧躍鴨01.webp',
-        description: '友軍擊殺後，隨機 2 位友軍永久 +3 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 2 位友軍永久 +2 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
     },
     quaquaval: {
         id: 'quaquaval', name: '狂歡浪舞鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/狂歡浪舞鴨00.webp', battleImageUrl: 'assets/狂歡浪舞鴨01.webp',
-        description: '友軍擊殺後，隨機 3 位友軍永久 +3 攻擊值。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 3 位友軍永久 +2 攻擊值。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 15. Rattata (Loop same name for stage 3)
@@ -362,13 +362,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'mankey', name: '猴怪', tier: 1, family: 'mankey',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/猴怪00.webp', battleImageUrl: 'assets/猴怪01.webp',
-        description: '合成與出售時前方友軍 +1 攻擊。', synergies: ['Angry'], evolveId: 'primeape'
+        description: '合成與出售時前方友軍 +2 攻擊。', synergies: ['Angry'], evolveId: 'primeape'
     },
     primeape: {
         id: 'primeape', name: '火爆猴', tier: 1, family: 'mankey',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/火爆猴00.webp', battleImageUrl: 'assets/火爆猴01.webp',
-        description: '合成與出售時前方友軍 +3 攻擊。', synergies: ['Angry'], evolveId: 'primeape_final', isHiddenFromShop: true
+        description: '合成與出售時前方友軍 +4 攻擊。', synergies: ['Angry'], evolveId: 'primeape_final', isHiddenFromShop: true
     },
     primeape_final: {
         id: 'primeape_final', name: '火爆猴', tier: 1, family: 'mankey',
@@ -543,13 +543,13 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'dwebble', name: '石居蟹', tier: 1, family: 'dwebble',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/石居蟹00.webp', battleImageUrl: 'assets/石居蟹01.webp',
-        description: '合成與出售時前方友軍 +1 生命。', synergies: ['Hard'], evolveId: 'crustle'
+        description: '合成與出售時前方友軍 +2 生命。', synergies: ['Hard'], evolveId: 'crustle'
     },
     crustle: {
         id: 'crustle', name: '岩殿居蟹', tier: 1, family: 'dwebble',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/岩殿居蟹00.webp', battleImageUrl: 'assets/岩殿居蟹01.webp',
-        description: '合成與出售時前方友軍 +3 生命。', synergies: ['Hard'], evolveId: 'crustle_final', isHiddenFromShop: true
+        description: '合成與出售時前方友軍 +4 生命。', synergies: ['Hard'], evolveId: 'crustle_final', isHiddenFromShop: true
     },
     crustle_final: {
         id: 'crustle_final', name: '岩殿居蟹', tier: 1, family: 'dwebble',
@@ -719,7 +719,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'ralts', name: '拉魯拉絲', tier: 3, family: 'ralts',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/拉魯拉絲00.webp', battleImageUrl: 'assets/拉魯拉絲01.webp',
-        description: '攻擊時，同時對敵方末位造成 50% 傷害。', synergies: ['Psychic', 'Thief'], evolveId: 'kirlia'
+        description: '攻擊時，同時對敵方末位造成 33% 傷害。', synergies: ['Psychic', 'Thief'], evolveId: 'kirlia'
     },
     kirlia: {
         id: 'kirlia', name: '奇魯莉安', tier: 3, family: 'ralts',

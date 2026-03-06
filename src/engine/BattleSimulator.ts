@@ -26,16 +26,18 @@ export class BattleSimulator {
     private natuLogged: Set<string> = new Set();
     private isSimulatingStep = false;
     private queuedKillRewards: (() => Promise<void>)[] = [];
-    private playerWins: number = 0;
     // Cached Synergies (Persist through death)
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
+    private psychicN: number = 1;
+    private charmanderN: number = 1;
     private speed: number = 1;
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, playerWins: number = 0, speed: number = 1) {
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, charmanderN: number = 1, psychicN: number = 1) {
         this.speed = speed;
-        this.playerWins = playerWins;
         this.originalPlayerTeam = originalPlayerTeam;
+        this.charmanderN = charmanderN;
+        this.psychicN = psychicN;
         // Preserve 5-slot architecture to match UI indices exactly
         this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
         this.enemyTeam = enemyTeam.map(u => {
@@ -825,7 +827,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const hpBuff = 3;
+                    const hpBuff = 2;
                     const targetCount = unit.level; // 1, 2, or 3
                     const now = Date.now();
                     const state = this.unitStates.get(unit) || {};
@@ -865,7 +867,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
-                    const atkBuff = 3;
+                    const atkBuff = 2;
                     const targetCount = unit.level; // 1, 2, or 3
                     const now = Date.now();
                     const state = this.unitStates.get(unit) || {};
@@ -1180,8 +1182,8 @@ export class BattleSimulator {
             if (idx !== -1 && idx < opTeam.length - 1) {
                 const neighbor = opTeam[idx + 1];
                 if (neighbor && neighbor.stats.hp > 0) {
-                    const splashDmg = [0, 2, 4, 8][attacker.level] || 2;
-                    await this.notifySkill(attacker, `發動了火焰漩渦！`);
+                    const splashDmg = this.charmanderN;
+                    await this.notifySkill(attacker, `發動了噴射火焰！`);
                     attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
                 }
             }
@@ -1193,7 +1195,7 @@ export class BattleSimulator {
             const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (liveEnemies.length > 0) {
                 const target = liveEnemies[liveEnemies.length - 1];
-                const multiplier = attacker.level >= 3 ? 1.0 : 0.5;
+                const multiplier = attacker.level >= 3 ? 1.0 : (attacker.level === 2 ? 0.5 : 0.33);
                 const bonusDmg = Math.ceil(attacker.stats.attack * multiplier);
                 this.log(`${attacker.name} 對 ${target.name} 發動了精神強念！`);
                 attackPromises.push(this.dealDamage(attacker, target, bonusDmg, true));
@@ -1248,7 +1250,7 @@ export class BattleSimulator {
                         this.log(isPlayer ? "敵方受到了預知未來的攻擊！" : "我方受到了預知未來的攻擊！");
                         const targets = isPlayer ? this.enemyTeam : this.playerTeam;
                         const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
-                        const dmg = 2 + (isPlayer ? this.playerWins : 0);
+                        const dmg = this.psychicN;
                         for (const target of livingEnemies) {
                             await this.dealDamage(null, target, dmg, true, true);
                         }
@@ -1623,6 +1625,7 @@ export class BattleSimulator {
         if (!pFront || !eFront) return false;
 
         this.turnCount++;
+
 
         const pEl = document.getElementById(pFront.id);
         const eEl = document.getElementById(eFront.id);

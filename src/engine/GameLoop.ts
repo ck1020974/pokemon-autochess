@@ -2,6 +2,7 @@
 import { Unit } from '../models/Unit';
 import { Shop } from '../models/Shop';
 import { UNIT_TEMPLATES } from '../models/UnitFactory';
+import { SYNERGIES } from '../models/Synergies';
 
 export const GamePhase = {
     SHOP: 'SHOP',
@@ -19,6 +20,10 @@ export class GameLoop {
     public wins: number = 0;
     public phase: GamePhase = GamePhase.SHOP;
     public lastResult: 'WIN' | 'LOSS' | 'DRAW' | null = null;
+
+    public charmanderN: number = 1;
+    public charmanderCounter: number = 0;
+    public psychicN: number = 1;
 
     public playerTeam: (Unit | null)[] = [null, null, null, null, null];
     public savedTeam: (Unit | null)[] = []; // Store original team before battle
@@ -47,6 +52,34 @@ export class GameLoop {
         this.phase = GamePhase.SHOP;
         this.gold = 10;
 
+        // --- Charmander Scaling ---
+        let maxCharmanderLevel = 0;
+        this.playerTeam.forEach(u => {
+            if (u && u.family === 'charmander') {
+                maxCharmanderLevel = Math.max(maxCharmanderLevel, u.level);
+            }
+        });
+
+        if (maxCharmanderLevel > 0) {
+            this.charmanderCounter++;
+            const threshold = [0, 3, 2, 1][maxCharmanderLevel] || 3;
+            if (this.charmanderCounter >= threshold) {
+                this.charmanderN++;
+                this.charmanderCounter = 0;
+            }
+        }
+
+        // --- Psychic Scaling ---
+        const psychicUnits = this.playerTeam.filter(u => u && u.synergies.includes('Psychic')) as Unit[];
+        const psychicFamilies = new Set(psychicUnits.map(u => u.family));
+        if (psychicFamilies.size >= 2) {
+            // Synergy active, increment N every round
+            this.psychicN++;
+        }
+
+        // --- Refresh Descriptions ---
+        this.refreshSpecialDescriptions();
+
         // Turn Start Abilities
         this.playerTeam.forEach(u => {
             if (!u) return;
@@ -60,6 +93,24 @@ export class GameLoop {
         });
 
         this.shop.roll(this.turn);
+    }
+
+    private refreshSpecialDescriptions() {
+        // Update templates so shop shows current value with generic "per level" hint
+        const genericCharmanderDesc = `同時對目標與後排敵人造成 N 傷害 (依星級每 3/2/1 回合增強)。目前 N = ${this.charmanderN}`;
+        UNIT_TEMPLATES.charmander.description = genericCharmanderDesc;
+        UNIT_TEMPLATES.charmeleon.description = genericCharmanderDesc;
+        UNIT_TEMPLATES.charizard.description = genericCharmanderDesc;
+
+        // Update current units on board with specific threshold
+        this.playerTeam.forEach(u => {
+            if (u && u.family === 'charmander') {
+                const threshold = [0, 3, 2, 1][u.level] || 3;
+                u.description = `同時對目標與後排敵人造成 ${this.charmanderN} 傷害 (每 ${threshold} 回合增強)。`;
+            }
+        });
+        // Update Psychic synergy description
+        SYNERGIES.Psychic.description = `[2/3/4] 第二次碰撞後，對全體敵方造成 ${this.psychicN} 點傷害 (共 1/2/3 次)`;
     }
 
     public startBattlePhase() {
@@ -98,7 +149,7 @@ export class GameLoop {
         const normalUnits = this.playerTeam.filter(u => u && u.synergies.includes('Normal')) as Unit[];
         const normalCount = getUniqueCount(normalUnits);
         if (normalCount >= 2) {
-            const buff = normalCount >= 4 ? 6 : (normalCount >= 3 ? 3 : 1);
+            const buff = normalCount >= 4 ? 6 : (normalCount >= 3 ? 4 : 2);
             const frontUnit = this.playerTeam.find(u => u !== null);
             if (frontUnit) {
                 applyBuff(frontUnit, buff, 'hp', 'Normal');
@@ -109,7 +160,7 @@ export class GameLoop {
         const ghostUnits = this.playerTeam.filter(u => u && u.synergies.includes('Ghost')) as Unit[];
         const ghostCount = getUniqueCount(ghostUnits);
         if (ghostCount >= 2) {
-            const buff = ghostCount >= 4 ? 6 : (ghostCount >= 3 ? 3 : 1);
+            const buff = ghostCount >= 4 ? 6 : (ghostCount >= 3 ? 4 : 2);
             const frontUnit = this.playerTeam.find(u => u !== null);
             if (frontUnit) {
                 applyBuff(frontUnit, buff, 'atk', 'Ghost');
@@ -246,15 +297,6 @@ export class GameLoop {
         }
     }
 
-    /**
-     * Buy unit. 
-     * Handles target logic and switches image to Battle Mode.
-     */
-    /**
-     * Buy unit. 
-     * Returns the index (0-4) of the slot where the unit ended up.
-     * Returns null if purchase failed.
-     */
     public buyUnit(shopIndex: number, targetIndex?: number): number | null {
         const cost = 3;
         if (this.gold < cost) return null;
@@ -391,8 +433,6 @@ export class GameLoop {
 
             this.gold += 1;
             this.playerTeam[index] = null;
-
-
         }
     }
 
@@ -403,16 +443,14 @@ export class GameLoop {
         if (!u1) return;
 
         // Check if Same Family AND Name AND Not Max Level -> Merge
-        // User Rule: If ANY side is Lv.3, cannot merge.
         if (u2 && u1.family === u2.family && u1.name === u2.name && u2.level < 3 && u1.level < 3) {
             // Merge u1 INTO u2
             this.mergeUnits(u2, u1);
             this.playerTeam[fromIndex] = null;
         } else {
-            // Swap (Includes case where u2 is SAME TYPE but MAX LEVEL)
+            // Swap
             this.playerTeam[fromIndex] = u2;
             this.playerTeam[toIndex] = u1;
-
         }
     }
 
@@ -426,7 +464,6 @@ export class GameLoop {
             target.battleImageUrl = source.battleImageUrl;
         }
 
-        // Calculate Future State
         const totalExp = target.exp + source.exp;
         const oldLevel = target.level;
         let predictedLevel = 1;
@@ -434,48 +471,29 @@ export class GameLoop {
         else if (totalExp >= 3) predictedLevel = 2;
         else predictedLevel = 1;
 
-        // Ensure level doesn't drop
         predictedLevel = Math.max(predictedLevel, oldLevel);
 
         const willLevelUp = predictedLevel > oldLevel;
-        const willEvolve = !!target.evolveId && willLevelUp; // Standard Evolving Unit leveling up
+        const willEvolve = !!target.evolveId && willLevelUp;
 
-        // Rule: Trigger Merge Effects (Igglybuff/Gastly) EXACTLY ONCE per mergeUnits call
-        // Trigger BEFORE level changes to use current level magnitude (e.g. Lv 1 Igglybuff gives +2)
         this.triggerMergeEffect(target);
 
         if (willLevelUp) {
-            // UNIFIED SYNC is removed in favor of distinct growth as requested
             if (willEvolve) {
                 this.performEvolution(target);
             } else {
                 target.level = predictedLevel;
-                // this.triggerMergeEffect(target); // Removed duplicate
-
-                // Non-evolving OR Final Stage Level Up
                 const base = UNIT_TEMPLATES[target.family].baseStats;
-
-                // Rule: Non-evolving (Stage 1 -> 2/3) gets 1x Base
-                // Rule: Already evolved but final stage (Stage 2 -> 3) gets 2x Base
-                // In my implementation, Stage 1 is lvl 1, Stage 2 is lvl 2, etc.
                 const multiplier = 1;
-
                 target.addGrowth(base.maxHp * multiplier, base.attack * multiplier);
                 console.log(`${target.name} Level Up (Non-Evolve) -> +${base.maxHp * multiplier}/+${base.attack * multiplier}`);
             }
         } else {
-            // Standard Merge (No Level Up)
-            // Rule: Add +source.exp stats (Accumulate fodder power)
             target.addGrowth(source.exp, source.exp);
-
-            // this.triggerMergeEffect(target); // Removed duplicate
-
             console.log(`${target.name} absorbs ${source.exp} exp. +${source.exp}/+${source.exp} Stats.`);
         }
 
-        // Update Exp
         target.exp = totalExp;
-
         console.log(`${target.name} Merged: Exp ${totalExp} (Level ${target.level})`);
     }
 
@@ -483,85 +501,59 @@ export class GameLoop {
         if (!unit.evolveId) return;
 
         const newTemplate = UNIT_TEMPLATES[unit.evolveId];
-        // "First object of family path is Base Stats source".
-        // unit.family stores the ID of the base unit (e.g. 'bulbasaur').
         const baseTemplate = UNIT_TEMPLATES[unit.family];
 
         if (newTemplate && baseTemplate) {
-            // triggerMergeEffect call removed from here, now handled centrally in mergeUnits
-
-            // Evolution Bonus: Add Base Stats based on Stage
-            // Stage 2 (lv 2) gets 2x Base. Stage 3 (lv 3) gets 3x Base.
-            // Since we call this AFTER unit.level has been set by logic or is about to be:
-            // Let's use the TARGET level: current + 1.
             const multiplier = 1;
             const bonus = baseTemplate.baseStats;
             unit.addGrowth(bonus.maxHp * multiplier, bonus.attack * multiplier);
 
-            console.log(`Evolution Bonus: +${bonus.maxHp * multiplier}/+${bonus.attack * multiplier} (lv ${unit.level + 1})`);
-
-            // Transform Logic
             unit.templateId = newTemplate.id;
             unit.name = newTemplate.name;
-            unit.description = newTemplate.description; // Update Description
-            unit.imageUrl = newTemplate.battleImageUrl || newTemplate.imageUrl; // Use 01 version (Battle Image)
+            unit.description = newTemplate.description;
+            unit.imageUrl = newTemplate.battleImageUrl || newTemplate.imageUrl;
             unit.battleImageUrl = newTemplate.battleImageUrl;
             unit.evolveId = newTemplate.evolveId;
-
-            // Update Synergies? Usually evolved form has same synergies, but good to refresh.
             unit.synergies = newTemplate.synergies || [];
-
-            // Tier? Shop Tier usually strictly Unit Tier, but evolved unit might be considered higher tier?
-            // "Stage 2" unit is Tier 1 Base?
-            // Let's rely on template tier.
             unit.tier = newTemplate.tier;
-
-            // Increment Level (Stage 1 -> 2 -> 3)
             unit.level += 1;
 
             console.log(`Evolution! ${unit.name} (Stage ${unit.level}) with Bonus +${bonus.maxHp}/+${bonus.attack}`);
         }
     }
 
-    // Helper for Merge/Evolution Effects
     private triggerMergeEffect(unit: Unit) {
-        // Mankey: Merge/Evolve -> Front Ally +2/5 Atk; Sell Lv 3 -> All Allies +10 Atk
         if (unit.family === 'mankey') {
             if (unit.level === 3) {
                 this.playerTeam.filter(u => u && u !== unit).forEach(u => {
                     u!.addBuff(10);
                 });
-                console.log(`Mankey Family Sell (Lv 3): +10 Atk to All Allies`);
             } else {
                 const team = this.playerTeam;
                 const idx = team.indexOf(unit);
                 if (idx > 0) {
                     const front = team[idx - 1];
                     if (front) {
-                        const amount = unit.level === 2 ? 3 : 1;
+                        const amount = unit.level === 2 ? 4 : 2;
                         front.addBuff(amount);
-                        console.log(`Mankey Family Merge: +${amount} Atk to ${front.name}`);
                     }
                 }
             }
         }
 
-        // Dwebble: Merge/Evolve -> Front Ally +2/5 HP; Sell Lv 3 -> All Allies +10 HP
         if (unit.family === 'dwebble') {
             if (unit.level === 3) {
                 this.playerTeam.filter(u => u && u !== unit).forEach(u => {
                     u!.addGrowth(10, 0);
                 });
-                console.log(`Dwebble Family Sell (Lv 3): +10 HP to All Allies`);
             } else {
                 const team = this.playerTeam;
                 const idx = team.indexOf(unit);
                 if (idx > 0) {
                     const front = team[idx - 1];
                     if (front) {
-                        const amount = unit.level === 2 ? 3 : 1;
+                        const amount = unit.level === 2 ? 4 : 2;
                         front.addGrowth(amount, 0);
-                        console.log(`Dwebble Family Merge: +${amount} HP to ${front.name}`);
                     }
                 }
             }
@@ -570,14 +562,10 @@ export class GameLoop {
 
     private cloneUnit(unit: Unit): Unit {
         const template = UNIT_TEMPLATES[unit.templateId];
-        // Fallback if template missing (shouldn't happen)
         if (!template) return unit;
 
         const clone = new Unit(template);
-        clone.id = unit.id; // Keep ID? Or new? For battle strictness, persistence doesn't matter much unless logic depends on ID.
-        // Actually best to keep ID stable for React keys if possible, though strict mode might complain if we swap objects.
-        // Let's keep data consistent.
-
+        clone.id = unit.id;
         clone.name = unit.name;
         clone.level = unit.level;
         clone.exp = unit.exp;
