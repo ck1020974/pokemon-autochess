@@ -102,15 +102,8 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, className }: any) {
-    const [isForcedOpen, setIsForcedOpen] = useState(false);
-
-    useEffect(() => {
-        if (isForcedOpen) {
-            const timer = setTimeout(() => setIsForcedOpen(false), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [isForcedOpen]);
+function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, className, activeSynergyId, setActiveSynergyId }: any) {
+    const isForcedOpen = activeSynergyId === synergy.id;
 
     let activeDesc = synergy.description;
     const isActive = count !== undefined && count >= synergy.tiers[0];
@@ -123,7 +116,9 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
             onMouseEnter={onMouseEnter}
             onClick={(e) => {
                 e.stopPropagation();
-                setIsForcedOpen(!isForcedOpen);
+                if (setActiveSynergyId) {
+                    setActiveSynergyId(isForcedOpen ? null : synergy.id);
+                }
             }}
         >
             {synergy.icon}
@@ -250,6 +245,8 @@ function App() {
 
     // Battle Timeout Timing
     const [battleElapsedSeconds, setBattleElapsedSeconds] = useState(0);
+
+    const [activeSynergyId, setActiveSynergyId] = useState<string | null>(null);
 
     const [initialEnemyTeam, setInitialEnemyTeam] = useState<(Unit | null)[]>([]);
 
@@ -1333,7 +1330,10 @@ function App() {
     const synergyStatus = getSynergyStatus(game.playerTeam);
 
     return (
-        <div className="game-container" onClick={() => focusedDifficulty && setFocusedDifficulty(null)}>
+        <div className="game-container" onClick={() => {
+            if (focusedDifficulty) setFocusedDifficulty(null);
+            setActiveSynergyId(null);
+        }}>
             {/* Modal Components */}
             {confirmDialog && (
                 <div className="premium-confirm-overlay" onClick={() => setConfirmDialog(null)}>
@@ -1877,6 +1877,8 @@ function App() {
                             units={syn.units}
                             activeFamilies={syn.activeFamilies}
                             className=""
+                            activeSynergyId={activeSynergyId}
+                            setActiveSynergyId={setActiveSynergyId}
                         />
                     ))}
                 </div>
@@ -1885,7 +1887,7 @@ function App() {
                 {(initialEnemyTeam.length > 0 || displayEnemyTeam) && (
                     <div className="board-synergies" style={{ left: 'auto', right: '10px', flexDirection: 'row-reverse' }}>
                         {getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || [])).map(syn => (
-                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeFamilies={syn.activeFamilies} isEnemy={true} />
+                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeFamilies={syn.activeFamilies} isEnemy={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />
                         ))}
                     </div>
                 )}
@@ -2211,7 +2213,7 @@ function App() {
                                         {selected.unit.synergies.map((synId: string) => {
                                             const syn = SYNERGIES[synId];
                                             if (!syn) return null;
-                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} />;
+                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />;
                                         })}
                                     </div>
                                 </div>
