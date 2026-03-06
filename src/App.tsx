@@ -1356,7 +1356,7 @@ function App() {
             {showTutorial && difficulty !== null && <TutorialModal onClose={() => setShowTutorial(false)} onStartTutorial={startTutorial} />}
 
             {/* Tutorial Message Box / Mask (Steps 1-11) */}
-            {tutorialStep > 0 && tutorialStep <= 11 && (game.phase === GamePhase.SHOP || tutorialStep === 11) && (
+            {tutorialStep > 0 && tutorialStep <= 11 && hasStarted && !showOpponentSelect && !showEncyclopedia && (game.phase === GamePhase.SHOP || tutorialStep === 11) && (
                 <>
                     <div className="tutorial-mask" onClick={() => (tutorialStep === 1 || tutorialStep === 11) ? handleTutorialNext() : null} />
                     {tutorialStep === 1 ? (
@@ -1378,7 +1378,7 @@ function App() {
                                 {tutorialStep === 7 && "選擇要挑戰的訓練家\n🎯任務：點擊對戰按鈕"}
                                 {tutorialStep === 8 && "點擊或拖曳角色合成\n🎯任務：購買並合成小火龍"}
                                 {tutorialStep === 9 && "開啟羈絆來提升強度\n🎯任務：購買火球鼠"}
-                                {tutorialStep === 10 && "挑戰更強的訓練家\n🎯任務：查看羈絆後對戰"}
+                                {tutorialStep === 10 && "挑戰更強的訓練家\n🎯任務：點擊對戰按鈕"}
                                 {tutorialStep === 11 && "戰敗時將扣除生命值\n生命值歸零將結束遊戲‼️"}
                             </div>
                         </div>
