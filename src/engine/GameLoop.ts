@@ -70,8 +70,9 @@ export class GameLoop {
             }
         }
 
-        // --- Psychic Scaling ---
+        // --- Psychic Scaling (Increments every turn) ---
         this.psychicN = 2 + (this.turn - 1);
+        console.log(`念力羈絆增強！目前威力：${this.psychicN}`);
 
         // --- Refresh Descriptions ---
         this.refreshSpecialDescriptions();
@@ -93,9 +94,9 @@ export class GameLoop {
 
     private refreshSpecialDescriptions() {
         // Update templates so shop shows CURRENT N value and correct frequency
-        UNIT_TEMPLATES.charmander.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (三場對戰後增強)。`;
-        UNIT_TEMPLATES.charmeleon.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (兩場對戰後增強)。`;
-        UNIT_TEMPLATES.charizard.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (每場對戰後增強)。`;
+        UNIT_TEMPLATES.charmander.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (三場戰鬥後增強)。`;
+        UNIT_TEMPLATES.charmeleon.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (兩場戰鬥後增強)。`;
+        UNIT_TEMPLATES.charizard.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)。`;
 
         // Sync static template scaling values to current global N
         (UNIT_TEMPLATES.charmander as any).scalingValue = this.charmanderN;
@@ -122,8 +123,14 @@ export class GameLoop {
             }
         });
 
-        // Update Psychic synergy description
-        SYNERGIES.Psychic.description = `[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 ${this.psychicN} 點傷害 (每場對戰後增強)`;
+        // Update Psychic synergy description using placeholder
+        const basePsychicDesc = SYNERGIES.Psychic.description;
+        if (basePsychicDesc.includes('[N]')) {
+            SYNERGIES.Psychic.description = basePsychicDesc.replace('[N]', this.psychicN.toString());
+        } else {
+            // Fallback if already replaced or format changed
+            SYNERGIES.Psychic.description = `[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 ${this.psychicN} 點傷害 (每場對戰後增強)`;
+        }
     }
 
     public startBattlePhase() {

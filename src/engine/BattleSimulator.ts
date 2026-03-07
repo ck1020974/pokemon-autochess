@@ -1264,6 +1264,7 @@ export class BattleSimulator {
                             const selectedTargets = shuffled.slice(0, targetCount);
 
                             const dmg = this.psychicN;
+                            this.log(isPlayer ? `預知未來對敵方造成 ${dmg} 傷害！` : `預知未來對我方造成 ${dmg} 傷害！`);
                             for (const target of selectedTargets) {
                                 await this.dealDamage(null, target, dmg, true, true);
                             }
