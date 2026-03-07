@@ -442,9 +442,9 @@ function App() {
                 if (t.battleImageUrl) addUrl(t.battleImageUrl);
             });
 
-            // Trainers: Novice and Intermediate are critical, others are background
-            [...NOVICE_OPPONENTS, ...INTERM_OPPONENTS].forEach(op => criticalUrls.add(op.url));
-            [...ADVANCED_OPPONENTS, ...ELITE_OPPONENTS, ...CHAMPION_OPPONENTS].forEach(op => backgroundUrls.add(op.url));
+            // Trainers: Only NOVICE are critical, others are background
+            NOVICE_OPPONENTS.forEach(op => criticalUrls.add(op.url));
+            [...INTERM_OPPONENTS, ...ADVANCED_OPPONENTS, ...ELITE_OPPONENTS, ...CHAMPION_OPPONENTS].forEach(op => backgroundUrls.add(op.url));
 
             // Critical token/derived images
             criticalUrls.add('assets/妙蛙種子01.webp');
