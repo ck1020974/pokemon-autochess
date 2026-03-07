@@ -15,6 +15,7 @@ import { SYNERGIES } from './models/Synergies';
 import { EncyclopediaModal } from './components/EncyclopediaModal';
 import { TutorialModal } from './components/TutorialModal';
 import { Unit } from './models/Unit';
+import { REWARD_DATA } from './models/RewardData';
 
 // Difficulty Icons
 import normalBall from './assets/普通.webp';
@@ -493,6 +494,11 @@ function App() {
                 preloadAudio('victoryroad');
                 preloadAudio('level up');
                 preloadAudio('recover');
+
+                // Add reward item images to background load
+                REWARD_DATA.forEach(reward => {
+                    if (reward.imageUrl) backgroundUrls.add(reward.imageUrl);
+                });
 
                 await loadAssets(Array.from(backgroundUrls), true);
                 console.log(`[系統] 背景資源載入完成！`);
@@ -1457,10 +1463,11 @@ function App() {
 
                                 <div style={{
                                     color: '#cbd5e1',
-                                    fontSize: '0.95rem',
-                                    textAlign: 'center',
-                                    lineHeight: '1.4',
-                                    padding: '0 10px'
+                                    fontSize: '1.05rem',
+                                    textAlign: 'left',
+                                    lineHeight: '1.6',
+                                    padding: '0 15px',
+                                    width: '100%'
                                 }}>
                                     {reward.effect}
                                 </div>

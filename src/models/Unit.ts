@@ -77,12 +77,16 @@ export class Unit {
 
   // Max stats according to rules: 50/50
   public capStats() {
-    // 1. Cap Max Values
+    // 1. Cap Max Values (Floor at 1)
     if (this.stats.maxHp > 50) this.stats.maxHp = 50;
-    if (this.stats.attack > 50) this.stats.attack = 50;
+    if (this.stats.maxHp < 1) this.stats.maxHp = 1;
 
-    // 2. Cap Current HP to Max HP (and 50 implicit)
+    if (this.stats.attack > 50) this.stats.attack = 50;
+    if (this.stats.attack < 1) this.stats.attack = 1;
+
+    // 2. Cap Current HP to Max HP (Floor at 1)
     if (this.stats.hp > this.stats.maxHp) this.stats.hp = this.stats.maxHp;
+    if (this.stats.hp < 1) this.stats.hp = 1;
   }
 
   // Helper for Permanent/Temporary Growth (MaxHP + HP + Atk)
