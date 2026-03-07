@@ -201,7 +201,7 @@ export class GameLoop {
         const starterUnits = this.playerTeam.filter(u => u && u.synergies.includes('Starter')) as Unit[];
         const starterCount = getUniqueCount(starterUnits);
         if (starterCount >= 3) {
-            const buff = starterCount >= 5 ? 3 : 1;
+            const buff = starterCount >= 5 ? 2 : 1;
             starterUnits.forEach(u => {
                 applyBuff(u, buff, 'hp', 'Starter');
                 applyBuff(u, buff, 'atk', 'Starter');

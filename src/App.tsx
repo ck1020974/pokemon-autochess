@@ -468,6 +468,8 @@ function App() {
             preloadAudio('start');
             preloadAudio('pokemonmart');
             preloadAudio('gymfight');
+            preloadAudio('pokemoncenter'); // Early loss protection
+            preloadAudio('gymwin');       // Early win protection
 
             console.log(`[系統] 開始預載入關鍵資源 (${criticalUrls.size} 個)...`);
             await loadAssets(Array.from(criticalUrls), false);
@@ -479,8 +481,6 @@ function App() {
             setTimeout(async () => {
                 console.log(`[系統] 開始背景載入剩餘資源 (${backgroundUrls.size} 個)...`);
                 preloadAudio('victoryroad');
-                preloadAudio('pokemoncenter');
-                preloadAudio('gymwin');
                 preloadAudio('level up');
                 preloadAudio('recover');
 
