@@ -368,14 +368,22 @@ export class GameLoop {
 
     private applyExpToUnit(unit: Unit, amount: number) {
         unit.exp += amount;
-        // Check for level up / evolution via merge logic? 
-        // Actually, let's keep it simple: just add stats if level up threshold met
-        // Unit.ts handleGrowth might be needed here or trigger a virtual merge
-        if (unit.exp >= 9 && unit.level < 3) {
-            // Force re-evaluation of level
-            this.mergeUnits(unit, { exp: 0, level: 1, stats: { attack: 0, maxHp: 0 }, family: unit.family } as any);
-        } else if (unit.exp >= 3 && unit.level < 2) {
-            this.mergeUnits(unit, { exp: 0, level: 1, stats: { attack: 0, maxHp: 0 }, family: unit.family } as any);
+
+        // Loop to handle potential multiple level-ups/evolutions (e.g., from Lv1 straight to Lv3)
+        let canStillLevelUp = true;
+        while (canStillLevelUp) {
+            canStillLevelUp = false;
+
+            // Check thresholds
+            if (unit.exp >= 9 && unit.level < 3) {
+                // Trigger Level 3 (Evolve if applicable)
+                this.mergeUnits(unit, { exp: 0, level: 1, stats: { attack: 0, maxHp: 0 }, family: unit.family } as any);
+                canStillLevelUp = true; // Check again after merge/evolution
+            } else if (unit.exp >= 3 && unit.level < 2) {
+                // Trigger Level 2 (Evolve if applicable)
+                this.mergeUnits(unit, { exp: 0, level: 1, stats: { attack: 0, maxHp: 0 }, family: unit.family } as any);
+                canStillLevelUp = true;
+            }
         }
     }
 

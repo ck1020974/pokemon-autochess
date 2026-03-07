@@ -21,7 +21,7 @@ export interface RewardDefinition {
 export const REWARD_DATA: RewardDefinition[] = [
     // --- GOLD ---
     { "difficulty": "EASY", "category": "GOLD", "item": "星星碎片", "effect": "下次準備階段獲得+1金幣", "imageUrl": "item/星星碎片.png" },
-    { "difficulty": "NORMAL", "category": "GOLD", "item": "慧心碎片", "effect": "下次準備階段獲得+2金幣", "imageUrl": "item/慧心碎片.png" },
+    { "difficulty": "NORMAL", "category": "GOLD", "item": "彗星碎片", "effect": "下次準備階段獲得+2金幣", "imageUrl": "item/彗星碎片.png" },
     { "difficulty": "HARD", "category": "GOLD", "item": "金珠", "effect": "下次準備階段獲得+3金幣", "imageUrl": "item/金珠.png" },
     { "difficulty": "EXTREME", "category": "GOLD", "item": "巨大金珠", "effect": "下次準備階段獲得+5金幣", "imageUrl": "item/巨大金珠.png" },
 
@@ -283,9 +283,9 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Trick", "item": "客房服務", "effect": "隊伍中的戲法角色+3生命", "imageUrl": "item/客房服務.png" },
 
     // --- EXP ---
-    { "difficulty": "EASY", "category": "EXP", "item": "經驗糖果XS", "effect": "隊伍中的隨機角色EXP+1", "imageUrl": "item/經驗糖果XS.png" },
-    { "difficulty": "NORMAL", "category": "EXP", "item": "經驗糖果S", "effect": "隊伍中的隨機兩位角色EXP+1", "imageUrl": "item/經驗糖果S.png" },
-    { "difficulty": "HARD", "category": "EXP", "item": "經驗糖果M", "effect": "隊伍中的隨機三位角色EXP+1", "imageUrl": "item/經驗糖果M.png" },
-    { "difficulty": "EXTREME", "category": "EXP", "item": "經驗糖果XL", "effect": "隊伍中的全體角色EXP+1", "imageUrl": "item/經驗糖果XL.png" },
+    { "difficulty": "EASY", "category": "EXP", "item": "經驗糖果XS", "effect": "隊伍中的隨機角色EXP+1", "imageUrl": "item/經驗糖果ＸＳ.png" },
+    { "difficulty": "NORMAL", "category": "EXP", "item": "經驗糖果S", "effect": "隊伍中的隨機兩位角色EXP+1", "imageUrl": "item/經驗糖果Ｓ.png" },
+    { "difficulty": "HARD", "category": "EXP", "item": "經驗糖果M", "effect": "隊伍中的隨機三位角色EXP+1", "imageUrl": "item/經驗糖果Ｍ.png" },
+    { "difficulty": "EXTREME", "category": "EXP", "item": "經驗糖果XL", "effect": "隊伍中的全體角色EXP+1", "imageUrl": "item/經驗糖果ＸＬ.png" },
     { "difficulty": "EXTREME", "category": "EXP", "item": "神奇糖果", "effect": "隊伍中的隨機角色EXP+3", "imageUrl": "item/神奇糖果.png" }
 ];
