@@ -315,8 +315,6 @@ export class HeadlessBattleSimulator {
     private registerUnitAbilities(unit: Unit) {
         if (unit.synergies.includes('Fire')) {
             this.eventBus.on('BEFORE_ATTACK', (e) => {
-                const s = this.unitStates.get(unit);
-                if (s?.isSilenced) return;
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
                     const buff = count >= 5 ? 10 : (count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0)));
@@ -330,8 +328,7 @@ export class HeadlessBattleSimulator {
 
         if (unit.synergies.includes('Grass')) {
             this.eventBus.on('AFTER_ATTACK', async (e) => {
-                const s = this.unitStates.get(unit);
-                if (s?.isSilenced || unit.stats.hp <= 0) return;
+                if (unit.stats.hp <= 0) return;
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && myTeam.includes(unit)) {
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
@@ -342,8 +339,7 @@ export class HeadlessBattleSimulator {
         }
         if (unit.synergies.includes('Water')) {
             this.eventBus.on('BEFORE_ATTACK', (e) => {
-                const s = this.unitStates.get(unit);
-                if (s?.isSilenced || unit.stats.hp <= 0) return;
+                if (unit.stats.hp <= 0) return;
                 if (e.source === unit && e.target && e.target.stats.hp > 0 && e.target.family !== 'sneasel') {
                     const count = this.getSynergyCountForUnit(unit, 'Water');
                     const debuff = count >= 5 ? 5 : (count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0)));
@@ -392,8 +388,6 @@ export class HeadlessBattleSimulator {
         }
         if (unit.synergies.includes('Angry')) {
             this.eventBus.on('ON_HURT', (e) => {
-                const s = this.unitStates.get(unit);
-                if (s?.isSilenced) return;
                 if (e.target === unit && this.getSynergyCountForUnit(unit, 'Angry') >= 2) {
                     const count = this.getSynergyCountForUnit(unit, 'Angry');
                     const buff = count >= 4 ? 8 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
@@ -406,7 +400,7 @@ export class HeadlessBattleSimulator {
         }
         if (unit.synergies.includes('Cave')) {
             this.eventBus.on('ON_MOVE', async (e) => {
-                if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
+                if (e.source === unit) {
                     if (this.getSynergyCountForUnit(unit, 'Cave') >= 2) {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, 2, 0, original);
@@ -611,8 +605,8 @@ export class HeadlessBattleSimulator {
                 if (unit.stats.hp <= 0 || s?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
-                    const buff = [0, 1, 4, 8][unit.level] || 1;
-                    this.growUnit(e.source, buff, buff);
+                    const buff = [0, 2, 5, 10][unit.level] || 2;
+                    this.growUnit(e.source, 0, buff);
                 }
             });
         }

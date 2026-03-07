@@ -96,19 +96,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'chikorita', name: '菊草葉', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/菊草葉00.webp', battleImageUrl: 'assets/菊草葉01.webp',
-        description: '友軍召喚物 +1 攻擊與生命。', synergies: ['Starter', 'Grass'], evolveId: 'bayleef'
+        description: '友軍召喚物 +2 攻擊。', synergies: ['Starter', 'Grass'], evolveId: 'bayleef'
     },
     bayleef: {
         id: 'bayleef', name: '月桂葉', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/月桂葉00.webp', battleImageUrl: 'assets/月桂葉01.webp',
-        description: '友軍召喚物 +4 攻擊與生命。', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
+        description: '友軍召喚物 +5 攻擊級。', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
     },
     meganium: {
         id: 'meganium', name: '大竺葵', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/大竺葵00.webp', battleImageUrl: 'assets/大竺葵01.webp',
-        description: '友軍召喚物 +8 攻擊與生命。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
+        description: '友軍召喚物 +10 攻擊。', synergies: ['Starter', 'Grass'], isHiddenFromShop: true
     },
 
     // 6. Cyndaquil

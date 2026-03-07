@@ -165,8 +165,8 @@ async function runStageBalanceSim() {
     for (const stage of STAGES) {
         console.log(`\n--- 測試階段: ${stage.name} ---`);
         report += `## ${stage.name} (期望勝率: ${stage.minWin}% ~ ${stage.maxWin}%)\n`;
-        report += `| 對手名稱 | ID | 陣容預覽 | 玩家勝率 | 平均存活 | 平均回合 | 診斷 |\n`;
-        report += `| :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n`;
+        report += `| 對手名稱 | ID | 陣容預覽 | 玩家勝率 | 平局率 | 平局平均血量(玩/敵) | 平均回合 | 診斷 |\n`;
+        report += `| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n`;
 
         for (const boss of stage.data) {
             let wins = 0;
@@ -174,6 +174,9 @@ async function runStageBalanceSim() {
             let draws = 0;
             let totalSurvivingUnits = 0;
             let totalTurns = 0;
+            let totalWinHpPercent = 0;
+            let totalDrawPlayerHpPercent = 0;
+            let totalDrawEnemyHpPercent = 0;
 
             // Get the boss team names once for the report
             const previewTeam = constructBossTeam(boss, stage.id);
@@ -195,25 +198,60 @@ async function runStageBalanceSim() {
                 totalTurns += simulator.turnCount;
 
                 const result = simulator.getResult();
+
+                // Calculate HP percent at the end of simulation
+                let playerMaxHp = 0;
+                let playerHp = 0;
+                playerTeam.forEach(u => {
+                    if (u) {
+                        playerMaxHp += Math.max(1, u.stats.maxHp);
+                        if (u.stats.hp > 0) playerHp += u.stats.hp;
+                    }
+                });
+                let enemyMaxHp = 0;
+                let enemyHp = 0;
+                enemyTeam.forEach(u => {
+                    if (u) {
+                        enemyMaxHp += Math.max(1, u.stats.maxHp);
+                        if (u.stats.hp > 0) enemyHp += u.stats.hp;
+                    }
+                });
+
+                const playerHpPercent = playerMaxHp > 0 ? (playerHp / playerMaxHp) * 100 : 0;
+                const enemyHpPercent = enemyMaxHp > 0 ? (enemyHp / enemyMaxHp) * 100 : 0;
+
                 if (result === 'WIN') {
                     wins++;
                     totalSurvivingUnits += playerTeam.filter(u => u && u.stats.hp > 0).length;
+                    totalWinHpPercent += playerHpPercent;
                 }
-                else if (result === 'LOSS') losses++;
-                else draws++;
+                else if (result === 'LOSS') {
+                    losses++;
+                }
+                else {
+                    draws++;
+                    totalDrawPlayerHpPercent += playerHpPercent;
+                    totalDrawEnemyHpPercent += enemyHpPercent;
+                }
             }
 
             const winRate = (wins / SIMS_PER_BOSS) * 100;
+            const drawRate = (draws / SIMS_PER_BOSS) * 100;
             const avgSurviving = wins > 0 ? (totalSurvivingUnits / wins).toFixed(1) : '0.0';
             const avgTurns = (totalTurns / SIMS_PER_BOSS).toFixed(1);
+
+            const avgDrawPlayerHp = draws > 0 ? (totalDrawPlayerHpPercent / draws).toFixed(1) : '0.0';
+            const avgDrawEnemyHp = draws > 0 ? (totalDrawEnemyHpPercent / draws).toFixed(1) : '0.0';
 
             // 診斷分析 (基於設計者期望)
             let diagnostic = '✅ 合格';
             if (winRate < stage.minWin) diagnostic = '🔴 過難 (建議削弱)';
             else if (winRate > stage.maxWin) diagnostic = '🟢 過易 (建議加強)';
 
-            console.log(`[${stage.name}] ${boss.name} - 勝率: ${winRate.toFixed(1)}%, 回合: ${avgTurns}`);
-            report += `| ${boss.name} | \`${boss.id}\` | ${teamNames} | **${winRate.toFixed(1)}%** | ${avgSurviving} | ${avgTurns} | ${diagnostic} |\n`;
+            if (drawRate > 15) diagnostic += ' ⚠️ 高平手率';
+
+            console.log(`[${stage.name}] ${boss.name} - 勝率: ${winRate.toFixed(1)}%, 平局: ${drawRate.toFixed(1)}%, 回合: ${avgTurns}`);
+            report += `| ${boss.name} | \`${boss.id}\` | ${teamNames} | **${winRate.toFixed(1)}%** | ${drawRate.toFixed(1)}% | ${avgDrawPlayerHp}% / ${avgDrawEnemyHp}% | ${avgTurns} | ${diagnostic} |\n`;
         }
         report += `\n`;
     }

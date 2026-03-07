@@ -699,7 +699,7 @@ export class BattleSimulator {
         // Angry: Atk on Hurt (Buff All Allies)
         if (unit.synergies.includes('Angry')) {
             this.eventBus.on('ON_HURT', (e) => {
-                if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
+                if (e.target === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Angry');
                     const buff = count >= 4 ? 8 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
                     if (buff > 0) {
@@ -1055,11 +1055,11 @@ export class BattleSimulator {
                 const { side: mySide } = this.getTeams(unit);
                 const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
                 if (e.source && mySide === sSide && e.source !== unit) {
-                    const buff = [0, 1, 4, 8][unit.level] || 1;
+                    const buff = [0, 2, 5, 10][unit.level] || 2;
                     await this.delay(150);
                     await this.notifySkill(unit, `對 ${e.source.name} 發動了甜甜香氣！`);
                     await this.playAnimation(unit, 'jump', 200);
-                    this.growUnit(e.source, buff, buff);
+                    this.growUnit(e.source, 0, buff);
                 }
             });
         }
