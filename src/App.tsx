@@ -442,9 +442,9 @@ function App() {
                 if (t.battleImageUrl) addUrl(t.battleImageUrl);
             });
 
-            // Trainers: Only NOVICE are critical, others are background
-            NOVICE_OPPONENTS.forEach(op => criticalUrls.add(op.url));
-            [...INTERM_OPPONENTS, ...ADVANCED_OPPONENTS, ...ELITE_OPPONENTS, ...CHAMPION_OPPONENTS].forEach(op => backgroundUrls.add(op.url));
+            // Trainers: Novice and Intermediate are critical, others are background
+            [...NOVICE_OPPONENTS, ...INTERM_OPPONENTS].forEach(op => criticalUrls.add(op.url));
+            [...ADVANCED_OPPONENTS, ...ELITE_OPPONENTS, ...CHAMPION_OPPONENTS].forEach(op => backgroundUrls.add(op.url));
 
             // Critical token/derived images
             criticalUrls.add('assets/妙蛙種子01.webp');
@@ -468,6 +468,8 @@ function App() {
             preloadAudio('start');
             preloadAudio('pokemonmart');
             preloadAudio('gymfight');
+            preloadAudio('pokemoncenter'); // Early loss protection
+            preloadAudio('gymwin');       // Early win protection
 
             console.log(`[系統] 開始預載入關鍵資源 (${criticalUrls.size} 個)...`);
             await loadAssets(Array.from(criticalUrls), false);
@@ -479,8 +481,6 @@ function App() {
             setTimeout(async () => {
                 console.log(`[系統] 開始背景載入剩餘資源 (${backgroundUrls.size} 個)...`);
                 preloadAudio('victoryroad');
-                preloadAudio('pokemoncenter');
-                preloadAudio('gymwin');
                 preloadAudio('level up');
                 preloadAudio('recover');
 
