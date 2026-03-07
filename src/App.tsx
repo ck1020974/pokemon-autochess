@@ -206,15 +206,18 @@ function getSynergyStatus(team: (Unit | null)[]) {
 function App() {
     const gameRef = useRef<GameLoop>(new GameLoop());
     const game = gameRef.current;
+
+    const [rewardChoices, setRewardChoices] = useState<any[]>([]);
     const update = useForceUpdate();
 
     useEffect(() => {
-        console.log("Pokemon AutoChess v4.8.3 - Syntax Fix & Final Logs");
+        console.log("Pokemon AutoChess v4.8.4 - Reward Phase Deploy");
     }, []);
 
     const handleRestart = () => {
         // 1. Reset Core Engine
         gameRef.current = new GameLoop();
+        setRewardChoices([]);
 
         // 2. Clear Primary States
         setDifficulty(null);
@@ -303,6 +306,10 @@ function App() {
     // Animation States
     const [goldErrorAnim, setGoldErrorAnim] = useState(false);
     const [hpLossAnim, setHpLossAnim] = useState(false);
+    const [focusedDifficulty, setFocusedDifficulty] = useState<string | null>(null);
+
+    const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
+    const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
 
     const triggerShake = () => {
         setTutorialShake(true);
@@ -324,22 +331,25 @@ function App() {
 
     // --- Tutorial Logic ---
     const startTutorial = () => {
-        handleRestart(); // reset game
-        setTimeout(() => {
-            if (gameRef.current) {
-                gameRef.current.gold = 10;
-                gameRef.current.shop.slots = [
-                    new Unit(UNIT_TEMPLATES.gastly),
-                    new Unit(UNIT_TEMPLATES.charmander),
-                    new Unit(UNIT_TEMPLATES.squirtle)
-                ];
-                gameRef.current.setDifficulty('NORMAL');
-                setDifficulty('NORMAL');
-                setTutorialStep(2);
-                setShowTutorial(false);
-                update();
-            }
-        }, 100);
+        // Reset game but PRESERVE title-screen-state
+        const newGame = new GameLoop();
+        gameRef.current = newGame;
+
+        // Setup Tutorial Context
+        newGame.gold = 10;
+        newGame.shop.slots = [
+            new Unit(UNIT_TEMPLATES.gastly),
+            new Unit(UNIT_TEMPLATES.charmander),
+            new Unit(UNIT_TEMPLATES.squirtle)
+        ];
+        newGame.setDifficulty('NORMAL');
+
+        // Sync React States
+        setDifficulty('NORMAL');
+        setTutorialStep(2);
+        setShowTutorial(false);
+        setHasStarted(true); // CRITICAL: Keep user on the board, not title screen
+        update();
     };
 
     // Step 10 Synergy Check
@@ -399,7 +409,7 @@ function App() {
                 }
             }
         }
-    }, [tutorialStep, gameRef.current.phase, battleResult, update]);
+    }, [tutorialStep, game.phase, battleResult, update]); // Changed from gameRef.current.phase
 
     // Image Preloading - Split into Critical (Tier 1/2) and Background (Tier 3+)
     useEffect(() => {
@@ -881,7 +891,9 @@ function App() {
             setInitialEnemyTeam([...enemyTeam]);
 
             const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
-            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN);
+            const activeBuffs = [...game.nextBattleBuffs];
+            game.nextBattleBuffs = []; // Clear buffs after consumption
+            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, false, activeBuffs);
             const currentSim = simulatorRef.current;
 
             currentSim.onUpdate = () => {
@@ -912,6 +924,7 @@ function App() {
                         setTimeout(() => {
                             if (simulatorRef.current) {
                                 const result = simulatorRef.current.getResult() || 'DRAW';
+                                game.lastResult = result;
                                 setSelected(null);
                                 setBattleResult(result);
                             }
@@ -1146,40 +1159,6 @@ function App() {
         setShowOpponentSelect(true);
     };
 
-    const handleOpponentSelect = (opponent: { id?: string, name: string, url: string }) => {
-        setSelectedOpponent(opponent as { id: string, name: string, url: string });
-        if (opponent.id) {
-            game.currentOpponentId = opponent.id;
-        }
-        setShowOpponentSelect(false);
-        game.startBattlePhase();
-        setBattleResult(null);
-        setLogs([]);
-        setBattleTick(0);
-        update();
-    };
-
-    const handleBattleResultClick = () => {
-        if (battleResult) {
-            music.stop(); // Stop victory music
-            const hpBefore = game.lives;
-            game.endBattle(battleResult);
-
-            if ((tutorialStep === 10) && battleResult === 'LOSS') {
-                setTutorialStep(11); // Move to Encyclopedia task after battle
-            }
-
-            if (game.lives < hpBefore) {
-                setHpLossAnim(true);
-                setTimeout(() => setHpLossAnim(false), 800);
-            }
-
-            simulatorRef.current = null;
-            setBattleResult(null);
-            update();
-        }
-    };
-
     const handleSelect = (unit: Unit | null, index: number, source: 'SHOP' | 'BOARD' | 'ENEMY') => {
         // --- Fallback for mobile/touch: Click Source -> Click Target ---
         if (game.phase === GamePhase.SHOP && selected) {
@@ -1247,7 +1226,6 @@ function App() {
         }
     };
 
-    // Drag Handlers
     const onDragStart = (e: React.DragEvent, index: number, source: 'SHOP' | 'BOARD') => {
         if (source === 'BOARD' && !isTutorialActionAllowed('MOVE_BOARD')) {
             if (tutorialStep > 0) triggerShake();
@@ -1325,9 +1303,54 @@ function App() {
         setSelected(null);
     };
 
-    const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
-    const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
-    const [focusedDifficulty, setFocusedDifficulty] = useState<string | null>(null);
+    const handleOpponentSelect = (opponent: { id?: string, name: string, url: string, difficulty?: string }) => {
+        setSelectedOpponent(opponent as { id: string, name: string, url: string });
+        if (opponent.id) {
+            game.currentOpponentId = opponent.id;
+        }
+        if (opponent.difficulty) {
+            game.currentOpponentDifficulty = opponent.difficulty;
+        }
+        setShowOpponentSelect(false);
+        game.startBattlePhase();
+        setBattleResult(null);
+        setLogs([]);
+        setBattleTick(0);
+        update();
+    };
+
+    const handleBattleResultClick = () => {
+        if (game.phase === 'BATTLE') {
+            music.stop(); // Stop victory music
+            const hpBefore = game.lives;
+            const result = game.lastResult;
+
+            if (result === 'WIN') {
+                game.endBattle('WIN');
+                setRewardChoices([...game.rewardChoices]);
+            } else {
+                game.endBattle(result!);
+            }
+
+            if (game.lives < hpBefore) {
+                setHpLossAnim(true);
+                setTimeout(() => setHpLossAnim(false), 800);
+            }
+        }
+
+        if (tutorialStep === 7) setTutorialStep(8);
+        if (tutorialStep === 10) setTutorialStep(11);
+
+        simulatorRef.current = null;
+        setBattleResult(null);
+        update();
+    };
+
+    const handleRewardSelect = (reward: any) => {
+        game.applyReward(reward);
+        setRewardChoices([]); // Clear UI state immediately
+        update();
+    };
 
     // Calculate Synergies (All)
     const synergyStatus = getSynergyStatus(game.playerTeam);
@@ -1353,226 +1376,329 @@ function App() {
                 </div>
             )}
 
-            {showTutorial && difficulty !== null && <TutorialModal onClose={() => setShowTutorial(false)} onStartTutorial={startTutorial} />}
+            {/* Tutorial Modal shows if difficulty selected but tutorial not started/ended */}
+            {showTutorial && tutorialStep === 0 && difficulty !== null && <TutorialModal onClose={() => setShowTutorial(false)} onStartTutorial={startTutorial} />}
 
-            {/* Tutorial Message Box / Mask (Steps 1-11) */}
-            {tutorialStep > 0 && tutorialStep <= 11 && hasStarted && !showOpponentSelect && !showEncyclopedia && (game.phase === GamePhase.SHOP || tutorialStep === 11) && (
-                <>
-                    <div className="tutorial-mask" onClick={() => (tutorialStep === 1 || tutorialStep === 11) ? handleTutorialNext() : null} />
-                    {tutorialStep === 1 ? (
-                        <div className="tutorial-message-box" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
-                            <div className="tutorial-actions" style={{ position: 'absolute', top: '100px', right: '20px' }}>
-                                <button className="tutorial-btn-continue" onClick={(e) => { e.stopPropagation(); handleTutorialNext(); }}>
-                                    點擊繼續 ⏭
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className={`tutorial-message-box ${tutorialShake ? 'shake-anim' : ''}`}>
-                            <div className="tutorial-text">
-                                {tutorialStep === 2 && "每回合都會獲得10$\n🎯任務：購買寶可夢"}
-                                {tutorialStep === 3 && "認識每隻寶可夢\n🎯任務：查看招式並關閉面板"}
-                                {tutorialStep === 4 && "調整陣容順序\n🎯任務：將鬼斯移動到其他位置"}
-                                {tutorialStep === 5 && "花費1$刷新商店\n🎯任務：點擊按鈕刷新商店角色"}
-                                {tutorialStep === 6 && "鎖定角色保留到下回合\n🎯任務：點擊鎖定所有小火龍"}
-                                {tutorialStep === 7 && "選擇要挑戰的訓練家\n🎯任務：點擊對戰按鈕"}
-                                {tutorialStep === 8 && "點擊或拖曳角色合成\n🎯任務：購買並合成小火龍"}
-                                {tutorialStep === 9 && "開啟羈絆來提高強度\n🎯任務：購買火球鼠"}
-                                {tutorialStep === 10 && "挑戰更強的訓練家\n🎯任務：點擊對戰按鈕"}
-                                {tutorialStep === 11 && "戰敗時將減少生命值\n生命值歸零將結束遊戲‼️"}
-                            </div>
-                        </div>
-                    )}
-                </>
-            )}
+            {/* Reward Selection Overlay (Z-Index 20000) */}
+            {game.phase === 'REWARD' && (
+                <div className="opponent-select-overlay show" style={{
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.85)',
+                    backdropFilter: 'blur(8px)',
+                    zIndex: 20000,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    animation: 'fadeIn 0.3s ease-out'
+                }}>
+                    <h2 style={{
+                        color: '#fff',
+                        fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+                        marginBottom: 'clamp(20px, 4vw, 40px)',
+                        textShadow: '0 2px 10px rgba(0,0,0,0.8)',
+                        letterSpacing: '4px'
+                    }}>
+                        請選擇你的獎勵
+                    </h2>
 
-            {/* Tutorial Completion Screen (Step 12) */}
-            {tutorialStep === 12 && (
-                <div className="battle-result-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.98)', zIndex: 30000, display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={handleRestart}>
-                    <div className="result-content" style={{ textAlign: 'center' }}>
-                        <div className="result-title" style={{ fontSize: '4.5rem', color: '#ffd700', textShadow: '0 0 40px rgba(255,215,0,0.6)', marginBottom: '15px' }}>
-                            遊戲教學已結束
-                        </div>
-                        <div className="result-subtitle" style={{ fontSize: '2rem', color: '#fff', marginBottom: '50px', opacity: 0.9 }}>
-                            擊敗所有訓練師，成為寶可夢冠軍！
-                        </div>
-                        <div style={{ fontSize: '1.3rem', color: '#aaa', animation: 'pulse 1.5s infinite' }}>
-                            點擊任意處重新開始
-                        </div>
+                    <div className="opponent-cards-container" style={{
+                        display: 'flex',
+                        gap: 'clamp(20px, 5vw, 60px)',
+                        justifyContent: 'center',
+                        flexWrap: 'wrap'
+                    }}>
+                        {rewardChoices.map((reward: any, idx) => (
+                            <div
+                                key={idx}
+                                className="opponent-card"
+                                onClick={() => handleRewardSelect(reward)}
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    cursor: 'pointer',
+                                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
+                                    padding: 'clamp(15px, 3vw, 25px)',
+                                    borderRadius: '16px',
+                                    border: '2px solid rgba(255,255,255,0.1)',
+                                    transition: 'all 0.2s',
+                                    width: 'clamp(130px, 25vw, 200px)', // Matched to opponent-card width
+                                    position: 'relative',
+                                    minHeight: '260px' // Slightly adjusted for items
+                                }}
+                            >
+                                <img
+                                    src={reward.imageUrl}
+                                    alt={reward.item}
+                                    style={{
+                                        width: 'clamp(80px, 15vw, 120px)', // Matched scale
+                                        height: 'clamp(80px, 15vw, 120px)',
+                                        objectFit: 'contain',
+                                        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))',
+                                        marginBottom: '15px'
+                                    }}
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = 'item/星星碎片.png';
+                                    }}
+                                />
+
+                                <div className="opponent-name" style={{
+                                    color: '#fff',
+                                    fontSize: '1.4rem',
+                                    fontWeight: 'bold',
+                                    letterSpacing: '2px',
+                                    marginBottom: '10px',
+                                    textAlign: 'center'
+                                }}>
+                                    {reward.item}
+                                </div>
+
+                                <div style={{
+                                    color: '#cbd5e1',
+                                    fontSize: '0.95rem',
+                                    textAlign: 'center',
+                                    lineHeight: '1.4',
+                                    padding: '0 10px'
+                                }}>
+                                    {reward.effect}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             )}
 
+            {/* Tutorial Message Box / Mask (Steps 1-11) */}
+            {
+                tutorialStep > 0 && tutorialStep <= 11 && hasStarted && !showOpponentSelect && !showEncyclopedia && (game.phase === GamePhase.SHOP || tutorialStep === 11) && (
+                    <>
+                        <div className="tutorial-mask" onClick={() => (tutorialStep === 1 || tutorialStep === 11) ? handleTutorialNext() : null} />
+                        {tutorialStep === 1 ? (
+                            <div className="tutorial-message-box" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
+                                <div className="tutorial-actions" style={{ position: 'absolute', top: '100px', right: '20px' }}>
+                                    <button className="tutorial-btn-continue" onClick={(e) => { e.stopPropagation(); handleTutorialNext(); }}>
+                                        點擊繼續 ⏭
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className={`tutorial-message-box ${tutorialShake ? 'shake-anim' : ''}`}>
+                                <div className="tutorial-text">
+                                    {tutorialStep === 2 && "每回合都會獲得10$\n🎯任務：購買寶可夢"}
+                                    {tutorialStep === 3 && "認識每隻寶可夢\n🎯任務：查看招式並關閉面板"}
+                                    {tutorialStep === 4 && "調整陣容順序\n🎯任務：將鬼斯移動到其他位置"}
+                                    {tutorialStep === 5 && "花費1$刷新商店\n🎯任務：點擊按鈕刷新商店角色"}
+                                    {tutorialStep === 6 && "鎖定角色保留到下回合\n🎯任務：點擊鎖定所有小火龍"}
+                                    {tutorialStep === 7 && "選擇要挑戰的訓練家\n🎯任務：點擊對戰按鈕"}
+                                    {tutorialStep === 8 && "點擊或拖曳角色合成\n🎯任務：購買並合成小火龍"}
+                                    {tutorialStep === 9 && "開啟羈絆來提高強度\n🎯任務：購買火球鼠"}
+                                    {tutorialStep === 10 && "挑戰更強的訓練家\n🎯任務：點擊對戰按鈕"}
+                                    {tutorialStep === 11 && "戰敗時將減少生命值\n生命值歸零將結束遊戲‼️"}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )
+            }
+
+            {/* Tutorial Completion Screen (Step 12) */}
+            {
+                tutorialStep === 12 && (
+                    <div className="battle-result-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.98)', zIndex: 30000, display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={handleRestart}>
+                        <div className="result-content" style={{ textAlign: 'center' }}>
+                            <div className="result-title" style={{ fontSize: '4.5rem', color: '#ffd700', textShadow: '0 0 40px rgba(255,215,0,0.6)', marginBottom: '15px' }}>
+                                遊戲教學已結束
+                            </div>
+                            <div className="result-subtitle" style={{ fontSize: '2rem', color: '#fff', marginBottom: '50px', opacity: 0.9 }}>
+                                擊敗所有訓練師，成為寶可夢冠軍！
+                            </div>
+                            <div style={{ fontSize: '1.3rem', color: '#aaa', animation: 'pulse 1.5s infinite' }}>
+                                點擊任意處重新開始
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+
             {/* Orientation Lock Overlay */}
-            {isPortrait && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
-                    background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
-                    zIndex: 10001,
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    color: '#fff', textAlign: 'center', padding: '20px',
-                    backdropFilter: 'blur(20px)'
-                }}>
-                    <div className="rotate-icon" style={{
-                        fontSize: '5rem',
-                        marginBottom: '30px',
-                        filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.5))'
-                    }}>📱</div>
-                    <h2 style={{
-                        fontSize: '1.8rem',
-                        fontWeight: 'bold',
-                        letterSpacing: '4px',
-                        background: 'linear-gradient(to bottom, #fff, #94a3b8)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        margin: 0,
-                        lineHeight: '1.4'
-                    }}>請旋轉手機<br />以開始遊戲</h2>
-                </div>
-            )}
+            {
+                isPortrait && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
+                        background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
+                        zIndex: 10001,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        color: '#fff', textAlign: 'center', padding: '20px',
+                        backdropFilter: 'blur(20px)'
+                    }}>
+                        <div className="rotate-icon" style={{
+                            fontSize: '5rem',
+                            marginBottom: '30px',
+                            filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.5))'
+                        }}>📱</div>
+                        <h2 style={{
+                            fontSize: '1.8rem',
+                            fontWeight: 'bold',
+                            letterSpacing: '4px',
+                            background: 'linear-gradient(to bottom, #fff, #94a3b8)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            margin: 0,
+                            lineHeight: '1.4'
+                        }}>請旋轉手機<br />以開始遊戲</h2>
+                    </div>
+                )
+            }
 
             {/* Mute Toggle Button removed from here */}
 
             {/* Loading & Start Screen */}
-            {!hasStarted && (
-                <div className="startup-overlay"
-                    style={{
-                        position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
-                        background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
-                        zIndex: 10000, display: 'flex', flexDirection: 'column',
-                        justifyContent: 'center', alignItems: 'center', gap: '30px'
-                    }}>
-                    <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                        <h1 style={{
-                            fontSize: '5rem',
-                            margin: '0',
-                            letterSpacing: '12px',
-                            background: 'linear-gradient(to bottom, #fff, #94a3b8)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
-                            fontWeight: 900
+            {
+                !hasStarted && (
+                    <div className="startup-overlay"
+                        style={{
+                            position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
+                            background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
+                            zIndex: 10000, display: 'flex', flexDirection: 'column',
+                            justifyContent: 'center', alignItems: 'center', gap: '30px'
                         }}>
-                            POKEMON<br />AUTOCHESS
-                        </h1>
-                    </div>
-
-                    <div className="loading-container" style={{ width: '600px', textAlign: 'center' }}>
-                        <div className="loading-bar-wrapper" style={{
-                            width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)',
-                            borderRadius: '3px', overflow: 'hidden', marginBottom: '20px',
-                            border: '1px solid rgba(255,255,255,0.05)'
-                        }}>
-                            <div className="loading-bar-fill" style={{
-                                width: `${loadingProgress}%`, height: '100%',
-                                background: 'linear-gradient(90deg, #60a5fa, #3b82f6)',
-                                transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                                boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)'
-                            }} />
+                        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                            <h1 style={{
+                                fontSize: '5rem',
+                                margin: '0',
+                                letterSpacing: '12px',
+                                background: 'linear-gradient(to bottom, #fff, #94a3b8)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
+                                fontWeight: 900
+                            }}>
+                                POKEMON<br />AUTOCHESS
+                            </h1>
                         </div>
-                        <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
-                            {hasLoaded ? '系統就緒' : `資源載入中... ${loadingProgress}%`}
-                        </p>
+
+                        <div className="loading-container" style={{ width: '600px', textAlign: 'center' }}>
+                            <div className="loading-bar-wrapper" style={{
+                                width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)',
+                                borderRadius: '3px', overflow: 'hidden', marginBottom: '20px',
+                                border: '1px solid rgba(255,255,255,0.05)'
+                            }}>
+                                <div className="loading-bar-fill" style={{
+                                    width: `${loadingProgress}%`, height: '100%',
+                                    background: 'linear-gradient(90deg, #60a5fa, #3b82f6)',
+                                    transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)'
+                                }} />
+                            </div>
+                            <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
+                                {hasLoaded ? '系統就緒' : `資源載入中... ${loadingProgress}%`}
+                            </p>
+                        </div>
+
+                        <button
+                            className={`start-game-btn ${hasLoaded ? 'is-ready' : ''}`}
+                            disabled={!hasLoaded}
+                            onClick={() => {
+                                music.play('start', true);
+                                setHasStarted(true);
+                            }}
+                        >
+                            開始遊戲
+                        </button>
+
+                        <p style={{
+                            position: 'absolute',
+                            bottom: '20px',
+                            color: 'rgba(148, 163, 184, 0.3)',
+                            fontSize: '0.7rem',
+                            letterSpacing: '2px'
+                        }}>v4.8.6 - PREMIUM EDITION</p>
                     </div>
-
-                    <button
-                        className={`start-game-btn ${hasLoaded ? 'is-ready' : ''}`}
-                        disabled={!hasLoaded}
-                        onClick={() => {
-                            music.play('start', true);
-                            setHasStarted(true);
-                        }}
-                    >
-                        開始遊戲
-                    </button>
-
-                    <p style={{
-                        position: 'absolute',
-                        bottom: '20px',
-                        color: 'rgba(148, 163, 184, 0.3)',
-                        fontSize: '0.7rem',
-                        letterSpacing: '2px'
-                    }}>v4.8.6 - PREMIUM EDITION</p>
-                </div>
-            )}
+                )
+            }
 
             {/* Difficulty Selection Screen (Only after Start) */}
-            {(hasStarted && difficulty === null) && (
-                <div className="startup-overlay"
-                    style={{
-                        position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
-                        background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
-                        zIndex: 10000, display: 'flex', flexDirection: 'column',
-                        justifyContent: 'center', alignItems: 'center', gap: '40px'
-                    }}>
-                    <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                        <h1 style={{
-                            fontSize: '4.5rem',
-                            margin: '0',
-                            letterSpacing: '10px',
-                            background: 'linear-gradient(to bottom, #fff, #94a3b8)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
-                            fontWeight: 900
+            {
+                (hasStarted && difficulty === null) && (
+                    <div className="startup-overlay"
+                        style={{
+                            position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
+                            background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
+                            zIndex: 10000, display: 'flex', flexDirection: 'column',
+                            justifyContent: 'center', alignItems: 'center', gap: '40px'
                         }}>
-                            POKEMON<br />AUTOCHESS
-                        </h1>
-                    </div>
+                        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                            <h1 style={{
+                                fontSize: '4.5rem',
+                                margin: '0',
+                                letterSpacing: '10px',
+                                background: 'linear-gradient(to bottom, #fff, #94a3b8)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
+                                fontWeight: 900
+                            }}>
+                                POKEMON<br />AUTOCHESS
+                            </h1>
+                        </div>
 
-                    <div className="difficulty-grid" style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(4, 1fr)',
-                        gap: '30px',
-                        maxWidth: '950px',
-                        width: '94%',
-                        margin: '0 auto'
-                    }}>
-                        {[
-                            { id: 'NORMAL', name: '普通', icon: normalBall, color: '#ef4444' },
-                            { id: 'GREAT', name: '超級', icon: greatBall, color: '#3b82f6' },
-                            { id: 'ULTRA', name: '高級', icon: ultraBall, color: '#eab308' },
-                            { id: 'MASTER', name: '大師', icon: masterBall, color: '#a855f7' }
-                        ].map(d => (
-                            <button
-                                key={d.id}
-                                className={`difficulty-btn ${focusedDifficulty === d.id ? 'is-focused' : ''}`}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (focusedDifficulty === d.id) {
-                                        handleDifficultySelect(d.id as any);
-                                    } else {
-                                        setFocusedDifficulty(d.id as any);
-                                    }
-                                }}
-                                style={{
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px',
-                                    padding: '30px 15px', background: 'rgba(0,0,0,0.4)', border: `1px solid ${d.color}33`,
-                                    borderRadius: '24px', cursor: 'pointer',
-                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    width: '100%',
-                                    minHeight: '200px',
-                                    backdropFilter: 'blur(10px)',
-                                    boxShadow: `0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px ${d.color}11`
-                                }}
-                            >
-                                <img src={d.icon} alt={d.name} style={{ width: '96px', height: '96px', filter: `drop-shadow(0 0 20px ${d.color}66)` }} />
-                                <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: d.color, letterSpacing: '2px' }}>{d.name}</span>
-                            </button>
-                        ))}
-                    </div>
+                        <div className="difficulty-grid" style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(4, 1fr)',
+                            gap: '30px',
+                            maxWidth: '950px',
+                            width: '94%',
+                            margin: '0 auto'
+                        }}>
+                            {[
+                                { id: 'NORMAL', name: '普通', icon: normalBall, color: '#ef4444' },
+                                { id: 'GREAT', name: '超級', icon: greatBall, color: '#3b82f6' },
+                                { id: 'ULTRA', name: '高級', icon: ultraBall, color: '#eab308' },
+                                { id: 'MASTER', name: '大師', icon: masterBall, color: '#a855f7' }
+                            ].map(d => (
+                                <button
+                                    key={d.id}
+                                    className={`difficulty-btn ${focusedDifficulty === d.id ? 'is-focused' : ''}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (focusedDifficulty === d.id) {
+                                            handleDifficultySelect(d.id as any);
+                                        } else {
+                                            setFocusedDifficulty(d.id as any);
+                                        }
+                                    }}
+                                    style={{
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px',
+                                        padding: '30px 15px', background: 'rgba(0,0,0,0.4)', border: `1px solid ${d.color}33`,
+                                        borderRadius: '24px', cursor: 'pointer',
+                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        width: '100%',
+                                        minHeight: '200px',
+                                        backdropFilter: 'blur(10px)',
+                                        boxShadow: `0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px ${d.color}11`
+                                    }}
+                                >
+                                    <img src={d.icon} alt={d.name} style={{ width: '96px', height: '96px', filter: `drop-shadow(0 0 20px ${d.color}66)` }} />
+                                    <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: d.color, letterSpacing: '2px' }}>{d.name}</span>
+                                </button>
+                            ))}
+                        </div>
 
-                    <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '5vh' }} className="startup-footer-box">
-                        <p style={{
-                            color: '#94a3b8',
-                            fontSize: '1.1rem',
-                            letterSpacing: '4px',
-                            opacity: 0.8,
-                            padding: '0 20px'
-                        }}>選擇本次挑戰難度</p>
+                        <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '5vh' }} className="startup-footer-box">
+                            <p style={{
+                                color: '#94a3b8',
+                                fontSize: '1.1rem',
+                                letterSpacing: '4px',
+                                opacity: 0.8,
+                                padding: '0 20px'
+                            }}>選擇本次挑戰難度</p>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Header */}
             <div className="header">
@@ -2233,15 +2359,17 @@ function App() {
             }
 
             {/* Modal should be rendered at the very end of the DOM to ensure highest physical layering context */}
-            {showEncyclopedia && createPortal(
-                <EncyclopediaModal onClose={() => {
-                    setShowEncyclopedia(false);
-                    if (tutorialStep === 11) {
-                        setTutorialStep(12);
-                    }
-                }} />,
-                document.getElementById('modal-root')!
-            )}
+            {
+                showEncyclopedia && createPortal(
+                    <EncyclopediaModal onClose={() => {
+                        setShowEncyclopedia(false);
+                        if (tutorialStep === 11) {
+                            setTutorialStep(12);
+                        }
+                    }} />,
+                    document.getElementById('modal-root')!
+                )
+            }
         </div >
     );
 }

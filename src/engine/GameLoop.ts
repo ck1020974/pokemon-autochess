@@ -3,10 +3,12 @@ import { Unit } from '../models/Unit';
 import { Shop } from '../models/Shop';
 import { UNIT_TEMPLATES } from '../models/UnitFactory';
 import { SYNERGIES } from '../models/Synergies';
+import { REWARD_DATA } from '../models/RewardData';
 
 export const GamePhase = {
     SHOP: 'SHOP',
     BATTLE: 'BATTLE',
+    REWARD: 'REWARD',
     GAME_OVER: 'GAME_OVER',
     VICTORY: 'VICTORY'
 } as const;
@@ -32,6 +34,11 @@ export class GameLoop {
     public difficultyScore: number = 1.0; // Dynamic difficulty tracker
     public defeatedOpponentIds: string[] = [];
     public currentOpponentId: string | null = null;
+    public currentOpponentDifficulty: string = 'NORMAL';
+
+    public rewardChoices: any[] = [];
+    public pendingGoldBonus: number = 0;
+    public nextBattleBuffs: any[] = [];
 
     constructor() {
         this.shop = new Shop();
@@ -50,7 +57,8 @@ export class GameLoop {
 
     public startShopPhase() {
         this.phase = GamePhase.SHOP;
-        this.gold = 10;
+        this.gold = 10 + this.pendingGoldBonus;
+        this.pendingGoldBonus = 0;
 
         // --- Charmander Scaling (Shared, based on max level) ---
         let maxCharmanderLevel = 0;
@@ -123,14 +131,10 @@ export class GameLoop {
             }
         });
 
-        // Update Psychic synergy description using placeholder
-        const basePsychicDesc = SYNERGIES.Psychic.description;
-        if (basePsychicDesc.includes('[N]')) {
-            SYNERGIES.Psychic.description = basePsychicDesc.replace('[N]', this.psychicN.toString());
-        } else {
-            // Fallback if already replaced or format changed
-            SYNERGIES.Psychic.description = `[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 ${this.psychicN} 點傷害 (每場對戰後增強)`;
-        }
+        // Update Psychic synergy description using placeholder or current value
+        const psychic = SYNERGIES.Psychic;
+        const template = '[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 [N] 點傷害 (每場對戰後增強)';
+        psychic.description = template.replace('[N]', this.psychicN.toString());
     }
 
     public startBattlePhase() {
@@ -277,6 +281,134 @@ export class GameLoop {
             this.savedTeam = [];
         }
 
+        if (result === 'WIN') {
+            this.phase = GamePhase.REWARD;
+            // Map opponent difficulty to reward difficulty
+            const difficultyMap: Record<string, string> = {
+                'NOVICE': 'EASY',
+                'QUALIFIED': 'NORMAL',
+                'GREAT': 'HARD',
+                'ULTRA': 'EXTREME',
+                'MASTER': 'EXTREME',
+                'ELITE': 'EXTREME',
+                'CHAMPION': 'EXTREME'
+            };
+            const rewardDiffRaw = ['EASY', 'NORMAL', 'HARD', 'EXTREME'].includes(this.currentOpponentDifficulty)
+                ? this.currentOpponentDifficulty
+                : (difficultyMap[this.currentOpponentDifficulty] || 'NORMAL');
+            this.rewardChoices = this.generateRewardOptions(rewardDiffRaw as any);
+        } else {
+            this.concludeTurn(result);
+        }
+    }
+
+    public generateRewardOptions(difficulty: any): any[] {
+
+        // 1. Get player synergies (including inactive ones)
+        const playerSynergies = new Set<string>();
+        this.playerTeam.forEach(u => {
+            if (u) u.synergies.forEach(s => playerSynergies.add(s));
+        });
+
+        // 2. Filter pool
+        const pool = REWARD_DATA.filter((r: any) => {
+            // Difficulty match
+            if (r.difficulty !== difficulty) return false;
+
+            // Synergy match logic
+            if (r.category === 'PERM_SYNERGY' || r.category === 'BATTLE_SYNERGY') {
+                return playerSynergies.has(r.synergyId);
+            }
+
+            // Fixed categories always included
+            return true;
+        });
+
+        // 3. Pick 3 unique items if possible
+        const shuffled = [...pool].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, 3);
+    }
+
+    public applyReward(reward: any) {
+        console.log(`Applying Reward: ${reward.item}`);
+
+        const targetUnits = this.playerTeam.filter(u => u !== null) as Unit[];
+
+        switch (reward.category) {
+            case 'GOLD':
+                const goldMatch = reward.effect.match(/\+(\d+)/);
+                if (goldMatch) this.pendingGoldBonus += parseInt(goldMatch[1]);
+                break;
+            case 'EXP':
+                const expMatch = reward.effect.match(/\+(\d+)/);
+                const expAmount = expMatch ? parseInt(expMatch[1]) : 1;
+
+                if (reward.effect.includes('全體')) {
+                    targetUnits.forEach(u => this.applyExpToUnit(u, expAmount));
+                } else {
+                    // Random target(s) based on text
+                    const count = reward.effect.includes('兩位') ? 2 : (reward.effect.includes('三位') ? 3 : 1);
+                    const shuffled = [...targetUnits].sort(() => 0.5 - Math.random());
+                    shuffled.slice(0, count).forEach(u => this.applyExpToUnit(u, expAmount));
+                }
+                break;
+            case 'PERM_NONE':
+            case 'PERM_SYNERGY':
+                this.applyPermanentReward(reward, targetUnits);
+                break;
+            case 'BATTLE_NONE':
+            case 'BATTLE_SYNERGY':
+                this.nextBattleBuffs.push(reward);
+                break;
+        }
+
+        this.rewardChoices = []; // Clear choices in engine
+        this.concludeTurn('WIN');
+    }
+
+    private applyExpToUnit(unit: Unit, amount: number) {
+        unit.exp += amount;
+        // Check for level up / evolution via merge logic? 
+        // Actually, let's keep it simple: just add stats if level up threshold met
+        // Unit.ts handleGrowth might be needed here or trigger a virtual merge
+        if (unit.exp >= 9 && unit.level < 3) {
+            // Force re-evaluation of level
+            this.mergeUnits(unit, { exp: 0, level: 1, stats: { attack: 0, maxHp: 0 }, family: unit.family } as any);
+        } else if (unit.exp >= 3 && unit.level < 2) {
+            this.mergeUnits(unit, { exp: 0, level: 1, stats: { attack: 0, maxHp: 0 }, family: unit.family } as any);
+        }
+    }
+
+    private applyPermanentReward(reward: any, units: Unit[]) {
+        const atkMatch = reward.effect.match(/\+(\d+)\s*攻擊/);
+        const hpMatch = reward.effect.match(/\+(\d+)\s*生命/);
+        const atkMinus = reward.effect.match(/-(\d+)\s*攻擊/);
+        const hpMinus = reward.effect.match(/-(\d+)\s*生命/);
+
+        const atk = (atkMatch ? parseInt(atkMatch[1]) : 0) - (atkMinus ? parseInt(atkMinus[1]) : 0);
+        const hp = (hpMatch ? parseInt(hpMatch[1]) : 0) - (hpMinus ? parseInt(hpMinus[1]) : 0);
+
+        let targets: Unit[] = [];
+        if (reward.effect.includes('首位')) {
+            const first = this.playerTeam.find(u => u !== null);
+            if (first) targets = [first];
+        } else if (reward.effect.includes('全體')) {
+            targets = units;
+        } else if (reward.synergyId) {
+            targets = units.filter(u => u.synergies.includes(reward.synergyId));
+        }
+
+        targets.forEach(u => {
+            u.addGrowth(hp, atk);
+            // Also apply to the permanent version in savedTeam
+            const savedUnit = this.savedTeam.find(su => su && su.id === u.id);
+            if (savedUnit) {
+                savedUnit.addGrowth(hp, atk);
+            }
+        });
+    }
+
+    private concludeTurn(result: string) {
         // Update Difficulty Score: Loss protection (Slower increase on loss)
         if (result === 'LOSS') {
             this.difficultyScore += 0.25;

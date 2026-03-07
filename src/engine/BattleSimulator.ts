@@ -31,9 +31,14 @@ export class BattleSimulator {
     private enemySynergies = new Map<string, number>();
     private psychicN: number = 2;
     private speed: number = 1;
+    public isSim: boolean = false;
+    public battleBuffs: any[] = [];
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 2) {
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 2, isSim: boolean = false, battleBuffs: any[] = []) {
         this.speed = speed;
+        this.isSim = isSim;
+        this.battleBuffs = battleBuffs;
+
         this.originalPlayerTeam = originalPlayerTeam;
         this.psychicN = psychicN;
         // Preserve 5-slot architecture to match UI indices exactly
@@ -51,6 +56,9 @@ export class BattleSimulator {
         }) as Unit[];
         this.eventBus = new EventBus();
 
+        // Apply Battle Rewards (Must be done after teams are initialized)
+        this.applyBattleRewards();
+
         // Register Initial Teams for Synergy Persistence
         this.playerTeam.forEach(u => { if (u) this.initialPlayerSet.add(u); });
         // Calculate Initial Synergies
@@ -60,6 +68,44 @@ export class BattleSimulator {
         // 1. Register Passive Abilities & Hooks
         this.playerTeam.forEach(u => { if (u) this.registerUnitAbilities(u); });
         this.enemyTeam.forEach(u => { if (u) this.registerUnitAbilities(u); });
+    }
+
+    private applyBattleRewards() {
+        if (!this.battleBuffs || this.battleBuffs.length === 0) return;
+
+        this.battleBuffs.forEach(reward => {
+            const atkMatch = reward.effect.match(/\+(\d+)\s*攻擊/);
+            const hpMatch = reward.effect.match(/\+(\d+)\s*生命/);
+            const atk = atkMatch ? parseInt(atkMatch[1]) : 0;
+            const hp = hpMatch ? parseInt(hpMatch[1]) : 0;
+
+            let targets: Unit[] = [];
+            const playerUnits = this.playerTeam.filter(u => u !== null) as Unit[];
+
+            if (reward.effect.includes('隨機角色')) {
+                const shuffled = [...playerUnits].sort(() => 0.5 - Math.random());
+                if (shuffled.length > 0) targets = [shuffled[0]];
+            } else if (reward.effect.includes('首位角色')) {
+                const first = playerUnits[0];
+                if (first) targets = [first];
+            } else if (reward.effect.includes('全體角色')) {
+                targets = playerUnits;
+            } else if (reward.effect.includes('雙方')) {
+                const synergyId = reward.synergyId;
+                targets = [...playerUnits, ...(this.enemyTeam.filter(u => u !== null) as Unit[])]
+                    .filter(u => u.synergies.includes(synergyId));
+            } else if (reward.synergyId) {
+                targets = playerUnits.filter(u => u.synergies.includes(reward.synergyId));
+            }
+
+            targets.forEach(u => {
+                if (atk > 0) u.addBuff(atk);
+                if (hp > 0) {
+                    u.stats.maxHp += hp;
+                    u.stats.hp += hp;
+                }
+            });
+        });
     }
 
     public async init() {
