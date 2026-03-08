@@ -341,7 +341,7 @@ export class GameLoop {
         }).map(r => {
             // Weights: Mint = 0.5, Synergy = 1.0, Generic = 2.0
             let weight = 1.0;
-            const isGeneric = ['GOLD', 'EXP', 'PERM_NONE', 'BATTLE_NONE'].includes(r.category);
+            const isGeneric = ['GOLD', 'EXP', 'LIVES', 'PERM_NONE', 'BATTLE_NONE'].includes(r.category);
             const isMint = r.item.includes('薄荷');
 
             if (isMint) weight = 0.5;
@@ -418,6 +418,13 @@ export class GameLoop {
             case 'BATTLE_SYNERGY':
                 this.nextBattleBuffs.push(reward);
                 break;
+            case 'LIVES':
+                const livesMatch = reward.effect.match(/\+(\d+)/);
+                if (livesMatch) {
+                    this.lives += parseInt(livesMatch[1]);
+                    console.log(`玩家生命增加：${livesMatch[1]}`);
+                }
+                break;
         }
 
         this.rewardChoices = []; // Clear choices in engine
@@ -466,6 +473,19 @@ export class GameLoop {
         } else if (reward.effect.includes('隨機角色')) {
             const shuffled = [...units].sort(() => 0.5 - Math.random());
             if (shuffled.length > 0) targets = [shuffled[0]];
+        } else if (reward.effect.includes('未進化') || reward.item === '幸運蛋') {
+            targets = units.filter(u => u.level === 1);
+        } else if (reward.effect.includes('已進化') || reward.item === '進化奇石') {
+            targets = units.filter(u => u.level > 1);
+        } else if (reward.effect.includes('無法進化') || reward.item === '不變之石') {
+            targets = units.filter(u => {
+                // Case 1: No evolution chain
+                if (!u.evolveId) return true;
+                // Case 2: Chain exists but next stage has same name (e.g. Raticate -> Raticate)
+                const nextTemplate = UNIT_TEMPLATES[u.evolveId];
+                if (nextTemplate && nextTemplate.name === u.name) return true;
+                return false;
+            });
         } else if (reward.synergyId) {
             targets = units.filter(u => u.synergies.includes(reward.synergyId));
         }

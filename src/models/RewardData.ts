@@ -7,7 +7,8 @@ export type RewardCategory =
     | 'PERM_NONE'           // 永久能力無羈絆
     | 'PERM_SYNERGY'        // 永久能力有羈絆
     | 'BATTLE_SYNERGY'      // 單次戰鬥能力有羈絆
-    | 'BATTLE_NONE';        // 單次戰鬥能力無羈絆
+    | 'BATTLE_NONE'         // 單次戰鬥能力無羈絆
+    | 'LIVES';              // 玩家生命
 
 export interface RewardDefinition {
     difficulty: RewardDifficulty;
@@ -289,5 +290,25 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "NORMAL", "category": "EXP", "item": "經驗糖果Ｓ", "effect": "讓角色成長的神奇糖果，隨機2名角色EXP+1", "imageUrl": "item/經驗糖果Ｓ.png" },
     { "difficulty": "HARD", "category": "EXP", "item": "經驗糖果Ｍ", "effect": "讓角色成長的神奇糖果，隨機3名角色EXP+1", "imageUrl": "item/經驗糖果Ｍ.png" },
     { "difficulty": "EXTREME", "category": "EXP", "item": "經驗糖果XL", "effect": "讓角色成長的神奇糖果，全體角色EXP+1", "imageUrl": "item/經驗糖果XL.png" },
-    { "difficulty": "EXTREME", "category": "EXP", "item": "神奇糖果", "effect": "讓角色成長的神奇糖果，隨機1名角色EXP+3", "imageUrl": "item/神奇糖果.png" }
+    { "difficulty": "EXTREME", "category": "EXP", "item": "神奇糖果", "effect": "讓角色成長的神奇糖果，隨機1名角色EXP+3", "imageUrl": "item/神奇糖果.png" },
+
+    // --- LIVES (Health Recovery) ---
+    { "difficulty": "EASY", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命值+1", "imageUrl": "item/愛心糖飾.png" },
+    { "difficulty": "NORMAL", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命值+2", "imageUrl": "item/愛心糖飾.png" },
+    { "difficulty": "HARD", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命值+3", "imageUrl": "item/愛心糖飾.png" },
+    { "difficulty": "EXTREME", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命值+5", "imageUrl": "item/愛心糖飾.png" },
+
+    // --- EVOLUTIONARY ITEMS (PERM_NONE Variants) ---
+    { "difficulty": "EASY", "category": "PERM_NONE", "item": "幸運蛋", "effect": "滿載著幸福的蛋，未進化過角色+1攻擊或生命", "imageUrl": "item/幸運蛋.png" },
+    { "difficulty": "NORMAL", "category": "PERM_NONE", "item": "幸運蛋", "effect": "滿載著幸福的蛋，未進化過角色+2攻擊或生命", "imageUrl": "item/幸運蛋.png" },
+    { "difficulty": "HARD", "category": "PERM_NONE", "item": "幸運蛋", "effect": "滿載著幸福的蛋，未進化過角色+3攻擊或生命", "imageUrl": "item/幸運蛋.png" },
+    { "difficulty": "EXTREME", "category": "PERM_NONE", "item": "幸運蛋", "effect": "滿載著幸福的蛋，未進化過角色+4攻擊或生命", "imageUrl": "item/幸運蛋.png" },
+
+    { "difficulty": "NORMAL", "category": "PERM_NONE", "item": "不變之石", "effect": "不會進化的神奇石頭，無法進化的角色+1攻擊或生命", "imageUrl": "item/不變之石.png" },
+    { "difficulty": "HARD", "category": "PERM_NONE", "item": "不變之石", "effect": "不會進化的神奇石頭，無法進化的角色+2攻擊或生命", "imageUrl": "item/不變之石.png" },
+    { "difficulty": "EXTREME", "category": "PERM_NONE", "item": "不變之石", "effect": "不會進化的神奇石頭，無法進化的角色+3攻擊或生命", "imageUrl": "item/不變之石.png" },
+
+    { "difficulty": "NORMAL", "category": "PERM_NONE", "item": "進化奇石", "effect": "進化的神奇石塊，已進化過的角色+1攻擊或生命", "imageUrl": "item/進化奇石.png" },
+    { "difficulty": "HARD", "category": "PERM_NONE", "item": "進化奇石", "effect": "進化的神奇石塊，已進化過的角色+2攻擊或生命", "imageUrl": "item/進化奇石.png" },
+    { "difficulty": "EXTREME", "category": "PERM_NONE", "item": "進化奇石", "effect": "進化的神奇石塊，已進化過的角色+3攻擊或生命", "imageUrl": "item/進化奇石.png" }
 ];
