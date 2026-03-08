@@ -38,6 +38,8 @@ export class GameLoop {
 
     public rewardChoices: any[] = [];
     public pendingGoldBonus: number = 0;
+    public pendingFreeRerolls: number = 0;
+    public freeRerolls: number = 0;
     public nextBattleBuffs: any[] = [];
 
     constructor() {
@@ -59,6 +61,8 @@ export class GameLoop {
         this.phase = GamePhase.SHOP;
         this.gold = 10 + this.pendingGoldBonus;
         this.pendingGoldBonus = 0;
+        this.freeRerolls = this.pendingFreeRerolls;
+        this.pendingFreeRerolls = 0;
 
         // --- Charmander Scaling (Shared, based on max level) ---
         let maxCharmanderLevel = 0;
@@ -310,8 +314,8 @@ export class GameLoop {
             if (u) u.synergies.forEach(s => playerSynergies.add(s));
         });
 
-        // 2. Filter pool
-        const pool = REWARD_DATA.filter((r: any) => {
+        // 2. Filter pool and assign weights
+        let pool = REWARD_DATA.filter((r: any) => {
             // Difficulty match
             if (r.difficulty !== difficulty) return false;
 
@@ -322,11 +326,30 @@ export class GameLoop {
 
             // Fixed categories always included
             return true;
+        }).map(r => {
+            // Generic = Weight 2, Synergy = Weight 1
+            const isGeneric = ['GOLD', 'EXP', 'PERM_NONE', 'BATTLE_NONE'].includes(r.category);
+            return { ...r, weight: isGeneric ? 2 : 1 };
         });
 
-        // 3. Pick 3 unique items if possible
-        const shuffled = [...pool].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, 3);
+        // 3. Pick 3 unique items using weighted random selection
+        const results: any[] = [];
+        for (let i = 0; i < 3; i++) {
+            if (pool.length === 0) break;
+
+            const totalWeight = pool.reduce((sum, r) => sum + r.weight, 0);
+            let random = Math.random() * totalWeight;
+
+            for (let j = 0; j < pool.length; j++) {
+                random -= pool[j].weight;
+                if (random <= 0) {
+                    const picked = pool.splice(j, 1)[0];
+                    results.push(picked);
+                    break;
+                }
+            }
+        }
+        return results;
     }
 
     public applyReward(reward: any) {
@@ -337,7 +360,12 @@ export class GameLoop {
         switch (reward.category) {
             case 'GOLD':
                 const goldMatch = reward.effect.match(/\+(\d+)/);
-                if (goldMatch) this.pendingGoldBonus += parseInt(goldMatch[1]);
+                if (goldMatch) {
+                    this.pendingGoldBonus += parseInt(goldMatch[1]);
+                } else if (reward.item === '老千骰子') {
+                    const diceMatch = reward.effect.match(/(\d+)次/);
+                    if (diceMatch) this.pendingFreeRerolls += parseInt(diceMatch[1]);
+                }
                 break;
             case 'EXP':
                 const expMatch = reward.effect.match(/\+(\d+)/);
@@ -433,7 +461,11 @@ export class GameLoop {
 
     // Actions
     public reroll() {
-        if (this.gold >= 1) {
+        if (this.freeRerolls > 0) {
+            this.freeRerolls--;
+            this.shop.roll(this.turn);
+            console.log(`使用免費刷新！剩餘次數：${this.freeRerolls}`);
+        } else if (this.gold >= 1) {
             this.gold -= 1;
             this.shop.roll(this.turn);
         }

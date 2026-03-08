@@ -24,6 +24,10 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "NORMAL", "category": "GOLD", "item": "彗星碎片", "effect": "下次準備階段獲得+2金幣", "imageUrl": "item/彗星碎片.png" },
     { "difficulty": "HARD", "category": "GOLD", "item": "金珠", "effect": "下次準備階段獲得+3金幣", "imageUrl": "item/金珠.png" },
     { "difficulty": "EXTREME", "category": "GOLD", "item": "巨大金珠", "effect": "下次準備階段獲得+5金幣", "imageUrl": "item/巨大金珠.png" },
+    { "difficulty": "EASY", "category": "GOLD", "item": "老千骰子", "effect": "下次準備階段獲得免費刷新1次", "imageUrl": "item/老千骰子.png" },
+    { "difficulty": "NORMAL", "category": "GOLD", "item": "老千骰子", "effect": "下次準備階段獲得免費刷新2次", "imageUrl": "item/老千骰子.png" },
+    { "difficulty": "HARD", "category": "GOLD", "item": "老千骰子", "effect": "下次準備階段獲得免費刷新3次", "imageUrl": "item/老千骰子.png" },
+    { "difficulty": "EXTREME", "category": "GOLD", "item": "老千骰子", "effect": "下次準備階段獲得免費刷新5次", "imageUrl": "item/老千骰子.png" },
 
     // --- BATTLE_NONE (Random/Positional/All) ---
     { "difficulty": "EASY", "category": "BATTLE_NONE", "item": "ＰＰ單項小補劑", "effect": "下場我方隨機角色+2攻擊", "imageUrl": "item/ＰＰ單項小補劑.png" },
@@ -134,10 +138,10 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Angry", "item": "龍火果", "effect": "下場我方憤怒角色+2生命", "imageUrl": "item/龍火果.png" },
     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Trick", "item": "福祿果", "effect": "下場我方戲法角色+2生命", "imageUrl": "item/福祿果.png" },
 
-    { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "星桃果", "effect": "下場雙方守住角色+3攻擊與生命", "imageUrl": "item/淨空石板.png" },
-    { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "羅子果", "effect": "下場雙方詛咒角色+3攻擊與生命", "imageUrl": "item/妖怪石板.png" },
-    { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Grass", "item": "龍火果", "effect": "下場雙方吸取角色+3攻擊與生命", "imageUrl": "item/碧綠石板.png" },
-    { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "福祿果", "effect": "下場雙方燃盡角色+3攻擊與生命", "imageUrl": "item/火球石板.png" },
+    { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "淨空石板", "effect": "下場雙方守住角色+3攻擊與生命", "imageUrl": "item/淨空石板.webp" },
+    { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "妖怪石板", "effect": "下場雙方詛咒角色+3攻擊與生命", "imageUrl": "item/妖怪石板.png" },
+    { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Grass", "item": "碧綠石板", "effect": "下場雙方吸取角色+3攻擊與生命", "imageUrl": "item/碧綠石板.png" },
+    { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "火球石板", "effect": "下場雙方燃盡角色+3攻擊與生命", "imageUrl": "item/火球石板.png" },
     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Water", "item": "水滴石板", "effect": "下場雙方潮旋角色+3攻擊與生命", "imageUrl": "item/水滴石板.png" },
     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Hard", "item": "鋼鐵石板", "effect": "下場雙方堅硬角色+3攻擊與生命", "imageUrl": "item/鋼鐵石板.png" },
     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Cave", "item": "大地石板", "effect": "下場雙方挖洞角色+3攻擊與生命", "imageUrl": "item/大地石板.png" },
@@ -147,7 +151,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "BugBite", "item": "玉蟲石板", "effect": "下場雙方蟲咬角色+3攻擊與生命", "imageUrl": "item/玉蟲石板.png" },
     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Thief", "item": "惡顏石板", "effect": "下場雙方小偷角色+3攻擊與生命", "imageUrl": "item/惡顏石板.png" },
 
-    { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "淨空石板", "effect": "下場雙方守住角色+5攻擊與生命", "imageUrl": "item/淨空石板.png" },
+    { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "淨空石板", "effect": "下場雙方守住角色+5攻擊與生命", "imageUrl": "item/淨空石板.webp" },
     { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "妖怪石板", "effect": "下場雙方詛咒角色+5攻擊與生命", "imageUrl": "item/妖怪石板.png" },
     { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Grass", "item": "碧綠石板", "effect": "下場雙方吸取角色+5攻擊與生命", "imageUrl": "item/碧綠石板.png" },
     { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "火球石板", "effect": "下場雙方燃盡角色+5攻擊與生命", "imageUrl": "item/火球石板.png" },
