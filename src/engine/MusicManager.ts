@@ -21,16 +21,37 @@ class MusicManager {
     }
 
     /**
-     * Preload multiple tracks into the cache.
+     * Preload multiple tracks into the cache and wait for them to be ready.
      */
-    public preload(names: string[]): void {
-        names.forEach(name => {
-            if (!this.audioCache.has(name)) {
+    public async preload(names: string[]): Promise<void> {
+        const promises = names.map(name => {
+            if (this.audioCache.has(name)) return Promise.resolve();
+
+            return new Promise<void>((resolve) => {
                 const audio = new Audio(`${this.musicPath}${name}.OGG`);
+                audio.preload = 'auto';
+
+                const onCanPlay = () => {
+                    audio.removeEventListener('canplaythrough', onCanPlay);
+                    audio.removeEventListener('error', onError);
+                    resolve();
+                };
+
+                const onError = () => {
+                    audio.removeEventListener('canplaythrough', onCanPlay);
+                    audio.removeEventListener('error', onError);
+                    console.warn(`Failed to preload music: ${name}`);
+                    resolve(); // Resolve anyway to not block game
+                };
+
+                audio.addEventListener('canplaythrough', onCanPlay);
+                audio.addEventListener('error', onError);
                 audio.load();
                 this.audioCache.set(name, audio);
-            }
+            });
         });
+
+        await Promise.all(promises);
     }
 
     public setMuted(muted: boolean): void {
@@ -73,9 +94,14 @@ class MusicManager {
                     return;
                 }
 
+                // IMPORTANT: Ensure duration is loaded and valid
+                if (!audio!.duration || isNaN(audio!.duration) || audio!.duration < fadeTime + 1) {
+                    return;
+                }
+
                 const remaining = audio!.duration - audio!.currentTime;
 
-                // Start fade out
+                // Start fade out only when near the end and not already fading
                 if (!isFadingOut && remaining > 0 && remaining < fadeTime) {
                     isFadingOut = true;
                     this.fadeVolume(audio!, 0, remaining * 1000);

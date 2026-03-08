@@ -431,24 +431,38 @@ function App() {
     // Image Preloading - Split into Critical (Tier 1/2) and Background (Tier 3+)
     useEffect(() => {
 
-        const loadAssets = async (urls: string[], isBackground: boolean = false) => {
+        const loadAssets = async (urls: string[], isBackground: boolean = false, musicNames: string[] = []) => {
             let loadedCount = 0;
-            const promises = urls.map(url => {
+            const total = urls.length + musicNames.length;
+            if (total === 0) return;
+
+            const updateProgress = () => {
+                loadedCount++;
+                if (!isBackground) {
+                    setLoadingProgress(Math.floor((loadedCount / total) * 100));
+                }
+            };
+
+            const imagePromises = urls.map(url => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.src = url;
                     const handleLoad = () => {
-                        loadedCount++;
-                        if (!isBackground) {
-                            setLoadingProgress(Math.floor((loadedCount / urls.length) * 100));
-                        }
+                        updateProgress();
                         resolve(url);
                     };
                     img.onload = handleLoad;
                     img.onerror = handleLoad;
                 });
             });
-            await Promise.all(promises);
+
+            const musicPromises = musicNames.map(name => {
+                return music.preload([name]).then(() => {
+                    updateProgress();
+                });
+            });
+
+            await Promise.all([...imagePromises, ...musicPromises]);
         };
 
         const preloadAllAssets = async () => {
@@ -487,26 +501,26 @@ function App() {
             criticalUrls.add(ultraBall);
             criticalUrls.add(masterBall);
 
-            // Preload critical audio (Early game + Common)
-            music.preload(['start', 'pokemonmart', 'gymfight', 'pokemoncenter', 'gymwin']);
+            // Critical audio (Early game + Common)
+            const criticalMusic = ['start', 'pokemonmart', 'gymfight', 'pokemoncenter', 'gymwin'];
 
-            console.log(`[系統] 開始預載入關鍵資源 (${criticalUrls.size} 個)...`);
-            await loadAssets(Array.from(criticalUrls), false);
+            console.log(`[系統] 開始預載入關鍵資源 (${criticalUrls.size} 個影像, ${criticalMusic.length} 首音樂)...`);
+            await loadAssets(Array.from(criticalUrls), false, criticalMusic);
 
             setHasLoaded(true);
             console.log(`[系統] 關鍵資源載入完成！`);
 
             // Next frame background load
             setTimeout(async () => {
-                console.log(`[系統] 開始背景載入剩餘資源 (${backgroundUrls.size} 個)...`);
-                music.preload(['victoryroad', 'level up', 'recover', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin']);
+                const backgroundMusic = ['victoryroad', 'level up', 'recover', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin'];
+                console.log(`[系統] 開始背景載入剩餘資源 (${backgroundUrls.size} 個影像, ${backgroundMusic.length} 首音樂)...`);
 
                 // Add reward item images to background load
                 REWARD_DATA.forEach(reward => {
                     if (reward.imageUrl) backgroundUrls.add(reward.imageUrl);
                 });
 
-                await loadAssets(Array.from(backgroundUrls), true);
+                await loadAssets(Array.from(backgroundUrls), true, backgroundMusic);
                 console.log(`[系統] 背景資源載入完成！`);
             }, 500);
         };
@@ -1143,7 +1157,7 @@ function App() {
     };
 
     const executeStartBattle = () => {
-        music.stop(); // Stop prep music
+        // music.stop(); // MOVED to handleOpponentSelect: Only stop when NPC is chosen
         setSelected(null);
         setBattleResult(null);
 
@@ -1344,6 +1358,7 @@ function App() {
             game.currentOpponentDifficulty = opponent.difficulty;
         }
         setShowOpponentSelect(false);
+        music.stop(); // Stop prep music ONLY now
         game.startBattlePhase();
         setBattleResult(null);
         setLogs([]);
@@ -1385,6 +1400,12 @@ function App() {
         music.stop(); // Stop the victory music (gymwin/elitefourwin/championwin)
         game.applyReward(reward);
         setRewardChoices([]); // Clear UI state immediately
+
+        // Return to Shop music if game is continuing
+        if (game.phase !== GamePhase.VICTORY && game.phase !== GamePhase.GAME_OVER) {
+            music.play('pokemonmart', true);
+        }
+
         update();
     };
 
