@@ -193,7 +193,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "BugBite", "item": "銀粉", "effect": "隊伍中的蟲咬角色+1攻擊", "imageUrl": "item/銀粉.png" },
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Thief", "item": "黑色眼鏡", "effect": "隊伍中的小偷角色+1攻擊", "imageUrl": "item/黑色眼鏡.png" },
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Starter", "item": "幸運草糖飾", "effect": "隊伍中的御三家角色+1攻擊", "imageUrl": "item/幸運草糖飾.png" },
-    { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "藍莓糖飾", "effect": "隊伍中的三胞胎角色+1攻擊", "imageUrl": "item/藍莓糖飾.png" },
+    { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "野莓糖飾", "effect": "隊伍中的三胞胎角色+1攻擊", "imageUrl": "item/野莓糖飾.png" },
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Angry", "item": "拳擊手套", "effect": "隊伍中的憤怒角色+1攻擊", "imageUrl": "item/拳擊手套.png" },
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Trick", "item": "客房服務", "effect": "隊伍中的戲法角色+1攻擊", "imageUrl": "item/客房服務.png" },
 
@@ -210,7 +210,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "BugBite", "item": "銀粉", "effect": "隊伍中的蟲咬角色+1生命", "imageUrl": "item/銀粉.png" },
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Thief", "item": "黑色眼鏡", "effect": "隊伍中的小偷角色+1生命", "imageUrl": "item/黑色眼鏡.png" },
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Starter", "item": "幸運草糖飾", "effect": "隊伍中的御三家角色+1生命", "imageUrl": "item/幸運草糖飾.png" },
-    { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "藍莓糖飾", "effect": "隊伍中的三胞胎角色+1生命", "imageUrl": "item/藍莓糖飾.png" },
+    { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "野莓糖飾", "effect": "隊伍中的三胞胎角色+1生命", "imageUrl": "item/野莓糖飾.png" },
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Angry", "item": "拳擊手套", "effect": "隊伍中的憤怒角色+1生命", "imageUrl": "item/拳擊手套.png" },
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Trick", "item": "客房服務", "effect": "隊伍中的戲法角色+1生命", "imageUrl": "item/客房服務.png" },
 
@@ -227,7 +227,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "BugBite", "item": "銀粉", "effect": "隊伍中的蟲咬角色+2攻擊", "imageUrl": "item/銀粉.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Thief", "item": "黑色眼鏡", "effect": "隊伍中的小偷角色+2攻擊", "imageUrl": "item/黑色眼鏡.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Starter", "item": "幸運草糖飾", "effect": "隊伍中的御三家角色+2攻擊", "imageUrl": "item/幸運草糖飾.png" },
-    { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "藍莓糖飾", "effect": "隊伍中的三胞胎角色+2攻擊", "imageUrl": "item/藍莓糖飾.png" },
+    { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "野莓糖飾", "effect": "隊伍中的三胞胎角色+2攻擊", "imageUrl": "item/野莓糖飾.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Angry", "item": "拳擊手套", "effect": "隊伍中的憤怒角色+2攻擊", "imageUrl": "item/拳擊手套.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Trick", "item": "客房服務", "effect": "隊伍中的戲法角色+2攻擊", "imageUrl": "item/客房服務.png" },
 
@@ -244,7 +244,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "BugBite", "item": "銀粉", "effect": "隊伍中的蟲咬角色+2生命", "imageUrl": "item/銀粉.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Thief", "item": "黑色眼鏡", "effect": "隊伍中的小偷角色+2生命", "imageUrl": "item/黑色眼鏡.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Starter", "item": "幸運草糖飾", "effect": "隊伍中的御三家角色+2生命", "imageUrl": "item/幸運草糖飾.png" },
-    { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "藍莓糖飾", "effect": "隊伍中的三胞胎角色+2生命", "imageUrl": "item/藍莓糖飾.png" },
+    { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "野莓糖飾", "effect": "隊伍中的三胞胎角色+2生命", "imageUrl": "item/野莓糖飾.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Angry", "item": "拳擊手套", "effect": "隊伍中的憤怒角色+2生命", "imageUrl": "item/拳擊手套.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Trick", "item": "客房服務", "effect": "隊伍中的戲法角色+2生命", "imageUrl": "item/客房服務.png" },
 
@@ -261,7 +261,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "BugBite", "item": "銀粉", "effect": "隊伍中的蟲咬角色+3攻擊", "imageUrl": "item/銀粉.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Thief", "item": "黑色眼鏡", "effect": "隊伍中的小偷角色+3攻擊", "imageUrl": "item/黑色眼鏡.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Starter", "item": "幸運草糖飾", "effect": "隊伍中的御三家角色+3攻擊", "imageUrl": "item/幸運草糖飾.png" },
-    { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "藍莓糖飾", "effect": "隊伍中的三胞胎角色+3攻擊", "imageUrl": "item/藍莓糖飾.png" },
+    { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "野莓糖飾", "effect": "隊伍中的三胞胎角色+3攻擊", "imageUrl": "item/野莓糖飾.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Angry", "item": "拳擊手套", "effect": "隊伍中的憤怒角色+3攻擊", "imageUrl": "item/拳擊手套.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Trick", "item": "客房服務", "effect": "隊伍中的戲法角色+3攻擊", "imageUrl": "item/客房服務.png" },
 
@@ -278,7 +278,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "BugBite", "item": "銀粉", "effect": "隊伍中的蟲咬角色+3生命", "imageUrl": "item/銀粉.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Thief", "item": "黑色眼鏡", "effect": "隊伍中的小偷角色+3生命", "imageUrl": "item/黑色眼鏡.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Starter", "item": "幸運草糖飾", "effect": "隊伍中的御三家角色+3生命", "imageUrl": "item/幸運草糖飾.png" },
-    { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "藍莓糖飾", "effect": "隊伍中的三胞胎角色+3生命", "imageUrl": "item/藍莓糖飾.png" },
+    { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Triplets", "item": "野莓糖飾", "effect": "隊伍中的三胞胎角色+3生命", "imageUrl": "item/野莓糖飾.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Angry", "item": "拳擊手套", "effect": "隊伍中的憤怒角色+3生命", "imageUrl": "item/拳擊手套.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Trick", "item": "客房服務", "effect": "隊伍中的戲法角色+3生命", "imageUrl": "item/客房服務.png" },
 

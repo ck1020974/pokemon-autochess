@@ -111,6 +111,11 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
     const isActive = count !== undefined && count >= synergy.tiers[0];
     const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
 
+    // Dynamic [N] replacement for Psychic synergy
+    if (synergy.id === 'Psychic' && (window as any).game) {
+        activeDesc = activeDesc.replace('[N]', (window as any).game.psychicN.toString());
+    }
+
     return (
         <div
             className={`synergy-icon ${className || ''} ${isForcedOpen ? 'force-visible' : ''}`}

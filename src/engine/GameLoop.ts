@@ -346,9 +346,10 @@ export class GameLoop {
                 if (reward.effect.includes('全體')) {
                     targetUnits.forEach(u => this.applyExpToUnit(u, expAmount));
                 } else {
-                    // Random target(s) based on text
+                    // Random target(s) based on text - Filter out Max Level units
+                    const eligibleUnits = targetUnits.filter(u => u.level < 3);
                     const count = reward.effect.includes('兩位') ? 2 : (reward.effect.includes('三位') ? 3 : 1);
-                    const shuffled = [...targetUnits].sort(() => 0.5 - Math.random());
+                    const shuffled = [...eligibleUnits].sort(() => 0.5 - Math.random());
                     shuffled.slice(0, count).forEach(u => this.applyExpToUnit(u, expAmount));
                 }
                 break;
