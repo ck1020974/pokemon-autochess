@@ -429,11 +429,13 @@ export class GameLoop {
             // Check thresholds
             if (unit.exp >= 9 && unit.level < 3) {
                 // Trigger Level 3 (Evolve if applicable)
-                this.mergeUnits(unit, { exp: 0, level: 1, stats: { attack: 0, maxHp: 0 }, family: unit.family } as any);
+                const dummy = new Unit(UNIT_TEMPLATES[unit.family]);
+                this.mergeUnits(unit, dummy);
                 canStillLevelUp = true; // Check again after merge/evolution
             } else if (unit.exp >= 3 && unit.level < 2) {
                 // Trigger Level 2 (Evolve if applicable)
-                this.mergeUnits(unit, { exp: 0, level: 1, stats: { attack: 0, maxHp: 0 }, family: unit.family } as any);
+                const dummy = new Unit(UNIT_TEMPLATES[unit.family]);
+                this.mergeUnits(unit, dummy);
                 canStillLevelUp = true;
             }
         }

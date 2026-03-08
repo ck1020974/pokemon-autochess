@@ -237,6 +237,12 @@ function App() {
         setDraggedItem(null);
         setLogs([]);
         setBattleElapsedSeconds(0);
+        setIsPaused(false);
+        isPausedRef.current = false;
+        setActiveSynergyId(null);
+        setShowOpponentSelect(false);
+        setSelectedOpponent(null);
+        setOpponentChoices([]);
 
         // 4. Force UI Update
         update();
