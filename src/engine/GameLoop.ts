@@ -141,8 +141,10 @@ export class GameLoop {
     }
 
     public startBattlePhase() {
-        // 3. Apply PREP END Synergies (Permanent Buffs)
         this.applyPrepEndSynergies();
+
+        // --- Clear Permanent Buff Visual Tags after Prep phase effects ---
+        this.playerTeam.forEach(u => { if (u) u.hasNewPermanentBuff = false; });
 
         // 4. Save Original Team
         this.savedTeam = [...this.playerTeam];
@@ -211,14 +213,16 @@ export class GameLoop {
             });
         }
 
-        // Starter (3): Every Starter unit -> +1 Attack & HP Permanent
         const starterUnits = this.playerTeam.filter(u => u && u.synergies.includes('Starter')) as Unit[];
         const starterCount = getUniqueCount(starterUnits);
         if (starterCount >= 3) {
-            const buff = starterCount >= 5 ? 2 : 1;
             starterUnits.forEach(u => {
-                applyBuff(u, buff, 'hp', 'Starter');
-                applyBuff(u, buff, 'atk', 'Starter');
+                const buff = starterCount >= 5 ? 2 : 1;
+                if (Math.random() < 0.5) {
+                    applyBuff(u, buff, 'hp', 'Starter');
+                } else {
+                    applyBuff(u, buff, 'atk', 'Starter');
+                }
             });
         }
 
@@ -326,9 +330,16 @@ export class GameLoop {
             // Fixed categories always included
             return true;
         }).map(r => {
-            // Generic = Weight 2, Synergy = Weight 1
+            // Weights: Mint = 0.5, Synergy = 1.0, Generic = 2.0
+            let weight = 1.0;
             const isGeneric = ['GOLD', 'EXP', 'PERM_NONE', 'BATTLE_NONE'].includes(r.category);
-            return { ...r, weight: isGeneric ? 2 : 1 };
+            const isMint = r.item.includes('薄荷');
+
+            if (isMint) weight = 0.5;
+            else if (isGeneric) weight = 2.0;
+            else weight = 1.0; // Synergies
+
+            return { ...r, weight };
         });
 
         // 3. Pick 3 unique items using weighted random selection
@@ -455,10 +466,12 @@ export class GameLoop {
             }
 
             u.addGrowth(finalHp, finalAtk);
+            u.hasNewPermanentBuff = true;
             // Also apply to the permanent version in savedTeam
             const savedUnit = this.savedTeam.find(su => su && su.id === u.id);
             if (savedUnit) {
                 savedUnit.addGrowth(finalHp, finalAtk);
+                savedUnit.hasNewPermanentBuff = true;
             }
         });
     }

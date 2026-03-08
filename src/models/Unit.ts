@@ -35,6 +35,7 @@ export class Unit {
   public synergies: string[];
   public family: string;
   public scalingValue: number = 1;
+  public hasNewPermanentBuff: boolean = false;
 
   constructor(template: UnitTemplate) {
     this.id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);

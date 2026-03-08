@@ -33,6 +33,7 @@ export class BattleSimulator {
     private speed: number = 1;
     public isSim: boolean = false;
     public battleBuffs: any[] = [];
+    private waterDebuffedTargets = new Set<Unit>();
 
     constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 2, isSim: boolean = false, battleBuffs: any[] = []) {
         this.speed = speed;
@@ -113,6 +114,7 @@ export class BattleSimulator {
         this.lightScreenActivated.clear();
         this.houndoomLogged.clear();
         this.natuLogged.clear();
+        this.waterDebuffedTargets.clear();
 
         await this.compactTeams();
 
@@ -656,21 +658,24 @@ export class BattleSimulator {
             });
         }
 
-        // Water (Vortex): Reduce target attack before attack
+        // Water (Vortex): Reduce target attack before attack (Once per target)
         if (unit.synergies.includes('Water')) {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (unit.stats.hp <= 0) return;
                 if (e.source === unit && e.target && e.target.stats.hp > 0) {
+                    if (this.waterDebuffedTargets.has(e.target)) return;
+
                     if (e.target.family === 'sneasel') {
                         this.log(`${e.target.name} 發動了銳利目光！`);
                         return;
                     }
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const debuff = count >= 5 ? 5 : (count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0)));
+                    const debuff = count >= 5 ? 10 : (count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0)));
                     if (debuff > 0 && e.target.stats.attack > 1) {
                         const amountReduced = Math.min(e.target.stats.attack - 1, debuff);
                         e.target.stats.attack -= amountReduced;
-                        this.log(`${e.target.name} 降低了 ${amountReduced} 攻擊！`);
+                        this.waterDebuffedTargets.add(e.target);
+                        this.log(`${e.target.name} 被潮旋捲入，降低了 ${amountReduced} 攻擊！`);
                     }
                 }
             });
@@ -695,13 +700,15 @@ export class BattleSimulator {
         // Squirtle Family: Damage Reduction
         if (unit.family === 'squirtle') {
             this.eventBus.on('BEFORE_HURT', (e) => {
-                if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
+                const s = this.unitStates.get(unit);
+                if (e.target === unit && !s?.isSilenced) {
                     const reduction = [0, 1, 2, 3][unit.level] || 1;
                     const oldAmt = e.context.amount;
                     if (oldAmt > 1) {
-                        e.context.amount = Math.max(1, oldAmt - reduction);
-                        if (e.context.amount < oldAmt) {
-                            this.log(`${unit.name} 的縮殼減輕了傷害！`);
+                        const newAmt = Math.max(1, oldAmt - reduction);
+                        if (newAmt < oldAmt) {
+                            e.context.amount = newAmt;
+                            this.log(`${unit.name} 發動了縮殼！`);
                         }
                     }
                 }

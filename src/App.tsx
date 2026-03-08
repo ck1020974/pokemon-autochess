@@ -2078,7 +2078,7 @@ function App() {
                             return (
                                 <div
                                     key={unit ? unit.id : `player-empty-${i}`}
-                                    className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''} ${((tutorialStep === 3 && unit?.family === 'gastly') || (tutorialStep === 4 && (unit?.family === 'gastly' || selected?.unit?.family === 'gastly'))) && game.phase === GamePhase.SHOP ? 'tutorial-highlight' : ''} ${(step8CharmanderTarget && game.phase === GamePhase.SHOP) ? 'synthetic-glow' : ''}`}
+                                    className={`unit-wrapper ${!unit && selected && selected.source !== 'ENEMY' ? 'is-target-eligible' : ''} ${((tutorialStep === 3 && unit?.family === 'gastly') || (tutorialStep === 4 && (unit?.family === 'gastly' || selected?.unit?.family === 'gastly'))) && game.phase === GamePhase.SHOP ? 'tutorial-highlight' : ''} ${(step8CharmanderTarget && game.phase === GamePhase.SHOP) ? 'synthetic-glow' : ''} ${unit?.hasNewPermanentBuff ? 'synthetic-glow' : ''}`}
                                     onDragOver={isInteractive ? onDragOver : undefined}
                                     onDrop={isInteractive ? (e) => onDrop(e, i) : undefined}
                                     onClick={(e) => {
