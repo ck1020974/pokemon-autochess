@@ -150,13 +150,21 @@ export class GameLoop {
         // --- Clear Permanent Buff Visual Tags after Prep phase effects ---
         this.playerTeam.forEach(u => { if (u) u.hasNewPermanentBuff = false; });
 
-        // 4. Save Original Team
-        this.savedTeam = [...this.playerTeam];
+        this.compactPlayerTeam(); // Auto-fill empty slots
+        this.savedTeam = JSON.parse(JSON.stringify(this.playerTeam)); // Deep copy to restore after battle
 
         // 5. Replace playerTeam with Deep Clones for the battle
         this.playerTeam = this.playerTeam.map(u => u ? this.cloneUnit(u) : null);
 
         this.phase = GamePhase.BATTLE;
+    }
+
+    private compactPlayerTeam() {
+        const compacted = this.playerTeam.filter(u => u !== null);
+        while (compacted.length < 5) {
+            compacted.push(null);
+        }
+        this.playerTeam = compacted;
     }
 
     private applyPrepEndSynergies() {

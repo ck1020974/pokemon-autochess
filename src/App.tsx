@@ -1468,7 +1468,7 @@ function App() {
                                         fontWeight: '900',
                                         color: '#fff',
                                         zIndex: 20,
-                                        backgroundColor: '#0ea5e9', // Blue color similar to NORMAL difficulty
+                                        backgroundColor: '#8b5cf6', // Violet color to distinguish from NORMAL difficulty
                                         boxShadow: '0 4px 8px rgba(0,0,0,0.4)',
                                         textTransform: 'uppercase',
                                         border: '1px solid rgba(255,255,255,0.3)',

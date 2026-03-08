@@ -31,7 +31,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
         tiers: [2, 3, 4]
     },
     'Trick': { id: 'Trick', name: '戲法', icon: '🪄', description: '[2] 戰鬥開始時，和隨機敵方對調生命', tiers: [2], color: '#a855f7' },
-    'BugBite': { id: 'BugBite', name: '蟲咬', icon: '🪲', description: '[2] 擊殺目標後，永久 +2 生命', tiers: [2], color: '#4ade80' },
+    'BugBite': { id: 'BugBite', name: '蟲咬', icon: '🪲', description: '[2] 擊殺對方後，永久 +1 生命', tiers: [2], color: '#4ade80' },
     'Thief': { id: 'Thief', name: '小偷', icon: '👤', description: '[2/3/4] 戰鬥開始時，從最強的敵方角色偷取 2/3/5 點攻擊', tiers: [2, 3, 4], color: '#64748b' },
 };
 

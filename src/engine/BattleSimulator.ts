@@ -1502,7 +1502,7 @@ export class BattleSimulator {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === killer.id);
                     this.log(`${killer.name} 發動了蟲咬`);
                     // We call growUnit. It will handle the "don't revive if dead" logic internally.
-                    this.growUnit(killer, 2, 0, '蟲咬', original, true);
+                    this.growUnit(killer, 1, 0, '蟲咬', original, true);
                 }
             };
 
