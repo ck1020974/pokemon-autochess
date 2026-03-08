@@ -134,10 +134,14 @@ export class GameLoop {
             }
         });
 
-        // Update Psychic synergy description using placeholder or current value
+        // Update Psychic synergy description using current value
         const psychic = SYNERGIES.Psychic;
         const template = '[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
-        psychic.description = template.replace('[N]', this.psychicN.toString());
+        const newDesc = template.replace('[N]', this.psychicN.toString());
+        if (psychic.description !== newDesc) {
+            psychic.description = newDesc;
+            console.log(`念力說明已更新為：${newDesc}`);
+        }
     }
 
     public startBattlePhase() {
@@ -407,6 +411,7 @@ export class GameLoop {
 
     private applyExpToUnit(unit: Unit, amount: number) {
         unit.exp += amount;
+        unit.hasNewPermanentBuff = true; // Trigger glow for EXP rewards
 
         // Loop to handle potential multiple level-ups/evolutions (e.g., from Lv1 straight to Lv3)
         let canStillLevelUp = true;

@@ -9,6 +9,8 @@ class MusicManager {
     private muted: boolean = false;
     private defaultVolume: number = 0.15;
 
+    private audioCache: Map<string, HTMLAudioElement> = new Map();
+
     private constructor() { }
 
     public static getInstance(): MusicManager {
@@ -16,6 +18,19 @@ class MusicManager {
             MusicManager.instance = new MusicManager();
         }
         return MusicManager.instance;
+    }
+
+    /**
+     * Preload multiple tracks into the cache.
+     */
+    public preload(names: string[]): void {
+        names.forEach(name => {
+            if (!this.audioCache.has(name)) {
+                const audio = new Audio(`${this.musicPath}${name}.OGG`);
+                audio.load();
+                this.audioCache.set(name, audio);
+            }
+        });
     }
 
     public setMuted(muted: boolean): void {
@@ -30,16 +45,22 @@ class MusicManager {
     }
 
     /**
-     * Play a single track.
+     * Play a single track. Uses cache if available.
      * @param name Name of the file (without extension)
      * @param loop Whether to loop the track
      */
     public play(name: string, loop: boolean = true): HTMLAudioElement {
         this.stop();
 
-        const audio = new Audio(`${this.musicPath}${name}.OGG`);
+        let audio = this.audioCache.get(name);
+        if (!audio) {
+            audio = new Audio(`${this.musicPath}${name}.OGG`);
+            this.audioCache.set(name, audio);
+        }
+
         audio.muted = this.muted;
         audio.volume = this.defaultVolume;
+        audio.currentTime = 0; // Ensure starts from beginning
 
         if (loop) {
             // Manual loop logic to support fading
@@ -48,27 +69,27 @@ class MusicManager {
 
             const checkFade = () => {
                 if (!this.currentAudio || this.currentAudio !== audio) {
-                    audio.removeEventListener('timeupdate', checkFade);
+                    audio!.removeEventListener('timeupdate', checkFade);
                     return;
                 }
 
-                const remaining = audio.duration - audio.currentTime;
+                const remaining = audio!.duration - audio!.currentTime;
 
                 // Start fade out
                 if (!isFadingOut && remaining > 0 && remaining < fadeTime) {
                     isFadingOut = true;
-                    this.fadeVolume(audio, 0, remaining * 1000);
+                    this.fadeVolume(audio!, 0, remaining * 1000);
                 }
             };
 
             audio.addEventListener('timeupdate', checkFade);
             audio.onended = () => {
                 if (this.currentAudio === audio) {
-                    audio.currentTime = 0;
-                    audio.volume = 0;
+                    audio!.currentTime = 0;
+                    audio!.volume = 0;
                     isFadingOut = false;
-                    audio.play().catch(e => console.warn("Music replay failed:", e));
-                    this.fadeVolume(audio, this.defaultVolume, 1000);
+                    audio!.play().catch(e => console.warn("Music replay failed:", e));
+                    this.fadeVolume(audio!, this.defaultVolume, 1000);
                 }
             };
         } else {

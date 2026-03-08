@@ -649,7 +649,7 @@ h3 {
 .synthetic-glow .unit-image,
 .synergy-icon.synthetic-glow {
   filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.9)) brightness(1.2);
-  animation: pulse-glow 2s infinite alternate;
+  animation: glow-fade-out 4s forwards ease-out;
 }
 
 .synergy-icon.is-checked {
@@ -657,13 +657,19 @@ h3 {
   filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.8)) brightness(1.2) !important;
 }
 
-@keyframes pulse-glow {
+@keyframes glow-fade-out {
   0% {
-    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.6)) brightness(1);
+    filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.9)) brightness(1.3);
+    opacity: 1;
+  }
+
+  70% {
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.4)) brightness(1.1);
+    opacity: 1;
   }
 
   100% {
-    filter: drop-shadow(0 0 25px rgba(250, 204, 21, 1)) brightness(1.3);
+    filter: drop-shadow(0 0 0px rgba(250, 204, 21, 0)) brightness(1);
   }
 }
 
@@ -2172,6 +2178,7 @@ h3 {
   position: relative;
   pointer-events: auto !important;
 }
+
 .opponent-card {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }

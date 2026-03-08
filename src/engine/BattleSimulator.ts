@@ -1188,7 +1188,7 @@ export class BattleSimulator {
         // this.log(`${attacker.name} 攻擊了 ${defender.name}！`);
         await this.delay(100);
 
-        await this.eventBus.emit({ type: 'BEFORE_ATTACK', source: attacker, target: defender, context: {} });
+        // BEFORE_ATTACK moved to simulateStep
 
         const attackPromises: Promise<any>[] = [];
         const dmg = attacker.stats.attack;
@@ -1716,22 +1716,10 @@ export class BattleSimulator {
             this.playAnimation(eFront, 'clash', 300)
         ];
 
-        // 2. Pre-Clash Synergy (Water/Vortex occurs BEFORE impact animation)
-        const triggerWater = async (attacker: Unit, defender: Unit) => {
-            if (attacker.synergies.includes('Water')) {
-                const count = this.getSynergyCountForUnit(attacker, 'Water');
-                const debuff = count >= 5 ? 5 : (count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0)));
-                if (debuff > 0 && defender.stats.attack > 1 && !this.unitStates.get(attacker)?.isSilenced) {
-                    const amountReduced = Math.min(defender.stats.attack - 1, debuff);
-                    defender.stats.attack -= amountReduced;
-                    this.log(`${defender.name} 降低了 ${amountReduced} 攻擊！`);
-                }
-            }
-        };
-
+        // 2. Pre-Clash logic: Trigger all BEFORE_ATTACK effects (Cyndaquil, Water, etc.)
         await Promise.all([
-            triggerWater(pFront, eFront),
-            triggerWater(eFront, pFront)
+            this.eventBus.emit({ type: 'BEFORE_ATTACK', source: pFront, target: eFront, context: {} }),
+            this.eventBus.emit({ type: 'BEFORE_ATTACK', source: eFront, target: pFront, context: {} })
         ]);
 
         await this.delay(150);
