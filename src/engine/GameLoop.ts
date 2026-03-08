@@ -137,7 +137,7 @@ export class GameLoop {
 
         // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
-        const template = '[2/3/4/5] 兩回合後，對隨機 2 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
+        const template = '[2/3/4/5] 兩回合後，對隨機 3 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
         psychic.description = template.replace('[N]', this.psychicN.toString());
     }
 

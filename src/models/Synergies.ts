@@ -27,7 +27,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
         name: '念力',
         icon: '🔮',
         color: '#a855f7',
-        description: '[2/3/4] 兩回合後，對隨機 2 位敵方造成 [N] 點傷害 (每場戰鬥後增強)',
+        description: '[2/3/4] 兩回合後，對隨機 3 位敵方造成 [N] 點傷害 (每場戰鬥後增強)',
         tiers: [2, 3, 4]
     },
     'Trick': { id: 'Trick', name: '戲法', icon: '🪄', description: '[2] 戰鬥開始時，和隨機敵方對調生命', tiers: [2], color: '#a855f7' },

@@ -597,13 +597,13 @@ function App() {
             // Selection based on progression
             if (game.wins <= 7) {
                 music.play('gymfight', true);
-            } else if (game.wins < 11) {
+            } else if (game.wins < 12) {
                 music.play('elitefourfight', true);
             } else {
                 music.play('championfight', true);
             }
         }
-    }, [game.phase]);
+    }, [game.phase, game]);
 
     useEffect(() => {
         if (game.phase === GamePhase.BATTLE) {
@@ -615,8 +615,11 @@ function App() {
             if (game.lastResult === 'WIN') {
                 if (game.wins <= 7) {
                     music.play('pokemonmart', true);
-                } else {
+                } else if (game.wins < 12) {
                     music.play('victoryroad', true);
+                } else {
+                    // Won against Champion
+                    music.stop();
                 }
             } else if (game.lastResult === 'LOSS' || game.lastResult === 'DRAW') {
                 // Always play recover sequence for all stages
@@ -628,7 +631,7 @@ function App() {
         } else {
             setBattleElapsedSeconds(0);
         }
-    }, [game.phase, difficulty]);
+    }, [game.phase, difficulty, game]);
 
     // Timer loop for timeout (using elapsed seconds for pause sync)
     useEffect(() => {

@@ -316,7 +316,7 @@ export class BattleSimulator {
             if (livingEnemies.length > 0 && times > 0) {
                 let firstTarget = livingEnemies[0];
                 for (const e of livingEnemies) {
-                    if (e.stats.hp < firstTarget.stats.hp) firstTarget = e;
+                    if (e.stats.hp > firstTarget.stats.hp) firstTarget = e;
                 }
 
                 if (!this.houndoomLogged.has(side)) {
@@ -330,7 +330,7 @@ export class BattleSimulator {
 
                     let bestTarget = freshEnemies[0];
                     for (const e of freshEnemies) {
-                        if (e.stats.hp < bestTarget.stats.hp) bestTarget = e;
+                        if (e.stats.hp > bestTarget.stats.hp) bestTarget = e;
                     }
                     await this.dealDamage(unit, bestTarget, 4, true, true); // Silent hits
                     await this.delay(50);
@@ -1312,7 +1312,7 @@ export class BattleSimulator {
                         const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
 
                         if (livingEnemies.length > 0) {
-                            const targetCount = 2; // Fixed as per user request
+                            const targetCount = 3; // Updated from 2
                             const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
                             const selectedTargets = shuffled.slice(0, targetCount);
 
