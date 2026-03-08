@@ -487,8 +487,8 @@ function App() {
             criticalUrls.add(ultraBall);
             criticalUrls.add(masterBall);
 
-            // Preload critical audio
-            music.preload(['start', 'pokemonmart', 'gymfight', 'pokemoncenter', 'gymwin', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin']);
+            // Preload critical audio (Early game + Common)
+            music.preload(['start', 'pokemonmart', 'gymfight', 'pokemoncenter', 'gymwin']);
 
             console.log(`[系統] 開始預載入關鍵資源 (${criticalUrls.size} 個)...`);
             await loadAssets(Array.from(criticalUrls), false);
@@ -499,7 +499,7 @@ function App() {
             // Next frame background load
             setTimeout(async () => {
                 console.log(`[系統] 開始背景載入剩餘資源 (${backgroundUrls.size} 個)...`);
-                music.preload(['victoryroad', 'level up', 'recover']);
+                music.preload(['victoryroad', 'level up', 'recover', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin']);
 
                 // Add reward item images to background load
                 REWARD_DATA.forEach(reward => {
