@@ -74,8 +74,8 @@ export class BattleSimulator {
         if (!this.battleBuffs || this.battleBuffs.length === 0) return;
 
         this.battleBuffs.forEach(reward => {
-            const atkMatch = reward.effect.match(/\+(\d+)\s*攻擊/);
-            const hpMatch = reward.effect.match(/\+(\d+)\s*生命/);
+            const atkMatch = reward.effect.match(/\+(\d+)\s*(?:攻擊力?|攻)/);
+            const hpMatch = reward.effect.match(/\+(\d+)\s*(?:生命值?|HP)/);
             const atk = atkMatch ? parseInt(atkMatch[1]) : 0;
             const hp = hpMatch ? parseInt(hpMatch[1]) : 0;
 
@@ -1305,7 +1305,7 @@ export class BattleSimulator {
                         const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
 
                         if (livingEnemies.length > 0) {
-                            const targetCount = count >= 4 ? 4 : (count >= 3 ? 3 : 2);
+                            const targetCount = 2; // Fixed as per user request
                             const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
                             const selectedTargets = shuffled.slice(0, targetCount);
 
@@ -1440,7 +1440,7 @@ export class BattleSimulator {
     }
 
     private async handleDeath(unit: Unit, killer?: Unit) {
-        // Log removed per user request: "不要在說明角色倒下，對戰訊息太多了"
+        // Log removed per user request: "不要在說明角色倒下，戰鬥訊息太多了"
         // this.log(`${unit.name} 倒下了！`);
 
         // Sableye: Revenge kill

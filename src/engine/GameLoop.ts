@@ -82,9 +82,8 @@ export class GameLoop {
             }
         }
 
-        // --- Psychic Scaling (Increments every turn) ---
-        this.psychicN = 2 + (this.turn - 1);
-        console.log(`念力羈絆增強！目前威力：${this.psychicN}`);
+        // --- Psychic Scaling (Increments in concludeTurn) ---
+        console.log(`念力傷害目前的威力：${this.psychicN}`);
 
         // --- Refresh Descriptions ---
         this.refreshSpecialDescriptions();
@@ -121,7 +120,7 @@ export class GameLoop {
                 u.scalingValue = this.charmanderN;
                 const freq = [0, '三', '兩', '一'][u.level] || '三';
                 const prefix = u.level === 3 ? '每' : '';
-                u.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場對戰後增強)。`;
+                u.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場戰鬥後增強)。`;
             }
         });
 
@@ -131,13 +130,13 @@ export class GameLoop {
                 u.scalingValue = this.charmanderN;
                 const freq = [0, '三', '兩', '一'][u.level] || '三';
                 const prefix = u.level === 3 ? '每' : '';
-                u.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場對戰後增強)。`;
+                u.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場戰鬥後增強)。`;
             }
         });
 
         // Update Psychic synergy description using placeholder or current value
         const psychic = SYNERGIES.Psychic;
-        const template = '[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 [N] 點傷害 (每場對戰後增強)';
+        const template = '[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
         psychic.description = template.replace('[N]', this.psychicN.toString());
     }
 
@@ -417,10 +416,10 @@ export class GameLoop {
     }
 
     private applyPermanentReward(reward: any, units: Unit[]) {
-        const atkMatch = reward.effect.match(/\+(\d+)\s*攻擊/);
-        const hpMatch = reward.effect.match(/\+(\d+)\s*生命/);
-        const atkMinus = reward.effect.match(/-(\d+)\s*攻擊/);
-        const hpMinus = reward.effect.match(/-(\d+)\s*生命/);
+        const atkMatch = reward.effect.match(/\+(\d+)\s*(?:攻擊|攻)/);
+        const hpMatch = reward.effect.match(/\+(\d+)\s*(?:生命|HP)/);
+        const atkMinus = reward.effect.match(/-(\d+)\s*(?:攻擊|攻)/);
+        const hpMinus = reward.effect.match(/-(\d+)\s*(?:生命|HP)/);
 
         const atk = (atkMatch ? parseInt(atkMatch[1]) : 0) - (atkMinus ? parseInt(atkMinus[1]) : 0);
         const hp = (hpMatch ? parseInt(hpMatch[1]) : 0) - (hpMinus ? parseInt(hpMinus[1]) : 0);
@@ -431,16 +430,35 @@ export class GameLoop {
             if (first) targets = [first];
         } else if (reward.effect.includes('全體')) {
             targets = units;
+        } else if (reward.effect.includes('隨機角色')) {
+            const shuffled = [...units].sort(() => 0.5 - Math.random());
+            if (shuffled.length > 0) targets = [shuffled[0]];
         } else if (reward.synergyId) {
             targets = units.filter(u => u.synergies.includes(reward.synergyId));
         }
 
         targets.forEach(u => {
-            u.addGrowth(hp, atk);
+            let finalHp = hp;
+            let finalAtk = atk;
+
+            // Randomized Stat Mechanism: "攻擊或生命"
+            if (reward.effect.includes('攻擊或生命')) {
+                const amountMatch = reward.effect.match(/\+(\d+)/);
+                const amount = amountMatch ? parseInt(amountMatch[1]) : 1;
+                if (Math.random() < 0.5) {
+                    finalAtk = amount;
+                    finalHp = 0;
+                } else {
+                    finalAtk = 0;
+                    finalHp = amount;
+                }
+            }
+
+            u.addGrowth(finalHp, finalAtk);
             // Also apply to the permanent version in savedTeam
             const savedUnit = this.savedTeam.find(su => su && su.id === u.id);
             if (savedUnit) {
-                savedUnit.addGrowth(hp, atk);
+                savedUnit.addGrowth(finalHp, finalAtk);
             }
         });
     }
@@ -453,6 +471,16 @@ export class GameLoop {
             this.difficultyScore += 0.5;
         } else {
             this.difficultyScore += 1.0;
+        }
+
+        // --- Psychic Synergy Scaling (Cumulative) ---
+        const psychicUnits = this.playerTeam.filter(u => u && u.synergies.includes('Psychic')) as Unit[];
+        const families = new Set(psychicUnits.map(u => u.family));
+        const pCount = families.size;
+        if (pCount >= 2) {
+            const increment = pCount >= 4 ? 3 : (pCount >= 3 ? 2 : 1);
+            this.psychicN += increment;
+            console.log(`念力羈絆增強！累積威力：${this.psychicN} (+${increment})`);
         }
 
         this.turn++;

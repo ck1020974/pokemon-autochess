@@ -1109,7 +1109,7 @@ function App() {
         }
         if (game.gold > 0 && tutorialStep === 0) {
             setConfirmDialog({
-                message: `進入對戰階段？`,
+                message: `進入戰鬥階段？`,
                 description: '未花完的 ' + game.gold + '$ ，將會直接消失！',
                 onConfirm: () => {
                     setConfirmDialog(null);
@@ -1159,7 +1159,7 @@ function App() {
         }
 
         // We show opponent choices for Boss matches (Wins: 8~11 or 12) or special gym levels.
-        // Actually, user spec says: "這 4 場中，每場會在對手畫面跳出從四天王中挑選。 前八勝階段... 這些館主將出現在一般對戰中供玩家挑戰"
+        // Actually, user spec says: "這 4 場中，每場會在對手畫面跳出從四天王中挑選。 前八勝階段... 這些館主將出現在一般戰鬥中供玩家挑戰"
         // Let's always show the opponent choice if we have a pool.
         const ALL_NPCS = npcPool;
         const unseenNpCS = ALL_NPCS.filter(boss => !game.defeatedOpponentIds?.includes(boss.id));
@@ -1466,6 +1466,28 @@ function App() {
                                     {reward.item}
                                 </div>
 
+                                {/* Temporary Badge */}
+                                {(reward.category === 'BATTLE_SYNERGY' || reward.category === 'BATTLE_NONE') && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '10px',
+                                        left: '10px',
+                                        padding: '4px 10px',
+                                        borderRadius: '6px',
+                                        fontSize: '0.85rem',
+                                        fontWeight: '900',
+                                        color: '#fff',
+                                        zIndex: 20,
+                                        backgroundColor: '#0ea5e9', // Blue color similar to NORMAL difficulty
+                                        boxShadow: '0 4px 8px rgba(0,0,0,0.4)',
+                                        textTransform: 'uppercase',
+                                        border: '1px solid rgba(255,255,255,0.3)',
+                                        letterSpacing: '1px'
+                                    }}>
+                                        暫時
+                                    </div>
+                                )}
+
                                 <div style={{
                                     color: '#cbd5e1',
                                     fontSize: '1.05rem',
@@ -1503,10 +1525,10 @@ function App() {
                                     {tutorialStep === 4 && "調整陣容順序\n🎯任務：將鬼斯移動到其他位置"}
                                     {tutorialStep === 5 && "花費1$刷新商店\n🎯任務：點擊按鈕刷新商店角色"}
                                     {tutorialStep === 6 && "鎖定角色保留到下回合\n🎯任務：點擊鎖定所有小火龍"}
-                                    {tutorialStep === 7 && "選擇要挑戰的訓練家\n🎯任務：點擊對戰按鈕"}
+                                    {tutorialStep === 7 && "選擇要挑戰的訓練家\n🎯任務：點擊戰鬥按鈕"}
                                     {tutorialStep === 8 && "點擊或拖曳角色合成\n🎯任務：購買並合成小火龍"}
                                     {tutorialStep === 9 && "開啟羈絆來提高強度\n🎯任務：購買火球鼠"}
-                                    {tutorialStep === 10 && "挑戰更強的訓練家\n🎯任務：點擊對戰按鈕"}
+                                    {tutorialStep === 10 && "挑戰更強的訓練家\n🎯任務：點擊戰鬥按鈕"}
                                     {tutorialStep === 11 && "戰敗時將減少生命值\n生命值歸零將結束遊戲‼️"}
                                 </div>
                             </div>
@@ -2239,7 +2261,7 @@ function App() {
                                 <button
                                     className={`battle-speed-btn ${battleSpeed > 1 ? 'active' : ''}`}
                                     onClick={toggleBattleSpeed}
-                                    title="切換對戰速度"
+                                    title="切換戰鬥速度"
                                 >
                                     ⏩ {battleSpeed}x
                                 </button>
