@@ -62,7 +62,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "NORMAL", "category": "BATTLE_NONE", "item": "特防強化", "effect": "提高戰鬥中的特防，我方全體角色+1生命", "imageUrl": "item/特防強化.png" },
 
     { "difficulty": "HARD", "category": "BATTLE_NONE", "item": "命中強化", "effect": "提高戰鬥中的命中，我方全體角色+2攻擊", "imageUrl": "item/命中強化.png" },
-    { "difficulty": "HARD", "category": "BATTLE_NONE", "item": "攻擊強化", "effect": "提高戰鬥中的攻擊，我方全體角色+2攻擊", "imageUrl": "item/攻擊強化.png" },
+    { "difficulty": "HARD", "category": "BATTLE_NONE", "item": "力量強化", "effect": "提高戰鬥中的攻擊，我方全體角色+2攻擊", "imageUrl": "item/力量強化.png" },
     { "difficulty": "HARD", "category": "BATTLE_NONE", "item": "特攻強化", "effect": "提高戰鬥中的特攻，我方全體角色+2攻擊", "imageUrl": "item/特攻強化.png" },
     { "difficulty": "HARD", "category": "BATTLE_NONE", "item": "速度強化", "effect": "提高戰鬥中的速度，我方全體角色+2攻擊", "imageUrl": "item/速度強化.png" },
     { "difficulty": "HARD", "category": "BATTLE_NONE", "item": "能力防守", "effect": "能力值不被降低，我方全體角色+2生命", "imageUrl": "item/能力防守.png" },

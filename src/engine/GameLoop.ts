@@ -45,6 +45,7 @@ export class GameLoop {
     constructor() {
         this.shop = new Shop();
         this.startShopPhase();
+        (window as any).game = this; // Expose to window for UI dynamic descriptions
     }
 
     public setDifficulty(level: 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER') {
@@ -134,14 +135,10 @@ export class GameLoop {
             }
         });
 
-        // Update Psychic synergy description using current value
+        // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
-        const template = '[2/3/4] 兩回合後，對隨機 2/3/4 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
-        const newDesc = template.replace('[N]', this.psychicN.toString());
-        if (psychic.description !== newDesc) {
-            psychic.description = newDesc;
-            console.log(`念力說明已更新為：${newDesc}`);
-        }
+        const template = '[2/3/4/5] 兩回合後，對隨機 2 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
+        psychic.description = template.replace('[N]', this.psychicN.toString());
     }
 
     public startBattlePhase() {
@@ -398,7 +395,17 @@ export class GameLoop {
                 } else {
                     // Random target(s) based on text - Filter out Max Level units
                     const eligibleUnits = targetUnits.filter(u => u.level < 3);
-                    const count = reward.effect.includes('兩位') ? 2 : (reward.effect.includes('三位') ? 3 : 1);
+                    let count = 1;
+
+                    const randomMatch = reward.effect.match(/隨機(\d+)名/);
+                    if (randomMatch) {
+                        count = parseInt(randomMatch[1]);
+                    } else if (reward.effect.includes('兩位')) {
+                        count = 2;
+                    } else if (reward.effect.includes('三位')) {
+                        count = 3;
+                    }
+
                     const shuffled = [...eligibleUnits].sort(() => 0.5 - Math.random());
                     shuffled.slice(0, count).forEach(u => this.applyExpToUnit(u, expAmount));
                 }

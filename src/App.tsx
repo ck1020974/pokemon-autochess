@@ -111,7 +111,7 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
     const isActive = count !== undefined && count >= synergy.tiers[0];
     const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
 
-    // Dynamic [N] replacement for Psychic synergy
+    // Dynamic [N] replacement for Psychic synergy (Fallback, mainly handled in GameLoop now)
     if (synergy.id === 'Psychic' && (window as any).game) {
         activeDesc = activeDesc.replace('[N]', (window as any).game.psychicN.toString());
     }
@@ -210,7 +210,11 @@ function getSynergyStatus(team: (Unit | null)[]) {
 
 
 function App() {
-    const gameRef = useRef<GameLoop>(new GameLoop());
+    const gameRef = useRef<GameLoop | null>(null);
+    if (!gameRef.current) {
+        gameRef.current = new GameLoop();
+        (window as any).game = gameRef.current;
+    }
     const game = gameRef.current;
 
     const [rewardChoices, setRewardChoices] = useState<any[]>([]);
@@ -547,8 +551,10 @@ function App() {
         handleRestart(); // NEW: Fully clear state first
 
         const g = gameRef.current;
-        g.setDifficulty(lvl);
-        g.startShopPhase(); // Ensure fresh gold and shop slots on every start
+        if (g) {
+            g.setDifficulty(lvl);
+            g.startShopPhase(); // Ensure fresh gold and shop slots on every start
+        }
 
         setDifficulty(lvl);
         setShowTutorial(true); // Auto-prompt tutorial instead of going straight to the game
