@@ -808,6 +808,7 @@ export class GameLoop {
         clone.synergies = [...unit.synergies];
         clone.family = unit.family;
         clone.scalingValue = unit.scalingValue;
+        clone.hasNewPermanentBuff = unit.hasNewPermanentBuff;
 
         return clone;
     }
