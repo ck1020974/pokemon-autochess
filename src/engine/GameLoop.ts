@@ -151,7 +151,7 @@ export class GameLoop {
         this.playerTeam.forEach(u => { if (u) u.hasNewPermanentBuff = false; });
 
         this.compactPlayerTeam(); // Auto-fill empty slots
-        this.savedTeam = JSON.parse(JSON.stringify(this.playerTeam)); // Deep copy to restore after battle
+        this.savedTeam = this.playerTeam.map(u => u ? this.cloneUnit(u) : null); // Proper clone to maintain methods
 
         // 5. Replace playerTeam with Deep Clones for the battle
         this.playerTeam = this.playerTeam.map(u => u ? this.cloneUnit(u) : null);

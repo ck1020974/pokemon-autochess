@@ -243,6 +243,7 @@ function App() {
         setShowOpponentSelect(false);
         setSelectedOpponent(null);
         setOpponentChoices([]);
+        simulatorRef.current = null; // CRITICAL: Clear battle simulator
 
         // 4. Force UI Update
         update();
@@ -543,8 +544,12 @@ function App() {
 
     const handleDifficultySelect = (lvl: 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER') => {
         music.stop(); // Stop 'start' music
-        game.setDifficulty(lvl);
-        game.startShopPhase(); // Ensure fresh gold and shop slots on every start
+        handleRestart(); // NEW: Fully clear state first
+
+        const g = gameRef.current;
+        g.setDifficulty(lvl);
+        g.startShopPhase(); // Ensure fresh gold and shop slots on every start
+
         setDifficulty(lvl);
         setShowTutorial(true); // Auto-prompt tutorial instead of going straight to the game
         update(); // Ensure shop phase logic triggers music check
