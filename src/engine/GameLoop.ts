@@ -160,7 +160,7 @@ export class GameLoop {
     }
 
     private compactPlayerTeam() {
-        const compacted = this.playerTeam.filter(u => u !== null);
+        const compacted: (Unit | null)[] = this.playerTeam.filter(u => u !== null);
         while (compacted.length < 5) {
             compacted.push(null);
         }
