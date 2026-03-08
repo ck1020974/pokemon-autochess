@@ -488,7 +488,7 @@ function App() {
             criticalUrls.add(masterBall);
 
             // Preload critical audio
-            music.preload(['start', 'pokemonmart', 'gymfight', 'pokemoncenter', 'gymwin']);
+            music.preload(['start', 'pokemonmart', 'gymfight', 'pokemoncenter', 'gymwin', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin']);
 
             console.log(`[系統] 開始預載入關鍵資源 (${criticalUrls.size} 個)...`);
             await loadAssets(Array.from(criticalUrls), false);
@@ -579,7 +579,15 @@ function App() {
         if (game.phase === GamePhase.BATTLE) {
             isPausedRef.current = false;
             setIsPaused(false);
-            music.play('gymfight', true);
+
+            // Selection based on progression
+            if (game.wins <= 7) {
+                music.play('gymfight', true);
+            } else if (game.wins < 11) {
+                music.play('elitefourfight', true);
+            } else {
+                music.play('championfight', true);
+            }
         }
     }, [game.phase]);
 
@@ -597,11 +605,8 @@ function App() {
                     music.play('victoryroad', true);
                 }
             } else if (game.lastResult === 'LOSS' || game.lastResult === 'DRAW') {
-                if (game.wins <= 7) {
-                    music.playRecoverSequence('pokemoncenter');
-                } else {
-                    music.play('pokemoncenter', true);
-                }
+                // Always play recover sequence for all stages
+                music.playRecoverSequence('pokemoncenter');
             } else {
                 // Initial game start (no last result)
                 music.play('pokemonmart', true);
@@ -979,10 +984,19 @@ function App() {
     useEffect(() => {
         if (battleResult === 'WIN') {
             const currentWins = game.wins;
+
+            // Determine track based on progression
+            let winTrack = 'gymwin';
+            if (currentWins >= 8 && currentWins < 12) {
+                winTrack = 'elitefourwin';
+            } else if (currentWins >= 12) {
+                winTrack = 'championwin';
+            }
+
             if (currentWins === 4 || currentWins === 8 || currentWins === 12) {
-                music.playLevelUpSequence('gymwin');
+                music.playLevelUpSequence(winTrack);
             } else {
-                music.play('gymwin', true);
+                music.play(winTrack, true);
             }
         } else if (battleResult === 'LOSS') {
             music.stop(); // Stops gymfight
@@ -1339,7 +1353,10 @@ function App() {
 
     const handleBattleResultClick = () => {
         if (game.phase === 'BATTLE') {
-            music.stop(); // Stop victory music
+            // Only stop if NOT a win (since win music should continue through reward selection)
+            if (game.lastResult !== 'WIN') {
+                music.stop();
+            }
             const hpBefore = game.lives;
             const result = game.lastResult;
 
@@ -1365,6 +1382,7 @@ function App() {
     };
 
     const handleRewardSelect = (reward: any) => {
+        music.stop(); // Stop the victory music (gymwin/elitefourwin/championwin)
         game.applyReward(reward);
         setRewardChoices([]); // Clear UI state immediately
         update();
