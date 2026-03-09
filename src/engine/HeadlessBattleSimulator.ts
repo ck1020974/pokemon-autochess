@@ -361,7 +361,7 @@ export class HeadlessBattleSimulator {
             });
         }
         if (unit.family === 'torchic') {
-            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
                 if (unit.stats.hp <= 0 || s?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);

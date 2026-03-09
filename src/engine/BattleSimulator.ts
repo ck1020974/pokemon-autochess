@@ -739,7 +739,7 @@ export class BattleSimulator {
 
         // Torchic: Pursuit
         if (unit.family === 'torchic') {
-            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && e.source !== unit && myTeam.includes(e.source) && e.target) {

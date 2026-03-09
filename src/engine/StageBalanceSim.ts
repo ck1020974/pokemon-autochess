@@ -133,14 +133,25 @@ function generatePlayerTeamForStage(stageId: string): Unit[] {
         }
         applyStatsByLevel(u, level);
 
-        // 如果是大後期，模擬 Carry 增幅 (Tier 獎勵)
+        // 如果是大後期，模擬 Carry 增幅 (Tier 獎勵 + 勳章/圍巾強化)
         if (applyCarryBuff && i === 0) { // 讓第一隻當主 C
             const tier = t.tier || 1;
-            const bonus = tier === 1 ? 15 : (tier === 2 ? 12 : (tier === 3 ? 10 : 8));
+            // 根據最近的平衡調整，PERM_SYNERGY 與 BATTLE_SYNERGY 給予更強的加成 (EASY +2, NORMAL +3, etc)
+            let battleSynBonus = 0;
+            let permSynBonus = 0;
+
+            if (stageId === 'Novice') { battleSynBonus = 2; }
+            else if (stageId === 'Intermediate') { battleSynBonus = 3; permSynBonus = 2; }
+            else if (stageId === 'Advanced') { battleSynBonus = 3; permSynBonus = 3; }
+            else { battleSynBonus = 3; permSynBonus = 4; }
+
+            const totalAtkBonus = (tier === 1 ? 15 : (tier === 2 ? 12 : 8)) + battleSynBonus + permSynBonus;
+            const totalHpBonus = (tier === 1 ? 15 : (tier === 2 ? 12 : 8)) + battleSynBonus + permSynBonus;
+
             if (Math.random() < 0.5) {
-                u.stats.hp += bonus; u.stats.maxHp += bonus; // HP Carry
+                u.stats.hp += totalHpBonus; u.stats.maxHp += totalHpBonus;
             } else {
-                u.stats.attack += bonus; // ATK Carry
+                u.stats.attack += totalAtkBonus;
             }
         }
 
