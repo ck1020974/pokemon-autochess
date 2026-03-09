@@ -750,7 +750,7 @@ export const PREFERRED_POSITIONS: Record<string, PreferredPosition> = {
     'gastly': 'ALL',
     'chikorita': 'BACK',
     'cyndaquil': 'ALL',
-    'totodile': 'FRONT',
+    'totodile': 'MID',
     'igglybuff': 'ALL',
     'treecko': 'MID_BACK',
     'torchic': 'MID_BACK',

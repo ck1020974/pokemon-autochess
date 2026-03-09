@@ -10,18 +10,18 @@ export interface OpponentDefinition {
 export const NOVICE_OPPONENTS: OpponentDefinition[] = [
     { id: 'novice_1', name: '武藏', url: 'gym/武藏.webp', coreUnits: ['meowth'], difficulty: 'EASY' },
     { id: 'novice_2', name: '小次郎', url: 'gym/小次郎.webp', coreUnits: ['meowth'], difficulty: 'EASY' },
-    { id: 'novice_3', name: '小剛', url: 'gym/小剛01.webp', coreUnits: ['mankey', 'dwebble', 'diglett'], difficulty: 'NORMAL' },
+    { id: 'novice_3', name: '小剛', url: 'gym/小剛01.webp', coreUnits: ['mankey', 'dwebble', 'diglett'], difficulty: 'HARD' },
     { id: 'novice_4', name: '小霞', url: 'gym/小霞01.webp', coreUnits: ['squirtle', 'igglybuff'], difficulty: 'EASY' },
-    { id: 'novice_5', name: '葉子', url: 'gym/葉子01.webp', coreUnits: ['bulbasaur', 'igglybuff'], difficulty: 'EASY' },
+    { id: 'novice_5', name: '葉子', url: 'gym/葉子01.webp', coreUnits: ['bulbasaur', 'igglybuff'], difficulty: 'NORMAL' },
     { id: 'novice_6', name: '克麗絲', url: 'gym/克麗絲.webp', coreUnits: ['totodile'], difficulty: 'EASY' },
     { id: 'novice_7', name: '阿響', url: 'gym/阿響01.webp', coreUnits: ['cyndaquil'], difficulty: 'NORMAL' },
     { id: 'novice_8', name: '琴音', url: 'gym/琴音01.webp', coreUnits: ['chikorita'], difficulty: 'EASY' },
     { id: 'novice_9', name: '青綠', url: 'gym/青綠01.webp', coreUnits: ['charmander', 'rattata'], difficulty: 'NORMAL' },
-    { id: 'novice_10', name: '松葉', url: 'gym/松葉.webp', coreUnits: ['drifloon', 'gastly'], difficulty: 'NORMAL' },
-    { id: 'novice_11', name: '杜娟', url: 'gym/杜娟.webp', coreUnits: ['dwebble', 'dwebble', 'diglett'], difficulty: 'NORMAL' },
+    { id: 'novice_10', name: '松葉', url: 'gym/松葉.webp', coreUnits: ['drifloon', 'gastly'], difficulty: 'HARD' },
+    { id: 'novice_11', name: '杜娟', url: 'gym/杜娟.webp', coreUnits: ['dwebble', 'dwebble', 'diglett'], difficulty: 'HARD' },
     { id: 'novice_12', name: '藤樹', url: 'gym/藤樹.webp', coreUnits: ['mankey', 'mankey', 'mankey'], difficulty: 'EASY' },
     { id: 'novice_13', name: '馬志士', url: 'gym/馬志士.webp', coreUnits: ['magnemite', 'magnemite', 'magnemite'], difficulty: 'EASY' },
-    { id: 'novice_14', name: '菜種', url: 'gym/菜種.webp', coreUnits: ['bulbasaur', 'bulbasaur', 'bulbasaur'], difficulty: 'NORMAL' },
+    { id: 'novice_14', name: '菜種', url: 'gym/菜種.webp', coreUnits: ['bulbasaur', 'bulbasaur', 'bulbasaur'], difficulty: 'HARD' },
     { id: 'novice_15', name: '莉莉艾', url: 'gym/莉莉艾.webp', coreUnits: ['igglybuff', 'igglybuff', 'squirtle'], difficulty: 'EASY' },
 ];
 
