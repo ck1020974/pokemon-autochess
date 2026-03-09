@@ -138,7 +138,7 @@ export class GameLoop {
         // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
         const template = '[2/3/4] 兩回合後，對隨機 3 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
-        psychic.description = template.replace('[N]', this.psychicN.toString());
+        psychic.description = template.replace('[N]', Math.floor(this.psychicN).toString());
     }
 
     public startBattlePhase() {
@@ -533,7 +533,7 @@ export class GameLoop {
         const families = new Set(psychicUnits.map(u => u.family));
         const pCount = families.size;
         if (pCount >= 2) {
-            const increment = pCount >= 4 ? 3 : (pCount >= 3 ? 2 : 1);
+            const increment = pCount >= 4 ? 2 : (pCount >= 3 ? 1.5 : 1);
             this.psychicN += increment;
             console.log(`念力羈絆增強！累積威力：${this.psychicN} (+${increment})`);
         }

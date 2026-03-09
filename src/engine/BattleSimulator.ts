@@ -701,7 +701,12 @@ export class BattleSimulator {
         if (unit.family === 'squirtle') {
             this.eventBus.on('BEFORE_HURT', (e) => {
                 const s = this.unitStates.get(unit);
-                if (e.target === unit && !s?.isSilenced) {
+                const source = e.context.source;
+                const sourceState = source ? this.unitStates.get(source) || {} : {};
+                const isBypassing = (source && source.family === 'pinsir' && !sourceState.isSilenced) ||
+                    (source && source.family === 'sableye' && sourceState.isAbsoluteKill);
+
+                if (e.target === unit && !s?.isSilenced && !isBypassing) {
                     const reduction = [0, 1, 2, 3][unit.level] || 1;
                     const oldAmt = e.context.amount;
                     if (oldAmt > 1) {
@@ -1403,13 +1408,7 @@ export class BattleSimulator {
         }
 
         // Pinsir/Sableye ignore reductions
-        if (!isBypassing) {
-            // Squirtle: Flat reduction
-            if (target.family === 'squirtle' && amount > 0) {
-                amount = Math.max(1, amount - target.level);
-                this.log(`${target.name} 發動了縮殼！`);
-            }
-        } else if (source) {
+        if (isBypassing && source) {
             if (source.family === 'pinsir') {
                 this.log(`${source.name} 發動了破格！`);
             }
