@@ -128,13 +128,13 @@ export class BattleSimulator {
             if (unit.family === 'spiritomb') return 5; // Phase 1: Silence
             if (unit.family === 'mrmime') return 4;    // Phase 2 Part 2: Light Screen
             if (unit.family === 'natu') return 3;      // Phase 2 Part 3: Swap
-            if (unit.family === 'houndour') return 1;  // Phase 4: First Strike (Ensure they are last even if they have Thief)
+            if (unit.family === 'houndour') return 0;  // Phase 4: First Strike (Now last priority)
 
-            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin'];
+            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin', 'totodile'];
             const hasStartupSynergy = unit.synergies.includes('Thief') || unit.synergies.includes('Trick');
             if (utility.includes(unit.family) || hasStartupSynergy) return 2; // Phase 3: Utility/Synergy
 
-            return 0; // Totodile, etc.
+            return 1; // Standard buffs (Gastly, Igglybuff, Totodile family) now Rank 1
         };
 
         // Sort by Priority: Rank (Desc) > Position (Asc) > Attack (Desc) > HP (Desc) > Random

@@ -474,17 +474,21 @@ export class GameLoop {
             const shuffled = [...units].sort(() => 0.5 - Math.random());
             if (shuffled.length > 0) targets = [shuffled[0]];
         } else if (reward.effect.includes('未進化') || reward.item === '幸運蛋') {
-            targets = units.filter(u => u.level === 1);
+            targets = units.filter(u => {
+                const baseTemplate = UNIT_TEMPLATES[u.family];
+                return u.name === baseTemplate.name; // "Not evolved" if name matches base family name
+            });
         } else if (reward.effect.includes('已進化') || reward.item === '進化奇石') {
-            targets = units.filter(u => u.level > 1);
+            targets = units.filter(u => {
+                const baseTemplate = UNIT_TEMPLATES[u.family];
+                return u.name !== baseTemplate.name; // "Evolved" if name changed from base species
+            });
         } else if (reward.effect.includes('無法進化') || reward.item === '不變之石') {
             targets = units.filter(u => {
-                // Case 1: No evolution chain
+                // Rule: If unit has no evolution id OR the evolution results in same name
                 if (!u.evolveId) return true;
-                // Case 2: Chain exists but next stage has same name (e.g. Raticate -> Raticate)
                 const nextTemplate = UNIT_TEMPLATES[u.evolveId];
-                if (nextTemplate && nextTemplate.name === u.name) return true;
-                return false;
+                return !nextTemplate || nextTemplate.name === u.name;
             });
         } else if (reward.synergyId) {
             targets = units.filter(u => u.synergies.includes(reward.synergyId));
