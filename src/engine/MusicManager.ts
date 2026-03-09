@@ -5,6 +5,7 @@
 class MusicManager {
     private static instance: MusicManager;
     private currentAudio: HTMLAudioElement | null = null;
+    private currentTrackName: string | null = null;
     private musicPath: string = 'music/';
     private muted: boolean = false;
     private defaultVolume: number = 0.15;
@@ -71,7 +72,13 @@ class MusicManager {
      * @param loop Whether to loop the track
      */
     public play(name: string, loop: boolean = true): HTMLAudioElement {
+        // If the same track is already playing, do nothing to avoid stuttering
+        if (this.currentTrackName === name && this.currentAudio && !this.currentAudio.paused) {
+            return this.currentAudio;
+        }
+
         this.stop();
+        this.currentTrackName = name;
 
         let audio = this.audioCache.get(name);
         if (!audio) {
@@ -81,48 +88,17 @@ class MusicManager {
 
         audio.muted = this.muted;
         audio.volume = this.defaultVolume;
-        audio.currentTime = 0; // Ensure starts from beginning
+        audio.currentTime = 0;
+        audio.loop = loop;
 
-        if (loop) {
-            // Manual loop logic to support fading
-            const fadeTime = 2; // seconds
-            let isFadingOut = false;
+        audio.play().catch(e => {
+            console.warn(`Music play failed for ${name}:`, e);
+            // If play fails (e.g. user hasn't interacted), we still mark it as current
+            // so that if play is called again after interaction, it won't be blocked if it's the same name.
+            // But actually, we want it to try playing again.
+            this.currentTrackName = null;
+        });
 
-            const checkFade = () => {
-                if (!this.currentAudio || this.currentAudio !== audio) {
-                    audio!.removeEventListener('timeupdate', checkFade);
-                    return;
-                }
-
-                // IMPORTANT: Ensure duration is loaded and valid
-                if (!audio!.duration || isNaN(audio!.duration) || audio!.duration < fadeTime + 1) {
-                    return;
-                }
-
-                const remaining = audio!.duration - audio!.currentTime;
-
-                // Start fade out only when near the end and not already fading
-                if (!isFadingOut && remaining > 0 && remaining < fadeTime) {
-                    isFadingOut = true;
-                    this.fadeVolume(audio!, 0, remaining * 1000);
-                }
-            };
-
-            audio.addEventListener('timeupdate', checkFade);
-            audio.onended = () => {
-                if (this.currentAudio === audio) {
-                    audio!.currentTime = 0;
-                    audio!.volume = 0;
-                    isFadingOut = false;
-                    audio!.play().catch(e => console.warn("Music replay failed:", e));
-                    this.fadeVolume(audio!, this.defaultVolume, 1000);
-                }
-            };
-        } else {
-            audio.loop = false;
-        }
-
-        audio.play().catch(e => console.warn("Music play failed:", e));
         this.currentAudio = audio;
         return audio;
     }
@@ -133,37 +109,12 @@ class MusicManager {
     public stop(): void {
         if (this.currentAudio) {
             this.currentAudio.pause();
-            this.currentAudio.onended = null; // Clear manual loop
             this.currentAudio.currentTime = 0;
             this.currentAudio = null;
+            this.currentTrackName = null;
         }
     }
 
-    /**
-     * Helper to gradually change volume.
-     */
-    private fadeVolume(audio: HTMLAudioElement, target: number, durationMs: number): void {
-        const startVolume = audio.volume;
-        const steps = 20;
-        const stepTime = durationMs / steps;
-        const volStep = (target - startVolume) / steps;
-        let currentStep = 0;
-
-        const interval = setInterval(() => {
-            if (!this.currentAudio || this.currentAudio !== audio) {
-                clearInterval(interval);
-                return;
-            }
-
-            currentStep++;
-            audio.volume = Math.max(0, Math.min(1, startVolume + volStep * currentStep));
-
-            if (currentStep >= steps) {
-                audio.volume = target;
-                clearInterval(interval);
-            }
-        }, stepTime);
-    }
 
     /**
      * Play a sequence of tracks. Useful for "Level Up" then "Gym Win".
