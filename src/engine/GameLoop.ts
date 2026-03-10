@@ -22,6 +22,13 @@ export class GameLoop {
     public wins: number = 0;
     public phase: GamePhase = GamePhase.SHOP;
     public lastResult: 'WIN' | 'LOSS' | 'DRAW' | null = null;
+    public drawCount: number = 0;
+    public lossCount: number = 0;
+    public difficultyName: string = 'NORMAL';
+    public battleHistory: { opponentId: string, result: 'WIN' | 'LOSS' | 'DRAW' }[] = [];
+    public gymBattleCount: number = 0;
+    public eliteBattleCount: number = 0;
+    public championBattleCount: number = 0;
 
     public charmanderN: number = 1;
     public charmanderCounter: number = 0;
@@ -56,6 +63,7 @@ export class GameLoop {
             'MASTER': 1.5
         };
         this.difficultyMultiplier = multipliers[level];
+        this.difficultyName = level;
     }
 
     public startShopPhase() {
@@ -261,6 +269,24 @@ export class GameLoop {
 
     public endBattle(result: 'WIN' | 'LOSS' | 'DRAW') {
         this.lastResult = result;
+
+        // Record History
+        if (this.currentOpponentId) {
+            this.battleHistory.push({
+                opponentId: this.currentOpponentId,
+                result: result
+            });
+            
+            // Increment stage counters
+            if (this.wins < 8) {
+                this.gymBattleCount++;
+            } else if (this.wins < 12) {
+                this.eliteBattleCount++;
+            } else {
+                this.championBattleCount++;
+            }
+        }
+
         if (result === 'WIN') {
             if (this.currentOpponentId) {
                 this.defeatedOpponentIds.push(this.currentOpponentId);
@@ -284,11 +310,14 @@ export class GameLoop {
                 return;
             }
         } else if (result === 'LOSS') {
+            this.lossCount++;
             this.lives--;
             if (this.lives <= 0) {
                 this.phase = GamePhase.GAME_OVER;
                 return;
             }
+        } else if (result === 'DRAW') {
+            this.drawCount++;
         }
 
         // Restore Original Team

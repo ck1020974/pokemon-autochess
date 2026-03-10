@@ -23,6 +23,14 @@ import greatBall from './assets/超級.webp';
 import ultraBall from './assets/高級.webp';
 import masterBall from './assets/大師.webp';
 
+const allOpponents = [
+    ...NOVICE_OPPONENTS,
+    ...INTERM_OPPONENTS,
+    ...ADVANCED_OPPONENTS,
+    ...ELITE_OPPONENTS,
+    ...CHAMPION_OPPONENTS
+];
+
 // --- Types ---
 interface SelectedUnitState {
     unit: Unit;
@@ -250,6 +258,8 @@ function App() {
         simulatorRef.current = null; // CRITICAL: Clear battle simulator
 
         // 4. Force UI Update
+        setSummaryStage(1);
+        setSummaryTab('team');
         update();
     };
 
@@ -324,6 +334,10 @@ function App() {
     const [goldErrorAnim, setGoldErrorAnim] = useState(false);
     const [hpLossAnim, setHpLossAnim] = useState(false);
     const [focusedDifficulty, setFocusedDifficulty] = useState<string | null>(null);
+
+    // Summary Screen Stages
+    const [summaryStage, setSummaryStage] = useState<1 | 2>(1);
+    const [summaryTab, setSummaryTab] = useState<'team' | 'history'>('team');
 
     const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
     const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
@@ -466,28 +480,30 @@ function App() {
         };
 
         const preloadAllAssets = async () => {
-            // CRITICAL: Tier 1 and 2, plus basic UI tokens
+            // CRITICAL: Tier 1 and 2, ALL unit display images (00.webp), plus basic UI tokens
             const criticalUrls = new Set<string>();
             const backgroundUrls = new Set<string>();
 
             Object.values(UNIT_TEMPLATES).forEach(t => {
-                // Determine if critical (Tier 1 & 2) or background (Tier 3+)
-                const isCritical = t.tier <= 2 || t.id === 'sprout';
+                // Priority 1: All Tier 1 & 2 units
+                const isCriticalTier = t.tier <= 2 || t.id === 'sprout';
+                
+                // Priority 2: ALL "display" images (00.webp) are critical for summary screen
+                if (t.imageUrl) {
+                    criticalUrls.add(t.imageUrl);
+                }
 
-                const addUrl = (url: string) => {
-                    if (isCritical) criticalUrls.add(url);
-                    else backgroundUrls.add(url);
-                };
-
-                if (t.imageUrl) addUrl(t.imageUrl);
-                if (t.battleImageUrl) addUrl(t.battleImageUrl);
+                if (t.battleImageUrl) {
+                    if (isCriticalTier) criticalUrls.add(t.battleImageUrl);
+                    else backgroundUrls.add(t.battleImageUrl);
+                }
             });
 
-            // Trainers: Only NOVICE are critical, others are background
+            // Trainers: Only NOVICE are critical, others are background (but will be preloaded on encounter)
             NOVICE_OPPONENTS.forEach(op => criticalUrls.add(op.url));
             [...INTERM_OPPONENTS, ...ADVANCED_OPPONENTS, ...ELITE_OPPONENTS, ...CHAMPION_OPPONENTS].forEach(op => backgroundUrls.add(op.url));
 
-            // Critical token/derived images
+            // Critical token/derived images (Battle versions of early game units)
             criticalUrls.add('assets/妙蛙種子01.webp');
             criticalUrls.add('assets/小拉達01.webp');
             criticalUrls.add('assets/飄飄球01.webp');
@@ -527,6 +543,31 @@ function App() {
 
         preloadAllAssets();
     }, []);
+
+    // --- Dynamic Preloading for Current Team & Opponents ---
+    useEffect(() => {
+        const teamUrls: string[] = [];
+        game.playerTeam.forEach(u => {
+            if (u) {
+                if (u.imageUrl) teamUrls.push(u.imageUrl);
+                if (u.battleImageUrl) teamUrls.push(u.battleImageUrl);
+            }
+        });
+
+        // Current Opponent Preload
+        if (game.currentOpponentId) {
+            const op = allOpponents.find(o => o.id === game.currentOpponentId);
+            if (op && op.url) teamUrls.push(op.url);
+        }
+
+        if (teamUrls.length > 0) {
+            // Silent background load
+            teamUrls.forEach(url => {
+                const img = new Image();
+                img.src = url;
+            });
+        }
+    }, [game.playerTeam, game.currentOpponentId, game.turn]);
 
     // --- BGM Initial Logic ---
     useEffect(() => {
@@ -1598,7 +1639,7 @@ function App() {
                                 擊敗所有訓練師，成為寶可夢冠軍！
                             </div>
                             <div style={{ fontSize: '1.3rem', color: '#aaa', animation: 'pulse 1.5s infinite' }}>
-                                點擊任意處重新開始
+                                點擊任意處繼續
                             </div>
                         </div>
                     </div>
@@ -1898,79 +1939,215 @@ function App() {
 
             {/* Game Over / Victory Overlay */}
             {
-                (game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER) && (
-                    <div
-                        className="battle-result-overlay"
-                        style={{
-                            position: 'fixed', // Key Fix: Ignore parent height collapse
-                            top: 0, left: 0, right: 0, bottom: 0,
-                            background: 'rgba(0,0,0,0.8)',
-                            backdropFilter: 'blur(10px)',
-                            zIndex: 10002,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            cursor: 'pointer'
-                        }}
-                        onClick={() => {
-                            if (game.phase === GamePhase.VICTORY) {
-                                setDifficulty(null);
-                                handleRestart();
-                            } else {
-                                handleRestart();
-                            }
-                        }}
-                    >
-                        {/* Main Message - Visual center of screen */}
-                        <div className="result-content" style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '15px',
-                            transform: 'translateY(-10%)'
-                        }}>
-                            <div className="result-title" style={{
-                                fontSize: 'min(6rem, 15vw)',
-                                margin: 0,
-                                color: '#fff',
-                                textShadow: '0 0 40px rgba(255,255,255,0.2), 0 10px 40px rgba(0,0,0,0.8)',
-                                animation: 'fadeInUp 0.8s ease-out'
-                            }}>
-                                {game.phase === GamePhase.VICTORY ? 'CHAMPION! 🏆' : 'GAME OVER 💀'}
-                            </div>
-                            <div className="result-subtitle" style={{
-                                fontSize: 'min(1.8rem, 5vw)',
-                                fontWeight: 'bold',
-                                color: '#fff',
-                                letterSpacing: '3px',
-                                background: 'rgba(255,255,255,0.15)',
-                                padding: '10px 40px',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '50px',
-                                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                                animation: 'fadeInUp 1s ease-out'
-                            }}>
-                                {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '眼前變得一片漆黑...'}
-                            </div>
-                        </div>
+                (game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER) && (() => {
+                    const mvp = [...game.playerTeam].filter(u => u).reduce((max: any, current: any) => {
+                        if (!max) return current;
+                        return (current.stats.attack > max.stats.attack) ? current : max;
+                    }, null);
 
-                        {/* Operational Area - Fixed at bottom of screen, below EVERYTHING */}
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '40px', // Real bottom of the window
-                            color: '#aaa',
-                            fontSize: '1.2rem',
-                            letterSpacing: '2px',
-                            animation: 'pulse 2s infinite',
-                            borderBottom: '1px solid rgba(255,255,255,0.2)',
-                            paddingBottom: '5px'
-                        }}>
-                            [ 點擊任意處重新開始 ]
+                    const totalGames = game.wins + (game.drawCount || 0) + (game.lossCount || 0);
+                    const winRate = totalGames > 0 ? Math.round((game.wins / totalGames) * 100) : 0;
+
+                    const restart = () => {
+                        handleRestart();
+                    };
+
+                    const getDifficultyIcon = () => {
+                        const mult = game.difficultyMultiplier || 1;
+                        if (mult >= 1.5) return masterBall;
+                        if (mult >= 1.3) return ultraBall;
+                        if (mult >= 1.1) return greatBall;
+                        return normalBall;
+                    };
+
+                    if (summaryStage === 1) {
+                        return (
+                            <div
+                                className="battle-result-overlay"
+                                style={{
+                                    position: 'fixed',
+                                    top: 0, left: 0, right: 0, bottom: 0,
+                                    background: 'rgba(0,0,0,0.9)',
+                                    backdropFilter: 'blur(20px)',
+                                    zIndex: 10002,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    cursor: 'pointer',
+                                    animation: 'fadeIn 0.5s'
+                                }}
+                                onClick={() => setSummaryStage(2)}
+                            >
+                                <div className="result-content" style={{ textAlign: 'center' }}>
+                                    <div className="result-title" style={{
+                                        fontSize: 'clamp(3.5rem, 12vw, 6rem)',
+                                        margin: 0,
+                                        color: game.phase === GamePhase.VICTORY ? '#fbbf24' : '#ef4444',
+                                        textShadow: '0 0 40px rgba(0,0,0,0.8)',
+                                        animation: 'fadeInUp 0.6s ease-out'
+                                    }}>
+                                        {game.phase === GamePhase.VICTORY ? 'CHAMPION! 🏆' : 'GAME OVER 💀'}
+                                    </div>
+                                    <div className="result-subtitle" style={{ fontSize: '1.8rem', opacity: 0.9, marginTop: '10px' }}>
+                                        {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '眼前變得一片漆黑...'}
+                                    </div>
+                                    <div className="result-subtitle" style={{ fontSize: '1rem', opacity: 0.5, marginTop: '40px', letterSpacing: '2px' }}>
+                                        [ 點擊畫面查看詳細數據 ]
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <div
+                            className="battle-result-overlay"
+                            style={{
+                                position: 'fixed',
+                                top: 0, left: 0, right: 0, bottom: 0,
+                                background: 'rgba(0,0,0,0.92)',
+                                backdropFilter: 'blur(30px)',
+                                zIndex: 10002,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                cursor: 'default',
+                                overflowY: 'auto',
+                                padding: '10px'
+                            }}
+                        >
+                            <div className="summary-container">
+                                {/* Compact Consolidated Header Row */}
+                                <div className="summary-header-row">
+                                    <div className="summary-stat-group">
+                                        <div className="difficulty-badge-container">
+                                            <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="difficulty" />
+                                        </div>
+                                        <div className="stat-box">
+                                            <div className="stat-box-label">⚔️ 戰績 (勝/平/敗)</div>
+                                            <div className="stat-box-value">{game.wins} / {game.drawCount || 0} / {game.lossCount || 0}</div>
+                                        </div>
+                                        {/* Major Battle Statistics */}
+                                        <div className="stat-box" style={{ marginLeft: '10px' }}>
+                                            <div className="stat-box-label">進度總場數</div>
+                                            <div className="stat-box-value" style={{ fontSize: '0.9rem', gap: '8px', display: 'flex' }}>
+                                                <span title="道館戰場數">🏅 {game.gymBattleCount}場</span>
+                                                <span title="四天王戰場數">⚔️ {game.eliteBattleCount}場</span>
+                                                <span title="冠軍戰戰場數">👑 {game.championBattleCount}場</span>
+                                            </div>
+                                        </div>
+                                        <div className="stat-box" style={{ marginLeft: '10px' }}>
+                                            <div className="stat-box-label">勝率</div>
+                                            <div className="stat-box-value" style={{ color: winRate >= 80 ? '#4ade80' : winRate >= 50 ? '#fbbf24' : '#ef4444' }}>
+                                                {winRate}%
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Tabs moved into header row to save space */}
+                                    <div className="summary-stat-btn-group">
+                                        <button
+                                            className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`}
+                                            onClick={() => setSummaryTab('team')}
+                                        >
+                                            最終隊伍
+                                        </button>
+                                        <button
+                                            className={`summary-tab-btn-compact ${summaryTab === 'history' ? 'is-active' : ''}`}
+                                            onClick={() => setSummaryTab('history')}
+                                        >
+                                            對戰紀錄
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Content Area */}
+                                <div className="summary-tab-content">
+                                    {summaryTab === 'team' ? (
+                                        <div className="summary-team-display">
+                                            {game.playerTeam.map((u: any, i: number) => {
+                                                if (!u) return <div key={i} className="summary-unit-card" style={{ width: '90px', height: '90px', background: 'rgba(255,255,255,0.03)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.1)' }} />;
+                                                const isMvp = u.id === mvp?.id;
+                                                return (
+                                                    <div key={i} className="summary-unit-card">
+                                                        {isMvp && <div className="mvp-badge">MVP</div>}
+                                                        {/* Unit Synergies display above the image */}
+                                                        <div className="summary-unit-synergies">
+                                                            {u.synergies.map((sId: string) => {
+                                                                const sObj = SYNERGIES[sId];
+                                                                return sObj ? (
+                                                                    <span key={sId} className="summary-synergy-icon" title={sObj.name}>
+                                                                        {sObj.icon}
+                                                                    </span>
+                                                                ) : null;
+                                                            })}
+                                                        </div>
+                                                        <img src={u.imageUrl.replace('01.webp', '00.webp')} className="summary-unit-img" alt={u.name} />
+                                                        <div className="summary-unit-name">{u.name}</div>
+                                                        {/* Dual Stat Display: Red ATK / Blue HP */}
+                                                        <div className="summary-unit-stats">
+                                                            <span className="summary-stat-atk" style={{ color: '#f87171' }}>{u.stats.attack}</span>
+                                                            <span style={{ color: 'rgba(255,255,255,0.2)' }}>|</span>
+                                                            <span className="summary-stat-hp" style={{ color: '#60a5fa' }}>{u.stats.hp}</span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <div className="summary-history-grid" style={{ paddingTop: '10px' }}>
+                                            {game.battleHistory?.map((entry: any, i: number) => {
+                                                const op = allOpponents.find(o => o.id === entry.opponentId);
+                                                return (
+                                                    <div key={i} className={`history-item is-${entry.result.toLowerCase()}`} title={`${op?.name || '未知'} - ${entry.result}`}>
+                                                        <img src={op?.url || ''} alt="opponent" />
+                                                        <div className="history-result-tag">{entry.result === 'WIN' ? 'W' : entry.result === 'LOSS' ? 'L' : 'D'}</div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Restart Action - Moved inside container or right below for better flow */}
+                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
+                                    <div
+                                        onClick={restart}
+                                        style={{
+                                            color: '#fff',
+                                            fontSize: '1rem',
+                                            fontWeight: '900',
+                                            letterSpacing: '3px',
+                                            cursor: 'pointer',
+                                            padding: '10px 80px',
+                                            borderRadius: '12px',
+                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+                                            border: '1px solid rgba(255,255,255,0.25)',
+                                            transition: 'all 0.2s',
+                                            boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
+                                            textTransform: 'uppercase'
+                                        }}
+                                        onMouseOver={(e: React.MouseEvent<HTMLDivElement>) => {
+                                            e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                        }}
+                                        onMouseOut={(e: React.MouseEvent<HTMLDivElement>) => {
+                                            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                        }}
+                                    >
+                                        重新開始
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                )
+                    );
+                })()
             }
+
+
 
             {/* Opponent Selection Overlay */}
             {
