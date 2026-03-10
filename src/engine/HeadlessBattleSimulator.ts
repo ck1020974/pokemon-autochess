@@ -21,6 +21,7 @@ export class HeadlessBattleSimulator {
     private playerWins: number = 0;
     private playerAttackCount: number = 0;
     private enemyAttackCount: number = 0;
+    private grassHealedTargets = new Set<Unit>();
 
     constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], playerWins: number = 0) {
         this.playerWins = playerWins || 0;
@@ -49,6 +50,7 @@ export class HeadlessBattleSimulator {
         this.spiritombTriggered.clear();
         this.lightScreenActivated.clear();
         this.natuLogged.clear();
+        this.grassHealedTargets.clear();
 
         await this.compactTeams();
 
@@ -330,10 +332,15 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('AFTER_ATTACK', async (e) => {
                 if (unit.stats.hp <= 0) return;
                 const { myTeam } = this.getTeams(unit);
-                if (e.source === unit && myTeam.includes(unit)) {
+                if (e.source === unit && e.target && myTeam.includes(unit)) {
+                    if (this.grassHealedTargets.has(e.target)) return;
+
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
                     const healAmount = count >= 5 ? 10 : (count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
-                    if (healAmount > 0) this.heal(unit, healAmount);
+                    if (healAmount > 0) {
+                        this.heal(unit, healAmount);
+                        this.grassHealedTargets.add(e.target);
+                    }
                 }
             });
         }

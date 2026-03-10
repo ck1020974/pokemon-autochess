@@ -137,7 +137,7 @@ export class GameLoop {
 
         // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
-        const template = '[2/3/4] 兩回合後，對隨機 3 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
+        const template = '[2/3/4] 每場戰鬥後增強 (3台：+2/+1循環) 目前威力：[N]';
         psychic.description = template.replace('[N]', Math.floor(this.psychicN).toString());
     }
 
@@ -299,19 +299,14 @@ export class GameLoop {
 
         if (result === 'WIN') {
             this.phase = GamePhase.REWARD;
-            // Map opponent difficulty to reward difficulty
+            // Map opponent difficulty to reward tiers (EASY, NORMAL, HARD, EXTREME)
             const difficultyMap: Record<string, string> = {
-                'NOVICE': 'EASY',
-                'QUALIFIED': 'NORMAL',
-                'GREAT': 'HARD',
-                'ULTRA': 'EXTREME',
-                'MASTER': 'EXTREME',
-                'ELITE': 'EXTREME',
-                'CHAMPION': 'EXTREME'
+                'EASY': 'EASY',
+                'NORMAL': 'NORMAL',
+                'HARD': 'HARD',
+                'VERY_HARD': 'EXTREME'
             };
-            const rewardDiffRaw = ['EASY', 'NORMAL', 'HARD', 'EXTREME'].includes(this.currentOpponentDifficulty)
-                ? this.currentOpponentDifficulty
-                : (difficultyMap[this.currentOpponentDifficulty] || 'NORMAL');
+            const rewardDiffRaw = difficultyMap[this.currentOpponentDifficulty] || 'NORMAL';
             this.rewardChoices = this.generateRewardOptions(rewardDiffRaw as any);
         } else {
             this.concludeTurn(result);
@@ -537,9 +532,17 @@ export class GameLoop {
         const families = new Set(psychicUnits.map(u => u.family));
         const pCount = families.size;
         if (pCount >= 2) {
-            const increment = pCount >= 4 ? 2 : (pCount >= 3 ? 1.5 : 1);
+            let increment = 0;
+            if (pCount >= 4) {
+                increment = 2;
+            } else if (pCount === 3) {
+                // Odd turns +2, Even turns +1 (Wait, Turn 1 is odd, Turn 2 is even)
+                increment = (this.turn % 2 === 1) ? 2 : 1;
+            } else {
+                increment = 1;
+            }
             this.psychicN += increment;
-            console.log(`念力羈絆增強！累積威力：${this.psychicN} (+${increment})`);
+            console.log(`念力羈絆增強！累積威力：${this.psychicN} (+${increment}) - 回合 ${this.turn}`);
         }
 
         this.turn++;

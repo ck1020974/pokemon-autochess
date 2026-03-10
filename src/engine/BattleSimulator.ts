@@ -34,6 +34,7 @@ export class BattleSimulator {
     public isSim: boolean = false;
     public battleBuffs: any[] = [];
     private waterDebuffedTargets = new Set<Unit>();
+    private grassHealedTargets = new Set<Unit>();
 
     constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 2, isSim: boolean = false, battleBuffs: any[] = []) {
         this.speed = speed;
@@ -647,12 +648,15 @@ export class BattleSimulator {
                 // Critical: Check HP AFTER attack completes to prevent dead units from healing
                 if (unit.stats.hp <= 0) return;
                 const { myTeam } = this.getTeams(unit);
-                if (e.source === unit && myTeam.includes(unit)) { // Ensure unit is still in team
+                if (e.source === unit && e.target && myTeam.includes(unit)) { // Ensure unit is still in team
+                    if (this.grassHealedTargets.has(e.target)) return;
+
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
                     const heal = count >= 5 ? 10 : (count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
                     if (heal > 0 && unit.stats.hp > 0) {
                         this.heal(unit, heal);
-                        this.log(`${unit.name} 吸取了 ${heal} 生命`);
+                        this.grassHealedTargets.add(e.target);
+                        this.log(`${unit.name} 吸取了 ${heal} 生命 (剩餘：${unit.stats.hp})`);
                     }
                 }
             });
