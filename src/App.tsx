@@ -487,7 +487,7 @@ function App() {
             Object.values(UNIT_TEMPLATES).forEach(t => {
                 // Priority 1: All Tier 1 & 2 units
                 const isCriticalTier = t.tier <= 2 || t.id === 'sprout';
-                
+
                 // Priority 2: ALL "display" images (00.webp) are critical for summary screen
                 if (t.imageUrl) {
                     criticalUrls.add(t.imageUrl);
@@ -970,6 +970,7 @@ function App() {
             });
 
             setInitialEnemyTeam([...enemyTeam]);
+            game.opponentTeam = [...enemyTeam];
 
             const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
             const activeBuffs = [...game.nextBattleBuffs];
@@ -1244,8 +1245,12 @@ function App() {
         const unseenNpCS = ALL_NPCS.filter(boss => !game.defeatedOpponentIds?.includes(boss.id));
         const finalPool = unseenNpCS.length > 0 ? unseenNpCS : ALL_NPCS;
 
+        const diffWeights: Record<string, number> = { 'EASY': 0, 'NORMAL': 1, 'HARD': 2, 'VERY_HARD': 3 };
         const shuffled = [...finalPool].sort(() => 0.5 - Math.random());
-        setOpponentChoices(shuffled.slice(0, 3));
+        const selected = shuffled.slice(0, 3);
+        selected.sort((a, b) => (diffWeights[a.difficulty || 'NORMAL'] ?? 1) - (diffWeights[b.difficulty || 'NORMAL'] ?? 1));
+
+        setOpponentChoices(selected);
         setShowOpponentSelect(true);
     };
 
@@ -2018,27 +2023,44 @@ function App() {
                                 padding: '10px'
                             }}
                         >
-                            <div className="summary-container">
+                            <div className="summary-container" style={{ position: 'relative' }}>
                                 {/* Compact Consolidated Header Row */}
-                                <div className="summary-header-row">
-                                    <div className="summary-stat-group">
+                                <div className="summary-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px', marginBottom: '15px' }}>
+                                    <div className="summary-stat-group" style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+                                        {/* 1. Difficulty Icon */}
                                         <div className="difficulty-badge-container">
                                             <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="difficulty" />
                                         </div>
+
+                                        {/* 2. Title (CHAMPION/GAME OVER) */}
+                                        <div style={{
+                                            textAlign: 'center',
+                                            fontSize: '1.8rem',
+                                            fontWeight: '900',
+                                            letterSpacing: '4px',
+                                            color: game.phase === GamePhase.VICTORY ? '#fbbf24' : '#ef4444',
+                                            textShadow: '0 0 15px rgba(0,0,0,0.5)',
+                                            margin: '0 10px'
+                                        }}>
+                                            {game.phase === GamePhase.VICTORY ? 'CHAMPION' : 'GAME OVER'}
+                                        </div>
+
+                                        {/* 3. Total Rounds */}
+                                        <div className="stat-box">
+                                            <div className="stat-box-label">總場數</div>
+                                            <div className="stat-box-value">
+                                                {(game.gymBattleCount || 0) + (game.eliteBattleCount || 0) + (game.championBattleCount || 0)} 場
+                                            </div>
+                                        </div>
+
+                                        {/* 4. Battle Stats */}
                                         <div className="stat-box">
                                             <div className="stat-box-label">⚔️ 戰績 (勝/平/敗)</div>
                                             <div className="stat-box-value">{game.wins} / {game.drawCount || 0} / {game.lossCount || 0}</div>
                                         </div>
-                                        {/* Major Battle Statistics */}
-                                        <div className="stat-box" style={{ marginLeft: '10px' }}>
-                                            <div className="stat-box-label">進度總場數</div>
-                                            <div className="stat-box-value" style={{ fontSize: '0.9rem', gap: '8px', display: 'flex' }}>
-                                                <span title="道館戰場數">🏅 {game.gymBattleCount}場</span>
-                                                <span title="四天王戰場數">⚔️ {game.eliteBattleCount}場</span>
-                                                <span title="冠軍戰戰場數">👑 {game.championBattleCount}場</span>
-                                            </div>
-                                        </div>
-                                        <div className="stat-box" style={{ marginLeft: '10px' }}>
+
+                                        {/* 5. Win Rate */}
+                                        <div className="stat-box">
                                             <div className="stat-box-label">勝率</div>
                                             <div className="stat-box-value" style={{ color: winRate >= 80 ? '#4ade80' : winRate >= 50 ? '#fbbf24' : '#ef4444' }}>
                                                 {winRate}%
@@ -2066,75 +2088,207 @@ function App() {
                                 {/* Content Area */}
                                 <div className="summary-tab-content">
                                     {summaryTab === 'team' ? (
-                                        <div className="summary-team-display">
-                                            {game.playerTeam.map((u: any, i: number) => {
-                                                if (!u) return <div key={i} className="summary-unit-card" style={{ width: '90px', height: '90px', background: 'rgba(255,255,255,0.03)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.1)' }} />;
-                                                const isMvp = u.id === mvp?.id;
-                                                return (
-                                                    <div key={i} className="summary-unit-card">
-                                                        {isMvp && <div className="mvp-badge">MVP</div>}
-                                                        {/* Unit Synergies display above the image */}
-                                                        <div className="summary-unit-synergies">
-                                                            {u.synergies.map((sId: string) => {
-                                                                const sObj = SYNERGIES[sId];
-                                                                return sObj ? (
-                                                                    <span key={sId} className="summary-synergy-icon" title={sObj.name}>
-                                                                        {sObj.icon}
-                                                                    </span>
-                                                                ) : null;
-                                                            })}
+                                        <div className="summary-team-display" style={{ marginTop: '-5px' }}>
+                                            <div className="summary-units-grid">
+                                                {/* Synergy Display repositioned to top-left of this grid via CSS absolute positioning */}
+                                                <div className="summary-synergies-row">
+                                                    {getSynergyStatus(game.playerTeam).map(syn => (
+                                                        <SynergyIcon
+                                                            key={syn.id}
+                                                            synergy={syn}
+                                                            count={syn.count}
+                                                            units={syn.units}
+                                                            activeFamilies={syn.activeFamilies}
+                                                            className="summary-synergy-item"
+                                                            showCount={true}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                {game.playerTeam.map((u: any, i: number) => {
+                                                    if (!u) return <div key={i} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.03)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.1)' }} />;
+                                                    const img00 = u.imageUrl.replace('01.webp', '00.webp');
+                                                    return (
+                                                        <div key={i} className="summary-unit-card">
+                                                            {mvp?.id === u.id && <div className="mvp-badge"> MVP</div>}
+                                                            <div className="summary-unit-img-wrapper">
+                                                                <img
+                                                                    src={img00}
+                                                                    className="summary-unit-img"
+                                                                    alt={u.speciesName}
+                                                                />
+                                                            </div>
+                                                            <div className="summary-unit-name">{u.speciesName}</div>
+                                                            <div className="unit-stats" style={{ marginTop: '5px' }}>
+                                                                <span className="stat-atk">{u.stats.attack}</span>
+                                                                <span className="stat-hp">{u.stats.hp}</span>
+                                                            </div>
                                                         </div>
-                                                        <img src={u.imageUrl.replace('01.webp', '00.webp')} className="summary-unit-img" alt={u.name} />
-                                                        <div className="summary-unit-name">{u.name}</div>
-                                                        {/* Dual Stat Display: Red ATK / Blue HP */}
-                                                        <div className="summary-unit-stats">
-                                                            <span className="summary-stat-atk" style={{ color: '#f87171' }}>{u.stats.attack}</span>
-                                                            <span style={{ color: 'rgba(255,255,255,0.2)' }}>|</span>
-                                                            <span className="summary-stat-hp" style={{ color: '#60a5fa' }}>{u.stats.hp}</span>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {/* Enemy Team Section - Compressed and Headerless */}
+                                            {game.opponentTeam && (
+                                                <div style={{ marginTop: '20px' }}>
+                                                    <div className="summary-units-grid">
+                                                        <div className="summary-synergies-row">
+                                                            {getSynergyStatus(game.opponentTeam).map(syn => (
+                                                                <SynergyIcon
+                                                                    key={syn.id}
+                                                                    synergy={syn}
+                                                                    count={syn.count}
+                                                                    units={syn.units}
+                                                                    activeFamilies={syn.activeFamilies}
+                                                                    className="summary-synergy-item"
+                                                                    showCount={true}
+                                                                />
+                                                            ))}
                                                         </div>
+                                                        {game.opponentTeam.map((u: any, i: number) => {
+                                                            if (!u) return <div key={`enemy-${i}`} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.01)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.05)' }} />;
+                                                            const img00 = u.imageUrl.replace('01.webp', '00.webp');
+                                                            return (
+                                                                <div key={`enemy-${i}`} className="summary-unit-card">
+                                                                    <div className="summary-unit-img-wrapper">
+                                                                        <img
+                                                                            src={img00}
+                                                                            className="summary-unit-img"
+                                                                            alt={u.speciesName}
+                                                                            style={{ filter: 'grayscale(0.2)' }}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="summary-unit-name">{u.speciesName}</div>
+                                                                    <div className="unit-stats" style={{ marginTop: '5px' }}>
+                                                                        <span className="stat-atk">{u.stats.attack}</span>
+                                                                        <span className="stat-hp">{u.stats.hp}</span>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
-                                                );
-                                            })}
+                                                </div>
+                                            )}
                                         </div>
                                     ) : (
-                                        <div className="summary-history-grid" style={{ paddingTop: '10px' }}>
-                                            {game.battleHistory?.map((entry: any, i: number) => {
-                                                const op = allOpponents.find(o => o.id === entry.opponentId);
+                                        <div className="summary-history-display">
+                                            {(() => {
+                                                const history = game.battleHistory || [];
+
+                                                // 1. Milestone 1
+                                                let card1: any = null;
+                                                if (game.phase === GamePhase.VICTORY) {
+                                                    const champ = history[history.length - 1];
+                                                    card1 = { label: '寶可夢大師', opponentId: champ?.opponentId };
+                                                } else {
+                                                    const lastWin = [...history].reverse().find(e => e.result === 'WIN');
+                                                    card1 = { label: '手下敗將', opponentId: lastWin?.opponentId };
+                                                }
+
+                                                // 2. Milestone 2 (Legendary Rival)
+                                                // ... encounters logic remains same
+                                                const encounters: Record<string, number> = {};
+                                                const lastEncounterIndex: Record<string, number> = {};
+                                                history.forEach((e, idx) => {
+                                                    encounters[e.opponentId] = (encounters[e.opponentId] || 0) + 1;
+                                                    lastEncounterIndex[e.opponentId] = idx;
+                                                });
+                                                let maxE = 0;
+                                                let rivalId = '';
+                                                Object.entries(encounters).forEach(([id, count]) => {
+                                                    if (count > maxE || (count === maxE && lastEncounterIndex[id] > lastEncounterIndex[rivalId])) {
+                                                        maxE = count;
+                                                        rivalId = id;
+                                                    }
+                                                });
+                                                const card2 = rivalId ? { label: '對戰勁敵', opponentId: rivalId } : null;
+
+                                                // 3. Milestone 3 (Lifelong Enemy)
+                                                const losses: Record<string, number> = {};
+                                                history.forEach((e) => {
+                                                    if (e.result === 'LOSS') {
+                                                        losses[e.opponentId] = (losses[e.opponentId] || 0) + 1;
+                                                    }
+                                                });
+                                                let maxL = 0;
+                                                let enemyId = '';
+                                                Object.entries(losses).forEach(([id, count]) => {
+                                                    if (count > maxL || (count === maxL && lastEncounterIndex[id] > lastEncounterIndex[enemyId])) {
+                                                        maxL = count;
+                                                        enemyId = id;
+                                                    }
+                                                });
+                                                const card3 = enemyId ? { label: '好討厭的感覺', opponentId: enemyId } : null;
+
+                                                // 4. Milestone 4 (First Victory) - Moved up to 2nd pos
+                                                const firstWin = history.find(e => e.result === 'WIN');
+                                                const card4 = firstWin ? { label: '冒險的起點', opponentId: firstWin.opponentId } : null;
+
+                                                const heroes = [card1, card4, card2, card3]; // 1:Champ, 2:Start, 3:Rival, 4:Enemy
+
                                                 return (
-                                                    <div key={i} className={`history-item is-${entry.result.toLowerCase()}`} title={`${op?.name || '未知'} - ${entry.result}`}>
-                                                        <img src={op?.url || ''} alt="opponent" />
-                                                        <div className="history-result-tag">{entry.result === 'WIN' ? 'W' : entry.result === 'LOSS' ? 'L' : 'D'}</div>
-                                                    </div>
+                                                    <>
+                                                        <div className="history-hero-grid">
+                                                            {heroes.map((hero, idx) => {
+                                                                if (!hero) return <div key={idx} className="hero-card is-empty"><div className="hero-label">尚未達成</div></div>;
+                                                                const op = allOpponents.find(o => o.id === hero.opponentId);
+                                                                return (
+                                                                    <div key={idx} className="hero-card">
+                                                                        <div className="hero-label">{hero.label}</div>
+                                                                        <img src={op?.url} className="hero-img" alt="hero" />
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+
+                                                        {/* Detailed History List */}
+                                                        <div className="summary-history-grid" style={{ marginTop: '5px' }}>
+                                                            {history.slice(-39).map((entry, idx) => {
+                                                                const op = allOpponents.find(o => o.id === entry.opponentId);
+                                                                return (
+                                                                    <div
+                                                                        key={idx}
+                                                                        className={`history-item is-${entry.result.toLowerCase()}`}
+                                                                        title={`${op?.name} - ${entry.result}`}
+                                                                    >
+                                                                        <img src={op?.url} alt={op?.name} />
+                                                                        <div className="history-result-tag">{entry.result === 'WIN' ? 'W' : entry.result === 'LOSS' ? 'L' : 'D'}</div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </>
                                                 );
-                                            })}
+                                            })()}
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Restart Action - Moved inside container or right below for better flow */}
-                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
+                                {/* Restart Action - Cleaned up and inserted correctly */}
+                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0px' }}>
                                     <div
-                                        onClick={restart}
+                                        onClick={handleRestart}
                                         style={{
                                             color: '#fff',
-                                            fontSize: '1rem',
+                                            fontSize: '0.95rem',
                                             fontWeight: '900',
-                                            letterSpacing: '3px',
+                                            letterSpacing: '2px',
                                             cursor: 'pointer',
-                                            padding: '10px 80px',
+                                            padding: '10px 30px',
                                             borderRadius: '12px',
-                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
-                                            border: '1px solid rgba(255,255,255,0.25)',
+                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))',
+                                            border: '1px solid rgba(255,255,255,0.3)',
                                             transition: 'all 0.2s',
-                                            boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
-                                            textTransform: 'uppercase'
+                                            boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+                                            textTransform: 'uppercase',
+                                            position: 'relative',
+                                            top: '-12px'
                                         }}
                                         onMouseOver={(e: React.MouseEvent<HTMLDivElement>) => {
-                                            e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
-                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
+                                            e.currentTarget.style.transform = 'translateY(-1px)';
                                         }}
                                         onMouseOut={(e: React.MouseEvent<HTMLDivElement>) => {
-                                            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))';
+                                            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))';
                                             e.currentTarget.style.transform = 'translateY(0)';
                                         }}
                                     >

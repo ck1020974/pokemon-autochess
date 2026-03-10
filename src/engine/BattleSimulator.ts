@@ -1405,7 +1405,7 @@ export class BattleSimulator {
         await this.eventBus.emit({ type: 'BEFORE_HURT', target, context: hurtContext });
         amount = hurtContext.amount; // Get modified damage from listeners
 
-        if (amount <= 0 && source !== null) {
+        if (amount <= 0) {
             // Damage nullified (e.g. by Mimikyu), don't show hurt anim
             if (this.onUpdate) this.onUpdate();
             return;
@@ -1713,10 +1713,14 @@ export class BattleSimulator {
         if (pEl) pEl.style.setProperty('--clash-offset', '20px');
         if (eEl) eEl.style.setProperty('--clash-offset', '20px');
 
-        // 1. Start clash animations
+        // 1. Start clash animations 
+        // User Request: Cyndaquil (火球鼠) simplified animation - Only jump, no forward clash.
+        const pAnim = pFront.family === 'cyndaquil' ? 'jump' : 'clash';
+        const eAnim = eFront.family === 'cyndaquil' ? 'jump' : 'clash';
+
         const anims = [
-            this.playAnimation(pFront, 'clash', 300),
-            this.playAnimation(eFront, 'clash', 300)
+            this.playAnimation(pFront, pAnim, 300),
+            this.playAnimation(eFront, eAnim, 300)
         ];
 
         // 2. Pre-Clash logic: Trigger all BEFORE_ATTACK effects (Cyndaquil, Water, etc.)

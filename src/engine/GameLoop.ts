@@ -35,6 +35,7 @@ export class GameLoop {
     public psychicN: number = 2;
 
     public playerTeam: (Unit | null)[] = [null, null, null, null, null];
+    public opponentTeam: (Unit | null)[] = [null, null, null, null, null];
     public savedTeam: (Unit | null)[] = []; // Store original team before battle
     public shop: Shop;
     public difficultyMultiplier: number = 1.0;
@@ -276,7 +277,7 @@ export class GameLoop {
                 opponentId: this.currentOpponentId,
                 result: result
             });
-            
+
             // Increment stage counters
             if (this.wins < 8) {
                 this.gymBattleCount++;
