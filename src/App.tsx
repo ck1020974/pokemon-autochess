@@ -1953,9 +1953,6 @@ function App() {
                     const totalGames = game.wins + (game.drawCount || 0) + (game.lossCount || 0);
                     const winRate = totalGames > 0 ? Math.round((game.wins / totalGames) * 100) : 0;
 
-                    const restart = () => {
-                        handleRestart();
-                    };
 
                     const getDifficultyIcon = () => {
                         const mult = game.difficultyMultiplier || 1;
