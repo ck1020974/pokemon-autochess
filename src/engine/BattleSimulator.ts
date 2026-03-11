@@ -631,7 +631,7 @@ export class BattleSimulator {
             this.eventBus.on('BEFORE_ATTACK', (e) => {
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
-                    const buff = count >= 5 ? 10 : (count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0)));
+                    const buff = count >= 5 ? 12 : (count >= 4 ? 7 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
                     if (buff > 0 && unit.stats.hp > 1) {
                         unit.stats.hp -= 1;
                         this.buffAttack(unit, buff);
@@ -651,7 +651,7 @@ export class BattleSimulator {
                     if (this.grassHealedTargets.has(e.target)) return;
 
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
-                    const heal = count >= 5 ? 10 : (count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
+                    const heal = count >= 5 ? 12 : (count >= 4 ? 7 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
                     if (heal > 0 && unit.stats.hp > 0) {
                         this.heal(unit, heal);
                         this.grassHealedTargets.add(e.target);
@@ -763,7 +763,7 @@ export class BattleSimulator {
             this.eventBus.on('ON_HURT', (e) => {
                 if (e.target === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Angry');
-                    const buff = count >= 4 ? 8 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
+                    const buff = count >= 4 ? 10 : (count >= 3 ? 5 : (count >= 2 ? 2 : 0));
                     if (buff > 0) {
                         const { myTeam } = this.getTeams(unit);
                         myTeam.forEach(u => {

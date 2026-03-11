@@ -1562,10 +1562,10 @@ h3 {
   /* --- Mobile Summary Screen Optimization --- */
   .summary-container {
     width: 98% !important;
-    padding: 4px !important;
-    gap: 8px !important;
+    padding: 2px !important;
+    gap: 4px !important;
     max-height: 98vh !important;
-    transform: scale(0.85) !important;
+    transform: scale(0.72) !important;
     transform-origin: top center !important;
   }
 
