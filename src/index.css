@@ -1558,6 +1558,91 @@ h3 {
     right: 5% !important;
     left: auto !important;
   }
+
+  /* --- Mobile Summary Screen Optimization --- */
+  .summary-container {
+    width: 95% !important;
+    padding: 8px !important;
+    gap: 10px !important;
+    max-height: 90vh !important;
+  }
+
+  .summary-header-row {
+    padding: 8px 12px !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: flex-start !important;
+  }
+
+  .summary-stat-group {
+    width: 100% !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+  }
+
+  .stat-box-value {
+    font-size: 1.1rem !important;
+  }
+
+  .summary-stat-btn-group {
+    width: 100% !important;
+    margin-left: 0 !important;
+    justify-content: center !important;
+  }
+
+  .summary-tab-content {
+    min-height: 300px !important;
+    padding: 10px !important;
+  }
+
+  .summary-unit-card {
+    width: 80px !important;
+    min-height: 100px !important;
+    padding: 8px !important;
+  }
+
+  .summary-unit-img {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .summary-units-grid {
+    gap: 10px !important;
+    padding-top: 20px !important;
+  }
+
+  .summary-unit-name {
+    font-size: 0.75rem !important;
+  }
+
+  .summary-unit-stats {
+    font-size: 0.65rem !important;
+    padding: 2px 4px !important;
+  }
+
+  .hero-card {
+    min-height: 100px !important;
+    padding: 8px !important;
+  }
+
+  .hero-img {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .hero-label {
+    font-size: 0.9rem !important;
+  }
+
+  .summary-history-grid {
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 4px !important;
+  }
+
+  .history-item {
+    width: 35px !important;
+    height: 35px !important;
+  }
 }
 
 /* --- Difficulty Screen Enhancements --- */

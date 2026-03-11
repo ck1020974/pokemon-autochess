@@ -663,8 +663,8 @@ function App() {
                     music.stop();
                 }
             } else if (game.lastResult === 'LOSS' || game.lastResult === 'DRAW') {
-                // Always play recover sequence for all stages
-                music.playRecoverSequence('pokemoncenter');
+                // Ensure room music is playing (the recover sequence might have started in battleResult effect)
+                music.play('pokemoncenter', true);
             } else {
                 // Initial game start (no last result)
                 music.play('pokemonmart', true);
@@ -1058,9 +1058,9 @@ function App() {
                 music.play(winTrack, true);
             }
         } else if (battleResult === 'LOSS') {
-            music.stop(); // Stops gymfight
+            music.playRecoverSequence('pokemoncenter');
         } else if (battleResult === 'DRAW') {
-            music.stop();
+            music.playRecoverSequence('pokemoncenter');
         }
     }, [battleResult]);
 
@@ -1417,9 +1417,10 @@ function App() {
 
     const handleBattleResultClick = () => {
         if (game.phase === 'BATTLE') {
-            // Only stop if NOT a win (since win music should continue through reward selection)
-            if (game.lastResult !== 'WIN') {
-                music.stop();
+            if (game.lastResult === 'WIN') {
+                // Keep playing victory music
+            } else {
+                // Let the transition handle it (it might already be playing recover sequence)
             }
             const hpBefore = game.lives;
             const result = game.lastResult;

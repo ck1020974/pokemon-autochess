@@ -146,7 +146,7 @@ export class GameLoop {
 
         // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
-        const template = '[2/3/4] 每場戰鬥後增強 (3台：+2/+1循環) 目前威力：[N]';
+        const template = '[2/3/4] 兩回合後對敵方造成[N]傷害(每場戰鬥後增強)';
         psychic.description = template.replace('[N]', Math.floor(this.psychicN).toString());
     }
 
@@ -345,54 +345,58 @@ export class GameLoop {
 
     public generateRewardOptions(difficulty: any): any[] {
 
-        // 1. Get player synergies (including inactive ones)
+        // 1. Get player synergies
         const playerSynergies = new Set<string>();
         this.playerTeam.forEach(u => {
             if (u) u.synergies.forEach(s => playerSynergies.add(s));
         });
 
-        // 2. Filter pool and assign weights
-        let pool = REWARD_DATA.filter((r: any) => {
-            // Difficulty match
-            if (r.difficulty !== difficulty) return false;
+        // 2. Define Pools
+        const pool1Items = ['幸運蛋', '不變之石', '進化奇石'];
+        const pool1Categories = ['GOLD', 'EXP', 'LIVES'];
 
-            // Synergy match logic
-            if (r.category === 'PERM_SYNERGY' || r.category === 'BATTLE_SYNERGY') {
-                return playerSynergies.has(r.synergyId);
-            }
+        // Filter REWARD_DATA by difficulty
+        const diffData = REWARD_DATA.filter((r: any) => r.difficulty === difficulty);
 
-            // Fixed categories always included
-            return true;
-        }).map(r => {
-            // Weights: Mint = 0.5, Synergy = 1.0, Generic = 2.0
-            let weight = 1.0;
-            const isGeneric = ['GOLD', 'EXP', 'LIVES', 'PERM_NONE', 'BATTLE_NONE'].includes(r.category);
-            const isMint = r.item.includes('薄荷');
+        // Pool 1: Utility/Resources (GOLD, EXP, LIVES, and special PERM_NONE items)
+        const pool1 = diffData.filter((r: any) => 
+            pool1Categories.includes(r.category) || pool1Items.includes(r.item)
+        );
 
-            if (isMint) weight = 0.5;
-            else if (isGeneric) weight = 2.0;
-            else weight = 1.0; // Synergies
+        // Pool 2: General Stat Buffs/Mints (BATTLE_NONE and remaining PERM_NONE)
+        const pool2 = diffData.filter((r: any) => 
+            r.category === 'BATTLE_NONE' || (r.category === 'PERM_NONE' && !pool1Items.includes(r.item))
+        );
 
-            return { ...r, weight };
-        });
+        // Pool 3: Synergy Buffs
+        let pool3 = diffData.filter((r: any) => 
+            (r.category === 'PERM_SYNERGY' || r.category === 'BATTLE_SYNERGY') && 
+            r.synergyId && playerSynergies.has(r.synergyId)
+        );
 
-        // 3. Pick 3 unique items using weighted random selection
+        // Fallback for Pool 3 if no synergies match
+        if (pool3.length === 0) {
+            pool3 = diffData.filter((r: any) => r.category === 'PERM_SYNERGY' || r.category === 'BATTLE_SYNERGY');
+        }
+
         const results: any[] = [];
-        for (let i = 0; i < 3; i++) {
-            if (pool.length === 0) break;
+        const pickRandom = (p: any[]) => p[Math.floor(Math.random() * p.length)];
 
-            const totalWeight = pool.reduce((sum, r) => sum + r.weight, 0);
-            let random = Math.random() * totalWeight;
+        if (pool1.length > 0) results.push(pickRandom(pool1));
+        if (pool2.length > 0) results.push(pickRandom(pool2));
+        if (pool3.length > 0) results.push(pickRandom(pool3));
 
-            for (let j = 0; j < pool.length; j++) {
-                random -= pool[j].weight;
-                if (random <= 0) {
-                    const picked = pool.splice(j, 1)[0];
-                    results.push(picked);
-                    break;
-                }
+        // Ensure we always return 3 unique rewards if possible
+        const allPools = [...pool1, ...pool2, ...pool3];
+        const uniqueAllPools = Array.from(new Set(allPools));
+        
+        while (results.length < 3 && uniqueAllPools.length > results.length) {
+            const extra = pickRandom(uniqueAllPools);
+            if (!results.includes(extra)) {
+                results.push(extra);
             }
         }
+
         return results;
     }
 

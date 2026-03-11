@@ -171,7 +171,7 @@ export class BattleSimulator {
         // --- PHASE 2: Environment & Weather (Snow, then Light Screen) ---
         const hasSnow = (this.playerSynergies.get('Snow') || 0) >= 2 || (this.enemySynergies.get('Snow') || 0) >= 2;
         if (hasSnow) {
-            this.log("開始下冰雹了！");
+            this.log("四周開始降下冰雹，冰雹襲擊了雙方隊伍！");
             await this.delay(500);
             const alive = [...this.playerTeam, ...this.enemyTeam].filter((u: Unit) => u !== null && u.stats.hp > 0);
             for (const target of alive) {
@@ -184,7 +184,6 @@ export class BattleSimulator {
                 if (this.onUpdate) this.onUpdate();
                 await this.delay(100);
             }
-            this.log("冰雹襲擊了雙方隊伍！");
             await this.delay(400);
         }
 
@@ -636,7 +635,7 @@ export class BattleSimulator {
                     if (buff > 0 && unit.stats.hp > 1) {
                         unit.stats.hp -= 1;
                         this.buffAttack(unit, buff);
-                        this.log(`${unit.name} 燃盡了 1 點生命！`);
+                        this.log(`${unit.name} 燃盡全身的火焰！`);
                     }
                 }
             });
@@ -656,6 +655,7 @@ export class BattleSimulator {
                     if (heal > 0 && unit.stats.hp > 0) {
                         this.heal(unit, heal);
                         this.grassHealedTargets.add(e.target);
+                        // Message remains same as per user instruction (none provided for Grass)
                         this.log(`${unit.name} 吸取了 ${heal} 生命 (剩餘：${unit.stats.hp})`);
                     }
                 }
@@ -679,7 +679,7 @@ export class BattleSimulator {
                         const amountReduced = Math.min(e.target.stats.attack - 1, debuff);
                         e.target.stats.attack -= amountReduced;
                         this.waterDebuffedTargets.add(e.target);
-                        this.log(`${e.target.name} 被潮旋捲入，降低了 ${amountReduced} 攻擊！`);
+                        this.log(`${e.target.name} 被困在漩渦，降低了 ${amountReduced} 攻擊！`);
                     }
                 }
             });
@@ -771,7 +771,8 @@ export class BattleSimulator {
                                 this.buffAttack(u, buff, true);
                             }
                         });
-                        this.log(`${unit.name} 激怒了全體友軍！`);
+                        const side = this.playerTeam.includes(unit) ? '我方' : '敵方';
+                        this.log(`${unit.name} 因憤怒的力量提高了 ${side} ${buff} 攻擊！`);
                         if (this.onUpdate) this.onUpdate();
                     }
                 }
@@ -786,7 +787,8 @@ export class BattleSimulator {
                     const buff = count >= 5 ? 4 : (count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0)));
                     if (buff > 0) {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
-                        this.growUnit(unit, 0, buff, '劍舞', original, false);
+                        this.growUnit(unit, 0, buff, '劍舞', original, true);
+                        this.log(`${unit.name}發動了劍舞， 提高 ${buff} 攻擊！`);
                     }
                 }
             });
@@ -855,7 +857,7 @@ export class BattleSimulator {
             this.eventBus.on('ON_HURT', async (e) => {
                 if (e.target === unit && e.context.source && e.context.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     if (!e.context.isSkillDamage && e.context.amount > 0) {
-                        const reflectDmg = Math.ceil(e.context.amount * 1.0); // 100% reflect
+                        const reflectDmg = Math.ceil(e.context.amount * 0.5); // Nerfed to 50%
                         this.log(`${unit.name} 反彈了 ${reflectDmg} 點傷害！`);
                         this.playAnimation(unit, 'jump', 200);
                         await this.dealDamage(unit, e.context.source, reflectDmg, true, true);
@@ -1474,7 +1476,6 @@ export class BattleSimulator {
         if (unit.synergies.includes('Triplets') && this.getSynergyCountForUnit(unit, 'Triplets') >= 3 && !this.unitStates.get(unit)?.isSilenced) {
             const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
             if (original) {
-                this.log(`${unit.name} 發動了三胞胎！`);
                 const isAtk = Math.random() < 0.5;
                 this.growUnit(unit, isAtk ? 0 : 3, isAtk ? 3 : 0, '三胞胎', original, true);
             }
@@ -1503,7 +1504,7 @@ export class BattleSimulator {
                 const bugBiteCount = this.getSynergyCountForUnit(killer, 'BugBite');
                 if (bugBiteCount >= 2 && killer.synergies.includes('BugBite')) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === killer.id);
-                    this.log(`${killer.name} 發動了蟲咬`);
+                    this.log(`${killer.name} 發動了蟲咬，提高 1 生命！`);
                     // We call growUnit. It will handle the "don't revive if dead" logic internally.
                     this.growUnit(killer, 1, 0, '蟲咬', original, true);
                 }
