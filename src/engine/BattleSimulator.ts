@@ -264,7 +264,7 @@ export class BattleSimulator {
         // Gastly Family: Atk buff at start (Swapped from Mankey)
         if (unit.family === 'gastly') {
             if (unit.templateId === 'gengar') { // Stage 3
-                await this.notifySkill(unit, `耿鬼發動了詭計！`);
+                await this.notifySkill(unit, `耿鬼使用了詭計！`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === u!.id);
                     this.growUnit(u!, 0, 3, '耿鬼技能', original, true);
@@ -287,7 +287,7 @@ export class BattleSimulator {
         // Igglybuff Family: HP buff at start (Swapped from Dwebble)
         if (unit.family === 'igglybuff') {
             if (unit.templateId === 'wigglytuff') { // Stage 3
-                await this.notifySkill(unit, `胖可丁發動了治癒波動！`);
+                await this.notifySkill(unit, `胖可丁使用了治癒波動！`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === u!.id);
                     this.growUnit(u!, 3, 0, '胖可丁技能', original, true);
@@ -301,7 +301,7 @@ export class BattleSimulator {
                         const amount = unit.templateId === 'jigglypuff' ? 3 : 1;
                         const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
                         this.growUnit(front, amount, 0, '能力提升', original, true);
-                        this.log(`${unit.name} 為 ${front.name} 恢復了生命！`);
+                        this.log(`${unit.name} 為 ${front.name} 增加了生命！`);
                     }
                 }
             }
@@ -320,7 +320,7 @@ export class BattleSimulator {
                 }
 
                 if (!this.houndoomLogged.has(side)) {
-                    this.log(`${unit.name} 對 ${firstTarget.name} 發動了噴射火焰！`);
+                    this.log(`${unit.name} 對 ${firstTarget.name} 使用了噴射火焰！`);
                     this.houndoomLogged.add(side);
                 }
 
@@ -421,7 +421,7 @@ export class BattleSimulator {
                 const timesToExecute = 1;
 
                 if (timesToExecute > 0) {
-                    await this.notifySkill(unit, `發動了瞬間移動！`);
+                    await this.notifySkill(unit, `使用了瞬間移動！`);
                 }
 
                 for (let t = 0; t < timesToExecute; t++) {
@@ -730,7 +730,7 @@ export class BattleSimulator {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 if (e.source === unit && !this.unitStates.get(unit)?.isSilenced) {
                     const dmg = [0, 1, 2, 5][unit.level] || 1;
-                    await this.notifySkill(unit, '發動了噴火！');
+                    await this.notifySkill(unit, '使用了噴火！');
                     await this.playAnimation(unit, 'jump', 200);
 
                     const allUnits = [...this.playerTeam, ...this.enemyTeam].filter(u => u && u !== unit && u.stats.hp > 0);
@@ -845,7 +845,6 @@ export class BattleSimulator {
                     if (idx !== -1 && idx < myTeam.length - 1) {
                         myTeam.splice(idx, 1);
                         myTeam.push(unit);
-                        this.log(`${unit.name} 攻擊後退居後排！`);
                         await this.compactTeams();
                         await this.delay(250);
                         await this.eventBus.emit({ type: 'ON_MOVE', source: unit, context: {} });
@@ -858,7 +857,7 @@ export class BattleSimulator {
                 if (e.target === unit && e.context.source && e.context.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     if (!e.context.isSkillDamage && e.context.amount > 0) {
                         const reflectDmg = Math.ceil(e.context.amount * 0.5); // Nerfed to 50%
-                        this.log(`${unit.name} 反彈了 ${reflectDmg} 點傷害！`);
+                        this.log(`${unit.name} 對${e.context.source.name}使用了捨身衝撞！`);
                         this.playAnimation(unit, 'jump', 200);
                         await this.dealDamage(unit, e.context.source, reflectDmg, true, true);
                     }
@@ -1077,7 +1076,7 @@ export class BattleSimulator {
                     const { myTeam, opTeam } = this.getTeams(unit);
 
                     const dmg = [0, 2, 5, 10][unit.level] || 2;
-                    await this.notifySkill(unit, `發動了自爆\n對全體造成了 ${dmg} 點傷害`);
+                    await this.notifySkill(unit, `使用了自爆\n對全體造成了 ${dmg} 點傷害`);
                     // Affect EVERYONE else (myTeam and opTeam)
                     const allTargets = [...myTeam, ...opTeam].filter(u => u && u !== unit && u.stats.hp > 0);
                     for (const target of allTargets) {
@@ -1106,7 +1105,7 @@ export class BattleSimulator {
                         state.mimikyuGuardsUsed = used + 1;
                         this.unitStates.set(unit, state);
                         e.context.amount = 0; // Nullify damage
-                        this.log(`${unit.name} 發動了畫皮抵擋傷害！`);
+                        this.log(`${unit.name} 發動了畫皮，抵擋傷害！`);
                     }
                 }
             });
@@ -1388,7 +1387,6 @@ export class BattleSimulator {
             sourceState.isLethalStrike = false;
             sourceState.lethalStrikeUsed = true; // Mark as permanently used
             amount = 99;
-            await this.notifySkill(source!, '致命一擊');
             this.log(`${source!.name} 對目標使用了迎頭一擊！`);
         }
 
