@@ -2616,3 +2616,9 @@ h3 {
   transform-origin: top left;
   margin: -4px;
 }
+/* 隱藏手機版結算畫面羈絆以節省高度 */
+@media (max-width: 768px) {
+  .summary-synergies-row {
+    display: none !important;
+  }
+}
