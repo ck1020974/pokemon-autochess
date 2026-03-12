@@ -2127,7 +2127,7 @@ function App() {
 
                                             {/* Enemy Team Section - Compressed and Headerless */}
                                             {game.opponentTeam && (
-                                                <div className="enemy-side" style={{ marginTop: '20px' }}>
+                                                <div style={{ marginTop: '20px' }}>
                                                     <div className="summary-units-grid">
                                                         <div className="summary-synergies-row">
                                                             {getSynergyStatus(game.opponentTeam).map(syn => (
