@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { createPortal } from 'react-dom';
 // Last updated: 2026-03-06 - Balance Fix Deploy
 import { useState, useEffect, useRef } from 'react';
@@ -18,10 +18,10 @@ import { Unit } from './models/Unit';
 import { REWARD_DATA } from './models/RewardData';
 
 // Difficulty Icons
-import normalBall from './assets/普通.webp';
-import greatBall from './assets/超級.webp';
-import ultraBall from './assets/高級.webp';
-import masterBall from './assets/大師.webp';
+import normalBall from './assets/?桅?webp';
+import greatBall from './assets/頞?.webp';
+import ultraBall from './assets/擃?.webp';
+import masterBall from './assets/憭批葦.webp';
 
 const allOpponents = [
     ...NOVICE_OPPONENTS,
@@ -78,7 +78,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
             {/* Silence Visual Overlay */}
             {silenced && (
                 <>
-                    <div className="silence-lock-badge" title="招式已被封印"> 🈲 </div>
+                    <div className="silence-lock-badge" title="??撌脰◤撠"> ? </div>
                     <div className="silence-overlay" />
                 </>
             )}
@@ -88,9 +88,9 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
                 <div
                     className={`card-lock-overlay ${frozen ? 'locked' : ''} ${tutorialHighlightLock ? 'tutorial-elevate' : ''}`}
                     onClick={(e) => { e.stopPropagation(); onToggleFreeze(); }}
-                    title={frozen ? "解除鎖定" : "鎖定角色"}
+                    title={frozen ? "閫???" : "??閫"}
                 >
-                    {frozen ? '🔒' : '🔓'}
+                    {frozen ? '??' : '??'}
                 </div>
             )}
 
@@ -504,12 +504,12 @@ function App() {
             [...INTERM_OPPONENTS, ...ADVANCED_OPPONENTS, ...ELITE_OPPONENTS, ...CHAMPION_OPPONENTS].forEach(op => backgroundUrls.add(op.url));
 
             // Critical token/derived images (Battle versions of early game units)
-            criticalUrls.add('assets/妙蛙種子01.webp');
-            criticalUrls.add('assets/小拉達01.webp');
-            criticalUrls.add('assets/飄飄球01.webp');
-            criticalUrls.add('assets/隨風球01.webp');
-            criticalUrls.add('assets/怨影娃娃01.webp');
-            criticalUrls.add('assets/詛咒娃娃01.webp');
+            criticalUrls.add('assets/憒?蝔桀?01.webp');
+            criticalUrls.add('assets/撠???1.webp');
+            criticalUrls.add('assets/憌???1.webp');
+            criticalUrls.add('assets/?券◢??1.webp');
+            criticalUrls.add('assets/?典蔣憡?01.webp');
+            criticalUrls.add('assets/閰?憡?01.webp');
 
             // Critical difficulty icons
             criticalUrls.add(normalBall);
@@ -520,16 +520,16 @@ function App() {
             // Critical audio (Early game + Common)
             const criticalMusic = ['start', 'pokemonmart', 'gymfight', 'pokemoncenter', 'gymwin'];
 
-            console.log(`[系統] 開始預載入關鍵資源 (${criticalUrls.size} 個影像, ${criticalMusic.length} 首音樂)...`);
+            console.log(`[蝟餌絞] ?????仿??菔?皞?(${criticalUrls.size} ?蔣?? ${criticalMusic.length} 擐璅?...`);
             await loadAssets(Array.from(criticalUrls), false, criticalMusic);
 
             setHasLoaded(true);
-            console.log(`[系統] 關鍵資源載入完成！`);
+            console.log(`[蝟餌絞] ?鞈?頛摰?嚗);
 
             // Next frame background load
             setTimeout(async () => {
                 const backgroundMusic = ['victoryroad', 'level up', 'recover', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin'];
-                console.log(`[系統] 開始背景載入剩餘資源 (${backgroundUrls.size} 個影像, ${backgroundMusic.length} 首音樂)...`);
+                console.log(`[蝟餌絞] ???頛?拚?鞈? (${backgroundUrls.size} ?蔣?? ${backgroundMusic.length} 擐璅?...`);
 
                 // Add reward item images to background load
                 REWARD_DATA.forEach(reward => {
@@ -537,7 +537,7 @@ function App() {
                 });
 
                 await loadAssets(Array.from(backgroundUrls), true, backgroundMusic);
-                console.log(`[系統] 背景資源載入完成！`);
+                console.log(`[蝟餌絞] ?鞈?頛摰?嚗);
             }, 500);
         };
 
@@ -1189,8 +1189,8 @@ function App() {
         }
         if (game.gold > 0 && tutorialStep === 0) {
             setConfirmDialog({
-                message: `進入戰鬥階段？`,
-                description: '未花完的 ' + game.gold + '$ ，將會直接消失！',
+                message: `?脣?圈洛?挾嚗,
+                description: '?芾摰? ' + game.gold + '$ 嚗???交?憭梧?',
                 onConfirm: () => {
                     setConfirmDialog(null);
                     executeStartBattle();
@@ -1211,9 +1211,9 @@ function App() {
             if (tutorialStep < 10) {
                 // First tutorial opponent: Brock Easter Egg (Three ways to face Brock!)
                 setOpponentChoices([
-                    { id: 'novice_3', name: '小剛', url: 'gym/小剛01.webp', difficulty: 'EASY' },
-                    { id: 'novice_3', name: '小剛', url: 'gym/小剛02.webp', difficulty: 'NORMAL' },
-                    { id: 'novice_3', name: '小剛', url: 'gym/小剛03.webp', difficulty: 'HARD' }
+                    { id: 'novice_3', name: '撠?', url: 'gym/撠?01.webp', difficulty: 'EASY' },
+                    { id: 'novice_3', name: '撠?', url: 'gym/撠?02.webp', difficulty: 'NORMAL' },
+                    { id: 'novice_3', name: '撠?', url: 'gym/撠?03.webp', difficulty: 'HARD' }
                 ]);
             } else {
                 // Second tutorial: Force Champions to ensure player defeat
@@ -1239,7 +1239,7 @@ function App() {
         }
 
         // We show opponent choices for Boss matches (Wins: 8~11 or 12) or special gym levels.
-        // Actually, user spec says: "這 4 場中，每場會在對手畫面跳出從四天王中挑選。 前八勝階段... 這些館主將出現在一般戰鬥中供玩家挑戰"
+        // Actually, user spec says: "??4 ?港葉嚗??湔??典???Ｚ歲?箏??予?葉??????畾?.. ??擗其蜓撠?曉銝?祆擛乩葉靘摰嗆???
         // Let's always show the opponent choice if we have a pool.
         const ALL_NPCS = npcPool;
         const unseenNpCS = ALL_NPCS.filter(boss => !game.defeatedOpponentIds?.includes(boss.id));
@@ -1476,8 +1476,8 @@ function App() {
                             <p className="premium-confirm-description">{confirmDialog.description}</p>
                         )}
                         <div className="premium-confirm-actions">
-                            <button className="premium-confirm-btn confirm-btn-yes" onClick={confirmDialog.onConfirm}>確定</button>
-                            <button className="premium-confirm-btn confirm-btn-no" onClick={() => setConfirmDialog(null)}>取消</button>
+                            <button className="premium-confirm-btn confirm-btn-yes" onClick={confirmDialog.onConfirm}>蝣箏?</button>
+                            <button className="premium-confirm-btn confirm-btn-no" onClick={() => setConfirmDialog(null)}>??</button>
                         </div>
                     </div>
                 </div>
@@ -1507,7 +1507,7 @@ function App() {
                         textShadow: '0 2px 10px rgba(0,0,0,0.8)',
                         letterSpacing: '4px'
                     }}>
-                        請選擇你的獎勵
+                        隢??????
                     </h2>
 
                     <div className="opponent-cards-container" style={{
@@ -1547,7 +1547,7 @@ function App() {
                                         marginBottom: '15px'
                                     }}
                                     onError={(e) => {
-                                        (e.target as HTMLImageElement).src = 'item/星星碎片.png';
+                                        (e.target as HTMLImageElement).src = 'item/??蝣?.png';
                                     }}
                                 />
 
@@ -1580,7 +1580,7 @@ function App() {
                                         border: '1px solid rgba(255,255,255,0.3)',
                                         letterSpacing: '1px'
                                     }}>
-                                        暫時
+                                        ?急?
                                     </div>
                                 )}
 
@@ -1609,23 +1609,23 @@ function App() {
                             <div className="tutorial-message-box" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
                                 <div className="tutorial-actions" style={{ position: 'absolute', top: '100px', right: '20px' }}>
                                     <button className="tutorial-btn-continue" onClick={(e) => { e.stopPropagation(); handleTutorialNext(); }}>
-                                        點擊繼續 ⏭
+                                        暺?蝜潛? ??
                                     </button>
                                 </div>
                             </div>
                         ) : (
                             <div className={`tutorial-message-box ${tutorialShake ? 'shake-anim' : ''}`}>
                                 <div className="tutorial-text">
-                                    {tutorialStep === 2 && "每回合都會獲得10$\n🎯任務：購買寶可夢"}
-                                    {tutorialStep === 3 && "認識每隻寶可夢\n🎯任務：查看招式並關閉面板"}
-                                    {tutorialStep === 4 && "調整陣容順序\n🎯任務：將鬼斯移動到其他位置"}
-                                    {tutorialStep === 5 && "花費1$刷新商店\n🎯任務：點擊按鈕刷新商店角色"}
-                                    {tutorialStep === 6 && "鎖定角色保留到下回合\n🎯任務：點擊鎖定所有小火龍"}
-                                    {tutorialStep === 7 && "選擇要挑戰的訓練家\n🎯任務：點擊戰鬥按鈕"}
-                                    {tutorialStep === 8 && "點擊或拖曳角色合成\n🎯任務：購買並合成小火龍"}
-                                    {tutorialStep === 9 && "開啟羈絆來提高強度\n🎯任務：購買火球鼠"}
-                                    {tutorialStep === 10 && "挑戰更強的訓練家\n🎯任務：點擊戰鬥按鈕"}
-                                    {tutorialStep === 11 && "戰敗時將減少生命值\n生命值歸零將結束遊戲‼️"}
+                                    {tutorialStep === 2 && "瘥???敺?0$\n?隞餃?嚗頃鞎瑕窄?臬丐"}
+                                    {tutorialStep === 3 && "隤?瘥撖嗅憭兝n?隞餃?嚗??撘蒂???Ｘ"}
+                                    {tutorialStep === 4 && "隤踵??捆??\n?隞餃?嚗?擛潭蝘餃??啣隞?蝵?}
+                                    {tutorialStep === 5 && "?梯祥1$?瑟??\n?隞餃?嚗?????啣?摨???}
+                                    {tutorialStep === 6 && "??閫靽??唬???\n?隞餃?嚗???摰????恍?"}
+                                    {tutorialStep === 7 && "?豢?閬??啁?閮毀摰跚n?隞餃?嚗??擛交???}
+                                    {tutorialStep === 8 && "暺????唾??脣??n?隞餃?嚗頃鞎瑚蒂??撠樴?}
+                                    {tutorialStep === 9 && "??蝢?靘?擃撥摨吒n?隞餃?嚗頃鞎瑞??"}
+                                    {tutorialStep === 10 && "??游撥??蝺游振\n?隞餃?嚗??擛交???}
+                                    {tutorialStep === 11 && "?唳???皜???墦n??潭飛?嗅?蝯???潘?"}
                                 </div>
                             </div>
                         )}
@@ -1639,13 +1639,13 @@ function App() {
                     <div className="battle-result-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.98)', zIndex: 30000, display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={handleRestart}>
                         <div className="result-content" style={{ textAlign: 'center' }}>
                             <div className="result-title" style={{ fontSize: '4.5rem', color: '#ffd700', textShadow: '0 0 40px rgba(255,215,0,0.6)', marginBottom: '15px' }}>
-                                遊戲教學已結束
+                                ??飛撌脩???
                             </div>
                             <div className="result-subtitle" style={{ fontSize: '2rem', color: '#fff', marginBottom: '50px', opacity: 0.9 }}>
-                                擊敗所有訓練師，成為寶可夢冠軍！
+                                ?????蝺游葦嚗??箏窄?臬丐??嚗?
                             </div>
                             <div style={{ fontSize: '1.3rem', color: '#aaa', animation: 'pulse 1.5s infinite' }}>
-                                點擊任意處繼續
+                                暺?隞餅??匱蝥?
                             </div>
                         </div>
                     </div>
@@ -1668,7 +1668,7 @@ function App() {
                             fontSize: '5rem',
                             marginBottom: '30px',
                             filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.5))'
-                        }}>📱</div>
+                        }}>?</div>
                         <h2 style={{
                             fontSize: '1.8rem',
                             fontWeight: 'bold',
@@ -1678,7 +1678,7 @@ function App() {
                             WebkitTextFillColor: 'transparent',
                             margin: 0,
                             lineHeight: '1.4'
-                        }}>請旋轉手機<br />以開始遊戲</h2>
+                        }}>隢?頧?璈?br />隞仿?憪???/h2>
                     </div>
                 )
             }
@@ -1724,7 +1724,7 @@ function App() {
                                 }} />
                             </div>
                             <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
-                                {hasLoaded ? '系統就緒' : `資源載入中... ${loadingProgress}%`}
+                                {hasLoaded ? '蝟餌絞撠梁?' : `鞈?頛銝?.. ${loadingProgress}%`}
                             </p>
                         </div>
 
@@ -1736,7 +1736,7 @@ function App() {
                                 setHasStarted(true);
                             }}
                         >
-                            開始遊戲
+                            ???
                         </button>
 
                         <p style={{
@@ -1784,10 +1784,10 @@ function App() {
                             margin: '0 auto'
                         }}>
                             {[
-                                { id: 'NORMAL', name: '普通', icon: normalBall, color: '#ef4444' },
-                                { id: 'GREAT', name: '超級', icon: greatBall, color: '#3b82f6' },
-                                { id: 'ULTRA', name: '高級', icon: ultraBall, color: '#eab308' },
-                                { id: 'MASTER', name: '大師', icon: masterBall, color: '#a855f7' }
+                                { id: 'NORMAL', name: '?桅?, icon: normalBall, color: '#ef4444' },
+                                { id: 'GREAT', name: '頞?', icon: greatBall, color: '#3b82f6' },
+                                { id: 'ULTRA', name: '擃?', icon: ultraBall, color: '#eab308' },
+                                { id: 'MASTER', name: '憭批葦', icon: masterBall, color: '#a855f7' }
                             ].map(d => (
                                 <button
                                     key={d.id}
@@ -1824,7 +1824,7 @@ function App() {
                                 letterSpacing: '4px',
                                 opacity: 0.8,
                                 padding: '0 20px'
-                            }}>選擇本次挑戰難度</p>
+                            }}>?豢??祆活???漲</p>
                         </div>
                     </div>
                 )
@@ -1839,11 +1839,11 @@ function App() {
                             background: 'rgba(255,255,255,0.05)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)',
                             cursor: 'pointer', transition: 'all 0.2s'
                         }}
-                            title="重新選擇難度"
+                            title="??豢???漲"
                             onClick={() => {
                                 setConfirmDialog({
-                                    message: '重新選擇難度？',
-                                    description: '遊戲進度將被清除，並重新開始！',
+                                    message: '??豢???漲嚗?,
+                                    description: '??脣漲撠◤皜嚗蒂???嚗?,
                                     onConfirm: () => {
                                         setConfirmDialog(null);
                                         setDifficulty(null);
@@ -1857,25 +1857,25 @@ function App() {
                                         difficulty === 'ULTRA' ? ultraBall : masterBall
                             } alt={difficulty} style={{ width: '20px', height: '20px' }} />
                             <span style={{ fontSize: '0.9rem', fontWeight: 'bold', opacity: 0.8 }}>{
-                                difficulty === 'NORMAL' ? '普通' :
-                                    difficulty === 'GREAT' ? '超級' :
-                                        difficulty === 'ULTRA' ? '高級' : '大師'
+                                difficulty === 'NORMAL' ? '?桅? :
+                                    difficulty === 'GREAT' ? '頞?' :
+                                        difficulty === 'ULTRA' ? '擃?' : '憭批葦'
                             }</span>
                         </div>
                     )}
                     {difficulty && (
                         <>
-                            <span className={`${hpLossAnim ? 'shake-anim' : ''} ${tutorialStep === 11 ? 'tutorial-elevate synthetic-glow' : ''}`} style={{ color: hpLossAnim ? '#ef4444' : undefined, zIndex: tutorialStep === 11 ? 10005 : 'auto', position: 'relative', padding: '0 8px' }}>❤️ 生命: {game.lives}</span>
-                            <span className={`${tutorialStep === 2 ? 'tutorial-highlight tutorial-pointer-left' : ''} ${goldErrorAnim ? 'shake-anim' : ''}`} style={{ padding: '0 8px', color: goldErrorAnim ? '#ef4444' : undefined, borderRadius: '8px', zIndex: tutorialStep === 2 ? 10000 : 'auto', position: 'relative' }}>💰 金幣: {game.gold}</span>
+                            <span className={`${hpLossAnim ? 'shake-anim' : ''} ${tutorialStep === 11 ? 'tutorial-elevate synthetic-glow' : ''}`} style={{ color: hpLossAnim ? '#ef4444' : undefined, zIndex: tutorialStep === 11 ? 10005 : 'auto', position: 'relative', padding: '0 8px' }}>?歹? ?: {game.lives}</span>
+                            <span className={`${tutorialStep === 2 ? 'tutorial-highlight tutorial-pointer-left' : ''} ${goldErrorAnim ? 'shake-anim' : ''}`} style={{ padding: '0 8px', color: goldErrorAnim ? '#ef4444' : undefined, borderRadius: '8px', zIndex: tutorialStep === 2 ? 10000 : 'auto', position: 'relative' }}>? ?馳: {game.gold}</span>
                         </>
                     )}
                 </div>
                 <div className="header-section">
                     {difficulty && (
                         <>
-                            <span style={{ color: game.wins < 8 ? '#fff' : '#888' }}>🏅 道館: {Math.min(game.wins, 8)}/8</span>
-                            <span style={{ color: (game.wins >= 8 && game.wins < 12) ? '#fbbf24' : '#888' }}>⚔️ 四天王: {Math.max(0, Math.min(game.wins - 8, 4))}/4</span>
-                            <span style={{ color: game.wins >= 12 ? '#f472b6' : '#888' }}>👑 冠軍: {Math.max(0, Math.min(game.wins - 12, 1))}/1</span>
+                            <span style={{ color: game.wins < 8 ? '#fff' : '#888' }}>?? ?尹: {Math.min(game.wins, 8)}/8</span>
+                            <span style={{ color: (game.wins >= 8 && game.wins < 12) ? '#fbbf24' : '#888' }}>?? ?予?? {Math.max(0, Math.min(game.wins - 8, 4))}/4</span>
+                            <span style={{ color: game.wins >= 12 ? '#f472b6' : '#888' }}>?? ??: {Math.max(0, Math.min(game.wins - 12, 1))}/1</span>
                         </>
                     )}
                     {/* Help & Mute Toggle Buttons inside Header */}
@@ -1886,7 +1886,7 @@ function App() {
                                 if (game.phase === GamePhase.BATTLE) return;
                                 setShowTutorial(true);
                             }}
-                            title="遊戲指南 (Tutorial)"
+                            title="??? (Tutorial)"
                             style={{
                                 color: showTutorial ? '#facc15' : '#aaa',
                                 border: showTutorial ? '1px solid #facc15' : '1px solid transparent',
@@ -1896,7 +1896,7 @@ function App() {
                                 cursor: game.phase === GamePhase.BATTLE ? 'default' : 'pointer'
                             }}
                         >
-                            ❓
+                            ??
                         </button>
                         <button
                             className="mute-toggle-btn-header"
@@ -1904,7 +1904,7 @@ function App() {
                                 if (game.phase === GamePhase.BATTLE) return;
                                 setShowEncyclopedia(true);
                             }}
-                            title="圖鑑"
+                            title="??"
                             style={{
                                 opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
                                 cursor: (game.phase === GamePhase.BATTLE) ? 'default' : 'pointer',
@@ -1912,14 +1912,14 @@ function App() {
                                 position: 'relative'
                             }}
                         >
-                            📖
+                            ??
                         </button>
                         <button
                             className="mute-toggle-btn-header"
                             onClick={toggleMute}
-                            title={isMuted ? "開啟聲音" : "靜音"}
+                            title={isMuted ? "???脤" : "?"}
                         >
-                            {isMuted ? '🔇' : '🔊'}
+                            {isMuted ? '??' : '??'}
                         </button>
                     </div>
                 </div>
@@ -1931,13 +1931,13 @@ function App() {
                     <div className="battle-result-overlay" onClick={handleBattleResultClick} style={{ zIndex: 10002 }}>
                         <div className="result-content">
                             <div className="result-title">
-                                {battleResult === 'WIN' ? 'VICTORY ⭕' :
-                                    battleResult === 'LOSS' ? 'DEFEAT ❌' : 'DRAW 🤝'}
+                                {battleResult === 'WIN' ? 'VICTORY 潃? :
+                                    battleResult === 'LOSS' ? 'DEFEAT ?? : 'DRAW ??'}
                             </div>
                             {battleResult === 'WIN' && (game.wins === 3 || game.wins === 7 || game.wins === 11) && (
-                                <div className="result-subtitle" style={{ fontSize: '1.5rem', color: '#ffffffff', marginBottom: '20px' }}>增加一點生命 ❤️</div>
+                                <div className="result-subtitle" style={{ fontSize: '1.5rem', color: '#ffffffff', marginBottom: '20px' }}>憓?銝暺????歹?</div>
                             )}
-                            <div className="result-subtitle">點擊任意處繼續</div>
+                            <div className="result-subtitle">暺?隞餅??匱蝥?/div>
                         </div>
                     </div>
                 )
@@ -1990,13 +1990,13 @@ function App() {
                                         textShadow: '0 0 40px rgba(0,0,0,0.8)',
                                         animation: 'fadeInUp 0.6s ease-out'
                                     }}>
-                                        {game.phase === GamePhase.VICTORY ? 'CHAMPION! 🏆' : 'GAME OVER 💀'}
+                                        {game.phase === GamePhase.VICTORY ? 'CHAMPION! ??' : 'GAME OVER ??'}
                                     </div>
                                     <div className="result-subtitle" style={{ fontSize: '1.8rem', opacity: 0.9, marginTop: '10px' }}>
-                                        {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '眼前變得一片漆黑...'}
+                                        {game.phase === GamePhase.VICTORY ? '?剖?雿迂?訾??舐?嚗? : '?澆?霈?銝??暺?..'}
                                     </div>
                                     <div className="result-subtitle" style={{ fontSize: '1rem', opacity: 0.5, marginTop: '40px', letterSpacing: '2px' }}>
-                                        [ 點擊畫面查看詳細數據 ]
+                                        [ 暺??恍?亦?閰喟敦?豢? ]
                                     </div>
                                 </div>
                             </div>
@@ -2045,21 +2045,21 @@ function App() {
 
                                         {/* 3. Total Rounds */}
                                         <div className="stat-box">
-                                            <div className="stat-box-label">總場數</div>
+                                            <div className="stat-box-label">蝮賢??/div>
                                             <div className="stat-box-value">
-                                                {(game.gymBattleCount || 0) + (game.eliteBattleCount || 0) + (game.championBattleCount || 0)} 場
+                                                {(game.gymBattleCount || 0) + (game.eliteBattleCount || 0) + (game.championBattleCount || 0)} ??
                                             </div>
                                         </div>
 
                                         {/* 4. Battle Stats */}
                                         <div className="stat-box">
-                                            <div className="stat-box-label">⚔️ 戰績 (勝/平/敗)</div>
+                                            <div className="stat-box-label">?? ?啁蜀 (??撟???</div>
                                             <div className="stat-box-value">{game.wins} / {game.drawCount || 0} / {game.lossCount || 0}</div>
                                         </div>
 
                                         {/* 5. Win Rate */}
                                         <div className="stat-box">
-                                            <div className="stat-box-label">勝率</div>
+                                            <div className="stat-box-label">??</div>
                                             <div className="stat-box-value" style={{ color: winRate >= 80 ? '#4ade80' : winRate >= 50 ? '#fbbf24' : '#ef4444' }}>
                                                 {winRate}%
                                             </div>
@@ -2072,13 +2072,13 @@ function App() {
                                             className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`}
                                             onClick={() => setSummaryTab('team')}
                                         >
-                                            最終隊伍
+                                            ?蝯?隡?
                                         </button>
                                         <button
                                             className={`summary-tab-btn-compact ${summaryTab === 'history' ? 'is-active' : ''}`}
                                             onClick={() => setSummaryTab('history')}
                                         >
-                                            對戰紀錄
+                                            撠蝝??
                                         </button>
                                     </div>
                                 </div>
@@ -2176,10 +2176,10 @@ function App() {
                                                 let card1: any = null;
                                                 if (game.phase === GamePhase.VICTORY) {
                                                     const champ = history[history.length - 1];
-                                                    card1 = { label: '寶可夢大師', opponentId: champ?.opponentId };
+                                                     card1 = { label: '寶可夢大師', opponentId: champ?.opponentId };
                                                 } else {
-                                                    const lastWin = [...history].reverse().find(e => e.result === 'WIN');
-                                                    card1 = { label: '手下敗將', opponentId: lastWin?.opponentId };
+                                                    const lastOpp = history[history.length - 1];
+                                                     card1 = { label: '手下敗將', opponentId: history[history.length - 1]?.opponentId };
                                                 }
 
                                                 // 2. Milestone 2 (Legendary Rival)
@@ -2198,7 +2198,7 @@ function App() {
                                                         rivalId = id;
                                                     }
                                                 });
-                                                const card2 = rivalId ? { label: '對戰勁敵', opponentId: rivalId } : null;
+                                                const card2 = rivalId ? { label: '撠?', opponentId: rivalId } : null;
 
                                                 // 3. Milestone 3 (Lifelong Enemy: Draws + Losses, Later Priority)
                                                 const nuisance: Record<string, number> = {};
@@ -2215,11 +2215,11 @@ function App() {
                                                          enemyId = id;
                                                      }
                                                  });
-                                                const card3 = enemyId ? { label: '好討厭的感覺', opponentId: enemyId } : null;
+                                                const card3 = enemyId ? { label: '憟質??剔??死', opponentId: enemyId } : null;
 
                                                 // 4. Milestone 4 (First Victory) - Moved up to 2nd pos
                                                 const firstBattle = history[0];
-                                                const card4 = firstBattle ? { label: '冒險的起點', opponentId: firstBattle.opponentId } : null;
+                                                const card4 = firstBattle ? { label: '??絲暺?, opponentId: firstBattle.opponentId } : null;
 
                                                 const heroes = [card1, card4, card2, card3]; // 1:Champ, 2:Start, 3:Rival, 4:Enemy
 
@@ -2227,7 +2227,7 @@ function App() {
                                                     <>
                                                         <div className="history-hero-grid">
                                                             {heroes.map((hero, idx) => {
-                                                                if (!hero) return <div key={idx} className="hero-card is-empty"><div className="hero-label">尚未達成</div></div>;
+                                                                if (!hero) return <div key={idx} className="hero-card is-empty"><div className="hero-label">撠??</div></div>;
                                                                 const op = allOpponents.find(o => o.id === hero.opponentId);
                                                                 return (
                                                                     <div key={idx} className="hero-card">
@@ -2290,7 +2290,7 @@ function App() {
                                             e.currentTarget.style.transform = 'translateY(0)';
                                         }}
                                     >
-                                        重新開始
+                                        ???
                                     </div>
                                 </div>
                             </div>
@@ -2326,7 +2326,7 @@ function App() {
                             textShadow: '0 2px 10px rgba(0,0,0,0.8)',
                             letterSpacing: '4px'
                         }}>
-                            請選擇你的對手
+                            隢??????
                         </h2>
 
                         <div className="opponent-cards-container" style={{
@@ -2513,7 +2513,7 @@ function App() {
                         <div className="shop-controls">
                             {/* Row 1: Shop Level Text - Higher and Better Color */}
                             <div className="shop-info-row" style={{ justifyContent: 'center', marginBottom: '0px', marginTop: '-15px' }}>
-                                <span className="tier-text" style={{ color: '#e2e8f0', fontSize: '1rem', opacity: 0.9 }}>商店 Lv.{game.shop.getTier(game.turn)}</span>
+                                <span className="tier-text" style={{ color: '#e2e8f0', fontSize: '1rem', opacity: 0.9 }}>?? Lv.{game.shop.getTier(game.turn)}</span>
                             </div>
 
                             {/* Row 2: Battle Button - Centered and Slimmer */}
@@ -2523,7 +2523,7 @@ function App() {
                                     onClick={handleStartBattle}
                                     style={{ height: '50px', width: '60px', zIndex: (tutorialStep === 7 || tutorialStep === 10) ? 10000 : 'auto' }}
                                 >
-                                    <span style={{ fontSize: '1.5rem' }}>⚔️</span>
+                                    <span style={{ fontSize: '1.5rem' }}>??</span>
                                 </button>
                             </div>
                         </div>
@@ -2547,9 +2547,9 @@ function App() {
                                     zIndex: 10,
                                     padding: '5px'
                                 }}
-                                title="刷新商店 ($1)"
+                                title="?瑟?? ($1)"
                             >
-                                🔄
+                                ??
                             </button>
 
                             <div className="shop-slots">
@@ -2608,14 +2608,14 @@ function App() {
                                                 color: 'rgba(255,255,255,0.12)',
                                                 lineHeight: 1,
                                                 fontWeight: 'bold',
-                                            }}>×</div>
+                                            }}>?</div>
                                             {turnsLeft > 0 && (
                                                 <div style={{
                                                     fontSize: '0.8rem',
                                                     color: 'rgba(255,255,255,0.3)',
                                                     whiteSpace: 'nowrap',
                                                     marginTop: '5px'
-                                                }}>{turnsLeft} 回合解鎖</div>
+                                                }}>{turnsLeft} ??閫??</div>
                                             )}
                                         </div>
                                     );
@@ -2634,14 +2634,14 @@ function App() {
                         <div className="battle-controls-container" style={{ zIndex: 10, position: 'relative' }}>
                             <div className="battle-controls-row">
                                 <button className="battle-pause-btn" onClick={togglePause}>
-                                    {isPaused ? '▶️ 繼續' : '⛔ 暫停'}
+                                    {isPaused ? '?塚? 蝜潛?' : '???怠?'}
                                 </button>
                                 <button
                                     className={`battle-speed-btn ${battleSpeed > 1 ? 'active' : ''}`}
                                     onClick={toggleBattleSpeed}
-                                    title="切換戰鬥速度"
+                                    title="???圈洛?漲"
                                 >
-                                    ⏩ {battleSpeed}x
+                                    ??{battleSpeed}x
                                 </button>
                             </div>
                         </div>
@@ -2655,7 +2655,7 @@ function App() {
                                     </div>
                                 ))
                             ) : (
-                                <div>戰鬥進行中...</div>
+                                <div>?圈洛?脰?銝?..</div>
                             )}
                         </div>
                     </div>
@@ -2688,7 +2688,7 @@ function App() {
                                 }
                             }}
                         >
-                            ×
+                            ?
                         </button>
                         <div className="detail-content" style={{ display: 'flex', gap: '15px' }}>
 
@@ -2703,7 +2703,7 @@ function App() {
                                         border: '1px solid #10b981', color: 'white', width: '90%',
                                         display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px'
                                     }} onClick={handleBuy}>
-                                        <span>購買 $3</span>
+                                        <span>鞈潸眺 $3</span>
                                     </button>
                                 )}
                                 {selected.source === 'BOARD' && game.phase === GamePhase.SHOP && (
@@ -2712,7 +2712,7 @@ function App() {
                                         border: '1px solid #ef4444', width: '90%', color: 'white',
                                         display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px'
                                     }} onClick={handleSell}>
-                                        <span>出售 $1</span>
+                                        <span>?箏 $1</span>
                                     </button>
                                 )}
 
@@ -2725,10 +2725,10 @@ function App() {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <div className="detail-name" style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{selected.unit.name}</div>
                                     <div style={{ color: '#ffd700', fontSize: '1.2rem', letterSpacing: '2px' }}>
-                                        {'★'.repeat(selected.unit.level)}
+                                        {'??.repeat(selected.unit.level)}
                                     </div>
                                     <div style={{ color: '#aaa', fontSize: '0.9rem', marginLeft: 'auto' }}>
-                                        {selected.unit.exp >= 9 ? 'EXP MAX' : `EXP：${selected.unit.exp}/9`}
+                                        {selected.unit.exp >= 9 ? 'EXP MAX' : `EXP嚗?{selected.unit.exp}/9`}
                                     </div>
                                 </div>
 
@@ -2743,8 +2743,8 @@ function App() {
                                         padding: '4px 8px', borderRadius: '6px',
                                         fontSize: '1rem', fontWeight: 'bold'
                                     }}>
-                                        <span style={{ color: '#60a5fa' }}>⚔️ {selected.unit.stats.attack}</span>
-                                        <span style={{ color: '#fca5a5' }}>❤️ {selected.unit.stats.hp}</span>
+                                        <span style={{ color: '#60a5fa' }}>?? {selected.unit.stats.attack}</span>
+                                        <span style={{ color: '#fca5a5' }}>?歹? {selected.unit.stats.hp}</span>
                                     </div>
 
                                     <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.2)' }}></div>
