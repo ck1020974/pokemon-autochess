@@ -2200,21 +2200,21 @@ function App() {
                                                 });
                                                 const card2 = rivalId ? { label: '對戰勁敵', opponentId: rivalId } : null;
 
-                                                // 3. Milestone 3 (Lifelong Enemy)
-                                                const losses: Record<string, number> = {};
+                                                // 3. Milestone 3 (Lifelong Enemy: Draws + Losses, Later Priority)
+                                                const nuisance: Record<string, number> = {};
                                                 history.forEach((e) => {
-                                                    if (e.result === 'LOSS') {
-                                                        losses[e.opponentId] = (losses[e.opponentId] || 0) + 1;
+                                                    if (e.result === 'LOSS' || e.result === 'DRAW') {
+                                                        nuisance[e.opponentId] = (nuisance[e.opponentId] || 0) + 1;
                                                     }
                                                 });
-                                                let maxL = 0;
+                                                let maxN = 0;
                                                 let enemyId = '';
-                                                Object.entries(losses).forEach(([id, count]) => {
-                                                    if (count > maxL || (count === maxL && lastEncounterIndex[id] > lastEncounterIndex[enemyId])) {
-                                                        maxL = count;
-                                                        enemyId = id;
-                                                    }
-                                                });
+                                                 Object.entries(nuisance).forEach(([id, count]) => {
+                                                     if (count > maxN || (count === maxN && lastEncounterIndex[id] >= (lastEncounterIndex[enemyId] || 0))) {
+                                                         maxN = count;
+                                                         enemyId = id;
+                                                     }
+                                                 });
                                                 const card3 = enemyId ? { label: '好討厭的感覺', opponentId: enemyId } : null;
 
                                                 // 4. Milestone 4 (First Victory) - Moved up to 2nd pos

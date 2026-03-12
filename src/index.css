@@ -1648,8 +1648,36 @@ h3 {
   }
 
   .hero-img {
-    width: 55px !important;
-    height: 55px !important;
+    width: 45px !important;
+    height: 45px !important;
+  }
+
+  /* 橫式佈局優化 (Landscape Optimization) */
+  @media (max-width: 950px) and (orientation: landscape) {
+    .summary-container {
+      transform: scale(0.58) !important; /* 進一步縮小整體佈局 */
+      max-height: 98vh !important;
+      margin-top: -10px !important; /* 向上微調位置 */
+    }
+
+    .summary-unit-img {
+      width: 40px !important;
+      height: 40px !important;
+    }
+
+    .summary-unit-card {
+      width: 65px !important;
+      min-height: 80px !important;
+    }
+
+    .unit-stats {
+      font-size: 0.8rem !important; /* 調大數字字體以確保清晰 */
+      padding: 2px 8px !important;
+    }
+    
+    .summary-units-grid {
+      gap: 3px !important;
+    }
   }
 
   .hero-label {
