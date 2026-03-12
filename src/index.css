@@ -1655,28 +1655,58 @@ h3 {
   /* 橫式佈局優化 (Landscape Optimization) */
   @media (max-width: 950px) and (orientation: landscape) {
     .summary-container {
-      transform: scale(0.58) !important; /* 進一步縮小整體佈局 */
-      max-height: 98vh !important;
-      margin-top: -10px !important; /* 向上微調位置 */
+      transform: scale(0.52) !important; /* 再度調降整體縮放以確保不溢出 */
+      max-height: 100vh !important;
+      margin-top: -15px !important;
     }
 
+    /* 結算隊伍部分 */
     .summary-unit-img {
-      width: 40px !important;
-      height: 40px !important;
+      width: 32px !important;
+      height: 32px !important;
     }
 
     .summary-unit-card {
-      width: 65px !important;
-      min-height: 80px !important;
+      width: 58px !important;
+      min-height: 75px !important;
+      padding: 4px !important;
+      background: rgba(255, 255, 255, 0.03) !important; /* 縮小透明框感覺 */
     }
 
     .unit-stats {
-      font-size: 0.8rem !important; /* 調大數字字體以確保清晰 */
-      padding: 2px 8px !important;
+      font-size: 0.95rem !important; /* 強調關鍵數值字體 */
+      padding: 1px 6px !important;
+      margin-top: -8px !important;
     }
     
     .summary-units-grid {
-      gap: 3px !important;
+      gap: 4px !important;
+    }
+
+    /* 里程碑部分 */
+    .hero-card {
+      width: 90px !important;
+      min-height: 75px !important;
+      padding: 6px !important;
+    }
+
+    .hero-img {
+      width: 35px !important;
+      height: 35px !important;
+    }
+
+    .hero-label {
+      font-size: 0.7rem !important;
+    }
+
+    /* 對戰紀錄部分 */
+    .summary-history-grid {
+      gap: 2px !important;
+    }
+
+    .history-item {
+      width: 26px !important;
+      height: 26px !important;
     }
   }
 
