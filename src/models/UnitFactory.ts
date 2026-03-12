@@ -462,19 +462,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'houndour', name: '戴魯比', tier: 3, family: 'houndour',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/戴魯比00.webp', battleImageUrl: 'assets/戴魯比01.webp',
-        description: '戰鬥開始時，對生命最高敵方造成 4 傷害 (共 1 次)。', synergies: ['Fire', 'Angry'], evolveId: 'houndoom'
+        description: '戰鬥開始時，對生命最高敵方造成 4 傷害 (共 1 次)。', synergies: ['Fire', 'Thief'], evolveId: 'houndoom'
     },
     houndoom: {
         id: 'houndoom', name: '黑魯加', tier: 3, family: 'houndour',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/黑魯加00.webp', battleImageUrl: 'assets/黑魯加01.webp',
-        description: '戰鬥開始時，對生命最高敵方造成 4 傷害 (共 2 次)。', synergies: ['Fire', 'Angry'], evolveId: 'houndoom_final', isHiddenFromShop: true
+        description: '戰鬥開始時，對生命最高敵方造成 4 傷害 (共 2 次)。', synergies: ['Fire', 'Thief'], evolveId: 'houndoom_final', isHiddenFromShop: true
     },
     houndoom_final: {
         id: 'houndoom_final', name: '黑魯加', tier: 3, family: 'houndour',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/黑魯加00.webp', battleImageUrl: 'assets/黑魯加01.webp',
-        description: '戰鬥開始時，對生命最高敵方造成 4 傷害 (共 3 次)。', synergies: ['Fire', 'Angry'], isHiddenFromShop: true
+        description: '戰鬥開始時，對生命最高敵方造成 4 傷害 (共 3 次)。', synergies: ['Fire', 'Thief'], isHiddenFromShop: true
     },
 
     // 24. Sneasel
@@ -676,7 +676,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'spiritomb', name: '花岩怪', tier: 5, family: 'spiritomb',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/花岩怪00.webp', battleImageUrl: 'assets/花岩怪01.webp',
-        description: '戰鬥開始時，使 2 個敵方角色的招式無效化。', synergies: ['Ghost', 'Thief']
+        description: '戰鬥開始時，使 2 個敵方角色的招式無效化。', synergies: ['Ghost', 'Angry']
     },
     heracross: {
         id: 'heracross', name: '赫拉克羅斯', tier: 3, family: 'heracross',

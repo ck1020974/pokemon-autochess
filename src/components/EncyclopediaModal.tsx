@@ -136,8 +136,8 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
             position: 'fixed',
             top: 0,
             left: 0,
-            width: '100vw',
-            height: '100vh',
+            right: 0,
+            bottom: 0,
             background: 'rgba(0,0,0,0.85)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
@@ -173,7 +173,7 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
                     {/* Main Area */}
                     <div className="encyclopedia-main">
                         {/* Grid of Base Units */}
-                        <div className="encyclopedia-grid" style={{ paddingBottom: '20px' }}>
+                        <div className="encyclopedia-grid">
                             {activeUnits.map(unit => (
                                 <div
                                     key={unit.id}
