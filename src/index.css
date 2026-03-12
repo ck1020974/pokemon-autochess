@@ -1646,25 +1646,24 @@ h3 {
     min-height: 90px !important;
     padding: 5px !important;
   }
+}
 
-  .hero-img {
-    width: 45px !important;
-    height: 45px !important;
-  }
-
-  /* 橫式佈局優化 (Landscape Optimization) - 第五輪 V3 重構 */
-  @media (max-width: 1200px) and (orientation: landscape) {
+/* 橫式佈局優化 (Landscape Optimization) - 第五輪 V4 修正 */
+@media (max-width: 1200px) and (orientation: landscape) {
     .summary-container {
-      transform: scale(0.65) !important; /* 提升縮放比例，內容更清晰 */
+      transform: scale(0.65) !important;
       max-height: 100vh !important;
-      margin-top: -30px !important; /* 調整平衡位移 */
+      margin-top: -30px !important;
       margin-bottom: -30px !important;
       gap: 15px !important;
+      width: 90% !important; 
+      max-width: 580px !important; /* 進一步收窄，確保在手機上更俐落 */
     }
 
-    /* 隱藏分頁按鈕，因為橫向模式下會同時顯示內容 */
+    /* 重新顯示分頁按鈕，讓使用者可以切換 */
     .summary-stat-btn-group {
-      display: none !important;
+      display: flex !important;
+      margin-bottom: 15px !important;
     }
 
     /* 隱藏敵方隊伍以節省空間 */
@@ -1690,16 +1689,15 @@ h3 {
 
     .summary-team-display,
     .summary-history-display {
-      width: 100% !important; /* 使其充滿容器空間 */
-      max-width: 750px !important; 
-      height: 180px !important; /* 統一縮減高度，使上下排列更協調 */
-      min-height: 180px !important;
+      width: 100% !important;
+      height: 250px !important; /* 恢復單個顯示的高度 */
+      min-height: 250px !important;
       overflow-y: auto !important;
       margin: 0 auto !important;
       background: rgba(0, 0, 0, 0.4) !important;
       border: 1px solid rgba(255, 255, 255, 0.1) !important;
       border-radius: 12px !important;
-      padding: 8px !important;
+      padding: 12px !important;
     }
 
     /* 單位展示微調 */
@@ -1718,20 +1716,6 @@ h3 {
     .unit-stats {
       font-size: 0.85rem !important;
       padding: 1px 4px !important;
-    }
-  }
-  .hero-label {
-    font-size: 0.8rem !important;
-  }
-
-  .summary-history-grid {
-    grid-template-columns: repeat(8, 1fr) !important;
-    gap: 3px !important;
-  }
-
-  .history-item {
-    width: 32px !important;
-    height: 32px !important;
   }
 }
 
