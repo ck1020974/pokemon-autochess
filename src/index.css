@@ -1652,61 +1652,67 @@ h3 {
     height: 45px !important;
   }
 
-  /* 橫式佈局優化 (Landscape Optimization) */
+  /* 橫式佈局優化 (Landscape Optimization) - 第三輪極致簡約 */
   @media (max-width: 950px) and (orientation: landscape) {
     .summary-container {
-      transform: scale(0.52) !important; /* 再度調降整體縮放以確保不溢出 */
+      transform: scale(0.46) !important; /* 極大化縮小以確保高度足夠 */
       max-height: 100vh !important;
-      margin-top: -15px !important;
+      margin-top: -30px !important; /* 深度向上微調 */
+      gap: 2px !important;
     }
 
-    /* 結算隊伍部分 */
+    /* 結算隊伍部分 - 極致瘦身 */
     .summary-unit-img {
+      width: 28px !important;
+      height: 28px !important;
+    }
+
+    .summary-unit-card {
+      width: 52px !important;
+      min-height: 65px !important;
+      padding: 3px !important;
+      background: rgba(255, 255, 255, 0.02) !important;
+      border-radius: 10px !important;
+    }
+
+    .unit-stats {
+      font-size: 0.9rem !important;
+      padding: 1px 4px !important;
+      margin-top: -6px !important;
+      border-radius: 6px !important;
+    }
+    
+    .summary-units-grid {
+      gap: 3px !important;
+      padding-top: 20px !important;
+    }
+
+    /* 里程碑部分 - 窄化外框 */
+    .hero-card {
+      width: 80px !important;
+      min-height: 65px !important;
+      padding: 4px !important;
+      border-radius: 15px !important;
+    }
+
+    .hero-img {
       width: 32px !important;
       height: 32px !important;
     }
 
-    .summary-unit-card {
-      width: 58px !important;
-      min-height: 75px !important;
-      padding: 4px !important;
-      background: rgba(255, 255, 255, 0.03) !important; /* 縮小透明框感覺 */
-    }
-
-    .unit-stats {
-      font-size: 0.95rem !important; /* 強調關鍵數值字體 */
-      padding: 1px 6px !important;
-      margin-top: -8px !important;
-    }
-    
-    .summary-units-grid {
-      gap: 4px !important;
-    }
-
-    /* 里程碑部分 */
-    .hero-card {
-      width: 90px !important;
-      min-height: 75px !important;
-      padding: 6px !important;
-    }
-
-    .hero-img {
-      width: 35px !important;
-      height: 35px !important;
-    }
-
     .hero-label {
-      font-size: 0.7rem !important;
+      font-size: 0.65rem !important;
+      margin-bottom: 2px !important;
     }
 
-    /* 對戰紀錄部分 */
+    /* 對戰紀錄部分 - 進一步縮小 */
     .summary-history-grid {
-      gap: 2px !important;
+      gap: 1px !important;
     }
 
     .history-item {
-      width: 26px !important;
-      height: 26px !important;
+      width: 22px !important;
+      height: 22px !important;
     }
   }
 

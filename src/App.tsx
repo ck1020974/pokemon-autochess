@@ -2218,8 +2218,8 @@ function App() {
                                                 const card3 = enemyId ? { label: '好討厭的感覺', opponentId: enemyId } : null;
 
                                                 // 4. Milestone 4 (First Victory) - Moved up to 2nd pos
-                                                const firstWin = history.find(e => e.result === 'WIN');
-                                                const card4 = firstWin ? { label: '冒險的起點', opponentId: firstWin.opponentId } : null;
+                                                const firstBattle = history[0];
+                                                const card4 = firstBattle ? { label: '冒險的起點', opponentId: firstBattle.opponentId } : null;
 
                                                 const heroes = [card1, card4, card2, card3]; // 1:Champ, 2:Start, 3:Rival, 4:Enemy
 
