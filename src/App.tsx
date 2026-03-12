@@ -2167,8 +2167,7 @@ function App() {
                                                 </div>
                                             )}
                                         </div>
-                                    )}
-                                    {((!isPortrait && window.innerWidth < 1200) || summaryTab === 'history') && (
+                                    ) : (
                                         <div className="summary-history-display">
                                             {(() => {
                                                 const history = game.battleHistory || [];
