@@ -2085,7 +2085,7 @@ function App() {
 
                                 {/* Content Area */}
                                 <div className="summary-tab-content">
-                                    {summaryTab === 'team' ? (
+                                    {((!isPortrait && window.innerWidth < 1200) || summaryTab === 'team') && (
                                         <div className="summary-team-display" style={{ marginTop: '-5px' }}>
                                             <div className="summary-units-grid">
                                                 {/* Synergy Display repositioned to top-left of this grid via CSS absolute positioning */}
@@ -2167,7 +2167,8 @@ function App() {
                                                 </div>
                                             )}
                                         </div>
-                                    ) : (
+                                    )}
+                                    {((!isPortrait && window.innerWidth < 1200) || summaryTab === 'history') && (
                                         <div className="summary-history-display">
                                             {(() => {
                                                 const history = game.battleHistory || [];
