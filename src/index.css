@@ -1652,12 +1652,13 @@ h3 {
     height: 45px !important;
   }
 
-  /* 橫式佈局優化 (Landscape Optimization) - 第三輪極致簡約 */
-  @media (max-width: 950px) and (orientation: landscape) {
+  /* 橫式佈局優化 (Landscape Optimization) - 第四輪極致縮小 */
+  @media (max-width: 1200px) and (orientation: landscape) {
     .summary-container {
-      transform: scale(0.46) !important; /* 極大化縮小以確保高度足夠 */
+      transform: scale(0.3) !important; /* 依照要求縮放至 0.3 */
       max-height: 100vh !important;
-      margin-top: -30px !important; /* 深度向上微調 */
+      margin-top: -60px !important; /* 更大幅度的向上微調以處理縮放後的空白 */
+      margin-bottom: -60px !important;
       gap: 2px !important;
     }
 
