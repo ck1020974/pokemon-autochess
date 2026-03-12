@@ -129,12 +129,18 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
             className={`synergy-icon ${className || ''} ${isForcedOpen ? 'force-visible' : ''}`}
             style={style}
             onMouseEnter={onMouseEnter}
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 if (setActiveSynergyId) {
                     setActiveSynergyId(isForcedOpen ? null : synergy.id);
                 } else {
                     setLocalOpen(!isForcedOpen);
+                }
+            }}
+            onTouchStart={(e) => {
+                // Prevent ghost tooltips on mobile by stopping propagation
+                if (setActiveSynergyId) {
+                    e.stopPropagation();
                 }
             }}
         >
@@ -2020,10 +2026,11 @@ function App() {
                                 overflowY: 'auto',
                                 padding: '10px'
                             }}
+                            onClick={() => setActiveSynergyId(null)}
                         >
-                            <div className="summary-container" style={{ position: 'relative' }}>
+                            <div className="summary-container" style={{ position: 'relative' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                 {/* Compact Consolidated Header Row */}
-                                <div className="summary-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px', marginBottom: '15px' }}>
+                                <div className="summary-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px', marginBottom: '15px' }} onClick={(e: React.MouseEvent) => { e.stopPropagation(); }}>
                                     <div className="summary-stat-group" style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
                                         {/* 1. Difficulty Icon */}
                                         <div className="difficulty-badge-container">
@@ -2070,13 +2077,13 @@ function App() {
                                     <div className="summary-stat-btn-group">
                                         <button
                                             className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`}
-                                            onClick={() => setSummaryTab('team')}
+                                            onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('team'); }}
                                         >
                                             最終隊伍
                                         </button>
                                         <button
                                             className={`summary-tab-btn-compact ${summaryTab === 'history' ? 'is-active' : ''}`}
-                                            onClick={() => setSummaryTab('history')}
+                                            onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('history'); }}
                                         >
                                             對戰紀錄
                                         </button>
@@ -2099,6 +2106,8 @@ function App() {
                                                             activeFamilies={syn.activeFamilies}
                                                             className="summary-synergy-item"
                                                             showCount={true}
+                                                            activeSynergyId={activeSynergyId}
+                                                            setActiveSynergyId={setActiveSynergyId}
                                                         />
                                                     ))}
                                                 </div>
@@ -2130,7 +2139,7 @@ function App() {
                                                 <div style={{ marginTop: '20px' }}>
                                                     <div className="summary-units-grid">
                                                         <div className="summary-synergies-row">
-                                                            {getSynergyStatus(game.opponentTeam).map(syn => (
+                                                            {getSynergyStatus(game.opponentTeam).map((syn: any) => (
                                                                 <SynergyIcon
                                                                     key={syn.id}
                                                                     synergy={syn}
@@ -2139,6 +2148,8 @@ function App() {
                                                                     activeFamilies={syn.activeFamilies}
                                                                     className="summary-synergy-item"
                                                                     showCount={true}
+                                                                    activeSynergyId={activeSynergyId}
+                                                                    setActiveSynergyId={setActiveSynergyId}
                                                                 />
                                                             ))}
                                                         </div>
@@ -2172,6 +2183,20 @@ function App() {
                                             {(() => {
                                                 const history = game.battleHistory || [];
 
+                                                // Helper to get base opponent info for name-based consolidation
+                                                const getConsolidatedInfo = (opponentId: string) => {
+                                                    const origOp = allOpponents.find(o => o.id === opponentId);
+                                                    if (!origOp) return { name: '未知', url: '' };
+
+                                                    // Use name as the key for consolidation
+                                                    // Find the '01' version image for this name if it exists, otherwise use current
+                                                    const baseOp = allOpponents.find(o => o.name === origOp.name && (o.id.endsWith('_1') || o.url.includes('01.webp'))) || origOp;
+                                                    return {
+                                                        name: origOp.name,
+                                                        url: baseOp.url
+                                                    };
+                                                };
+
                                                 // 1. Milestone 1
                                                 let card1: any = null;
                                                 if (game.phase === GamePhase.VICTORY) {
@@ -2183,56 +2208,62 @@ function App() {
                                                 }
 
                                                 // 2. Milestone 2 (Legendary Rival)
-                                                // ... encounters logic remains same
-                                                const encounters: Record<string, number> = {};
-                                                const lastEncounterIndex: Record<string, number> = {};
+                                                // Group encounters by NAME
+                                                const nameEncounters: Record<string, number> = {};
+                                                const lastSeenIdByName: Record<string, string> = {};
+                                                const lastEncounterIndexByName: Record<string, number> = {};
+
                                                 history.forEach((e, idx) => {
-                                                    encounters[e.opponentId] = (encounters[e.opponentId] || 0) + 1;
-                                                    lastEncounterIndex[e.opponentId] = idx;
+                                                    const info = getConsolidatedInfo(e.opponentId);
+                                                    nameEncounters[info.name] = (nameEncounters[info.name] || 0) + 1;
+                                                    lastSeenIdByName[info.name] = e.opponentId;
+                                                    lastEncounterIndexByName[info.name] = idx;
                                                 });
+
                                                 let maxE = 0;
-                                                let rivalId = '';
-                                                Object.entries(encounters).forEach(([id, count]) => {
-                                                    if (count > maxE || (count === maxE && lastEncounterIndex[id] > lastEncounterIndex[rivalId])) {
+                                                let rivalName = '';
+                                                Object.entries(nameEncounters).forEach(([name, count]) => {
+                                                    if (count > maxE || (count === maxE && lastEncounterIndexByName[name] > (lastEncounterIndexByName[rivalName] || 0))) {
                                                         maxE = count;
-                                                        rivalId = id;
+                                                        rivalName = name;
                                                     }
                                                 });
-                                                const card2 = rivalId ? { label: '對戰勁敵', opponentId: rivalId } : null;
+                                                const card2 = rivalName ? { label: '對戰勁敵', opponentId: lastSeenIdByName[rivalName] } : null;
 
-                                                // 3. Milestone 3 (Lifelong Enemy: Draws + Losses, Later Priority)
-                                                const nuisance: Record<string, number> = {};
+                                                // 3. Milestone 3 (Lifelong Enemy: Draws + Losses)
+                                                const nameNuisance: Record<string, number> = {};
                                                 history.forEach((e) => {
                                                     if (e.result === 'LOSS' || e.result === 'DRAW') {
-                                                        nuisance[e.opponentId] = (nuisance[e.opponentId] || 0) + 1;
+                                                        const info = getConsolidatedInfo(e.opponentId);
+                                                        nameNuisance[info.name] = (nameNuisance[info.name] || 0) + 1;
                                                     }
                                                 });
                                                 let maxN = 0;
-                                                let enemyId = '';
-                                                 Object.entries(nuisance).forEach(([id, count]) => {
-                                                     if (count > maxN || (count === maxN && lastEncounterIndex[id] >= (lastEncounterIndex[enemyId] || 0))) {
-                                                         maxN = count;
-                                                         enemyId = id;
-                                                     }
-                                                 });
-                                                const card3 = enemyId ? { label: '好討厭的感覺', opponentId: enemyId } : null;
+                                                let enemyName = '';
+                                                Object.entries(nameNuisance).forEach(([name, count]) => {
+                                                    if (count > maxN || (count === maxN && lastEncounterIndexByName[name] >= (lastEncounterIndexByName[enemyName] || 0))) {
+                                                        maxN = count;
+                                                        enemyName = name;
+                                                    }
+                                                });
+                                                const card3 = enemyName ? { label: '好討厭的感覺', opponentId: lastSeenIdByName[enemyName] } : null;
 
-                                                // 4. Milestone 4 (First Victory) - Moved up to 2nd pos
+                                                // 4. Milestone 4 (First Victory)
                                                 const firstBattle = history[0];
                                                 const card4 = firstBattle ? { label: '冒險的起點', opponentId: firstBattle.opponentId } : null;
 
-                                                const heroes = [card1, card4, card2, card3]; // 1:Champ, 2:Start, 3:Rival, 4:Enemy
+                                                const heroes = [card1, card4, card2, card3];
 
                                                 return (
                                                     <>
                                                         <div className="history-hero-grid">
                                                             {heroes.map((hero, idx) => {
                                                                 if (!hero) return <div key={idx} className="hero-card is-empty"><div className="hero-label">尚未達成</div></div>;
-                                                                const op = allOpponents.find(o => o.id === hero.opponentId);
+                                                                const info = getConsolidatedInfo(hero.opponentId);
                                                                 return (
                                                                     <div key={idx} className="hero-card">
                                                                         <div className="hero-label">{hero.label}</div>
-                                                                        <img src={op?.url} className="hero-img" alt="hero" />
+                                                                        <img src={info.url} className="hero-img" alt="hero" />
                                                                     </div>
                                                                 );
                                                             })}
@@ -2241,14 +2272,14 @@ function App() {
                                                         {/* Detailed History List */}
                                                         <div className="summary-history-grid" style={{ marginTop: '5px' }}>
                                                             {history.slice(-39).map((entry, idx) => {
-                                                                const op = allOpponents.find(o => o.id === entry.opponentId);
+                                                                const info = getConsolidatedInfo(entry.opponentId);
                                                                 return (
                                                                     <div
                                                                         key={idx}
                                                                         className={`history-item is-${entry.result.toLowerCase()}`}
-                                                                        title={`${op?.name} - ${entry.result}`}
+                                                                        title={`${info.name} - ${entry.result}`}
                                                                     >
-                                                                        <img src={op?.url} alt={op?.name} />
+                                                                        <img src={info.url} alt={info.name} />
                                                                         <div className="history-result-tag">{entry.result === 'WIN' ? 'W' : entry.result === 'LOSS' ? 'L' : 'D'}</div>
                                                                     </div>
                                                                 );
