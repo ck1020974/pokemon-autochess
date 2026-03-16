@@ -1,7 +1,7 @@
 
 import { Unit } from '../models/Unit';
 import { Shop } from '../models/Shop';
-import { UNIT_TEMPLATES } from '../models/UnitFactory';
+import { ALL_UNITS } from '../data/AllUnits';
 import { SYNERGIES } from '../models/Synergies';
 import { REWARD_DATA } from '../models/RewardData';
 
@@ -115,14 +115,14 @@ export class GameLoop {
 
     private refreshSpecialDescriptions() {
         // Update templates so shop shows CURRENT N value and correct frequency
-        UNIT_TEMPLATES.charmander.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (三場戰鬥後增強)。`;
-        UNIT_TEMPLATES.charmeleon.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (兩場戰鬥後增強)。`;
-        UNIT_TEMPLATES.charizard.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)。`;
+        ALL_UNITS.charmander.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (三場戰鬥後增強)。`;
+        ALL_UNITS.charmeleon.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (兩場戰鬥後增強)。`;
+        ALL_UNITS.charizard.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)。`;
 
         // Sync static template scaling values to current global N
-        (UNIT_TEMPLATES.charmander as any).scalingValue = this.charmanderN;
-        (UNIT_TEMPLATES.charmeleon as any).scalingValue = this.charmanderN;
-        (UNIT_TEMPLATES.charizard as any).scalingValue = this.charmanderN;
+        (ALL_UNITS.charmander as any).scalingValue = this.charmanderN;
+        (ALL_UNITS.charmeleon as any).scalingValue = this.charmanderN;
+        (ALL_UNITS.charizard as any).scalingValue = this.charmanderN;
 
         // Sync units in shop (including frozen ones)
         this.shop.slots.forEach(u => {
@@ -382,17 +382,38 @@ export class GameLoop {
         const results: any[] = [];
         const pickRandom = (p: any[]) => p[Math.floor(Math.random() * p.length)];
 
-        if (pool1.length > 0) results.push(pickRandom(pool1));
-        if (pool2.length > 0) results.push(pickRandom(pool2));
-        if (pool3.length > 0) results.push(pickRandom(pool3));
+        // --- Improved Reward Logic: Focus on Matching Synergies ---
+        // We want to show a mix of matching synergies (Pool 3) and general/utility rewards (Pool 1/2).
+        
+        // 1. Guaranteed 1-2 Synergy Rewards if player has matching synergies
+        const shuffledPool3 = [...pool3].sort(() => 0.5 - Math.random());
+        if (shuffledPool3.length > 0) {
+            results.push(shuffledPool3.shift());
+            // If they have MANY matching synergies, give them another one to increase visibility
+            if (shuffledPool3.length > 0 && Math.random() < 0.7) {
+                results.push(shuffledPool3.shift());
+            }
+        }
 
-        // Ensure we always return 3 unique rewards if possible
+        // 2. Fill with Pool 1 (Utility) if not already full
+        const shuffledPool1 = [...pool1].sort(() => 0.5 - Math.random());
+        while (results.length < 3 && shuffledPool1.length > 0) {
+            results.push(shuffledPool1.shift());
+        }
+
+        // 3. Fill with Pool 2 (General Stats) if still not full
+        const shuffledPool2 = [...pool2].sort(() => 0.5 - Math.random());
+        while (results.length < 3 && shuffledPool2.length > 0) {
+            results.push(shuffledPool2.shift());
+        }
+
+        // Ensure we always return 3 unique rewards if possible (Absolute fallback)
         const allPools = [...pool1, ...pool2, ...pool3];
         const uniqueAllPools = Array.from(new Set(allPools));
         
         while (results.length < 3 && uniqueAllPools.length > results.length) {
             const extra = pickRandom(uniqueAllPools);
-            if (!results.includes(extra)) {
+            if (!results.some(r => r.item === extra.item)) { // Compare by item name to be safe
                 results.push(extra);
             }
         }
@@ -472,12 +493,12 @@ export class GameLoop {
             // Check thresholds
             if (unit.exp >= 9 && unit.level < 3) {
                 // Trigger Level 3 (Evolve if applicable)
-                const dummy = new Unit(UNIT_TEMPLATES[unit.family]);
+                const dummy = new Unit(ALL_UNITS[unit.family]);
                 this.mergeUnits(unit, dummy);
                 canStillLevelUp = true; // Check again after merge/evolution
             } else if (unit.exp >= 3 && unit.level < 2) {
                 // Trigger Level 2 (Evolve if applicable)
-                const dummy = new Unit(UNIT_TEMPLATES[unit.family]);
+                const dummy = new Unit(ALL_UNITS[unit.family]);
                 this.mergeUnits(unit, dummy);
                 canStillLevelUp = true;
             }
@@ -504,19 +525,19 @@ export class GameLoop {
             if (shuffled.length > 0) targets = [shuffled[0]];
         } else if (reward.effect.includes('未進化') || reward.item === '幸運蛋') {
             targets = units.filter(u => {
-                const baseTemplate = UNIT_TEMPLATES[u.family];
+                const baseTemplate = ALL_UNITS[u.family];
                 return u.name === baseTemplate.name; // "Not evolved" if name matches base family name
             });
         } else if (reward.effect.includes('已進化') || reward.item === '進化奇石') {
             targets = units.filter(u => {
-                const baseTemplate = UNIT_TEMPLATES[u.family];
+                const baseTemplate = ALL_UNITS[u.family];
                 return u.name !== baseTemplate.name; // "Evolved" if name changed from base species
             });
         } else if (reward.effect.includes('無法進化') || reward.item === '不變之石') {
             targets = units.filter(u => {
                 // Rule: If unit has no evolution id OR the evolution results in same name
                 if (!u.evolveId) return true;
-                const nextTemplate = UNIT_TEMPLATES[u.evolveId];
+                const nextTemplate = ALL_UNITS[u.evolveId];
                 return !nextTemplate || nextTemplate.name === u.name;
             });
         } else if (reward.synergyId) {
@@ -686,7 +707,7 @@ export class GameLoop {
                         this.gold -= cost * 3;
                         const indicesToBuy = copiesIndices.slice(0, 3);
                         indicesToBuy.forEach(idx => this.shop.buy(idx));
-                        const evolvedTemplate = UNIT_TEMPLATES[shopUnit.evolveId];
+                        const evolvedTemplate = ALL_UNITS[shopUnit.evolveId];
                         if (evolvedTemplate) {
                             const virtualUnit = new Unit(evolvedTemplate);
                             virtualUnit.exp = 3;
@@ -783,7 +804,7 @@ export class GameLoop {
                 this.performEvolution(target);
             } else {
                 target.level = predictedLevel;
-                const base = UNIT_TEMPLATES[target.family].baseStats;
+                const base = ALL_UNITS[target.family].baseStats;
                 const multiplier = 1;
                 target.addGrowth(base.maxHp * multiplier, base.attack * multiplier);
                 console.log(`${target.name} Level Up (Non-Evolve) -> +${base.maxHp * multiplier}/+${base.attack * multiplier}`);
@@ -799,8 +820,8 @@ export class GameLoop {
     private performEvolution(unit: Unit) {
         if (!unit.evolveId) return;
 
-        const newTemplate = UNIT_TEMPLATES[unit.evolveId];
-        const baseTemplate = UNIT_TEMPLATES[unit.family];
+        const newTemplate = ALL_UNITS[unit.evolveId];
+        const baseTemplate = ALL_UNITS[unit.family];
 
         if (newTemplate && baseTemplate) {
             const multiplier = 1;
@@ -860,7 +881,7 @@ export class GameLoop {
     }
 
     private cloneUnit(unit: Unit): Unit {
-        const template = UNIT_TEMPLATES[unit.templateId];
+        const template = ALL_UNITS[unit.templateId];
         if (!template) return unit;
 
         const clone = new Unit(template);

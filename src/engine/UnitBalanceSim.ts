@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { Unit } from '../models/Unit';
-import { UNIT_TEMPLATES } from '../models/UnitFactory';
+import { ALL_UNITS } from '../data/AllUnits';
 import { HeadlessBattleSimulator } from './HeadlessBattleSimulator';
 import { writeFileSync } from 'fs';
-import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS, CHAMPION_OPPONENTS } from '../models/BossData';
+import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS, CHAMPION_OPPONENTS } from '../data/AllOpponents';
 import { SYNERGIES } from '../models/Synergies';
 
 const TOTAL_BATTLES = 5000;
@@ -20,7 +20,7 @@ const STAGES = [
 // --- 輔助函數：模擬星級升級數值 (Reused) ---
 function applyStatsByLevel(unit: Unit, targetLevel: number) {
     unit.level = targetLevel;
-    const baseStats = UNIT_TEMPLATES[unit.templateId]?.baseStats || unit.stats;
+    const baseStats = ALL_UNITS[unit.templateId]?.baseStats || unit.stats;
     unit.stats = { ...baseStats };
     for (let lv = 2; lv <= unit.level; lv++) {
         let bHp = Math.floor(baseStats.hp * 0.5);
@@ -40,7 +40,7 @@ function constructBossTeam(boss: any, stageId: string): Unit[] {
 
     for (const coreId of boss.coreUnits) {
         if (team.length >= 5) break;
-        const t = UNIT_TEMPLATES[coreId];
+        const t = ALL_UNITS[coreId];
         if (t) {
             const u = new Unit(t);
             applyStatsByLevel(u, baseLevel);
@@ -53,7 +53,7 @@ function constructBossTeam(boss: any, stageId: string): Unit[] {
 }
 
 function generatePlayerTeamForStage(stageId: string): Unit[] {
-    const allTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
+    const allTemplates = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
     const team: Unit[] = [];
 
     let unitCount = 3;
@@ -80,7 +80,7 @@ function generatePlayerTeamForStage(stageId: string): Unit[] {
 
         if (stageId === 'Elite' || stageId === 'Champion') {
             while (t.evolveId) {
-                const nextT = UNIT_TEMPLATES[t.evolveId];
+                const nextT = ALL_UNITS[t.evolveId];
                 if (nextT) t = nextT;
                 else break;
             }

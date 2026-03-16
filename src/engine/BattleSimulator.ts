@@ -1,7 +1,7 @@
 
 import { Unit } from '../models/Unit';
 import { EventBus } from './EventBus';
-import { UNIT_TEMPLATES } from '../models/UnitFactory';
+import { ALL_UNITS } from '../data/AllUnits';
 
 export interface BattleLog {
     message: string;
@@ -218,7 +218,7 @@ export class BattleSimulator {
     }
 
     private cloneUnit(unit: Unit): Unit {
-        const clone = new Unit(UNIT_TEMPLATES[unit.templateId]);
+        const clone = new Unit(ALL_UNITS[unit.templateId]);
         clone.stats = { ...unit.stats };
         clone.level = unit.level;
         clone.exp = unit.exp;
@@ -380,7 +380,7 @@ export class BattleSimulator {
                 unit.level = target.level; // Skill intensity follows target's star level
 
                 // Directly copy the target's exact template (ignoring star level difference)
-                const currentTemplate = UNIT_TEMPLATES[target.templateId];
+                const currentTemplate = ALL_UNITS[target.templateId];
 
                 unit.templateId = currentTemplate.id;
                 unit.description = currentTemplate.description;
@@ -1560,7 +1560,7 @@ export class BattleSimulator {
     }
 
     private async spawnUnit(team: Unit[], index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false) {
-        const template = UNIT_TEMPLATES[templateId];
+        const template = ALL_UNITS[templateId];
         if (!template) return;
         const newUnit = new Unit(template);
         newUnit.level = level;

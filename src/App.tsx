@@ -6,30 +6,23 @@ import './index.css';
 import { GameLoop, GamePhase } from './engine/GameLoop';
 import { music } from './engine/MusicManager';
 
-import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS, CHAMPION_OPPONENTS } from './models/BossData';
 import { BattleSimulator } from './engine/BattleSimulator';
 import type { BattleLog } from './engine/BattleSimulator';
-import { UNIT_TEMPLATES, PREFERRED_POSITIONS } from './models/UnitFactory';
-import type { PreferredPosition } from './models/UnitFactory';
+import { ALL_UNITS, PREFERRED_POSITIONS } from './data/AllUnits';
+import type { PreferredPosition } from './data/AllUnits';
 import { SYNERGIES } from './models/Synergies';
 import { EncyclopediaModal } from './components/EncyclopediaModal';
 import { TutorialModal } from './components/TutorialModal';
 import { Unit } from './models/Unit';
 import { REWARD_DATA } from './models/RewardData';
+import type { GameEdition } from './models/Edition';
+import { ClassicEdition } from './data/editions/classic';
 
 // Difficulty Icons
 import normalBall from './assets/普通.webp';
 import greatBall from './assets/超級.webp';
 import ultraBall from './assets/高級.webp';
 import masterBall from './assets/大師.webp';
-
-const allOpponents = [
-    ...NOVICE_OPPONENTS,
-    ...INTERM_OPPONENTS,
-    ...ADVANCED_OPPONENTS,
-    ...ELITE_OPPONENTS,
-    ...CHAMPION_OPPONENTS
-];
 
 // --- Types ---
 interface SelectedUnitState {
@@ -199,7 +192,7 @@ function getSynergyStatus(team: (Unit | null)[]) {
         const isActive = count >= syn.tiers[0];
 
         // Find units belonging to this synergy and sort them by tier
-        const units = Object.values(UNIT_TEMPLATES)
+        const units = Object.values(ALL_UNITS)
             .filter(t => t.synergies?.includes(syn.id) && !t.isHiddenFromShop && t.id !== 'sprout')
             .sort((a, b) => a.tier - b.tier);
 
@@ -230,6 +223,16 @@ function App() {
         (window as any).game = gameRef.current;
     }
     const game = gameRef.current;
+
+    const [activeEdition] = useState<GameEdition>(ClassicEdition);
+
+    const allEditionOpponents = React.useMemo(() => [
+        ...activeEdition.noviceOpponents,
+        ...activeEdition.intermOpponents,
+        ...activeEdition.advancedOpponents,
+        ...activeEdition.eliteOpponents,
+        ...activeEdition.championOpponents
+    ], [activeEdition]);
 
     const [rewardChoices, setRewardChoices] = useState<any[]>([]);
     const update = useForceUpdate();
@@ -375,9 +378,9 @@ function App() {
         // Setup Tutorial Context
         newGame.gold = 10;
         newGame.shop.slots = [
-            new Unit(UNIT_TEMPLATES.gastly),
-            new Unit(UNIT_TEMPLATES.charmander),
-            new Unit(UNIT_TEMPLATES.squirtle)
+            new Unit(ALL_UNITS.gastly),
+            new Unit(ALL_UNITS.charmander),
+            new Unit(ALL_UNITS.squirtle)
         ];
         newGame.setDifficulty('NORMAL');
 
@@ -399,14 +402,14 @@ function App() {
         if (tutorialStep === 0) return;
 
         if (tutorialStep === 2) {
-            if (game.playerTeam.filter(u => u !== null).length >= 3) {
+            if (game.playerTeam.filter((u: any) => u !== null).length >= 3) {
                 setTutorialStep(3);
                 setSelected(null);
             }
         } else if (tutorialStep === 4) {
-            const gastlyIdx = game.playerTeam.findIndex(u => u?.family === 'gastly');
+            const gastlyIdx = game.playerTeam.findIndex((u: any) => u?.family === 'gastly');
             // If Gastly is in index 1-4, it's behind someone if there is another unit in index 0 to (gastlyIdx-1)
-            const isBehindSomeone = gastlyIdx > 0 && game.playerTeam.slice(0, gastlyIdx).some(u => u !== null);
+            const isBehindSomeone = gastlyIdx > 0 && game.playerTeam.slice(0, gastlyIdx).some((u: any) => u !== null);
             if (isBehindSomeone) {
                 setTutorialStep(5);
                 setSelected(null);
@@ -414,7 +417,7 @@ function App() {
         } else if (tutorialStep === 5) {
             const isReplaced = game.shop.slots.length === 2 && game.shop.slots[0]?.family === 'charmander' && game.shop.slots[1]?.family === 'charmander';
             if (game.gold < 10 && !isReplaced) {
-                game.shop.slots = [new Unit(UNIT_TEMPLATES.charmander), new Unit(UNIT_TEMPLATES.charmander), null];
+                game.shop.slots = [new Unit(ALL_UNITS.charmander), new Unit(ALL_UNITS.charmander), null];
                 game.shop.frozen = [false, false, false, false, false];
                 update();
             } else if (game.gold < 10 && isReplaced) {
@@ -430,15 +433,15 @@ function App() {
             }
         } else if (tutorialStep === 8) {
             if (game.phase === GamePhase.SHOP && battleResult === null) {
-                const hasLevel2Charmander = game.playerTeam.some(u => u?.family === 'charmander' && u.level >= 2);
+                const hasLevel2Charmander = game.playerTeam.some((u: any) => u?.family === 'charmander' && u.level >= 2);
                 if (hasLevel2Charmander) {
                     setTutorialStep(9);
                 } else {
                     if (game.shop.slots.length > 0 && game.shop.slots[2]?.family !== 'cyndaquil') {
-                        game.shop.slots[0] = new Unit(UNIT_TEMPLATES.charmander);
-                        game.shop.slots[1] = new Unit(UNIT_TEMPLATES.charmander);
-                        game.shop.slots[2] = new Unit(UNIT_TEMPLATES.cyndaquil);
-                        game.shop.slots[3] = new Unit(UNIT_TEMPLATES.igglybuff);
+                        game.shop.slots[0] = new Unit(ALL_UNITS.charmander);
+                        game.shop.slots[1] = new Unit(ALL_UNITS.charmander);
+                        game.shop.slots[2] = new Unit(ALL_UNITS.cyndaquil);
+                        game.shop.slots[3] = new Unit(ALL_UNITS.igglybuff);
                         game.shop.slots.length = 4;
                         game.shop.frozen = [false, false, false, false, false];
                         update();
@@ -490,7 +493,7 @@ function App() {
             const criticalUrls = new Set<string>();
             const backgroundUrls = new Set<string>();
 
-            Object.values(UNIT_TEMPLATES).forEach(t => {
+            Object.values(ALL_UNITS).forEach(t => {
                 // Priority 1: All Tier 1 & 2 units
                 const isCriticalTier = t.tier <= 2 || t.id === 'sprout';
 
@@ -506,8 +509,8 @@ function App() {
             });
 
             // Trainers: Only NOVICE are critical, others are background (but will be preloaded on encounter)
-            NOVICE_OPPONENTS.forEach(op => criticalUrls.add(op.url));
-            [...INTERM_OPPONENTS, ...ADVANCED_OPPONENTS, ...ELITE_OPPONENTS, ...CHAMPION_OPPONENTS].forEach(op => backgroundUrls.add(op.url));
+            activeEdition.noviceOpponents.forEach((op: any) => criticalUrls.add(op.url));
+            [...activeEdition.intermOpponents, ...activeEdition.advancedOpponents, ...activeEdition.eliteOpponents, ...activeEdition.championOpponents].forEach((op: any) => backgroundUrls.add(op.url));
 
             // Critical token/derived images (Battle versions of early game units)
             criticalUrls.add('assets/妙蛙種子01.webp');
@@ -562,7 +565,7 @@ function App() {
 
         // Current Opponent Preload
         if (game.currentOpponentId) {
-            const op = allOpponents.find(o => o.id === game.currentOpponentId);
+            const op = allEditionOpponents.find((o: any) => o.id === game.currentOpponentId);
             if (op && op.url) teamUrls.push(op.url);
         }
 
@@ -628,7 +631,7 @@ function App() {
     };
 
     const toggleBattleSpeed = () => {
-        setBattleSpeed(prev => {
+        setBattleSpeed((prev: any) => {
             if (prev === 1) return 2;
             if (prev === 2) return 3;
             return 1;
@@ -763,9 +766,9 @@ function App() {
             // 3. Strategy / Synergy Selection
             if (tutorialStep > 0 && tutorialStep < 10) {
                 // Tutorial Battle 1: Use Brock (novice_3)'s team exactly
-                const brock = NOVICE_OPPONENTS.find(n => n.id === 'novice_3')!;
-                enemyTeam = brock.coreUnits.map(id => {
-                    const t = UNIT_TEMPLATES[id];
+                const brock = activeEdition.noviceOpponents.find((n: any) => n.id === 'novice_3') || activeEdition.noviceOpponents[0];
+                enemyTeam = brock.coreUnits.map((id: string) => {
+                    const t = ALL_UNITS[id];
                     if (!t) return null;
                     const u = new Unit(t);
                     u.level = 1;
@@ -773,11 +776,11 @@ function App() {
                 }).concat(Array(5).fill(null)).slice(0, 5) as Unit[];
             } else if (selectedOpponent && selectedOpponent.id) {
                 // Real gameplay OR Tutorial Battle 2: Use chosen opponent's team
-                let def = CHAMPION_OPPONENTS.find(c => c.id === selectedOpponent.id) ||
-                    ELITE_OPPONENTS.find(c => c.id === selectedOpponent.id) ||
-                    ADVANCED_OPPONENTS.find(e => e.id === selectedOpponent.id) ||
-                    INTERM_OPPONENTS.find(g => g.id === selectedOpponent.id) ||
-                    NOVICE_OPPONENTS.find(n => n.id === selectedOpponent.id);
+                let def = activeEdition.championOpponents.find((c: any) => c.id === selectedOpponent.id) ||
+                    activeEdition.eliteOpponents.find((c: any) => c.id === selectedOpponent.id) ||
+                    activeEdition.advancedOpponents.find((e: any) => e.id === selectedOpponent.id) ||
+                    activeEdition.intermOpponents.find((g: any) => g.id === selectedOpponent.id) ||
+                    activeEdition.noviceOpponents.find((n: any) => n.id === selectedOpponent.id);
                 if (def) {
                     // bossLevel for Core Units
                     let bossLevel = enemyBaseLevel;
@@ -795,8 +798,8 @@ function App() {
                     const getEvolvedTemplate = (t: any, targetLevel: number) => {
                         let current = t;
                         for (let i = 1; i < targetLevel; i++) {
-                            if (current && current.evolveId && UNIT_TEMPLATES[current.evolveId]) {
-                                current = UNIT_TEMPLATES[current.evolveId];
+                            if (current && current.evolveId && ALL_UNITS[current.evolveId]) {
+                                current = ALL_UNITS[current.evolveId];
                             } else {
                                 break;
                             }
@@ -809,7 +812,7 @@ function App() {
                     let coreCount = 0;
                     for (const coreId of def.coreUnits) {
                         if (coreCount >= enemyCount) break;
-                        const baseT = UNIT_TEMPLATES[coreId];
+                        const baseT = ALL_UNITS[coreId];
                         if (baseT) {
                             const t = getEvolvedTemplate(baseT, bossLevel);
                             const u = new Unit(t);
@@ -828,7 +831,7 @@ function App() {
                     const shopTier = game.shop.getTier(game.turn);
 
                     while (fillCount > 0 && attempts < MAX_ENEMY_ATTEMPTS) {
-                        const availableTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= shopTier);
+                        const availableTemplates = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= shopTier && activeEdition.availableUnitIds.includes(t.id));
                         let pool = availableTemplates;
                         if (mainSynergy && Math.random() < 0.7) {
                             const sPool = availableTemplates.filter(t => t.synergies.includes(mainSynergy));
@@ -876,16 +879,16 @@ function App() {
                     }
                 } else {
                     // Fallback logic if ID not found (Should not happen)
-                    enemyTeam = [new Unit(UNIT_TEMPLATES.rattata), null, null, null, null];
+                    enemyTeam = [new Unit(ALL_UNITS.rattata), null, null, null, null];
                 }
             } else {
                 // This block executes if there's NO selected opponent (e.g., debugging or not opening the modal)
-                let fallbackPool = game.wins >= 12 ? CHAMPION_OPPONENTS : (game.wins >= 8 ? ELITE_OPPONENTS : (game.wins >= 5 ? ADVANCED_OPPONENTS : (game.wins >= 3 ? INTERM_OPPONENTS : NOVICE_OPPONENTS)));
+                let fallbackPool = game.wins >= 12 ? activeEdition.championOpponents : (game.wins >= 8 ? activeEdition.eliteOpponents : (game.wins >= 5 ? activeEdition.advancedOpponents : (game.wins >= 3 ? activeEdition.intermOpponents : activeEdition.noviceOpponents)));
                 const def = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
                 const fbCandidateUnits: Unit[] = [];
                 for (const coreId of def.coreUnits) {
                     if (fbCandidateUnits.length >= enemyCount) break;
-                    const t = UNIT_TEMPLATES[coreId];
+                    const t = ALL_UNITS[coreId];
                     if (t) {
                         const u = new Unit(t);
                         u.level = enemyBaseLevel;
@@ -895,7 +898,7 @@ function App() {
                 let fbFillCount = enemyCount - fbCandidateUnits.length;
                 const fbShopTier = game.shop.getTier(game.turn);
                 while (fbFillCount > 0) {
-                    const allT = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= fbShopTier);
+                    const allT = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= fbShopTier && activeEdition.availableUnitIds.includes(t.id));
                     const t = getRandomEnemyTemplate(allT);
                     const u = new Unit(t);
                     u.level = enemyBaseLevel;
@@ -933,7 +936,7 @@ function App() {
             // Emulate evolution stat growth up to Level 3
             enemyTeam.forEach(u => {
                 if (!u) return;
-                const baseStats = UNIT_TEMPLATES[u.templateId]?.baseStats || u.stats;
+                const baseStats = ALL_UNITS[u.templateId]?.baseStats || u.stats;
                 u.stats = { ...baseStats };
                 for (let lv = 2; lv <= u.level; lv++) {
                     let bHp = Math.floor(baseStats.hp * 0.5);
@@ -1125,9 +1128,9 @@ function App() {
         if (tutorialStep === 5) {
             // Force 2 Charmanders in the shop for Step 6 double lock tutorial
             game.shop.slots = [
-                new Unit(UNIT_TEMPLATES.charmander),
-                new Unit(UNIT_TEMPLATES.charmander),
-                new Unit(UNIT_TEMPLATES.squirtle)
+                new Unit(ALL_UNITS.charmander),
+                new Unit(ALL_UNITS.charmander),
+                new Unit(ALL_UNITS.squirtle)
             ];
             setTutorialStep(6);
         }
@@ -1223,7 +1226,7 @@ function App() {
                 ]);
             } else {
                 // Second tutorial: Force Champions to ensure player defeat
-                const shuffledChampions = [...CHAMPION_OPPONENTS].sort(() => 0.5 - Math.random());
+                const shuffledChampions = [...activeEdition.championOpponents].sort(() => 0.5 - Math.random());
                 setOpponentChoices(shuffledChampions.slice(0, 3));
             }
             setShowOpponentSelect(true);
@@ -1233,15 +1236,15 @@ function App() {
         // Determine which opponent pool to use based on game.wins
         let npcPool: any[] = [];
         if (game.wins >= 12) {
-            npcPool = CHAMPION_OPPONENTS;
+            npcPool = activeEdition.championOpponents;
         } else if (game.wins >= 8) {
-            npcPool = ELITE_OPPONENTS;
+            npcPool = activeEdition.eliteOpponents;
         } else if (game.wins >= 5) {
-            npcPool = ADVANCED_OPPONENTS;
+            npcPool = activeEdition.advancedOpponents;
         } else if (game.wins >= 3) {
-            npcPool = INTERM_OPPONENTS;
+            npcPool = activeEdition.intermOpponents;
         } else {
-            npcPool = NOVICE_OPPONENTS;
+            npcPool = activeEdition.noviceOpponents;
         }
 
         // We show opponent choices for Boss matches (Wins: 8~11 or 12) or special gym levels.
@@ -2185,12 +2188,12 @@ function App() {
 
                                                 // Helper to get base opponent info for name-based consolidation
                                                 const getConsolidatedInfo = (opponentId: string) => {
-                                                    const origOp = allOpponents.find(o => o.id === opponentId);
+                                                    const origOp = allEditionOpponents.find(o => o.id === opponentId);
                                                     if (!origOp) return { name: '未知', url: '' };
 
                                                     // Use name as the key for consolidation
                                                     // Find the '01' version image for this name if it exists, otherwise use current
-                                                    const baseOp = allOpponents.find(o => o.name === origOp.name && (o.id.endsWith('_1') || o.url.includes('01.webp'))) || origOp;
+                                                    const baseOp = allEditionOpponents.find(o => o.name === origOp.name && (o.id.endsWith('_1') || o.url.includes('01.webp'))) || origOp;
                                                     return {
                                                         name: origOp.name,
                                                         url: baseOp.url
@@ -2272,7 +2275,7 @@ function App() {
                                                         <div className="summary-history-grid" style={{ marginTop: '5px' }}>
                                                             {history.slice(-39).map((entry, idx) => {
                                                                 const info = getConsolidatedInfo(entry.opponentId);
-                                                                const origOp = allOpponents.find(o => o.id === entry.opponentId);
+                                                                const origOp = allEditionOpponents.find(o => o.id === entry.opponentId);
                                                                 const displayUrl = origOp ? origOp.url : info.url;
                                                                 return (
                                                                     <div
@@ -2588,10 +2591,10 @@ function App() {
                                 {/* Render Active Slots */}
                                 {game.shop.slots.map((unit: Unit | null, i: number) => {
                                     if (unit) {
-                                        (unit as any).isMergeable = game.playerTeam.some(u => u && u.family === unit.family && u.level === unit.level);
+                                        (unit as any).isMergeable = game.playerTeam.some((u: any) => u && u.family === unit.family && u.level === unit.level);
                                     }
 
-                                    const hasGastly = game.playerTeam.some(u => u?.family === 'gastly');
+                                    const hasGastly = game.playerTeam.some((u: any) => u?.family === 'gastly');
                                     const isHighlighted = (tutorialStep === 2 && ((!hasGastly && unit?.family === 'gastly') || (hasGastly && (unit?.family === 'charmander' || unit?.family === 'squirtle')))) ||
                                         (tutorialStep === 6 && unit?.family === 'charmander') ||
                                         (tutorialStep === 8 && unit?.family === 'charmander') ||
@@ -2681,7 +2684,7 @@ function App() {
                         {/* 2. Battle Log (Bottom) */}
                         <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5, minHeight: '4.5em', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             {logs.length > 0 ? (
-                                logs.slice(-3).map((log, i) => (
+                                logs.slice(-3).map((log: any, i: number) => (
                                     <div key={i} style={{ opacity: i === 2 ? 1 : (i === 1 ? 0.6 : 0.3) }}>
                                         {log.message}
                                     </div>
@@ -2726,7 +2729,7 @@ function App() {
 
                             {/* Left Column: Image + Actions */}
                             <div className="detail-left" style={{ width: '140px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-                                <img src={UNIT_TEMPLATES[selected.unit.templateId].imageUrl} className="detail-image" alt={selected.unit.name} style={{ width: '105px', height: '105px', objectFit: 'contain' }} />
+                                <img src={ALL_UNITS[selected.unit.templateId].imageUrl} className="detail-image" alt={selected.unit.name} style={{ width: '105px', height: '105px', objectFit: 'contain' }} />
 
                                 {/* Action Buttons (Buy/Sell) */}
                                 {selected.source === 'SHOP' && (
@@ -2805,11 +2808,13 @@ function App() {
             {/* Modal should be rendered at the very end of the DOM to ensure highest physical layering context */}
             {
                 showEncyclopedia && createPortal(
-                    <EncyclopediaModal onClose={() => {
-                        setShowEncyclopedia(false);
-                        if (tutorialStep === 11) {
-                            setTutorialStep(12);
-                        }
+                    <EncyclopediaModal 
+                        activeEdition={activeEdition}
+                        onClose={() => {
+                            setShowEncyclopedia(false);
+                            if (tutorialStep === 11) {
+                                setTutorialStep(12);
+                            }
                     }} />,
                     document.getElementById('modal-root')!
                 )

@@ -1,7 +1,7 @@
 
-import type { UnitTemplate } from './Unit';
+import type { UnitTemplate } from '../models/Unit';
 
-export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
+export const ALL_UNITS: Record<string, UnitTemplate> = {
     // --- Evolution Paths Define ---
     // Format: Base -> Stage 2 -> Stage 3
 

@@ -1,7 +1,7 @@
 
 import { Unit } from './Unit';
 // Removed unused UnitTemplate import
-import { UNIT_TEMPLATES } from './UnitFactory';
+import { ALL_UNITS } from '../data/AllUnits';
 
 export class Shop {
     public slots: (Unit | null)[] = [];
@@ -56,7 +56,7 @@ export class Shop {
                     }
                 }
 
-                const tierTemplates = Object.values(UNIT_TEMPLATES).filter(u => u.tier === targetTier && !u.isHiddenFromShop);
+                const tierTemplates = Object.values(ALL_UNITS).filter(u => u.tier === targetTier && !u.isHiddenFromShop);
 
                 if (tierTemplates.length > 0) {
                     const randomTemp = tierTemplates[Math.floor(Math.random() * tierTemplates.length)];

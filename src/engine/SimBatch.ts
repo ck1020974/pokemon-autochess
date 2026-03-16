@@ -1,6 +1,6 @@
 
 import { Unit } from '../models/Unit';
-import { UNIT_TEMPLATES } from '../models/UnitFactory';
+import { ALL_UNITS } from '../data/AllUnits';
 import { SYNERGIES } from '../models/Synergies';
 import { HeadlessBattleSimulator } from './HeadlessBattleSimulator';
 import { writeFileSync } from 'node:fs';
@@ -26,8 +26,8 @@ let totalLoops = 0;
 const loopCases: any[] = [];
 
 // Initialize trackers
-Object.keys(UNIT_TEMPLATES).forEach(id => {
-    if (!UNIT_TEMPLATES[id].isHiddenFromShop) {
+Object.keys(ALL_UNITS).forEach(id => {
+    if (!ALL_UNITS[id].isHiddenFromShop) {
         unitStats[id] = { pickCount: 0, winCount: 0 };
         carryUnitStats[id] = { pickCount: 0, winCount: 0 };
     }
@@ -39,7 +39,7 @@ Object.keys(SYNERGIES).forEach(id => {
 // --- Helper Functions ---
 function generateChampionTeam(): Unit[] {
     const enemyCount = 5;
-    const allTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
+    const allTemplates = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
     const enemyTeam: Unit[] = [];
 
     const elements = ['Fire', 'Water', 'Grass'];
@@ -52,7 +52,7 @@ function generateChampionTeam(): Unit[] {
             : allTemplates[Math.floor(Math.random() * allTemplates.length)];
 
         while (t.evolveId) {
-            const nextT = UNIT_TEMPLATES[t.evolveId];
+            const nextT = ALL_UNITS[t.evolveId];
             if (nextT) t = nextT;
             else break;
         }
@@ -74,7 +74,7 @@ function generateChampionTeam(): Unit[] {
 }
 
 function generateRandomPlayerTeam(): Unit[] {
-    const allTemplates = Object.values(UNIT_TEMPLATES).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
+    const allTemplates = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
     const team: Unit[] = [];
 
     const availableSynergies = Object.keys(SYNERGIES);
@@ -87,7 +87,7 @@ function generateRandomPlayerTeam(): Unit[] {
             : allTemplates[Math.floor(Math.random() * allTemplates.length)];
 
         while (t.evolveId) {
-            const nextT = UNIT_TEMPLATES[t.evolveId];
+            const nextT = ALL_UNITS[t.evolveId];
             if (nextT) t = nextT;
             else break;
         }
@@ -112,7 +112,7 @@ function applyCarryBuff(team: Unit[]): { unit: Unit; type: 'HP' | 'ATK' } {
     const type = Math.random() < 0.5 ? 'HP' : 'ATK';
 
     // T1:+15, T2:+12, T3:+10, T4:+8
-    const tier = UNIT_TEMPLATES[carry.templateId].tier;
+    const tier = ALL_UNITS[carry.templateId].tier;
     const bonus = tier === 1 ? 15 : (tier === 2 ? 12 : (tier === 3 ? 10 : 8));
 
     if (type === 'HP') {
@@ -164,7 +164,7 @@ async function runSimulation() {
         else totalDraws++;
 
         // Carry Stats
-        const baseId = Object.keys(UNIT_TEMPLATES).find(id => UNIT_TEMPLATES[id].family === carryInfo.unit.family && !UNIT_TEMPLATES[id].isHiddenFromShop);
+        const baseId = Object.keys(ALL_UNITS).find(id => ALL_UNITS[id].family === carryInfo.unit.family && !ALL_UNITS[id].isHiddenFromShop);
         if (baseId && carryUnitStats[baseId]) {
             carryUnitStats[baseId].pickCount++;
             if (result === 'WIN') carryUnitStats[baseId].winCount++;
@@ -180,7 +180,7 @@ async function runSimulation() {
         // Track Unit Stats
         const playerFamilies = new Set(playerTeam.map(u => u.family));
         playerFamilies.forEach(fam => {
-            const baseTemplate = Object.values(UNIT_TEMPLATES).find(t => t.family === fam && !t.isHiddenFromShop);
+            const baseTemplate = Object.values(ALL_UNITS).find(t => t.family === fam && !t.isHiddenFromShop);
             if (baseTemplate && unitStats[baseTemplate.id]) {
                 unitStats[baseTemplate.id].pickCount++;
                 if (result === 'WIN') unitStats[baseTemplate.id].winCount++;
@@ -241,7 +241,7 @@ function generateReport(duration: number) {
     sortedCarries.forEach(id => {
         const s = carryUnitStats[id];
         const wr = (s.winCount / s.pickCount) * 100;
-        const name = UNIT_TEMPLATES[id].name;
+        const name = ALL_UNITS[id].name;
         report += `| ${name} | ${s.pickCount} | ${s.winCount} | ${wr.toFixed(1)}% |\n`;
     });
 
@@ -260,7 +260,7 @@ function generateReport(duration: number) {
     sortedUnits.forEach(id => {
         const s = unitStats[id];
         const wr = (s.winCount / s.pickCount) * 100;
-        const name = UNIT_TEMPLATES[id].name;
+        const name = ALL_UNITS[id].name;
         let rating = 'Normal';
         if (wr > 50) rating = '🔥 Strong';
         else if (wr < 25) rating = '❄️ Weak';

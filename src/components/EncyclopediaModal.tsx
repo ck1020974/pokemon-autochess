@@ -2,12 +2,14 @@ import * as React from 'react';
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import './EncyclopediaModal.css';
-import { UNIT_TEMPLATES } from '../models/UnitFactory';
+import { ALL_UNITS } from '../data/AllUnits';
+import type { GameEdition } from '../models/Edition';
 import { SYNERGIES } from '../models/Synergies';
 import type { UnitTemplate } from '../models/Unit';
 
 interface EncyclopediaModalProps {
     onClose: () => void;
+    activeEdition: GameEdition;
 }
 
 const TIER_NAMES = {
@@ -37,15 +39,17 @@ const SYNERGY_PRIORITY = [
 
 const ENCYCLOPEDIA_VERSION = '2026-03-04-0105'; // 版本標記，用於協助使用者確認是否為最新版
 
-export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
+export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalProps) {
     const [activeTier, setActiveTier] = useState<number>(1);
     const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null); // Controls the detail popup
 
     // Get base units (those allowed in shop, not hidden) grouped by tier
     const baseUnitsByTier = useMemo(() => {
         const groups: Record<number, UnitTemplate[]> = { 1: [], 2: [], 3: [], 4: [], 5: [] };
-        Object.values(UNIT_TEMPLATES).forEach(template => {
-            if (!template.isHiddenFromShop && template.tier >= 1 && template.tier <= 5 && template.id !== 'sprout') {
+        Object.values(ALL_UNITS).forEach(template => {
+            // Filter by hidden status AND availability in the current edition
+            const isAvailable = activeEdition.availableUnitIds.includes(template.id);
+            if (isAvailable && !template.isHiddenFromShop && template.tier >= 1 && template.tier <= 5 && template.id !== 'sprout') {
                 groups[template.tier].push(template);
             }
         });
@@ -91,12 +95,12 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
     // Get evolution path for a selected unit, padding to exactly 3 evolutionary stages
     const getEvolutionPath = (startTemplateId: string) => {
         const path: UnitTemplate[] = [];
-        let current: UnitTemplate | undefined = UNIT_TEMPLATES[startTemplateId];
+        let current: UnitTemplate | undefined = ALL_UNITS[startTemplateId];
 
         while (current) {
             path.push(current);
             if (current.evolveId) {
-                current = UNIT_TEMPLATES[current.evolveId];
+                current = ALL_UNITS[current.evolveId];
             } else {
                 break;
             }
@@ -124,7 +128,7 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
     };
 
     const activeUnits = baseUnitsByTier[activeTier];
-    const selectedTemplate = selectedUnitId ? UNIT_TEMPLATES[selectedUnitId] : null;
+    const selectedTemplate = selectedUnitId ? ALL_UNITS[selectedUnitId] : null;
 
     // Handle selection when changing tiers
     const handleTierChange = (tier: number) => {
@@ -209,7 +213,7 @@ export function EncyclopediaModal({ onClose }: EncyclopediaModalProps) {
                                             if (!syn) return null;
 
                                             // Find units belonging to this synergy
-                                            const units = Object.values(UNIT_TEMPLATES)
+                                            const units = Object.values(ALL_UNITS)
                                                 .filter(t => t.synergies?.includes(syn.id) && !t.isHiddenFromShop && t.id !== 'sprout')
                                                 .sort((a, b) => a.tier - b.tier);
 

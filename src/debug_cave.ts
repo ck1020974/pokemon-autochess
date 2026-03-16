@@ -1,14 +1,14 @@
 
 import { Unit } from './models/Unit';
-import { UNIT_TEMPLATES } from './models/UnitFactory';
+import { ALL_UNITS } from './data/AllUnits';
 import { HeadlessBattleSimulator } from './engine/HeadlessBattleSimulator';
 
 async function testCaveSynergy() {
     console.log("--- Testing Cave Synergy ---");
 
     // Cave [2]: Diglett + Onix
-    const onix = new Unit(UNIT_TEMPLATES['onix']);
-    const diglett = new Unit(UNIT_TEMPLATES['diglett']);
+    const onix = new Unit(ALL_UNITS['onix']);
+    const diglett = new Unit(ALL_UNITS['diglett']);
 
     onix.id = "ONIX_ID";
     diglett.id = "DIGLETT_ID";
@@ -24,7 +24,7 @@ async function testCaveSynergy() {
     console.log(`Initial Stats - Onix: ${pOnix.stats.hp}/${pOnix.stats.maxHp}, Diglett: ${pDiglett.stats.hp}/${pDiglett.stats.maxHp}`);
     console.log(`Unit IDs - Onix: ${pOnix.id}, Diglett: ${pDiglett.id}`);
 
-    const eDummy = new Unit(UNIT_TEMPLATES['bulbasaur']);
+    const eDummy = new Unit(ALL_UNITS['bulbasaur']);
     sim.enemyTeam[0] = eDummy;
 
     console.log("\nOnix attacks eDummy...");

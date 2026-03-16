@@ -1,7 +1,7 @@
 
 import { Unit } from '../models/Unit';
 import { EventBus } from './EventBus';
-import { UNIT_TEMPLATES } from '../models/UnitFactory';
+import { ALL_UNITS } from '../data/AllUnits';
 
 export class HeadlessBattleSimulator {
     public playerTeam: Unit[];
@@ -91,7 +91,7 @@ export class HeadlessBattleSimulator {
     }
 
     private cloneUnit(unit: Unit): Unit {
-        const template = UNIT_TEMPLATES[unit.templateId];
+        const template = ALL_UNITS[unit.templateId];
         const clone = new Unit(template);
         clone.stats = { ...unit.stats };
         clone.level = unit.level;
@@ -210,7 +210,7 @@ export class HeadlessBattleSimulator {
                 unit.level = target.level; // Skill intensity follows target's star level
 
                 // Directly copy the target's exact template (ignoring star level difference)
-                const currentTemplate = UNIT_TEMPLATES[target.templateId];
+                const currentTemplate = ALL_UNITS[target.templateId];
 
                 unit.templateId = currentTemplate.id;
                 unit.synergies = [...currentTemplate.synergies];
@@ -892,7 +892,7 @@ export class HeadlessBattleSimulator {
     }
 
     private async spawnUnit(team: Unit[], index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false) {
-        const template = UNIT_TEMPLATES[templateId];
+        const template = ALL_UNITS[templateId];
         if (!template) return;
 
         const newUnit = new Unit(template);
