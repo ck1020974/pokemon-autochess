@@ -363,7 +363,8 @@ export class HeadlessBattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && e.source !== unit && myTeam.includes(e.source)) {
                     const buff = [0, 1, 2, 5][unit.level] || 1;
-                    this.growUnit(unit, buff, buff);
+                    const isAtk = Math.random() < 0.5;
+                    this.growUnit(unit, isAtk ? 0 : buff, isAtk ? buff : 0);
                 }
             });
         }
@@ -551,8 +552,7 @@ export class HeadlessBattleSimulator {
                     if (deathIdx === -1) deathIdx = 0;
                 }
                 const count = unit.level >= 3 ? 5 : 2;
-                const bonus = [0, 0, 1, 2][unit.level];
-                const stats = 1 + bonus;
+                const stats = [0, 1, 2, 5][unit.level] || 1;
                 for (let i = 0; i < count; i++) {
                     const { myTeam: currentTeam } = this.getTeams(unit);
                     await this.spawnUnit(currentTeam, deathIdx + i, 'mouse', 1, stats, stats, true);

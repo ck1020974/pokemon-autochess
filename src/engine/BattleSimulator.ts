@@ -694,10 +694,11 @@ export class BattleSimulator {
                 // Trigger when ANY OTHER ally attacks
                 if (e.source && e.source !== unit && myTeam.includes(e.source)) {
                     const buffAmount = [0, 1, 2, 5][unit.level] || 1;
+                    const isAtk = Math.random() < 0.5;
                     await this.delay(150); // Delay for visual pacing
                     await this.notifySkill(unit, `發動了健美！`);
                     await this.playAnimation(unit, 'jump', 200);
-                    this.growUnit(unit, buffAmount, buffAmount, '水躍魚技能');
+                    this.growUnit(unit, isAtk ? 0 : buffAmount, isAtk ? buffAmount : 0, '水躍魚技能');
                 }
             });
         }
@@ -1038,8 +1039,8 @@ export class BattleSimulator {
                     await this.notifySkill(unit, '召喚了小老鼠');
                     await this.delay(100); // reduced from 200
                     const count = unit.level >= 3 ? 5 : 2;
-                    // Fix: Match description. Lv1: 1/1, Lv2: 2/2, Lv3: 3/3
-                    const stats = [0, 1, 2, 3][unit.level] || 1;
+                    // Fix: Match description. Lv1: 1/1, Lv2: 2/2, Lv3: 5/5
+                    const stats = [0, 1, 2, 5][unit.level] || 1;
                     for (let i = 0; i < count; i++) {
                         const { myTeam: currentTeam } = this.getTeams(unit);
                         const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;

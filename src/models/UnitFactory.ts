@@ -222,19 +222,19 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'mudkip', name: '水躍魚', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/水躍魚00.webp', battleImageUrl: 'assets/水躍魚01.webp',
-        description: '友軍攻擊時，自身 +1 攻擊與生命。', synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
+        description: '友軍攻擊時，自身 +1 攻擊或生命。', synergies: ['Starter', 'Water'], evolveId: 'marshtomp'
     },
     marshtomp: {
         id: 'marshtomp', name: '沼躍魚', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/沼躍魚00.webp', battleImageUrl: 'assets/沼躍魚01.webp',
-        description: '友軍攻擊時，自身 +2 攻擊與生命。', synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
+        description: '友軍攻擊時，自身 +2 攻擊或生命。', synergies: ['Starter', 'Water'], evolveId: 'swampert', isHiddenFromShop: true
     },
     swampert: {
         id: 'swampert', name: '巨沼怪', tier: 3, family: 'mudkip',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/巨沼怪00.webp', battleImageUrl: 'assets/巨沼怪01.webp',
-        description: '友軍攻擊時，自身 +5 攻擊與生命。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '友軍攻擊時，自身 +5 攻擊或生命。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 12. Sprigatito
@@ -314,7 +314,7 @@ export const UNIT_TEMPLATES: Record<string, UnitTemplate> = {
         id: 'raticate_final', name: '拉達', tier: 1, family: 'rattata',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/拉達00.webp', battleImageUrl: 'assets/拉達01.webp',
-        description: '死亡後召喚 5 隻 3/3 小老鼠。', synergies: ['Normal'], isHiddenFromShop: true
+        description: '死亡後召喚 5 隻 5/5 小老鼠。', synergies: ['Normal'], isHiddenFromShop: true
     },
 
     // 16. Diglett
