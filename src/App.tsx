@@ -2269,17 +2269,18 @@ function App() {
                                                             })}
                                                         </div>
 
-                                                        {/* Detailed History List */}
                                                         <div className="summary-history-grid" style={{ marginTop: '5px' }}>
                                                             {history.slice(-39).map((entry, idx) => {
                                                                 const info = getConsolidatedInfo(entry.opponentId);
+                                                                const origOp = allOpponents.find(o => o.id === entry.opponentId);
+                                                                const displayUrl = origOp ? origOp.url : info.url;
                                                                 return (
                                                                     <div
                                                                         key={idx}
                                                                         className={`history-item is-${entry.result.toLowerCase()}`}
                                                                         title={`${info.name} - ${entry.result}`}
                                                                     >
-                                                                        <img src={info.url} alt={info.name} />
+                                                                        <img src={displayUrl} alt={info.name} />
                                                                         <div className="history-result-tag">{entry.result === 'WIN' ? 'W' : entry.result === 'LOSS' ? 'L' : 'D'}</div>
                                                                     </div>
                                                                 );
