@@ -656,7 +656,7 @@ export class BattleSimulator {
                         this.heal(unit, heal);
                         this.grassHealedTargets.add(e.target);
                         // Message remains same as per user instruction (none provided for Grass)
-                        this.log(`${unit.name} 吸取了 ${heal} 生命 (剩餘：${unit.stats.hp})`);
+                        this.log(`${unit.name} 吸取了 ${heal} 生命`);
                     }
                 }
             });
