@@ -344,81 +344,65 @@ export class GameLoop {
     }
 
     public generateRewardOptions(difficulty: any): any[] {
-
         // 1. Get player synergies
         const playerSynergies = new Set<string>();
         this.playerTeam.forEach(u => {
             if (u) u.synergies.forEach(s => playerSynergies.add(s));
         });
 
-        // 2. Define Pools
-        const pool1Items = ['幸運蛋', '不變之石', '進化奇石'];
-        const pool1Categories = ['GOLD', 'EXP', 'LIVES'];
-
-        // Filter REWARD_DATA by difficulty
+        // 2. Filter REWARD_DATA by difficulty
         const diffData = REWARD_DATA.filter((r: any) => r.difficulty === difficulty);
 
-        // Pool 1: Utility/Resources (GOLD, EXP, LIVES, and special PERM_NONE items)
-        const pool1 = diffData.filter((r: any) => 
+        // 3. Define Pools
+        // Pool 1: 資源類 (GOLD, EXP, LIVES, and special PERM_NONE items like Evolutionary Items)
+        const pool1Items = ['幸運蛋', '不變之石', '進化奇石'];
+        const pool1Categories = ['GOLD', 'EXP', 'LIVES'];
+        const pool1 = diffData.filter((r: any) =>
             pool1Categories.includes(r.category) || pool1Items.includes(r.item)
         );
 
-        // Pool 2: General Stat Buffs/Mints (BATTLE_NONE and remaining PERM_NONE)
-        const pool2 = diffData.filter((r: any) => 
-            r.category === 'BATTLE_NONE' || (r.category === 'PERM_NONE' && !pool1Items.includes(r.item))
+        // Pool 2: 通用強化類 (BATTLE_NONE and Mints)
+        // 薄荷 (Mints) 雖然類別標記為 PERM_NONE，但在此分類中屬於通用強化
+        const pool2 = diffData.filter((r: any) =>
+            r.category === 'BATTLE_NONE' || (r.category === 'PERM_NONE' && r.item.includes('薄荷'))
         );
 
-        // Pool 3: Synergy Buffs
-        let pool3 = diffData.filter((r: any) => 
-            (r.category === 'PERM_SYNERGY' || r.category === 'BATTLE_SYNERGY') && 
-            r.synergyId && playerSynergies.has(r.synergyId)
+        // Pool 3: 羈絆強化類 (PERM_SYNERGY, BATTLE_SYNERGY)
+        let pool3 = diffData.filter((r: any) =>
+            (r.category === 'PERM_SYNERGY' || r.category === 'BATTLE_SYNERGY')
         );
 
-        // Fallback for Pool 3 if no synergies match
-        if (pool3.length === 0) {
-            pool3 = diffData.filter((r: any) => r.category === 'PERM_SYNERGY' || r.category === 'BATTLE_SYNERGY');
-        }
-
+        // 4. Selection Logic: Strict One from Each Pool
         const results: any[] = [];
-        const pickRandom = (p: any[]) => p[Math.floor(Math.random() * p.length)];
+        const shuffle = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
 
-        // --- Improved Reward Logic: Focus on Matching Synergies ---
-        // We want to show a mix of matching synergies (Pool 3) and general/utility rewards (Pool 1/2).
-        
-        // 1. Guaranteed 1-2 Synergy Rewards if player has matching synergies
-        const shuffledPool3 = [...pool3].sort(() => 0.5 - Math.random());
-        if (shuffledPool3.length > 0) {
-            results.push(shuffledPool3.shift());
-            // If they have MANY matching synergies, give them another one to increase visibility
-            if (shuffledPool3.length > 0 && Math.random() < 0.7) {
-                results.push(shuffledPool3.shift());
+        // Pick from Pool 1
+        const shuffledP1 = shuffle(pool1);
+        if (shuffledP1.length > 0) results.push(shuffledP1[0]);
+
+        // Pick from Pool 2
+        const shuffledP2 = shuffle(pool2);
+        if (shuffledP2.length > 0) results.push(shuffledP2[0]);
+
+        // Pick from Pool 3 (Prioritize player's synergies)
+        const matchingPool3 = pool3.filter(r => r.synergyId && playerSynergies.has(r.synergyId));
+        const finalPool3 = matchingPool3.length > 0 ? matchingPool3 : pool3;
+        const shuffledP3 = shuffle(finalPool3);
+        if (shuffledP3.length > 0) results.push(shuffledP3[0]);
+
+        // 5. Fallback: If we don't have 3 unique choices, fill from all items
+        if (results.length < 3) {
+            const allItems = shuffle(diffData);
+            for (const item of allItems) {
+                if (results.length >= 3) break;
+                if (!results.some(r => r.item === item.item)) {
+                    results.push(item);
+                }
             }
         }
 
-        // 2. Fill with Pool 1 (Utility) if not already full
-        const shuffledPool1 = [...pool1].sort(() => 0.5 - Math.random());
-        while (results.length < 3 && shuffledPool1.length > 0) {
-            results.push(shuffledPool1.shift());
-        }
-
-        // 3. Fill with Pool 2 (General Stats) if still not full
-        const shuffledPool2 = [...pool2].sort(() => 0.5 - Math.random());
-        while (results.length < 3 && shuffledPool2.length > 0) {
-            results.push(shuffledPool2.shift());
-        }
-
-        // Ensure we always return 3 unique rewards if possible (Absolute fallback)
-        const allPools = [...pool1, ...pool2, ...pool3];
-        const uniqueAllPools = Array.from(new Set(allPools));
-        
-        while (results.length < 3 && uniqueAllPools.length > results.length) {
-            const extra = pickRandom(uniqueAllPools);
-            if (!results.some(r => r.item === extra.item)) { // Compare by item name to be safe
-                results.push(extra);
-            }
-        }
-
-        return results;
+        // Final safety check and shuffle the display order
+        return shuffle(results).slice(0, 3);
     }
 
     public applyReward(reward: any) {
