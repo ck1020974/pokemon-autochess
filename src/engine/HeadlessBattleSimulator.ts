@@ -712,7 +712,8 @@ export class HeadlessBattleSimulator {
             const { opTeam } = this.getTeams(attacker);
             const idx = opTeam.indexOf(defender);
             if (idx !== -1 && idx < opTeam.length - 1 && opTeam[idx + 1] && opTeam[idx + 1]!.stats.hp > 0) {
-                const splashDmg = attacker.scalingValue;
+                const isEnemyAttacker = this.enemyTeam.includes(attacker);
+                const splashDmg = isEnemyAttacker ? this.playerWins : attacker.scalingValue;
                 promises.push(this.dealDamage(attacker, opTeam[idx + 1]!, splashDmg, true));
             }
         }
@@ -755,10 +756,17 @@ export class HeadlessBattleSimulator {
             if (this.enemyAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('player')) {
                 this.psychicTriggered.add('player');
                 this.enemyAttackCount = 0;
-                const allEnemies = this.enemyTeam.filter(u => u && u.stats.hp > 0);
-                // In Headless, we use playerWins as a proxy for 'N' scaling
-                const dmg = 2 + this.playerWins;
-                for (const target of allEnemies) await this.dealDamage(null, target, dmg, true, true);
+
+                const targets = this.enemyTeam;
+                const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
+                if (livingEnemies.length > 0) {
+                    const targetCount = 2; // Updated from all
+                    const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
+                    const selectedTargets = shuffled.slice(0, targetCount);
+                    // In Headless, we use playerWins as a proxy for 'N' scaling
+                    const dmg = 2 + this.playerWins;
+                    for (const target of selectedTargets) await this.dealDamage(null, target, dmg, true, true);
+                }
             }
         } else {
             this.playerAttackCount++;
@@ -766,9 +774,16 @@ export class HeadlessBattleSimulator {
             if (this.playerAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('enemy')) {
                 this.psychicTriggered.add('enemy');
                 this.playerAttackCount = 0;
-                const allAllies = this.playerTeam.filter(u => u && u.stats.hp > 0);
-                const dmg = 2 + this.playerWins; // Assuming symmetrical logic for enemy psychic if any
-                for (const target of allAllies) await this.dealDamage(null, target, dmg, true, true);
+
+                const targets = this.playerTeam;
+                const livingAllies = targets.filter(u => u && u.stats.hp > 0);
+                if (livingAllies.length > 0) {
+                    const targetCount = 2; // Updated from all
+                    const shuffled = [...livingAllies].sort(() => 0.5 - Math.random());
+                    const selectedTargets = shuffled.slice(0, targetCount);
+                    const dmg = this.playerWins; // Scaling for enemy psychic
+                    for (const target of selectedTargets) await this.dealDamage(null, target, dmg, true, true);
+                }
             }
         }
     }

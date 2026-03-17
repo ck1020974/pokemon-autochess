@@ -984,7 +984,7 @@ function App() {
             const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
             const activeBuffs = [...game.nextBattleBuffs];
             game.nextBattleBuffs = []; // Clear buffs after consumption
-            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, false, activeBuffs);
+            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, false, activeBuffs, game.wins);
             const currentSim = simulatorRef.current;
 
             currentSim.onUpdate = () => {
@@ -2808,14 +2808,14 @@ function App() {
             {/* Modal should be rendered at the very end of the DOM to ensure highest physical layering context */}
             {
                 showEncyclopedia && createPortal(
-                    <EncyclopediaModal 
+                    <EncyclopediaModal
                         activeEdition={activeEdition}
                         onClose={() => {
                             setShowEncyclopedia(false);
                             if (tutorialStep === 11) {
                                 setTutorialStep(12);
                             }
-                    }} />,
+                        }} />,
                     document.getElementById('modal-root')!
                 )
             }
