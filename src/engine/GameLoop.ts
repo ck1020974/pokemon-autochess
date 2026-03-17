@@ -115,9 +115,9 @@ export class GameLoop {
 
     private refreshSpecialDescriptions() {
         // Update templates so shop shows CURRENT N value and correct frequency
-        ALL_UNITS.charmander.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (三場戰鬥後增強)。`;
-        ALL_UNITS.charmeleon.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (兩場戰鬥後增強)。`;
-        ALL_UNITS.charizard.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)。`;
+        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (三場戰鬥後增強)。`;
+        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (兩場戰鬥後增強)。`;
+        ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)。`;
 
         // Sync static template scaling values to current global N
         (ALL_UNITS.charmander as any).scalingValue = this.charmanderN;
@@ -130,7 +130,7 @@ export class GameLoop {
                 u.scalingValue = this.charmanderN;
                 const freq = [0, '三', '兩', '一'][u.level] || '三';
                 const prefix = u.level === 3 ? '每' : '';
-                u.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場戰鬥後增強)。`;
+                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場戰鬥後增強)。`;
             }
         });
 
@@ -140,7 +140,7 @@ export class GameLoop {
                 u.scalingValue = this.charmanderN;
                 const freq = [0, '三', '兩', '一'][u.level] || '三';
                 const prefix = u.level === 3 ? '每' : '';
-                u.description = `同時對後排敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場戰鬥後增強)。`;
+                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場戰鬥後增強)。`;
             }
         });
 
