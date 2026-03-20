@@ -103,9 +103,9 @@ export class GameLoop {
 
     public refreshSpecialDescriptions() {
         // Update templates so shop shows CURRENT N value and correct frequency
-        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (三場勝場後增強)。`;
-        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (兩場勝場後增強)。`;
-        ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每場勝場後增強)。`;
+        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 點傷害 (每三回合後增強)`;
+        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 點傷害 (每二回合後增強)`;
+        ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 點傷害 (每回合後增強)`;
 
         // Sync static template scaling values to current global N
         (ALL_UNITS.charmander as any).scalingValue = this.charmanderN;
@@ -116,9 +116,9 @@ export class GameLoop {
         this.shop.slots.forEach(u => {
             if (u && u.family === 'charmander') {
                 u.scalingValue = this.charmanderN;
-                const freq = [0, '三', '兩', '一'][u.level] || '三';
-                const prefix = u.level === 3 ? '每' : '';
-                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場戰鬥後增強)。`;
+                const freq = [0, '三', '二', ''][u.level] || '三';
+                const suffix = u.level === 3 ? '每回合' : `每${freq}回合`;
+                u.description = `同時對後方敵方造成 ${this.charmanderN} 點傷害 (${suffix}後增強)`;
             }
         });
 
@@ -126,25 +126,23 @@ export class GameLoop {
         this.playerTeam.forEach(u => {
             if (u && u.family === 'charmander') {
                 u.scalingValue = this.charmanderN;
-                const freq = [0, '三', '兩', '一'][u.level] || '三';
-                const prefix = u.level === 3 ? '每' : '';
-                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場勝場後增強)。`;
+                const freq = [0, '三', '二', ''][u.level] || '三';
+                const suffix = u.level === 3 ? '每回合' : `每${freq}回合`;
+                u.description = `同時對後方敵方造成 ${this.charmanderN} 點傷害 (${suffix}後增強)`;
             }
         });
 
-        // Sync opponent's units on board
+        // Sync opponent's units on board (Enemy uses Player wins as scaling value)
         this.opponentTeam.forEach(u => {
             if (u && u.family === 'charmander') {
-                u.scalingValue = this.charmanderN;
-                const freq = [0, '三', '兩', '一'][u.level] || '三';
-                const prefix = u.level === 3 ? '每' : '';
-                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場勝場後增強)。`;
+                u.scalingValue = this.wins; // FIXED: Enemy scaling is current player wins
+                u.description = `同時對後方敵方造成 ${this.wins} 點傷害 (數值固定為玩家勝場數)`;
             }
         });
 
         // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
-        const template = '[2/3/4] 兩回合後對隨機 2 位敵方造成 [N] 點傷害 (每場勝場後增強)';
+        const template = '[2/3/4] 兩回合後，對隨機 2 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
         psychic.description = template.replace('[N]', Math.floor(this.psychicN).toString());
     }
 
@@ -345,7 +343,11 @@ export class GameLoop {
     }
 
     private processWinScaling() {
-        // --- Charmander Scaling ---
+        // Winner-only scaling removed (moved to processRoundScaling)
+    }
+
+    private processRoundScaling() {
+        // --- Player Charmander Scaling (Round-based) ---
         let maxCharmanderLevel = 0;
         this.playerTeam.forEach(u => {
             if (u && u.family === 'charmander') {
@@ -362,7 +364,7 @@ export class GameLoop {
             }
         }
 
-        // --- Psychic Scaling ---
+        // --- Player Psychic Scaling (Round-based) ---
         const psychicUnits = this.playerTeam.filter(u => u && u.synergies.includes('Psychic')) as Unit[];
         const families = new Set(psychicUnits.map(u => u.family));
         const pCount = families.size;
@@ -371,12 +373,13 @@ export class GameLoop {
             if (pCount >= 4) {
                 increment = 2;
             } else if (pCount === 3) {
-                increment = (this.wins % 2 === 1) ? 2 : 1;
+                // Odd Round +2, Even Round +1 (Turn 1 is odd)
+                increment = (this.turn % 2 === 1) ? 2 : 1;
             } else {
                 increment = 1;
             }
             this.psychicN += increment;
-            console.log(`念力羈絆增強！累積威力：${this.psychicN} (+${increment}) - 當前勝場：${this.wins}`);
+            console.log(`念力羈絆增強！累積威力：${this.psychicN} (+${increment}) - 當前回合：${this.turn}`);
         }
     }
 
@@ -614,7 +617,8 @@ export class GameLoop {
             this.difficultyScore += 1.0;
         }
 
-        // --- Psychic Synergy Scaling (Moved to processWinScaling) ---
+        // --- Round-based Scaling Trigger ---
+        this.processRoundScaling();
 
         this.turn++;
         this.startShopPhase();
