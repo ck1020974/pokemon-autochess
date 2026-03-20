@@ -85,7 +85,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/耿鬼00.webp',
         battleImageUrl: 'assets/耿鬼01.webp',
-        description: '戰鬥開始時，我方全體永久獲得 3 點攻擊。',
+        description: '戰鬥開始時，我方全體永久 +3 攻擊。',
         synergies: ['Ghost', 'Poison'],
         family: 'gastly',
         isHiddenFromShop: true
@@ -102,7 +102,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'bayleef', name: '月桂葉', tier: 2, family: 'chikorita',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/月桂葉00.webp', battleImageUrl: 'assets/月桂葉01.webp',
-        description: '友軍召喚物 +5 攻擊級。', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
+        description: '友軍召喚物 +5 攻擊。', synergies: ['Starter', 'Grass'], evolveId: 'meganium', isHiddenFromShop: true
     },
     meganium: {
         id: 'meganium', name: '大竺葵', tier: 2, family: 'chikorita',
@@ -136,19 +136,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'totodile', name: '小鋸鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/小鋸鱷00.webp', battleImageUrl: 'assets/小鋸鱷01.webp',
-        description: '戰鬥開始時，前方友軍獲得自身 33% 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'croconaw'
+        description: '戰鬥開始時，前方友軍 +33% 自身攻擊。', synergies: ['Starter', 'Water'], evolveId: 'croconaw'
     },
     croconaw: {
         id: 'croconaw', name: '藍鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/藍鱷00.webp', battleImageUrl: 'assets/藍鱷01.webp',
-        description: '戰鬥開始時，前方友軍獲得自身 50% 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍 +50% 自身攻擊。', synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
     },
     feraligatr: {
         id: 'feraligatr', name: '大力鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/大力鱷00.webp', battleImageUrl: 'assets/大力鱷01.webp',
-        description: '戰鬥開始時，前方友軍獲得自身 100% 攻擊值。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍 +100% 自身攻擊。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 8. Igglybuff (New)
@@ -171,7 +171,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         baseStats: { hp: 6, maxHp: 6, attack: 3 },
         imageUrl: 'assets/胖可丁00.webp',
         battleImageUrl: 'assets/胖可丁01.webp',
-        description: '戰鬥開始時，我方全體永久獲得 3 點生命。',
+        description: '戰鬥開始時，我方全體永久 +3 生命。',
         synergies: ['Normal', 'Fairy'],
         family: 'igglybuff',
         isHiddenFromShop: true
