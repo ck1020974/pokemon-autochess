@@ -114,7 +114,7 @@ export class GameLoop {
             }
         });
 
-        this.shop.roll(this.turn, this.edition?.availableUnitIds);
+        (this.shop as any).roll(this.turn, this.edition?.availableUnitIds);
     }
 
     private refreshSpecialDescriptions() {
@@ -607,11 +607,11 @@ export class GameLoop {
     public reroll() {
         if (this.freeRerolls > 0) {
             this.freeRerolls--;
-            this.shop.roll(this.turn, this.edition?.availableUnitIds);
+            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds);
             console.log(`使用免費刷新！剩餘次數：${this.freeRerolls}`);
         } else if (this.gold >= 1) {
             this.gold -= 1;
-            this.shop.roll(this.turn, this.edition?.availableUnitIds);
+            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds);
         }
     }
 
