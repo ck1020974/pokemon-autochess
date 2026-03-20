@@ -30,7 +30,6 @@ export class BattleSimulator {
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
     private psychicN: number = 2;
-    private playerWins: number = 0;
 
     private speed: number = 1;
     public isSim: boolean = false;
@@ -38,14 +37,13 @@ export class BattleSimulator {
     private waterDebuffedTargets = new Set<Unit>();
     private grassHealedTargets = new Set<Unit>();
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 2, isSim: boolean = false, battleBuffs: any[] = [], playerWins: number = 0) {
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 2, isSim: boolean = false, battleBuffs: any[] = []) {
         this.speed = speed;
         this.isSim = isSim;
         this.battleBuffs = battleBuffs;
 
         this.originalPlayerTeam = originalPlayerTeam;
         this.psychicN = psychicN;
-        this.playerWins = playerWins;
         // Preserve 5-slot architecture to match UI indices exactly
         this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
         this.enemyTeam = enemyTeam.map(u => {
@@ -1330,7 +1328,7 @@ export class BattleSimulator {
                             const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
                             const selectedTargets = shuffled.slice(0, targetCount);
 
-                            const dmg = isPlayer ? this.psychicN : this.playerWins;
+                            const dmg = this.psychicN;
                             this.log(isPlayer ? `預知未來對敵方造成 ${dmg} 傷害！` : `預知未來對我方造成 ${dmg} 傷害！`);
                             for (const target of selectedTargets) {
                                 await this.dealDamage(null, target, dmg, true, true);

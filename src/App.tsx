@@ -993,11 +993,12 @@ function App() {
 
             setInitialEnemyTeam([...enemyTeam]);
             game.opponentTeam = [...enemyTeam];
+            game.refreshSpecialDescriptions();
 
             const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
             const activeBuffs = [...game.nextBattleBuffs];
             game.nextBattleBuffs = []; // Clear buffs after consumption
-            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, false, activeBuffs, game.wins);
+            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, false, activeBuffs);
             const currentSim = simulatorRef.current;
 
             currentSim.onUpdate = () => {

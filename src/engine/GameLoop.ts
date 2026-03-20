@@ -78,23 +78,7 @@ export class GameLoop {
         this.freeRerolls = this.pendingFreeRerolls;
         this.pendingFreeRerolls = 0;
 
-        // --- Charmander Scaling (Shared, based on max level) ---
-        let maxCharmanderLevel = 0;
-        this.playerTeam.forEach(u => {
-            if (u && u.family === 'charmander') {
-                maxCharmanderLevel = Math.max(maxCharmanderLevel, u.level);
-            }
-        });
-
-        if (maxCharmanderLevel > 0) {
-            this.charmanderCounter++;
-            const threshold = [0, 3, 2, 1][maxCharmanderLevel] || 3;
-            if (this.charmanderCounter >= threshold) {
-                this.charmanderN++;
-                this.charmanderCounter = 0;
-                console.log(`小火龍家族技能增強！目前威力：${this.charmanderN}`);
-            }
-        }
+        // --- Charmander Scaling (Handled in endBattle) ---
 
         // --- Psychic Scaling (Increments in concludeTurn) ---
         console.log(`念力傷害目前的威力：${this.psychicN}`);
@@ -117,11 +101,11 @@ export class GameLoop {
         (this.shop as any).roll(this.turn, this.edition?.availableUnitIds);
     }
 
-    private refreshSpecialDescriptions() {
+    public refreshSpecialDescriptions() {
         // Update templates so shop shows CURRENT N value and correct frequency
-        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (三場戰鬥後增強)。`;
-        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (兩場戰鬥後增強)。`;
-        ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)。`;
+        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (三場勝場後增強)。`;
+        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (兩場勝場後增強)。`;
+        ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每場勝場後增強)。`;
 
         // Sync static template scaling values to current global N
         (ALL_UNITS.charmander as any).scalingValue = this.charmanderN;
@@ -144,13 +128,23 @@ export class GameLoop {
                 u.scalingValue = this.charmanderN;
                 const freq = [0, '三', '兩', '一'][u.level] || '三';
                 const prefix = u.level === 3 ? '每' : '';
-                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場戰鬥後增強)。`;
+                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場勝場後增強)。`;
+            }
+        });
+
+        // Sync opponent's units on board
+        this.opponentTeam.forEach(u => {
+            if (u && u.family === 'charmander') {
+                u.scalingValue = this.charmanderN;
+                const freq = [0, '三', '兩', '一'][u.level] || '三';
+                const prefix = u.level === 3 ? '每' : '';
+                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${prefix}${freq}場勝場後增強)。`;
             }
         });
 
         // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
-        const template = '[2/3/4] 兩回合後對隨機 2 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
+        const template = '[2/3/4] 兩回合後對隨機 2 位敵方造成 [N] 點傷害 (每場勝場後增強)';
         psychic.description = template.replace('[N]', Math.floor(this.psychicN).toString());
     }
 
@@ -314,6 +308,9 @@ export class GameLoop {
                 this.phase = GamePhase.VICTORY;
                 return;
             }
+
+            // --- Win-based Scaling Trigger ---
+            this.processWinScaling();
         } else if (result === 'LOSS') {
             this.lossCount++;
             this.lives--;
@@ -344,6 +341,42 @@ export class GameLoop {
             this.rewardChoices = this.generateRewardOptions(rewardDiffRaw as any);
         } else {
             this.concludeTurn(result);
+        }
+    }
+
+    private processWinScaling() {
+        // --- Charmander Scaling ---
+        let maxCharmanderLevel = 0;
+        this.playerTeam.forEach(u => {
+            if (u && u.family === 'charmander') {
+                maxCharmanderLevel = Math.max(maxCharmanderLevel, u.level);
+            }
+        });
+        if (maxCharmanderLevel > 0) {
+            this.charmanderCounter++;
+            const threshold = [0, 3, 2, 1][maxCharmanderLevel] || 3;
+            if (this.charmanderCounter >= threshold) {
+                this.charmanderN++;
+                this.charmanderCounter = 0;
+                console.log(`小火龍家族技能增強！目前威力：${this.charmanderN}`);
+            }
+        }
+
+        // --- Psychic Scaling ---
+        const psychicUnits = this.playerTeam.filter(u => u && u.synergies.includes('Psychic')) as Unit[];
+        const families = new Set(psychicUnits.map(u => u.family));
+        const pCount = families.size;
+        if (pCount >= 2) {
+            let increment = 0;
+            if (pCount >= 4) {
+                increment = 2;
+            } else if (pCount === 3) {
+                increment = (this.wins % 2 === 1) ? 2 : 1;
+            } else {
+                increment = 1;
+            }
+            this.psychicN += increment;
+            console.log(`念力羈絆增強！累積威力：${this.psychicN} (+${increment}) - 當前勝場：${this.wins}`);
         }
     }
 
@@ -581,23 +614,7 @@ export class GameLoop {
             this.difficultyScore += 1.0;
         }
 
-        // --- Psychic Synergy Scaling (Cumulative) ---
-        const psychicUnits = this.playerTeam.filter(u => u && u.synergies.includes('Psychic')) as Unit[];
-        const families = new Set(psychicUnits.map(u => u.family));
-        const pCount = families.size;
-        if (pCount >= 2) {
-            let increment = 0;
-            if (pCount >= 4) {
-                increment = 2;
-            } else if (pCount === 3) {
-                // Odd turns +2, Even turns +1 (Wait, Turn 1 is odd, Turn 2 is even)
-                increment = (this.turn % 2 === 1) ? 2 : 1;
-            } else {
-                increment = 1;
-            }
-            this.psychicN += increment;
-            console.log(`念力羈絆增強！累積威力：${this.psychicN} (+${increment}) - 回合 ${this.turn}`);
-        }
+        // --- Psychic Synergy Scaling (Moved to processWinScaling) ---
 
         this.turn++;
         this.startShopPhase();
