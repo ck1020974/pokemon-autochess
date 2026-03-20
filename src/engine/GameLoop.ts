@@ -1,9 +1,11 @@
-
 import { Unit } from '../models/Unit';
 import { Shop } from '../models/Shop';
 import { ALL_UNITS } from '../data/AllUnits';
 import { SYNERGIES } from '../models/Synergies';
 import { REWARD_DATA } from '../models/RewardData';
+
+import type { GameEdition } from '../models/Edition';
+import { ClassicEdition } from '../data/editions/classic';
 
 export const GamePhase = {
     SHOP: 'SHOP',
@@ -38,6 +40,7 @@ export class GameLoop {
     public opponentTeam: (Unit | null)[] = [null, null, null, null, null];
     public savedTeam: (Unit | null)[] = []; // Store original team before battle
     public shop: Shop;
+    public edition: GameEdition = ClassicEdition;
     public difficultyMultiplier: number = 1.0;
     public difficultyScore: number = 1.0; // Dynamic difficulty tracker
     public defeatedOpponentIds: string[] = [];
@@ -50,8 +53,9 @@ export class GameLoop {
     public freeRerolls: number = 0;
     public nextBattleBuffs: any[] = [];
 
-    constructor() {
+    constructor(edition?: GameEdition) {
         this.shop = new Shop();
+        if (edition) this.edition = edition;
         this.startShopPhase();
         (window as any).game = this; // Expose to window for UI dynamic descriptions
     }
@@ -110,7 +114,7 @@ export class GameLoop {
             }
         });
 
-        this.shop.roll(this.turn);
+        this.shop.roll(this.turn, this.edition?.availableUnitIds);
     }
 
     private refreshSpecialDescriptions() {
@@ -372,6 +376,17 @@ export class GameLoop {
             (r.category === 'PERM_SYNERGY' || r.category === 'BATTLE_SYNERGY')
         );
 
+        // EXTRA FILTER for Modern Edition (or any edition with restricted units):
+        // Only include synergy rewards if that synergy actually has characters in the current edition.
+        const availableSynergies = new Set<string>();
+        this.edition.availableUnitIds.forEach(id => {
+            const u = ALL_UNITS[id];
+            if (u && u.synergies) {
+                u.synergies.forEach(s => availableSynergies.add(s));
+            }
+        });
+        pool3 = pool3.filter(r => !r.synergyId || availableSynergies.has(r.synergyId));
+
         // 4. Selection Logic: Strict One from Each Pool
         const results: any[] = [];
         const shuffle = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
@@ -592,11 +607,11 @@ export class GameLoop {
     public reroll() {
         if (this.freeRerolls > 0) {
             this.freeRerolls--;
-            this.shop.roll(this.turn);
+            this.shop.roll(this.turn, this.edition?.availableUnitIds);
             console.log(`使用免費刷新！剩餘次數：${this.freeRerolls}`);
         } else if (this.gold >= 1) {
             this.gold -= 1;
-            this.shop.roll(this.turn);
+            this.shop.roll(this.turn, this.edition?.availableUnitIds);
         }
     }
 

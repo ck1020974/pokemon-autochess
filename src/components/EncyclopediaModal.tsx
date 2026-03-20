@@ -90,7 +90,7 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
             });
         });
         return groups;
-    }, []);
+    }, [activeEdition]);
 
     // Get evolution path for a selected unit, padding to exactly 3 evolutionary stages
     const getEvolutionPath = (startTemplateId: string) => {
@@ -214,7 +214,7 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
 
                                             // Find units belonging to this synergy
                                             const units = Object.values(ALL_UNITS)
-                                                .filter(t => t.synergies?.includes(syn.id) && !t.isHiddenFromShop && t.id !== 'sprout')
+                                                .filter(t => t.synergies?.includes(syn.id) && !t.isHiddenFromShop && t.id !== 'sprout' && activeEdition.availableUnitIds.includes(t.id))
                                                 .sort((a, b) => a.tier - b.tier);
 
                                             return (

@@ -17,6 +17,17 @@ import { Unit } from './models/Unit';
 import { REWARD_DATA } from './models/RewardData';
 import type { GameEdition } from './models/Edition';
 import { ClassicEdition } from './data/editions/classic';
+import { ModernEdition } from './data/editions/modern';
+
+const getInitialEdition = (): GameEdition => {
+    const params = new URLSearchParams(window.location.search);
+    const v = params.get('v');
+    const edition = params.get('edition');
+    if (v === '2' || edition === 'modern') {
+        return ModernEdition;
+    }
+    return ClassicEdition;
+};
 
 // Difficulty Icons
 import normalBall from './assets/普通.webp';
@@ -217,14 +228,14 @@ function getSynergyStatus(team: (Unit | null)[]) {
 
 
 function App() {
+    const [activeEdition] = useState<GameEdition>(getInitialEdition());
+
     const gameRef = useRef<GameLoop | null>(null);
     if (!gameRef.current) {
-        gameRef.current = new GameLoop();
+        gameRef.current = new GameLoop(activeEdition);
         (window as any).game = gameRef.current;
     }
     const game = gameRef.current;
-
-    const [activeEdition] = useState<GameEdition>(ClassicEdition);
 
     const allEditionOpponents = React.useMemo(() => [
         ...activeEdition.noviceOpponents,
@@ -243,7 +254,7 @@ function App() {
 
     const handleRestart = () => {
         // 1. Reset Core Engine
-        gameRef.current = new GameLoop();
+        gameRef.current = new GameLoop(activeEdition);
         setRewardChoices([]);
 
         // 2. Clear Primary States
@@ -351,6 +362,9 @@ function App() {
     const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
     const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
 
+    const tutorialUnitId = 'gastly';
+    const tutorialUnitName = '鬼斯';
+
     const triggerShake = () => {
         setTutorialShake(true);
         setTimeout(() => setTutorialShake(false), 400);
@@ -378,7 +392,7 @@ function App() {
         // Setup Tutorial Context
         newGame.gold = 10;
         newGame.shop.slots = [
-            new Unit(ALL_UNITS.gastly),
+            new Unit(ALL_UNITS[tutorialUnitId]),
             new Unit(ALL_UNITS.charmander),
             new Unit(ALL_UNITS.squirtle)
         ];
@@ -407,9 +421,9 @@ function App() {
                 setSelected(null);
             }
         } else if (tutorialStep === 4) {
-            const gastlyIdx = game.playerTeam.findIndex((u: any) => u?.family === 'gastly');
-            // If Gastly is in index 1-4, it's behind someone if there is another unit in index 0 to (gastlyIdx-1)
-            const isBehindSomeone = gastlyIdx > 0 && game.playerTeam.slice(0, gastlyIdx).some((u: any) => u !== null);
+            const tutorialUnitIdx = game.playerTeam.findIndex((u: any) => u?.family === tutorialUnitId);
+            // If Tutorial Unit is in index 1-4, it's behind someone if there is another unit in index 0 to (tutorialUnitIdx-1)
+            const isBehindSomeone = tutorialUnitIdx > 0 && game.playerTeam.slice(0, tutorialUnitIdx).some((u: any) => u !== null);
             if (isBehindSomeone) {
                 setTutorialStep(5);
                 setSelected(null);
@@ -494,12 +508,11 @@ function App() {
             const backgroundUrls = new Set<string>();
 
             Object.values(ALL_UNITS).forEach(t => {
-                // Priority 1: All Tier 1 & 2 units
                 const isCriticalTier = t.tier <= 2 || t.id === 'sprout';
 
-                // Priority 2: ALL "display" images (00.webp) are critical for summary screen
                 if (t.imageUrl) {
-                    criticalUrls.add(t.imageUrl);
+                    if (isCriticalTier) criticalUrls.add(t.imageUrl);
+                    else backgroundUrls.add(t.imageUrl);
                 }
 
                 if (t.battleImageUrl) {
@@ -813,7 +826,7 @@ function App() {
                     for (const coreId of def.coreUnits) {
                         if (coreCount >= enemyCount) break;
                         const baseT = ALL_UNITS[coreId];
-                        if (baseT) {
+                        if (baseT && activeEdition.availableUnitIds.includes(coreId)) {
                             const t = getEvolvedTemplate(baseT, bossLevel);
                             const u = new Unit(t);
                             u.level = bossLevel;
@@ -889,7 +902,7 @@ function App() {
                 for (const coreId of def.coreUnits) {
                     if (fbCandidateUnits.length >= enemyCount) break;
                     const t = ALL_UNITS[coreId];
-                    if (t) {
+                    if (t && activeEdition.availableUnitIds.includes(coreId)) {
                         const u = new Unit(t);
                         u.level = enemyBaseLevel;
                         fbCandidateUnits.push(u);
@@ -1093,14 +1106,14 @@ function App() {
         if (tutorialStep === 2) {
             if (actionType !== 'BUY' && actionType !== 'SELECT_SHOP') return false;
             const unit = game.shop.slots[payload];
-            const hasGastly = game.playerTeam.some(u => u?.family === 'gastly');
-            if (!hasGastly) {
-                return unit?.family === 'gastly';
+            const hasTutorialUnit = game.playerTeam.some(u => u?.family === tutorialUnitId);
+            if (!hasTutorialUnit) {
+                return unit?.family === tutorialUnitId;
             } else {
                 return unit?.family === 'charmander' || unit?.family === 'squirtle';
             }
         }
-        if (tutorialStep === 3) return actionType === 'SELECT_BOARD' || (actionType === 'SELECT_BOARD' && payload === 'gastly');
+        if (tutorialStep === 3) return actionType === 'SELECT_BOARD' || (actionType === 'SELECT_BOARD' && payload === tutorialUnitId);
         if (tutorialStep === 4) return actionType === 'MOVE_BOARD' || actionType === 'SELECT_BOARD';
         if (tutorialStep === 5) return actionType === 'REROLL';
         if (tutorialStep === 6) {
@@ -1626,8 +1639,8 @@ function App() {
                             <div className={`tutorial-message-box ${tutorialShake ? 'shake-anim' : ''}`}>
                                 <div className="tutorial-text">
                                     {tutorialStep === 2 && "每回合都會獲得10$\n🎯任務：購買寶可夢"}
-                                    {tutorialStep === 3 && "認識每隻寶可夢\n🎯任務：查看招式並關閉面板"}
-                                    {tutorialStep === 4 && "調整陣容順序\n🎯任務：將鬼斯移動到其他位置"}
+                                    {tutorialStep === 3 && `認識每隻寶可夢\n🎯任務：查看${tutorialUnitName}招式並關閉面板`}
+                                    {tutorialStep === 4 && `調整陣容順序\n🎯任務：將${tutorialUnitName}移動到其他位置`}
                                     {tutorialStep === 5 && "花費1$刷新商店\n🎯任務：點擊按鈕刷新商店角色"}
                                     {tutorialStep === 6 && "鎖定角色保留到下回合\n🎯任務：點擊鎖定所有小火龍"}
                                     {tutorialStep === 7 && "選擇要挑戰的訓練家\n🎯任務：點擊戰鬥按鈕"}
@@ -1754,7 +1767,7 @@ function App() {
                             color: 'rgba(148, 163, 184, 0.3)',
                             fontSize: '0.7rem',
                             letterSpacing: '2px'
-                        }}>v4.8.6 - PREMIUM EDITION</p>
+                        }}>v4.8.6 - {activeEdition.name}</p>
                     </div>
                 )
             }
@@ -1833,7 +1846,7 @@ function App() {
                                 letterSpacing: '4px',
                                 opacity: 0.8,
                                 padding: '0 20px'
-                            }}>選擇本次挑戰難度</p>
+                            }}>選擇本次挑戰難度 ({activeEdition.name})</p>
                         </div>
                     </div>
                 )

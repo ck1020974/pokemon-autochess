@@ -1608,19 +1608,19 @@ h3 {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     transform: translateY(15px);
-    /* 小幅往下 */
+    /* 撠誩�敺�銝� */
   }
 
   .startup-footer-box {
     margin-bottom: 0 !important;
     margin-top: 0 !important;
     transform: translateY(-15px);
-    /* 往上一點 */
+    /* 敺�銝𠹺�暺� */
   }
 
   .startup-overlay h1 {
     font-size: 2.22rem !important;
-    /* 顯著放大標題 */
+    /* 憿航��曉之璅䠷� */
     letter-spacing: 5px !important;
     margin: 0 !important;
     line-height: 1.1 !important;
@@ -1637,7 +1637,7 @@ h3 {
   .difficulty-btn {
     padding: 15px 5px !important;
     min-height: 145px !important;
-    /* 增加按鈕外框高度 */
+    /* 憓𧼮��厰�憭𡝗�擃睃漲 */
     gap: 12px !important;
     border-radius: 20px !important;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
@@ -1645,7 +1645,7 @@ h3 {
 
   .difficulty-btn img {
     width: 60px !important;
-    /* 難度球放大 */
+    /* ��漲��𦆮憭� */
     height: 60px !important;
   }
 
@@ -1657,7 +1657,7 @@ h3 {
 
   .startup-overlay p {
     font-size: 1.2rem !important;
-    /* 選擇挑戰難度字體放大 */
+    /* �豢��烐���漲摮烾��曉之 */
     margin: 0 !important;
     opacity: 0.9 !important;
     letter-spacing: 3px !important;
@@ -1705,7 +1705,7 @@ h3 {
 
   .startup-overlay h1 {
     font-size: 3rem !important;
-    /* 超大 H1 文字 */
+    /* 頞�之 H1 ��� */
     letter-spacing: 4px !important;
     line-height: 1.1 !important;
   }
@@ -1720,7 +1720,7 @@ h3 {
   .difficulty-btn {
     padding: 30px 15px !important;
     min-height: 165px !important;
-    /* 旗艦級卡牌高度 */
+    /* �𡑒刧蝝𡁜㨃�屸�摨� */
     gap: 15px !important;
     border-radius: 26px !important;
     box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6) !important;
@@ -1728,7 +1728,7 @@ h3 {
 
   .difficulty-btn img {
     width: 72px !important;
-    /* 超級大難度球 */
+    /* 頞��憭折𧙗摨衣� */
     height: 72px !important;
     filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5)) !important;
   }
@@ -1741,7 +1741,7 @@ h3 {
 
   .startup-overlay p {
     font-size: 1.45rem !important;
-    /* 超級大提示文字 */
+    /* 頞��憭扳�蝷箸�摮� */
     padding: 0 10px !important;
     letter-spacing: 5px !important;
     opacity: 1 !important;
@@ -1854,6 +1854,14 @@ h3 {
     margin-left: auto !important;
     margin-right: auto !important;
     box-sizing: border-box !important;
+    overflow: visible !important; /* Ensure slots are not clipped */
+  }
+
+  .board-teams-horizontal {
+    padding-right: 0 !important; /* Remove large desktop padding that pushes player slots off-screen */
+    width: 100% !important;
+    justify-content: center !important;
+    gap: 40px !important; /* Slightly tighter gap for mobile */
   }
 
   /* Specific widening for ultra-long screens (Aspect Ratio >= 2.1) - e.g. iPhone 16 Pro (6.1"/6.3") */
@@ -2015,7 +2023,7 @@ h3 {
 }
 
 .tutorial-highlight::after {
-  content: "👇";
+  content: "\1F447";
   position: absolute;
   top: -45px;
   left: 50%;
@@ -2158,7 +2166,7 @@ h3 {
 }
 
 .tutorial-highlight.tutorial-pointer-left::after {
-  content: "👈";
+  content: "\1F448";
   top: 50%;
   left: auto;
   right: -65px;
@@ -2616,7 +2624,7 @@ h3 {
   transform-origin: top left;
   margin: -4px;
 }
-/* ���ä��������e�����̥H�`�ٰ��� */
+/* 隱藏手機版結算畫面羈絆以節省高度 */
 @media (max-width: 768px) {
   .summary-synergies-row {
     display: none !important;
