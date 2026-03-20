@@ -19,7 +19,7 @@ export class Shop {
         return 4; // Turn 10+
     }
 
-    public roll(turn: number) {
+    public roll(turn: number, availableUnitIds?: string[]) {
         const tier = this.getTier(turn);
 
         // Dynamic Slot Count
@@ -56,7 +56,12 @@ export class Shop {
                     }
                 }
 
-                const tierTemplates = Object.values(ALL_UNITS).filter(u => u.tier === targetTier && !u.isHiddenFromShop);
+                const tierTemplates = Object.values(ALL_UNITS).filter(u => {
+                    const isCorrectTier = u.tier === targetTier;
+                    const isNotHidden = !u.isHiddenFromShop;
+                    const isAvailable = availableUnitIds ? availableUnitIds.includes(u.id) : true;
+                    return isCorrectTier && isNotHidden && isAvailable;
+                });
 
                 if (tierTemplates.length > 0) {
                     const randomTemp = tierTemplates[Math.floor(Math.random() * tierTemplates.length)];

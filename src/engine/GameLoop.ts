@@ -173,7 +173,7 @@ export class GameLoop {
         // Unique Count Helper
         const getUniqueCount = (units: Unit[]) => {
             const families = new Set(units.map(u => u.family));
-            console.log(`Checking Synergy Count: ${families.size} unique families found.`);
+            console.log(`正在檢查羈絆數量：發現 ${families.size} 個獨特家族。`);
             return families.size;
         };
 
@@ -181,10 +181,10 @@ export class GameLoop {
         const applyBuff = (unit: Unit, amount: number, type: 'hp' | 'atk', source: string) => {
             if (type === 'hp') {
                 unit.addGrowth(amount, 0);
-                console.log(`${source} Synergy: ${unit.name} +${amount} HP`);
+                console.log(`${source} 羈絆：${unit.name} +${amount} 生命`);
             } else {
                 unit.addBuff(amount);
-                console.log(`${source} Synergy: ${unit.name} +${amount} Atk`);
+                console.log(`${source} 羈絆：${unit.name} +${amount} 攻擊`);
             }
         };
 
@@ -457,7 +457,7 @@ export class GameLoop {
     }
 
     public applyReward(reward: any) {
-        console.log(`Applying Reward: ${reward.item}`);
+        console.log(`正在應用獎勵：${reward.item}`);
 
         const targetUnits = this.playerTeam.filter(u => u !== null) as Unit[];
 
@@ -747,7 +747,7 @@ export class GameLoop {
         // Find if there's ANOTHER unit on the board with the same ID and Name that isn't this one
         const other = this.playerTeam.find(u => u && u !== unit && u.family === unit.family && u.name === unit.name && u.level < 3);
         if (other) {
-            console.log(`Chain Merge Triggered for ${unit.name}`);
+            console.log(`${unit.name} 觸發了連鎖合成！`);
             const idxOther = this.playerTeam.indexOf(other);
 
             // Standard merge: higher exp/stats unit absorbs the other
@@ -766,7 +766,7 @@ export class GameLoop {
 
             // Special: Sell Trigger for Mankey/Dwebble (All Levels)
             if (unit.family === 'mankey' || unit.family === 'dwebble') {
-                console.log(`Sell Trigger for ${unit.name} (Lv ${unit.level})`);
+                console.log(`${unit.name} (等級 ${unit.level}) 觸發了出售效果`);
                 this.triggerMergeEffect(unit);
             }
 
