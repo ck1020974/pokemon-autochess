@@ -13,6 +13,7 @@ export type GameEventType =
     | 'ON_FRIEND_DEATH'
     | 'ON_SELL'
     | 'ON_MOVE'
+    | 'ON_ATTACK'
     | 'SHOP_TURN_END';
 
 export interface GameEvent {

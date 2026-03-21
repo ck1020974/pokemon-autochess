@@ -37,7 +37,7 @@ export class Shop {
             1: [80, 20, 0, 0, 0],       // Turn 1-2
             2: [60, 30, 10, 0, 0],      // Turn 3-5
             3: [35, 35, 20, 10, 0],     // Turn 6-9
-            4: [17.5, 25, 30, 20, 7.5]  // Turn 10+
+            4: [20, 25, 30, 20, 5]  // Turn 10+
         };
 
         const currentProbs = PROBS[tier];
@@ -63,8 +63,20 @@ export class Shop {
                     return isCorrectTier && isNotHidden && isAvailable;
                 });
 
-                if (tierTemplates.length > 0) {
-                    const randomTemp = tierTemplates[Math.floor(Math.random() * tierTemplates.length)];
+                let pool: any[] = [];
+                tierTemplates.forEach(u => {
+                    const isLegendary = u.id === 'raikou' || u.id === 'entei' || u.id === 'suicune';
+                    // Eevee double rate (Tier 3)
+                    const isEevee = u.id === 'eevee';
+
+                    let weight = isLegendary ? 1 : 3;
+                    if (isEevee) weight = 6;
+
+                    for (let w = 0; w < weight; w++) pool.push(u);
+                });
+
+                if (pool.length > 0) {
+                    const randomTemp = pool[Math.floor(Math.random() * pool.length)];
                     this.slots[i] = new Unit(randomTemp);
                 } else {
                     // Fallback if no unit of target tier exists (Shouldn't happen with proper DB)

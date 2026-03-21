@@ -1,20 +1,26 @@
 import type { GameEdition } from '../../../models/Edition';
 import { ALL_UNITS } from '../../AllUnits';
 import {
-    NOVICE_OPPONENTS,
-    INTERM_OPPONENTS,
-    ADVANCED_OPPONENTS,
-    ELITE_OPPONENTS,
-    CHAMPION_OPPONENTS
-} from '../../AllOpponents';
+    MODERN_NOVICE_OPPONENTS,
+    MODERN_INTERM_OPPONENTS,
+    MODERN_ADVANCED_OPPONENTS,
+    MODERN_ELITE_OPPONENTS,
+    MODERN_CHAMPION_OPPONENTS
+} from '../../ModernOpponents';
 
 const INCLUDED_FAMILIES = [
     'bulbasaur', 'charmander', 'squirtle',
     'chikorita', 'cyndaquil', 'totodile',
-    'magnemite', 'diglett', 'doduo',
-    'natu', 'meowth', 'houndour',
-    'pinsir', 'heracross',
-    'onix', 'sneasel', 'mrmime'
+    'psyduck', 'bellsprout', 'vulpix',
+    'eevee',
+    'doduo', 'magnemite', 'sneasel', 'diglett', 'mareep',
+    'heracross', 'pinsir',
+    'caterpie', 'cleffa', 'togepi', 'pichu', 'ekans', 'wynaut', 'geodude', 'natu',
+    'cubone', 'murkrow',
+    'bonsly',
+    'meowth', 'kangaskhan', 'farfetchd', 'mrmime',
+    'happiny',
+    'raikou', 'entei', 'suicune', 'dratini', 'larvitar', 'delibird', 'shuckle'
 ];
 
 export const ModernEdition: GameEdition = {
@@ -27,17 +33,20 @@ export const ModernEdition: GameEdition = {
         // --- 根據需求調整：第二版本 (Modern Edition) 限縮 T1 商店角色池 ---
         // 除御三家外，移除所有其他 T1 角色 (含寶寶丁、小拉達、猴怪等)
         if (u.tier === 1) {
-            const starterFamilies = ['bulbasaur', 'charmander', 'squirtle'];
-            if (!starterFamilies.includes(u.family)) {
+            const allowedT1Families = [
+                'bulbasaur', 'charmander', 'squirtle',
+                'caterpie', 'cleffa', 'togepi', 'ekans', 'wynaut', 'geodude', 'bonsly'
+            ];
+            if (!allowedT1Families.includes(u.family)) {
                 return false;
             }
         }
 
         return true;
     }),
-    noviceOpponents: NOVICE_OPPONENTS,
-    intermOpponents: INTERM_OPPONENTS,
-    advancedOpponents: ADVANCED_OPPONENTS,
-    eliteOpponents: ELITE_OPPONENTS,
-    championOpponents: CHAMPION_OPPONENTS
+    noviceOpponents: MODERN_NOVICE_OPPONENTS,
+    intermOpponents: MODERN_INTERM_OPPONENTS,
+    advancedOpponents: MODERN_ADVANCED_OPPONENTS,
+    eliteOpponents: MODERN_ELITE_OPPONENTS,
+    championOpponents: MODERN_CHAMPION_OPPONENTS
 };

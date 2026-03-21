@@ -34,6 +34,8 @@ export class GameLoop {
 
     public charmanderN: number = 1;
     public charmanderCounter: number = 0;
+    public pichuN: number = 3;
+    public pichuCounter: number = 0;
     public psychicN: number = 2;
 
     public playerTeam: (Unit | null)[] = [null, null, null, null, null];
@@ -103,14 +105,22 @@ export class GameLoop {
 
     public refreshSpecialDescriptions() {
         // Update templates so shop shows CURRENT N value and correct frequency
-        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 點傷害 (每三回合後增強)`;
-        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 點傷害 (每二回合後增強)`;
-        ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 點傷害 (每回合後增強)`;
+        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每三回合後增強)`;
+        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每二回合後增強)`;
+        ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每回合後增強)`;
 
         // Sync static template scaling values to current global N
         (ALL_UNITS.charmander as any).scalingValue = this.charmanderN;
         (ALL_UNITS.charmeleon as any).scalingValue = this.charmanderN;
         (ALL_UNITS.charizard as any).scalingValue = this.charmanderN;
+
+        // Pichu family templates
+        ALL_UNITS.pichu.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (每三場戰鬥後增強)。`;
+        ALL_UNITS.pikachu.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (每兩場戰鬥後增強)。`;
+        ALL_UNITS.raichu.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (每場戰鬥後增強)。`;
+        (ALL_UNITS.pichu as any).scalingValue = this.pichuN;
+        (ALL_UNITS.pikachu as any).scalingValue = this.pichuN;
+        (ALL_UNITS.raichu as any).scalingValue = this.pichuN;
 
         // Sync units in shop (including frozen ones)
         this.shop.slots.forEach(u => {
@@ -118,7 +128,13 @@ export class GameLoop {
                 u.scalingValue = this.charmanderN;
                 const freq = [0, '三', '二', ''][u.level] || '三';
                 const suffix = u.level === 3 ? '每回合' : `每${freq}回合`;
-                u.description = `同時對後方敵方造成 ${this.charmanderN} 點傷害 (${suffix}後增強)`;
+                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${suffix}後增強)`;
+            }
+            if (u && u.family === 'pichu') {
+                u.scalingValue = this.pichuN;
+                const freq = [0, '三', '二', ''][u.level] || '三';
+                const suffix = u.level === 3 ? '每回合' : `每${freq}回合`;
+                u.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (${suffix}後增強)。`;
             }
         });
 
@@ -128,21 +144,32 @@ export class GameLoop {
                 u.scalingValue = this.charmanderN;
                 const freq = [0, '三', '二', ''][u.level] || '三';
                 const suffix = u.level === 3 ? '每回合' : `每${freq}回合`;
-                u.description = `同時對後方敵方造成 ${this.charmanderN} 點傷害 (${suffix}後增強)`;
+                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${suffix}後增強)`;
+            }
+            if (u && u.family === 'pichu') {
+                u.scalingValue = this.pichuN;
+                const freq = [0, '三', '二', ''][u.level] || '三';
+                const suffix = u.level === 3 ? '每回合' : `每${freq}回合`;
+                u.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (${suffix}後增強)。`;
             }
         });
 
         // Sync opponent's units on board (Enemy uses Player wins as scaling value)
         this.opponentTeam.forEach(u => {
+            const enemyScale = Math.max(1, this.wins);
             if (u && u.family === 'charmander') {
-                u.scalingValue = this.wins; // FIXED: Enemy scaling is current player wins
-                u.description = `同時對後方敵方造成 ${this.wins} 點傷害 (數值固定為玩家勝場數)`;
+                u.scalingValue = enemyScale;
+                u.description = `同時對後方敵方造成 ${enemyScale} 傷害 (數值固定為我方勝場數)`;
+            }
+            if (u && u.family === 'pichu') {
+                u.scalingValue = enemyScale; // Force same scaling for enemy Pichu
+                u.description = `戰鬥開始時，對最弱的敵方造成 ${enemyScale} 傷害 (數值固定為我方勝場數)`;
             }
         });
 
         // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
-        const template = '[2/3/4] 兩回合後，對隨機 2 位敵方造成 [N] 點傷害 (每場戰鬥後增強)';
+        const template = '[2/3/4] 兩回合後，對隨機 2 位敵方造成 [N] 傷害 (每場戰鬥後增強)';
         psychic.description = template.replace('[N]', Math.floor(this.psychicN).toString());
     }
 
@@ -171,10 +198,28 @@ export class GameLoop {
 
     private applyPrepEndSynergies() {
         // Unique Count Helper
-        const getUniqueCount = (units: Unit[]) => {
+        const getUniqueCount = (units: Unit[], synergyId?: string) => {
             const families = new Set(units.map(u => u.family));
-            console.log(`正在檢查羈絆數量：發現 ${families.size} 個獨特家族。`);
-            return families.size;
+            let count = families.size;
+
+            if (synergyId) {
+                const eeveeUnits = units.filter(u => u.family === 'eevee');
+                if (eeveeUnits.length > 0) {
+                    if (synergyId === 'BatonPass') {
+                        // Baton Pass: Unique Eevee forms count as different
+                        const uniqueForms = new Set(eeveeUnits.map(u => u.templateId));
+                        count += (uniqueForms.size - 1);
+                    } else {
+                        // Elemental Synergy: If there's an Eevee form that matches the synergy, it counts as 2
+                        const matches = eeveeUnits.some(u => {
+                            const template = ALL_UNITS[u.templateId];
+                            return template.synergies.includes(synergyId) && u.templateId !== 'eevee';
+                        });
+                        if (matches) count += 1; // Base 1 + Bonus 1 = 2
+                    }
+                }
+            }
+            return count;
         };
 
         // Helper: Apply Synergy Buff
@@ -190,7 +235,7 @@ export class GameLoop {
 
         // Normal (2/3/4) [Blessing]: Frontmost Friend -> +1/3/5 HP Permanent
         const normalUnits = this.playerTeam.filter(u => u && u.synergies.includes('Normal')) as Unit[];
-        const normalCount = getUniqueCount(normalUnits);
+        const normalCount = getUniqueCount(normalUnits, 'Normal');
         if (normalCount >= 2) {
             const buff = normalCount >= 5 ? 10 : (normalCount >= 4 ? 6 : (normalCount >= 3 ? 4 : 2));
             const frontUnit = this.playerTeam.find(u => u !== null);
@@ -201,7 +246,7 @@ export class GameLoop {
 
         // Ghost (2/3/4) [Shadow]: Frontmost Friend -> +1/3/5 Atk Permanent
         const ghostUnits = this.playerTeam.filter(u => u && u.synergies.includes('Ghost')) as Unit[];
-        const ghostCount = getUniqueCount(ghostUnits);
+        const ghostCount = getUniqueCount(ghostUnits, 'Ghost');
         if (ghostCount >= 2) {
             const buff = ghostCount >= 5 ? 10 : (ghostCount >= 4 ? 6 : (ghostCount >= 3 ? 4 : 2));
             const frontUnit = this.playerTeam.find(u => u !== null);
@@ -212,7 +257,7 @@ export class GameLoop {
 
         // Beetle (2): Every Beetle unit -> +4 HP or Attack (prioritize lower stat)
         const beetleUnits = this.playerTeam.filter(u => u && u.synergies.includes('Beetle')) as Unit[];
-        const beetleCount = getUniqueCount(beetleUnits);
+        const beetleCount = getUniqueCount(beetleUnits, 'Beetle');
         if (beetleCount >= 2) {
             beetleUnits.forEach(u => {
                 const addAtk = u.stats.attack < u.stats.maxHp;
@@ -228,7 +273,7 @@ export class GameLoop {
         }
 
         const starterUnits = this.playerTeam.filter(u => u && u.synergies.includes('Starter')) as Unit[];
-        const starterCount = getUniqueCount(starterUnits);
+        const starterCount = getUniqueCount(starterUnits, 'Starter');
         if (starterCount >= 3) {
             starterUnits.forEach(u => {
                 const buff = starterCount >= 5 ? 2 : 1;
@@ -260,6 +305,53 @@ export class GameLoop {
                     if (choice === 'atk') applyBuff(u, amount, 'atk', 'Magnemite');
                     else applyBuff(u, amount, 'hp', 'Magnemite');
                 }
+            }
+
+            // Cleffa (皮寶寶) family: Backmost perm HP
+            if (u.family === 'cleffa') {
+                if (u.templateId === 'clefable') { // Level 3 / Clefable
+                    this.playerTeam.forEach(target => {
+                        if (target && target !== u) applyBuff(target, 3, 'hp', 'Clefable');
+                    });
+                } else {
+                    const idx = this.playerTeam.indexOf(u);
+                    if (idx < this.playerTeam.length - 1) {
+                        const back = this.playerTeam[idx + 1];
+                        if (back) {
+                            const amount = u.level === 2 ? 3 : 1;
+                            applyBuff(back, amount, 'hp', u.name);
+                        }
+                    }
+                }
+            }
+
+            // Togepi (波克比) family: Backmost perm ATK
+            if (u.family === 'togepi') {
+                if (u.templateId === 'togekiss') { // Level 3 / Togekiss
+                    this.playerTeam.forEach(target => {
+                        if (target && target !== u) applyBuff(target, 3, 'atk', 'Togekiss');
+                    });
+                } else {
+                    const idx = this.playerTeam.indexOf(u);
+                    if (idx < this.playerTeam.length - 1) {
+                        const back = this.playerTeam[idx + 1];
+                        if (back) {
+                            const amount = u.level === 2 ? 3 : 1;
+                            applyBuff(back, amount, 'atk', u.name);
+                        }
+                    }
+                }
+            }
+
+            // Dratini (迷你龍) family: All allies perm ATK & HP
+            if (u.family === 'dratini') {
+                const amount = [0, 1, 3, 5][u.level] || 1;
+                this.playerTeam.forEach(target => {
+                    if (target) {
+                        applyBuff(target, amount, 'atk', u.name);
+                        applyBuff(target, amount, 'hp', u.name);
+                    }
+                });
             }
         });
     }
@@ -364,6 +456,23 @@ export class GameLoop {
             }
         }
 
+        // --- Player Pichu Scaling (Round-based) ---
+        let maxPichuLevel = 0;
+        this.playerTeam.forEach(u => {
+            if (u && u.family === 'pichu') {
+                maxPichuLevel = Math.max(maxPichuLevel, u.level);
+            }
+        });
+        if (maxPichuLevel > 0) {
+            this.pichuCounter++;
+            const threshold = [0, 3, 2, 1][maxPichuLevel] || 3;
+            if (this.pichuCounter >= threshold) {
+                this.pichuN += 2;
+                this.pichuCounter = 0;
+                console.log(`皮丘家族技能增強！目前威力：${this.pichuN}`);
+            }
+        }
+
         // --- Player Psychic Scaling (Round-based) ---
         const psychicUnits = this.playerTeam.filter(u => u && u.synergies.includes('Psychic')) as Unit[];
         const families = new Set(psychicUnits.map(u => u.family));
@@ -394,17 +503,18 @@ export class GameLoop {
         const diffData = REWARD_DATA.filter((r: any) => r.difficulty === difficulty);
 
         // 3. Define Pools
-        // Pool 1: 資源類 (GOLD, EXP, LIVES, and special PERM_NONE items like Evolutionary Items)
-        const pool1Items = ['幸運蛋', '不變之石', '進化奇石'];
+        // Pool 1: 資源類 (GOLD, EXP, LIVES)
         const pool1Categories = ['GOLD', 'EXP', 'LIVES'];
         const pool1 = diffData.filter((r: any) =>
-            pool1Categories.includes(r.category) || pool1Items.includes(r.item)
+            pool1Categories.includes(r.category)
         );
 
-        // Pool 2: 通用強化類 (BATTLE_NONE and Mints)
-        // 薄荷 (Mints) 雖然類別標記為 PERM_NONE，但在此分類中屬於通用強化
+        // Pool 2: 通用強化類 (BATTLE_NONE, Mints, and Evolutionary Items)
+        const pool2Items = ['幸運蛋', '不變之石', '進化奇石'];
         const pool2 = diffData.filter((r: any) =>
-            r.category === 'BATTLE_NONE' || (r.category === 'PERM_NONE' && r.item.includes('薄荷'))
+            r.category === 'BATTLE_NONE' ||
+            (r.category === 'PERM_NONE' && r.item.includes('薄荷')) ||
+            pool2Items.includes(r.item)
         );
 
         // Pool 3: 羈絆強化類 (PERM_SYNERGY, BATTLE_SYNERGY)
@@ -764,8 +874,9 @@ export class GameLoop {
             const unit = this.playerTeam[index];
             if (!unit) return;
 
-            // Special: Sell Trigger for Mankey/Dwebble (All Levels)
-            if (unit.family === 'mankey' || unit.family === 'dwebble') {
+            // Special: Sell Trigger for certain families
+            const sellTriggerFamilies = ['mankey', 'dwebble', 'ekans', 'wynaut'];
+            if (sellTriggerFamilies.includes(unit.family)) {
                 console.log(`${unit.name} (等級 ${unit.level}) 觸發了出售效果`);
                 this.triggerMergeEffect(unit);
             }
@@ -805,7 +916,8 @@ export class GameLoop {
 
         target.scalingValue = Math.max(target.scalingValue, source.scalingValue);
 
-        const totalExp = target.exp + source.exp;
+        const expGain = (target.family === 'eevee') ? source.exp * 2 : source.exp;
+        const totalExp = target.exp + expGain;
         const oldLevel = target.level;
         let predictedLevel = 1;
         if (totalExp >= 9) predictedLevel = 3;
@@ -822,6 +934,8 @@ export class GameLoop {
         if (willLevelUp) {
             if (willEvolve) {
                 this.performEvolution(target);
+            } else if (target.family === 'eevee') {
+                this.performEeveeEvolution(target, predictedLevel);
             } else {
                 target.level = predictedLevel;
                 const base = ALL_UNITS[target.family].baseStats;
@@ -830,11 +944,35 @@ export class GameLoop {
                 console.log(`${target.name} Level Up (Non-Evolve) -> +${base.maxHp * multiplier}/+${base.attack * multiplier}`);
             }
         } else {
-            target.addGrowth(source.exp, source.exp);
-            console.log(`${target.name} absorbs ${source.exp} exp. +${source.exp}/+${source.exp} Stats.`);
+            target.addGrowth(expGain, expGain);
+            console.log(`${target.name} absorbs ${expGain} exp. +${expGain}/+${expGain} Stats.`);
         }
         target.exp = totalExp;
         console.log(`${target.name} Merged: Exp ${totalExp} (Level ${target.level})`);
+    }
+
+    private performEeveeEvolution(unit: Unit, newLevel: number) {
+        unit.level = newLevel;
+        // Only evolve if currently base form Eevee
+        if (unit.templateId === 'eevee') {
+            const forms = ['flareon', 'vaporeon', 'jolteon', 'espeon', 'umbreon', 'leafeon', 'glaceon', 'sylveon'];
+            const chosen = forms[Math.floor(Math.random() * forms.length)];
+            const template = ALL_UNITS[chosen];
+
+            unit.templateId = template.id;
+            unit.name = template.name;
+            unit.imageUrl = template.battleImageUrl || template.imageUrl;
+            unit.battleImageUrl = template.battleImageUrl;
+            unit.description = template.description;
+            unit.synergies = [...template.synergies];
+            console.log(`伊布進化了！變成了 ${unit.name}`);
+        } else {
+            console.log(`${unit.name} 等級提升，保持原有型態。`);
+        }
+
+        // Apply Growth (Same as non-evolve logic but for Eevee)
+        const base = ALL_UNITS[unit.family].baseStats;
+        unit.addGrowth(base.maxHp, base.attack);
     }
 
     private performEvolution(unit: Unit) {
@@ -894,6 +1032,38 @@ export class GameLoop {
                     if (front) {
                         const amount = unit.level === 2 ? 4 : 2;
                         front.addGrowth(amount, 0);
+                    }
+                }
+            }
+        }
+
+        // Removed caterpie logic because it was moved to battle start.
+
+        if (unit.family === 'ekans') {
+            if (unit.templateId === 'arbok_final') { // Level 3
+                this.playerTeam.filter(u => u && u !== unit).forEach(u => u!.addBuff(10));
+            } else {
+                const idx = this.playerTeam.indexOf(unit);
+                if (idx < this.playerTeam.length - 1) {
+                    const back = this.playerTeam[idx + 1];
+                    if (back) {
+                        const amount = unit.templateId === 'arbok' ? 5 : 2;
+                        back.addBuff(amount);
+                    }
+                }
+            }
+        }
+
+        if (unit.family === 'wynaut') {
+            if (unit.templateId === 'wobbuffet_final') { // Level 3
+                this.playerTeam.filter(u => u && u !== unit).forEach(u => u!.addGrowth(10, 0));
+            } else {
+                const idx = this.playerTeam.indexOf(unit);
+                if (idx < this.playerTeam.length - 1) {
+                    const back = this.playerTeam[idx + 1];
+                    if (back) {
+                        const amount = unit.templateId === 'wobbuffet' ? 5 : 2;
+                        back.addGrowth(amount, 0);
                     }
                 }
             }

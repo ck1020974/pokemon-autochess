@@ -22,19 +22,27 @@ const TIER_NAMES = {
 
 // 顯式定義羈絆排序順序，確保排序邏輯萬無一失
 const SYNERGY_PRIORITY = [
-    'Starter',      // 御三家
-    'Normal',       // 守住
-    'Ghost',        // 詛咒
-    'Grass',        // 吸取
-    'Fire',         // 燃盡
-    'Water',        // 潮旋
-    'Triplets',     // 三胞胎
-    'Hard',         // 堅硬
-    'Cave',         // 挖洞
-    'Angry',        // 憤怒
-    'Snow',         // 降雪
-    'SwordDance',   // 劍舞
-    'Psychic'       // 念力
+    'Starter',      // 御三家 (1)
+    'Normal',       // 守住 (2)
+    'Ghost',        // 詛咒 (3)
+    'Grass',        // 吸取 (4)
+    'Fire',         // 燃盡 (5)
+    'Water',        // 潮旋 (6)
+    'Charge',       // 充電 (7)
+    'BugBite',      // 蟲咬 (8)
+    'Cave',         // 挖洞 (8)
+    'Angry',        // 憤怒 (9)
+    'Triplets',     // 三胞胎 (10)
+    'Psychic',      // 念力 (11)
+    'Snow',         // 降雪 (12)
+    'Thief',        // 小偷 (13)
+    'Trick',        // 戲法 (15)
+    'SwordDance',   // 劍舞 (16)
+    'Hard',         // 堅硬 (17)
+    'Charm',        // 撒嬌 (18)
+    'BatonPass',    // 接棒 (19)
+    'Outrage',      // 逆鱗 (20)
+    'Roost',        // 羽棲 (21)
 ];
 
 const ENCYCLOPEDIA_VERSION = '2026-03-04-0105'; // 版本標記，用於協助使用者確認是否為最新版
@@ -42,6 +50,7 @@ const ENCYCLOPEDIA_VERSION = '2026-03-04-0105'; // 版本標記，用於協助�
 export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalProps) {
     const [activeTier, setActiveTier] = useState<number>(1);
     const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null); // Controls the detail popup
+    const [viewingStageIndex, setViewingStageIndex] = useState<number>(0); // Controls which stage (0, 1, 2) is viewed in detail popup
 
     // Get base units (those allowed in shop, not hidden) grouped by tier
     const baseUnitsByTier = useMemo(() => {
@@ -49,7 +58,11 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
         Object.values(ALL_UNITS).forEach(template => {
             // Filter by hidden status AND availability in the current edition
             const isAvailable = activeEdition.availableUnitIds.includes(template.id);
-            if (isAvailable && !template.isHiddenFromShop && template.tier >= 1 && template.tier <= 5 && template.id !== 'sprout') {
+            const isEeveeEvolution = template.family === 'eevee' && template.id !== 'eevee';
+            // Exclude base eevee from grid, but show its 8 evolutions (8 boxes total)
+            if (isAvailable && isEeveeEvolution && template.tier >= 1 && template.tier <= 5 && template.id !== 'sprout') {
+                groups[template.tier].push(template);
+            } else if (isAvailable && !template.isHiddenFromShop && template.family !== 'eevee' && template.tier >= 1 && template.tier <= 5 && template.id !== 'sprout') {
                 groups[template.tier].push(template);
             }
         });
@@ -58,6 +71,51 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
         // Priority 2: Group by first synergy
         Object.keys(groups).forEach(tier => {
             groups[parseInt(tier)].sort((a, b) => {
+                // Priority 0: Eevee family at the absolute end, sorted in specific order
+                if (a.family === 'eevee' && b.family !== 'eevee') return 1;
+                if (b.family === 'eevee' && a.family !== 'eevee') return -1;
+                if (a.family === 'eevee' && b.family === 'eevee') {
+                    const EEVEE_ORDER = ['vaporeon', 'jolteon', 'flareon', 'espeon', 'umbreon', 'leafeon', 'glaceon', 'sylveon'];
+                    return EEVEE_ORDER.indexOf(a.id) - EEVEE_ORDER.indexOf(b.id);
+                }
+
+                // Priority 0.1: Special handling for legendary beasts (Raikou, Entei, Suicune) - Always last (but before Eevee if Eevee exists in same tier)
+                const getLegendaryRank = (u: UnitTemplate) => {
+                    if (u.id === 'raikou') return 1;
+                    if (u.id === 'entei') return 2;
+                    if (u.id === 'suicune') return 3;
+                    return 0;
+                };
+
+                const legA = getLegendaryRank(a);
+                const legB = getLegendaryRank(b);
+                if (legA > 0 || legB > 0) {
+                    if (legA > 0 && legB > 0) return legA - legB;
+                    return legA > 0 ? 1 : -1;
+                }
+
+                // Priority 1: Evolution stages (3 stages > 2 stages > 1 stage)
+                // Exclude Eevee from this rule since it's already handled as absolute last
+                const getEvolutionStages = (u: UnitTemplate) => {
+                    const familyUnits = Object.values(ALL_UNITS).filter(t => t.family === u.family);
+                    const root = familyUnits.find(t => !familyUnits.some(other => other.evolveId === t.id));
+                    if (!root) return 1;
+                    let count = 1;
+                    let curr = root;
+                    while (curr.evolveId && ALL_UNITS[curr.evolveId]) {
+                        // Count as a real stage only if it's not a technical suffix (_final, _2, _3)
+                        if (!curr.evolveId.endsWith('_final') && !curr.evolveId.endsWith('_2') && !curr.evolveId.endsWith('_3')) {
+                            count++;
+                        }
+                        curr = ALL_UNITS[curr.evolveId];
+                    }
+                    return count;
+                };
+
+                const stagesA = getEvolutionStages(a);
+                const stagesB = getEvolutionStages(b);
+                if (stagesA !== stagesB) return stagesB - stagesA;
+
                 const getStarterRank = (u: UnitTemplate) => {
                     if (u.synergies.includes('Starter') && u.synergies.includes('Grass')) return 1;
                     if (u.synergies.includes('Starter') && u.synergies.includes('Fire')) return 2;
@@ -94,8 +152,15 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
 
     // Get evolution path for a selected unit, padding to exactly 3 evolutionary stages
     const getEvolutionPath = (startTemplateId: string) => {
+        const startUnit = ALL_UNITS[startTemplateId];
+        // Special Case: Eevee family path (Eevee -> Evolution -> Evolution)
+        if (startUnit.family === 'eevee' && startUnit.id !== 'eevee') {
+            const eevee = ALL_UNITS['eevee'];
+            return [eevee, startUnit, startUnit];
+        }
+
         const path: UnitTemplate[] = [];
-        let current: UnitTemplate | undefined = ALL_UNITS[startTemplateId];
+        let current: UnitTemplate | undefined = startUnit;
 
         while (current) {
             path.push(current);
@@ -181,8 +246,11 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
                             {activeUnits.map(unit => (
                                 <div
                                     key={unit.id}
-                                    className="encyclopedia-unit-card"
-                                    onClick={() => setSelectedUnitId(unit.id)}
+                                    className={`encyclopedia-unit-card tier-${unit.tier}`}
+                                    onClick={() => {
+                                        setSelectedUnitId(unit.id);
+                                        setViewingStageIndex(0);
+                                    }}
                                 >
                                     <img src={unit.imageUrl} alt={unit.name} className="encyclopedia-unit-img" />
                                     <div className="encyclopedia-unit-name">{unit.name}</div>
@@ -199,74 +267,128 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
 
             {/* Selected Unit Details Modal - Use Portal to escape overflow:hidden */}
             {selectedTemplate && createPortal(
-                <div className="encyclopedia-detail-overlay" onClick={(e) => { e.stopPropagation(); setSelectedUnitId(null); }}>
+                <div className="encyclopedia-detail-overlay" onClick={(e) => { e.stopPropagation(); setSelectedUnitId(null); setViewingStageIndex(0); }}>
                     <div className="encyclopedia-detail-modal" onClick={e => e.stopPropagation()}>
-                        <button className="encyclopedia-close-btn" style={{ position: 'absolute', top: '15px', right: '20px', zIndex: 10 }} onClick={() => setSelectedUnitId(null)}>×</button>
+                        <button className="encyclopedia-close-btn" style={{ position: 'absolute', top: '15px', right: '20px', zIndex: 10 }} onClick={() => { setSelectedUnitId(null); setViewingStageIndex(0); }}>×</button>
 
-                        <div className="encyclopedia-detail-content">
-                            <div className="encyclopedia-detail-header-row">
-                                <div className="encyclopedia-detail-title" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                    {selectedTemplate.name}
-                                    <div className="encyclopedia-detail-synergies" style={{ marginLeft: '10px' }}>
-                                        {selectedTemplate.synergies.map(synId => {
-                                            const syn = SYNERGIES[synId];
-                                            if (!syn) return null;
+                        {(() => {
+                            const path = getEvolutionPath(selectedTemplate.id);
+                            const viewingTemplate = path[viewingStageIndex] || selectedTemplate;
+                            return (
+                                <div className="encyclopedia-detail-content">
+                                    <div className="encyclopedia-detail-header-row">
+                                        <div className="encyclopedia-detail-title" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                            {viewingTemplate.name}
+                                            <div className="encyclopedia-detail-synergies" style={{ marginLeft: '10px' }}>
+                                                {[...viewingTemplate.synergies]
+                                                    .sort((a, b) => SYNERGY_PRIORITY.indexOf(a) - SYNERGY_PRIORITY.indexOf(b))
+                                                    .map(synId => {
+                                                        const syn = SYNERGIES[synId];
+                                                        if (!syn) return null;
 
-                                            // Find units belonging to this synergy
-                                            const units = Object.values(ALL_UNITS)
-                                                .filter(t => t.synergies?.includes(syn.id) && !t.isHiddenFromShop && t.id !== 'sprout' && activeEdition.availableUnitIds.includes(t.id))
-                                                .sort((a, b) => a.tier - b.tier);
+                                                        // Find units belonging to this synergy
+                                                        const units = Object.values(ALL_UNITS)
+                                                            .filter(t => {
+                                                                const isAvailable = activeEdition.availableUnitIds.includes(t.id);
+                                                                if (!isAvailable || t.id === 'sprout') return false;
+                                                                if (!t.synergies?.includes(syn.id)) return false;
 
-                                            return (
-                                                <div key={synId} className="synergy-icon encyclopedia-syn-icon" style={{ borderColor: syn.color, position: 'relative', width: '38px', height: '38px', fontSize: '1.4rem', margin: 0 }}>
-                                                    {syn.icon}
-                                                    <div className="synergy-tooltip encyclopedia-tooltip">
-                                                        <div style={{ fontWeight: 'bold', color: syn.color, marginBottom: '4px' }}>
-                                                            {syn.icon} {syn.name}
-                                                        </div>
-                                                        <div>{syn.description}</div>
-                                                        {units.length > 0 && (
-                                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px', marginTop: '8px' }}>
-                                                                {units.map((u) => (
-                                                                    <img key={u.id} src={u.imageUrl} alt={u.name} title={u.name} style={{ width: '28px', height: '28px', objectFit: 'contain', borderRadius: '4px', background: 'rgba(0,0,0,0.3)', border: 'none' }} />
-                                                                ))}
+                                                                // Always include Eevee family separately (all evolutions)
+                                                                if (t.family === 'eevee') return true;
+
+                                                                // For other families, only show the FIRST unit in the family that has the synergy
+                                                                const familyUnits = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id));
+                                                                const unitsWithSyn = familyUnits.filter(u => u.synergies?.includes(syn.id));
+
+                                                                // Helper to find evolution depth within the family
+                                                                const getStageDepth = (uId: string) => {
+                                                                    let depth = 0;
+                                                                    let currId = uId;
+                                                                    // Simple back-trace: find how many units list this one as evolveId
+                                                                    while (true) {
+                                                                        const parent = familyUnits.find(p => p.evolveId === currId);
+                                                                        if (parent) {
+                                                                            depth++;
+                                                                            currId = parent.id;
+                                                                        } else {
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                    return depth;
+                                                                };
+
+                                                                // Sort by stage depth (earliest first)
+                                                                const firstInFamily = unitsWithSyn.sort((a, b) => getStageDepth(a.id) - getStageDepth(b.id))[0];
+
+                                                                return t.id === firstInFamily?.id;
+                                                            })
+                                                            .sort((a, b) => {
+                                                                if (a.family === 'eevee' && b.family !== 'eevee') return 1;
+                                                                if (b.family === 'eevee' && a.family !== 'eevee') return -1;
+                                                                return a.tier - b.tier;
+                                                            });
+
+                                                        return (
+                                                            <div key={synId} className="synergy-icon encyclopedia-syn-icon" style={{ borderColor: syn.color, position: 'relative', width: '38px', height: '38px', fontSize: '1.4rem', margin: 0 }}>
+                                                                {syn.icon}
+                                                                <div className="synergy-tooltip encyclopedia-tooltip">
+                                                                    <div style={{ fontWeight: 'bold', color: syn.color, marginBottom: '4px' }}>
+                                                                        {syn.icon} {syn.name}
+                                                                    </div>
+                                                                    <div>{syn.description}</div>
+                                                                    {units.length > 0 && (
+                                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px', marginTop: '8px' }}>
+                                                                            {units.map((u) => (
+                                                                                <img key={u.id} src={u.imageUrl} alt={u.name} title={u.name} style={{ width: '28px', height: '28px', objectFit: 'contain', borderRadius: '4px', background: 'rgba(0,0,0,0.3)', border: 'none' }} />
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
+                                                        );
+                                                    })}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="encyclopedia-evolution-path-container">
+                                        <div className="encyclopedia-evolution-path">
+                                            {path.map((stage, index) => {
+                                                const stats = getSimulatedStats(stage.baseStats, index);
+                                                const isActive = viewingStageIndex === index;
+
+                                                return (
+                                                    <React.Fragment key={stage.id}>
+                                                        {index > 0 && <div className="encyclopedia-evolution-arrow"></div>}
+                                                        <div
+                                                            className={`encyclopedia-evolution-stage ${isActive ? 'active' : ''}`}
+                                                            style={{ cursor: 'pointer' }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setViewingStageIndex(index);
+                                                            }}
+                                                        >
+                                                            <div className="encyclopedia-stage-stars">
+                                                                {'★'.repeat(index + 1)}
+                                                            </div>
+                                                            <img src={stage.battleImageUrl || stage.imageUrl} alt={stage.name} className="encyclopedia-stage-img" />
+                                                            <div className="encyclopedia-stage-name">{stage.name}</div>
+                                                            <div className="encyclopedia-unit-stats" style={{ margin: '6px 0 5px 0' }}>
+                                                                <span className="encyclopedia-stat-atk">⚔️ {stats.attack}</span>
+                                                                <span className="encyclopedia-stat-hp">❤️ {stats.hp}</span>
+                                                            </div>
+                                                            <div className="encyclopedia-stage-desc" style={{ textAlign: 'left' }}>
+                                                                {stage.description}
+                                                            </div>
+                                                        </div>
+                                                    </React.Fragment>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="encyclopedia-evolution-path-container">
-                                <div className="encyclopedia-evolution-path">
-                                    {getEvolutionPath(selectedTemplate.id).map((stage, index) => {
-                                        const stats = getSimulatedStats(stage.baseStats, index);
-                                        return (
-                                            <React.Fragment key={stage.id}>
-                                                {index > 0 && <div className="encyclopedia-evolution-arrow"></div>}
-                                                <div className="encyclopedia-evolution-stage">
-                                                    <div className="encyclopedia-stage-stars">
-                                                        {'★'.repeat(index + 1)}
-                                                    </div>
-                                                    <img src={stage.battleImageUrl || stage.imageUrl} alt={stage.name} className="encyclopedia-stage-img" />
-                                                    <div className="encyclopedia-stage-name">{stage.name}</div>
-                                                    <div className="encyclopedia-unit-stats" style={{ margin: '6px 0 5px 0' }}>
-                                                        <span className="encyclopedia-stat-atk">⚔️ {stats.attack}</span>
-                                                        <span className="encyclopedia-stat-hp">❤️ {stats.hp}</span>
-                                                    </div>
-                                                    <div className="encyclopedia-stage-desc" style={{ textAlign: 'left' }}>
-                                                        {stage.description}
-                                                    </div>
-                                                </div>
-                                            </React.Fragment>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </div>
+                            );
+                        })()}
                     </div>
                 </div>,
                 document.getElementById('modal-root')!

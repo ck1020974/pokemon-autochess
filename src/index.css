@@ -123,6 +123,37 @@ h3 {
   }
 }
 
+@keyframes glow-rainbow-anim {
+  0% {
+    filter: drop-shadow(0 0 12px #ff0000) brightness(1.2);
+  }
+
+  20% {
+    filter: drop-shadow(0 0 18px #ffff00) brightness(1.4);
+  }
+
+  40% {
+    filter: drop-shadow(0 0 22px #00ff00) brightness(1.2);
+  }
+
+  60% {
+    filter: drop-shadow(0 0 18px #00ffff) brightness(1.4);
+  }
+
+  80% {
+    filter: drop-shadow(0 0 12px #0000ff) brightness(1.2);
+  }
+
+  100% {
+    filter: drop-shadow(0 0 18px #ff00ff) brightness(1.4);
+  }
+}
+
+.glow-rainbow-anim .unit-image {
+  animation: glow-rainbow-anim 1s infinite alternate !important;
+  z-index: 100 !important;
+}
+
 .start-game-btn.is-ready:hover {
   background: rgba(255, 255, 255, 0.15);
   box-shadow: 0 0 30px rgba(96, 165, 250, 0.3);
@@ -1499,6 +1530,31 @@ h3 {
   backdrop-filter: grayscale(0.4) brightness(0.9);
 }
 
+.is-gastro-acid .unit-image {
+  filter: sepia(1) saturate(2) hue-rotate(230deg) brightness(0.8);
+}
+
+.gift-flash {
+  animation: giftFlash 1.5s ease-out forwards;
+}
+
+@keyframes giftFlash {
+  0% {
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+
+  50% {
+    filter: brightness(1.5) saturate(2);
+    transform: scale(1.1);
+  }
+
+  100% {
+    filter: brightness(1) saturate(1);
+    transform: scale(1);
+  }
+}
+
 /* --- Mobile Portrait & Narrow Devices (e.g. iPhone 17) --- */
 @media (max-width: 480px) {
   .shop-container {
@@ -1772,6 +1828,14 @@ h3 {
   animation: glow-green calc(1s / var(--anim-speed)) ease-in-out;
 }
 
+.glow-white-anim {
+  animation: glow-white calc(0.6s / var(--anim-speed)) ease-in-out;
+}
+
+.gift-flash-anim {
+  animation: gift-yellow-flash calc(0.6s / var(--anim-speed)) ease-in-out;
+}
+
 @keyframes glow-red {
 
   0%,
@@ -1805,6 +1869,79 @@ h3 {
 
   50% {
     filter: drop-shadow(0 0 15px rgba(34, 197, 94, 1));
+  }
+}
+
+.glow-pale-pink {
+  animation: glow-pink calc(1s / var(--anim-speed)) ease-in-out;
+}
+
+.glow-yellow {
+  animation: glow-yellow calc(1s / var(--anim-speed)) ease-in-out;
+}
+
+.glow-orange {
+  animation: glow-orange calc(1.2s / var(--anim-speed)) ease-in-out;
+}
+
+@keyframes glow-pink {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0px transparent);
+  }
+
+  50% {
+    filter: drop-shadow(0 0 15px rgba(244, 114, 182, 1));
+  }
+}
+
+@keyframes glow-yellow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0px transparent);
+  }
+
+  50% {
+    filter: drop-shadow(0 0 15px rgba(253, 224, 71, 1));
+  }
+}
+
+@keyframes glow-orange {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0px transparent);
+  }
+
+  50% {
+    filter: drop-shadow(0 0 20px rgba(251, 146, 60, 1));
+  }
+}
+
+@keyframes glow-white {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0px transparent);
+  }
+
+  50% {
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.9));
+  }
+}
+
+@keyframes gift-yellow-flash {
+
+  0%,
+  100% {
+    filter: none;
+  }
+
+  50% {
+    filter: sepia(100%) saturate(300%) hue-rotate(10deg) brightness(1.2);
+    transform: scale(1.05);
   }
 }
 
@@ -1854,14 +1991,17 @@ h3 {
     margin-left: auto !important;
     margin-right: auto !important;
     box-sizing: border-box !important;
-    overflow: visible !important; /* Ensure slots are not clipped */
+    overflow: visible !important;
+    /* Ensure slots are not clipped */
   }
 
   .board-teams-horizontal {
-    padding-right: 0 !important; /* Remove large desktop padding that pushes player slots off-screen */
+    padding-right: 0 !important;
+    /* Remove large desktop padding that pushes player slots off-screen */
     width: 100% !important;
     justify-content: center !important;
-    gap: 40px !important; /* Slightly tighter gap for mobile */
+    gap: 40px !important;
+    /* Slightly tighter gap for mobile */
   }
 
   /* Specific widening for ultra-long screens (Aspect Ratio >= 2.1) - e.g. iPhone 16 Pro (6.1"/6.3") */
@@ -2624,9 +2764,60 @@ h3 {
   transform-origin: top left;
   margin: -4px;
 }
+
 /* 隱藏手機版結算畫面羈絆以節省高度 */
 @media (max-width: 768px) {
   .summary-synergies-row {
     display: none !important;
   }
 }
+
+/* --- Card Tier Visuals --- */
+.tier-1 {
+  --tier-color: #9ca3af;
+}
+
+/* Gray-400 */
+.tier-2 {
+  --tier-color: #22c55e;
+}
+
+/* Green-500 */
+.tier-3 {
+  --tier-color: #3b82f6;
+}
+
+/* Blue-500 */
+.tier-4 {
+  --tier-color: #ff4d4d;
+}
+
+/* Light Vibrant Red */
+.tier-5 {
+  --tier-color: #ffcc00;
+}
+
+/* Vibrant Gold */
+
+/* Shop Card Image Radial Background */
+.shop-slots .unit-card.tier-1 .unit-visual-wrapper {
+  background: radial-gradient(circle at 50% 50%, rgba(156, 163, 175, 0.8) 0%, transparent 85%);
+}
+
+.shop-slots .unit-card.tier-2 .unit-visual-wrapper {
+  background: radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.8) 0%, transparent 85%);
+}
+
+.shop-slots .unit-card.tier-3 .unit-visual-wrapper {
+  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.8) 0%, transparent 85%);
+}
+
+.shop-slots .unit-card.tier-4 .unit-visual-wrapper {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 77, 77, 0.9) 0%, transparent 90%);
+}
+
+.shop-slots .unit-card.tier-5 .unit-visual-wrapper {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 204, 0, 1.0) 0%, rgba(255, 204, 0, 0.2) 60%, transparent 100%);
+}
+
+/* Encyclopedia Card Borders Removed per request */

@@ -56,7 +56,7 @@ interface ConfirmDialogState {
 // --- Helper Components ---
 
 // UnitCard with Direct Lock & Silence Support
-function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock }: any) {
+function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock }: any) {
     if (!unit || unit.stats.hp <= 0) {
         return (
             <div className="slot-placeholder">
@@ -68,7 +68,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
     return (
         <div
             id={unit.id}
-            className={`unit-card ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${isSelected ? 'is-selected' : ''} ${showMergeGlow ? 'is-mergeable' : ''} ${isEvolving ? 'is-evolving' : ''}`}
+            className={`unit-card tier-${unit.tier || 1} ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${gastroAcid ? 'is-gastro-acid' : ''} ${isSelected ? 'is-selected' : ''} ${showMergeGlow ? 'is-mergeable' : ''} ${isEvolving ? 'is-evolving' : ''}`}
             onClick={(e) => { e.stopPropagation(); onClick(); }}
             draggable={draggable}
             onDragStart={onDragStart}
@@ -80,7 +80,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
             <div className="floor-marker"></div>
 
             {/* Silence Visual Overlay */}
-            {silenced && (
+            {silenced && !gastroAcid && (
                 <>
                     <div className="silence-lock-badge" title="招式已被封印"> 🈲 </div>
                     <div className="silence-overlay" />
@@ -115,12 +115,12 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, className, activeSynergyId, setActiveSynergyId }: any) {
+function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive }: any) {
     const [localOpen, setLocalOpen] = useState(false);
     const isForcedOpen = setActiveSynergyId ? (activeSynergyId === synergy.id) : localOpen;
 
     let activeDesc = synergy.description;
-    const isActive = count !== undefined && count >= synergy.tiers[0];
+    const isActive = (count !== undefined && count >= synergy.tiers[0]) || forceActive;
     const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
 
     // Dynamic [N] replacement for Psychic synergy (Fallback, mainly handled in GameLoop now)
@@ -184,35 +184,54 @@ function useForceUpdate() {
 
 // Helper to calculate active synergies
 // Helper to calculate all synergies data
-function getSynergyStatus(team: (Unit | null)[]) {
-    const synergyContributors: Record<string, Set<string>> = {};
-
-    team.forEach(u => {
-        if (!u) return;
-        u.synergies.forEach(syn => {
-            if (!synergyContributors[syn]) {
-                synergyContributors[syn] = new Set();
-            }
-            // Use family for unique check
-            synergyContributors[syn].add(u.family);
-        });
-    });
+function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
+    const teamUnits = team.filter((u): u is Unit => u !== null);
 
     const allSynergies = Object.values(SYNERGIES).map(syn => {
-        const count = synergyContributors[syn.id] ? synergyContributors[syn.id].size : 0;
+        const synId = syn.id;
+        const potentialUnits = teamUnits.filter(u => u.synergies.includes(synId));
+
+        const familySet = new Set(potentialUnits.map(u => u.family));
+        const activeFamilies = new Set(potentialUnits.map(u => u.family));
+
+        let count = familySet.size;
+
+        // Eevee Family Special Counting Logic
+        const eeveeUnits = potentialUnits.filter(u => u.family === 'eevee');
+        if (eeveeUnits.length > 0) {
+            if (synId === 'BatonPass') {
+                // Baton Pass: Unique Eevee forms count as different
+                const uniqueForms = new Set(eeveeUnits.map(u => u.templateId));
+                count += (uniqueForms.size - 1);
+            } else {
+                // Elemental Synergy: If there's an Eevee form that matches the synergy, it counts as 2
+                const hasEvolvedEevee = eeveeUnits.some(u => u.templateId !== 'eevee');
+                if (hasEvolvedEevee) count += 1; // Base 1 (family) + 1 (bonus) = 2
+            }
+        }
+
         const isActive = count >= syn.tiers[0];
 
         // Find units belonging to this synergy and sort them by tier
         const units = Object.values(ALL_UNITS)
-            .filter(t => t.synergies?.includes(syn.id) && !t.isHiddenFromShop && t.id !== 'sprout')
-            .sort((a, b) => a.tier - b.tier);
+            .filter(t => {
+                const isEeveeFamily = t.family === 'eevee';
+                const baseCondition = !t.isHiddenFromShop && t.id !== 'sprout';
+                const isAvailable = activeEdition.availableUnitIds.includes(t.id);
+                return t.synergies?.includes(syn.id) && (baseCondition || isEeveeFamily) && isAvailable;
+            })
+            .sort((a, b) => {
+                if (a.family === 'eevee' && b.family !== 'eevee') return 1;
+                if (b.family === 'eevee' && a.family !== 'eevee') return -1;
+                return a.tier - b.tier;
+            });
 
         return {
             ...syn,
             count,
             isActive,
             units,
-            activeFamilies: synergyContributors[syn.id] || new Set()
+            activeFamilies
         };
     });
 
@@ -228,7 +247,10 @@ function getSynergyStatus(team: (Unit | null)[]) {
 
 
 function App() {
-    const [activeEdition] = useState<GameEdition>(getInitialEdition());
+    const [activeEdition, setActiveEdition] = useState<GameEdition>(getInitialEdition());
+    const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
+    const [focusedVersionId, setFocusedVersionId] = useState<string | null>(null);
+    const [, setLoadingStage] = useState<number>(1);
 
     const gameRef = useRef<GameLoop | null>(null);
     if (!gameRef.current) {
@@ -302,6 +324,11 @@ function App() {
     const [activeSynergyId, setActiveSynergyId] = useState<string | null>(null);
 
     const [initialEnemyTeam, setInitialEnemyTeam] = useState<(Unit | null)[]>([]);
+
+    // UI Synergy Tracking
+    const [initialPlayerTeamForSynergy, setInitialPlayerTeamForSynergy] = useState<(Unit | null)[]>([]);
+    const [initialEnemyTeamForSynergy, setInitialEnemyTeamForSynergy] = useState<(Unit | null)[]>([]);
+    const previousGamePhase = useRef<GamePhase>(game.phase);
 
     // Evolution Visual State
     const [evolvingUnitId, setEvolvingUnitId] = useState<string | null>(null);
@@ -411,7 +438,6 @@ function App() {
     // using useEffect to Step 11, because Step 10 now includes the battle task.
 
 
-    // Progression Effect
     useEffect(() => {
         if (tutorialStep === 0) return;
 
@@ -597,6 +623,15 @@ function App() {
             music.play('start', true);
         }
     }, [difficulty]);
+
+    // Keep track of entering/leaving battle for UI synergy calculation
+    useEffect(() => {
+        if (game.phase === GamePhase.BATTLE && previousGamePhase.current !== GamePhase.BATTLE) {
+            setInitialPlayerTeamForSynergy([...game.playerTeam]);
+            setInitialEnemyTeamForSynergy(game.opponentTeam ? [...game.opponentTeam] : []);
+        }
+        previousGamePhase.current = game.phase;
+    }, [game.phase, game.playerTeam, game.opponentTeam]);
 
     // Orientation Detection
     useEffect(() => {
@@ -998,7 +1033,8 @@ function App() {
             const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
             const activeBuffs = [...game.nextBattleBuffs];
             game.nextBattleBuffs = []; // Clear buffs after consumption
-            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, game.wins, false, activeBuffs);
+            const enemyPsychicN = Math.max(1, game.wins);
+            simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, enemyPsychicN, false, activeBuffs);
             const currentSim = simulatorRef.current;
 
             currentSim.onUpdate = () => {
@@ -1483,7 +1519,10 @@ function App() {
     };
 
     // Calculate Synergies (All)
-    const synergyStatus = getSynergyStatus(game.playerTeam);
+    const activeTeamForSynergy = (game.phase === GamePhase.BATTLE || game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER)
+        ? (initialPlayerTeamForSynergy.length > 0 ? initialPlayerTeamForSynergy : displayPlayerTeam)
+        : displayPlayerTeam;
+    const synergyStatus = getSynergyStatus(activeTeamForSynergy, activeEdition);
 
     return (
         <div className="game-container" onClick={() => {
@@ -1708,9 +1747,9 @@ function App() {
 
             {/* Mute Toggle Button removed from here */}
 
-            {/* Loading & Start Screen */}
+            {/* Loading & Start Screen (Stage 1) */}
             {
-                !hasStarted && (
+                !hasStarted && !selectedVersionId && (
                     <div className="startup-overlay"
                         style={{
                             position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
@@ -1733,49 +1772,145 @@ function App() {
                             </h1>
                         </div>
 
-                        <div className="loading-container" style={{ width: '600px', textAlign: 'center' }}>
-                            <div className="loading-bar-wrapper" style={{
-                                width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)',
-                                borderRadius: '3px', overflow: 'hidden', marginBottom: '20px',
-                                border: '1px solid rgba(255,255,255,0.05)'
-                            }}>
-                                <div className="loading-bar-fill" style={{
-                                    width: `${loadingProgress}%`, height: '100%',
-                                    background: 'linear-gradient(90deg, #60a5fa, #3b82f6)',
-                                    transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)'
-                                }} />
+                        {!hasLoaded && (
+                            <div className="loading-container" style={{ width: '600px', textAlign: 'center' }}>
+                                <div className="loading-bar-wrapper" style={{
+                                    width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)',
+                                    borderRadius: '3px', overflow: 'hidden', marginBottom: '20px',
+                                    border: '1px solid rgba(255,255,255,0.05)'
+                                }}>
+                                    <div className="loading-bar-fill" style={{
+                                        width: `${loadingProgress}%`, height: '100%',
+                                        background: 'linear-gradient(90deg, #60a5fa, #3b82f6)',
+                                        transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)'
+                                    }} />
+                                </div>
+                                <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
+                                    資源載入中... {loadingProgress}%
+                                </p>
                             </div>
-                            <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
-                                {hasLoaded ? '系統就緒' : `資源載入中... ${loadingProgress}%`}
-                            </p>
-                        </div>
+                        )}
 
-                        <button
-                            className={`start-game-btn ${hasLoaded ? 'is-ready' : ''}`}
-                            disabled={!hasLoaded}
-                            onClick={() => {
-                                music.play('start', true);
-                                setHasStarted(true);
-                            }}
-                        >
-                            開始遊戲
-                        </button>
+                        {/* Version Selection Options show up once Stage 1 is loaded */}
+                        {hasLoaded && (
+                            <div className="difficulty-grid" style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(3, 1fr)',
+                                gap: '30px',
+                                maxWidth: '950px',
+                                width: '94%',
+                                margin: '20px auto 0'
+                            }}>
+                                {[
+                                    { id: 'classic', name: '經典版本', subtitle: '簡單上手的經典玩法', icon: 'icon-192.png', color: '#10b981', available: true },
+                                    { id: 'modern', name: '帝王版本', subtitle: '進階策略的豐富玩法', icon: 'icon-002.png', color: '#3b82f6', available: true },
+                                    { id: 'infinite', name: '無限版本', subtitle: '全局角色的無限玩法', icon: 'icon-003.png', color: '#a855f7', available: false }
+                                ].map(v => (
+                                    <button
+                                        key={v.id}
+                                        className={`difficulty-btn ${focusedVersionId === v.id ? 'is-focused' : ''}`}
+                                        disabled={!v.available}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (!v.available) return;
 
-                        <p style={{
-                            position: 'absolute',
-                            bottom: '20px',
-                            color: 'rgba(148, 163, 184, 0.3)',
-                            fontSize: '0.7rem',
-                            letterSpacing: '2px'
-                        }}>v4.8.6 - {activeEdition.name}</p>
+                                            // Handle selecting the version
+                                            if (focusedVersionId === v.id) {
+                                                music.play('start', true);
+                                                setSelectedVersionId(v.id);
+                                                setActiveEdition(v.id === 'modern' ? ModernEdition : ClassicEdition);
+                                                setLoadingStage(2); // Start loading stage 2
+                                            } else {
+                                                setFocusedVersionId(v.id);
+                                            }
+                                        }}
+                                        style={{
+                                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '15px',
+                                            padding: '25px 15px', background: 'rgba(0,0,0,0.4)', border: 'none',
+                                            borderRadius: '24px', cursor: v.available ? 'pointer' : 'not-allowed',
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            width: '100%',
+                                            minHeight: '220px',
+                                            backdropFilter: 'blur(10px)',
+                                            boxShadow: `0 10px 30px rgba(0,0,0,0.5)`,
+                                            opacity: v.available ? 1 : 0.5,
+                                            filter: v.available ? 'none' : 'grayscale(100%)'
+                                        }}
+                                    >
+                                        <img src={v.icon} alt={v.name} style={{ width: '120px', height: '120px', borderRadius: '16px', filter: `drop-shadow(0 0 15px ${v.color}55)` }} />
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                            <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: v.color, letterSpacing: '2px' }}>{v.name}</span>
+                                            <span style={{ fontSize: '0.85rem', color: '#94a3b8', letterSpacing: '1px' }}>{v.subtitle}</span>
+                                            {!v.available && <span style={{ fontSize: '0.75rem', color: '#ef4444', letterSpacing: '1px', marginTop: '5px' }}>(尚未開放)</span>}
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {!hasLoaded && (
+                            <p style={{
+                                position: 'absolute',
+                                bottom: '20px',
+                                color: 'rgba(148, 163, 184, 0.3)',
+                                fontSize: '0.7rem',
+                                letterSpacing: '2px'
+                            }}>v4.8.6 - {activeEdition.name}</p>
+                        )}
                     </div>
                 )
             }
 
-            {/* Difficulty Selection Screen (Only after Start) */}
+            {/* Stage 2 Loading Overlay (After selecting version, before difficulty) */}
             {
-                (hasStarted && difficulty === null) && (
+                !hasStarted && selectedVersionId && !hasLoaded && (
+                    <div className="startup-overlay"
+                        style={{
+                            position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
+                            background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
+                            zIndex: 10000, display: 'flex', flexDirection: 'column',
+                            justifyContent: 'center', alignItems: 'center', gap: '30px'
+                        }}>
+                        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                            <h1 style={{
+                                fontSize: '4rem',
+                                margin: '0',
+                                letterSpacing: '8px',
+                                background: 'linear-gradient(to bottom, #fff, #94a3b8)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.1))',
+                                fontWeight: 900
+                            }}>
+                                準備進入冒險
+                            </h1>
+                        </div>
+
+                        <div className="loading-container" style={{ width: '500px', textAlign: 'center' }}>
+                            <div className="loading-bar-wrapper" style={{
+                                width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)',
+                                borderRadius: '2px', overflow: 'hidden', marginBottom: '20px',
+                                border: '1px solid rgba(255,255,255,0.05)'
+                            }}>
+                                <div className="loading-bar-fill" style={{
+                                    width: `${loadingProgress}%`, height: '100%',
+                                    background: 'linear-gradient(90deg, #10b981, #059669)',
+                                    transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    boxShadow: '0 0 10px rgba(16, 185, 129, 0.5)'
+                                }} />
+                            </div>
+                            <p style={{ color: '#94a3b8', fontSize: '0.9rem', letterSpacing: '2px', margin: 0, opacity: 0.7 }}>
+                                正在載入 {activeEdition.name} 初期資源... {loadingProgress}%
+                            </p>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* Difficulty Selection Screen (After Version Selection & Stage 2 Load) */}
+            {
+                (!hasStarted && selectedVersionId && hasLoaded && difficulty === null) && (
                     <div className="startup-overlay"
                         style={{
                             position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
@@ -1847,7 +1982,7 @@ function App() {
                                 letterSpacing: '4px',
                                 opacity: 0.8,
                                 padding: '0 20px'
-                            }}>選擇本次挑戰難度 ({activeEdition.name})</p>
+                            }}>選擇本次挑戰難度</p>
                         </div>
                     </div>
                 )
@@ -1862,15 +1997,14 @@ function App() {
                             background: 'rgba(255,255,255,0.05)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)',
                             cursor: 'pointer', transition: 'all 0.2s'
                         }}
-                            title="重新選擇難度"
+                            title="重新選擇版本與難度"
                             onClick={() => {
                                 setConfirmDialog({
-                                    message: '重新選擇難度？',
-                                    description: '遊戲進度將被清除，並重新開始！',
+                                    message: '重新選擇遊戲？',
+                                    description: '遊戲進度將被清除，並回到最初畫面重新開始！',
                                     onConfirm: () => {
                                         setConfirmDialog(null);
-                                        setDifficulty(null);
-                                        handleRestart();
+                                        window.location.reload();
                                     }
                                 });
                             }}>
@@ -2114,7 +2248,7 @@ function App() {
                                             <div className="summary-units-grid">
                                                 {/* Synergy Display repositioned to top-left of this grid via CSS absolute positioning */}
                                                 <div className="summary-synergies-row">
-                                                    {getSynergyStatus(game.playerTeam).map(syn => (
+                                                    {getSynergyStatus(initialPlayerTeamForSynergy.length > 0 ? initialPlayerTeamForSynergy : game.playerTeam, activeEdition).map(syn => (
                                                         <SynergyIcon
                                                             key={syn.id}
                                                             synergy={syn}
@@ -2156,7 +2290,7 @@ function App() {
                                                 <div style={{ marginTop: '20px' }}>
                                                     <div className="summary-units-grid">
                                                         <div className="summary-synergies-row">
-                                                            {getSynergyStatus(game.opponentTeam).map((syn: any) => (
+                                                            {getSynergyStatus(initialEnemyTeamForSynergy.length > 0 ? initialEnemyTeamForSynergy : game.opponentTeam, activeEdition).map((syn: any) => (
                                                                 <SynergyIcon
                                                                     key={syn.id}
                                                                     synergy={syn}
@@ -2476,7 +2610,7 @@ function App() {
                 {/* 2. Synergies (Enemy) */}
                 {(initialEnemyTeam.length > 0 || displayEnemyTeam) && (
                     <div className="board-synergies" style={{ left: 'auto', right: '10px', flexDirection: 'row-reverse' }}>
-                        {getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || [])).map(syn => (
+                        {getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || []), activeEdition).map(syn => (
                             <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeFamilies={syn.activeFamilies} isEnemy={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />
                         ))}
                     </div>
@@ -2523,6 +2657,7 @@ function App() {
                                         isInteractive={isInteractive}
                                         isSelected={selected?.unit === unit && selected?.source === 'BOARD'}
                                         silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
+                                        gastroAcid={unit ? simulatorRef.current?.unitStates.get(unit)?.isGastroAcid : false}
                                         hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
                                         isEvolving={unit && evolvingUnitId === unit.id}
                                     />
@@ -2544,6 +2679,7 @@ function App() {
                                         onClick={() => handleSelect(unit, i, 'ENEMY')}
                                         flipped={true}
                                         silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
+                                        gastroAcid={unit ? simulatorRef.current?.unitStates.get(unit)?.isGastroAcid : false}
                                         hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
                                         isEvolving={unit && evolvingUnitId === unit.id}
                                     />
@@ -2803,7 +2939,7 @@ function App() {
                                         {selected.unit.synergies.map((synId: string) => {
                                             const syn = SYNERGIES[synId];
                                             if (!syn) return null;
-                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} />;
+                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} forceActive={true} />;
                                         })}
                                     </div>
                                 </div>

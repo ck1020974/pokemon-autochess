@@ -13,18 +13,20 @@ export class HeadlessBattleSimulator {
     private lightScreenActivated: Set<string> = new Set();
     private initialPlayerSet: Set<Unit> = new Set();
     private spiritombTriggered: Set<string> = new Set();
-    private psychicTriggered: Set<string> = new Set();
     private natuLogged: Set<string> = new Set();
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
+    private participantPlayerUnits = new Set<Unit>();
+    private participantEnemyUnits = new Set<Unit>();
     private originalPlayerTeam: (Unit | null)[] | null = null;
+    private grassHealedTargets = new Set<Unit>();
     private playerWins: number = 0;
     private playerAttackCount: number = 0;
     private enemyAttackCount: number = 0;
-    private grassHealedTargets = new Set<Unit>();
+    private psychicTriggered: Set<string> = new Set();
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], playerWins: number = 0) {
-        this.playerWins = playerWins || 0;
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], _playerWins: number = 0) {
+        this.playerWins = _playerWins;
         this.originalPlayerTeam = originalPlayerTeam || null;
         this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
         this.enemyTeam = enemyTeam.map(u => {
@@ -39,8 +41,10 @@ export class HeadlessBattleSimulator {
         this.eventBus = new EventBus();
 
         this.playerTeam.forEach(u => { if (u) this.initialPlayerSet.add(u); });
-        this.calculateCachedSynergies(this.playerTeam.filter(u => u !== null), this.playerSynergies);
-        this.calculateCachedSynergies(this.enemyTeam.filter(u => u !== null), this.enemySynergies);
+        this.playerTeam.forEach(u => { if (u) this.participantPlayerUnits.add(u); });
+        this.enemyTeam.forEach(u => { if (u) this.participantEnemyUnits.add(u); });
+        this.calculateCachedSynergies(Array.from(this.participantPlayerUnits), this.playerSynergies);
+        this.calculateCachedSynergies(Array.from(this.participantEnemyUnits), this.enemySynergies);
 
         this.enemyTeam.forEach(u => { if (u) this.registerUnitAbilities(u); });
         this.playerTeam.forEach(u => { if (u) this.registerUnitAbilities(u); });
@@ -155,6 +159,21 @@ export class HeadlessBattleSimulator {
             }
         }
 
+        // Pichu Family: Damage to weakest enemy at start
+        if (unit.family === 'pichu') {
+            const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0);
+            if (livingEnemies.length > 0) {
+                let weakest = livingEnemies[0];
+                for (const e of livingEnemies) {
+                    if (e.stats.hp < weakest.stats.hp) weakest = e;
+                }
+                const dmg = unit.scalingValue || 3;
+                // dealDamage in Headless is async if it calls notifySkill but here it's simplified
+                await this.dealDamage(unit, weakest, dmg, true);
+                this.log(`${unit.name} 使用了電光一閃。`);
+            }
+        }
+
         // Mr. Mime: Light Screen
         if (unit.family === 'mrmime' && !this.lightScreenActivated.has(side)) {
             const globalState = this.unitStates.get(unit) || {};
@@ -215,10 +234,10 @@ export class HeadlessBattleSimulator {
                 unit.templateId = currentTemplate.id;
                 unit.synergies = [...currentTemplate.synergies];
 
-                this.calculateCachedSynergies(this.playerTeam.filter(u => u !== null), this.playerSynergies);
-                this.calculateCachedSynergies(this.enemyTeam.filter(u => u !== null), this.enemySynergies);
+                this.calculateCachedSynergies(Array.from(this.participantPlayerUnits), this.playerSynergies);
+                this.calculateCachedSynergies(Array.from(this.participantEnemyUnits), this.enemySynergies);
                 this.registerUnitAbilities(unit);
-                const startAbilities = ['gastly', 'igglybuff', 'houndour', 'spiritomb', 'mudkip', 'gulpin', 'totodile'];
+                const startAbilities = ['gastly', 'igglybuff', 'houndour', 'spiritomb', 'mudkip', 'gulpin', 'totodile', 'pichu', 'caterpie', 'togepi'];
                 if (startAbilities.includes(unit.family)) await this.executeUnitStartOfBattleAbility(unit);
             }
         }
@@ -238,6 +257,140 @@ export class HeadlessBattleSimulator {
                 }
             }
         }
+
+        // Caterpie Family: Permanent Atk buff at start
+        if (unit.family === 'caterpie') {
+            const isStage3 = (unit.level >= 3);
+            if (isStage3) {
+                const living = myTeam.filter(u => u && u.stats.hp > 0);
+                living.forEach(u => {
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
+                    this.growUnit(u, 0, 3, original, true);
+                });
+            } else {
+                const idx = myTeam.indexOf(unit);
+                if (idx < myTeam.length - 1) { // back ally
+                    const back = myTeam[idx + 1];
+                    if (back) {
+                        const amount = unit.level === 2 ? 3 : 1;
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
+                        this.growUnit(back, 0, amount, original, true);
+                    }
+                }
+            }
+        }
+
+        // Mareep Family: Battle Start -> Permanent buff front ally (Lv1/2) or all allies (Lv3)
+        if (unit.family === 'mareep') {
+            const buff = unit.level >= 2 ? 2 : 1;
+            if (unit.level >= 3) {
+                const living = myTeam.filter(u => u && u.stats.hp > 0);
+                living.forEach(ally => {
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
+                    this.growUnit(ally, buff, buff, original, true);
+                });
+            } else {
+                const idx = myTeam.indexOf(unit);
+                if (idx > 0) {
+                    const front = myTeam[idx - 1];
+                    if (front && front.stats.hp > 0) {
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
+                        this.growUnit(front, buff, buff, original, true);
+                    }
+                }
+            }
+        }
+
+        // Delibird: Gift (Battle Start)
+        if (unit.family === 'delibird') {
+            const times = [0, 1, 2, 3][unit.level] || 1;
+            for (let i = 0; i < times; i++) {
+                const enemies = opTeam.filter(u => u && u.stats.hp > 0);
+                const allies = myTeam.filter(u => u && u.stats.hp > 0);
+                if (enemies.length > 0) {
+                    const target = enemies[Math.floor(Math.random() * enemies.length)];
+                    await this.dealDamage(unit, target, 5, true);
+                }
+                if (allies.length > 0) {
+                    const target = allies[Math.floor(Math.random() * allies.length)];
+                    this.heal(target, 5);
+                }
+            }
+        }
+
+        // Shuckle: Gastro Acid (Start)
+        if (unit.family === 'shuckle') {
+            const idx = myTeam.indexOf(unit);
+            if (idx < myTeam.length - 1) { // has back ally
+                const back = myTeam[idx + 1];
+                if (back && back.stats.hp > 0) {
+                    const healAmt = Math.floor(unit.stats.hp * 0.5);
+                    unit.stats.hp -= healAmt; // Shuckle loses HP
+                    // Temporary buff: only modify cloned battle unit, NOT original
+                    back.stats.hp += healAmt;
+                    back.stats.maxHp += healAmt;
+                    back.capStats(); // Enforce 50/50 cap
+                    this.log(`${unit.name} 分歧了 ${healAmt} 點生命給後方的 ${back.name}！`);
+                }
+            }
+
+            // Gastro Acid (Start of Battle)
+            const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0);
+            if (livingEnemies.length > 0) {
+                const target = livingEnemies[Math.floor(Math.random() * livingEnemies.length)];
+                const tState = this.unitStates.get(target) || {};
+                tState.isSilenced = true;
+                tState.isGastroAcid = true;
+                this.unitStates.set(target, tState);
+                this.log(`${unit.name} 對 ${target.name} 使用了胃液，使其招式無效化！`);
+            }
+        }
+
+        // --- Legendary Beasts ---
+
+        // Raikou: All allies +5 HP, all enemies 4-10 damage
+        if (unit.family === 'raikou') {
+            myTeam.filter(u => u && u.stats.hp > 0).forEach(ally => {
+                this.growUnit(ally, 5, 0, null, true);
+            });
+            const enemies = opTeam.filter(u => u && u.stats.hp > 0);
+            for (const enemy of enemies) {
+                const dmg = 4 + Math.floor(Math.random() * 7);
+                await this.dealDamage(unit, enemy, dmg, true, true);
+            }
+        }
+
+        // Entei: All allies +5 HP, strongest enemy 30 damage
+        if (unit.family === 'entei') {
+            myTeam.filter(u => u && u.stats.hp > 0).forEach(ally => {
+                this.growUnit(ally, 5, 0, null, true);
+            });
+            const enemies = opTeam.filter(u => u && u.stats.hp > 0);
+            if (enemies.length > 0) {
+                let strongest = enemies[0];
+                let maxPower = strongest.stats.hp + strongest.stats.attack;
+                for (const e of enemies) {
+                    const power = e.stats.hp + e.stats.attack;
+                    if (power > maxPower) {
+                        strongest = e;
+                        maxPower = power;
+                    }
+                }
+                await this.dealDamage(unit, strongest, 30, true);
+            }
+        }
+
+        // Suicune: All allies +5 ATK, weakest enemy 30 damage
+        if (unit.family === 'suicune') {
+            myTeam.filter(u => u && u.stats.hp > 0).forEach(ally => {
+                this.buffAttack(ally, 5, true);
+            });
+            const enemies = opTeam.filter(u => u && u.stats.hp > 0);
+            if (enemies.length > 0) {
+                const weakest = [...enemies].sort((a, b) => a.stats.hp - b.stats.hp)[0];
+                await this.dealDamage(unit, weakest, 30, true);
+            }
+        }
     }
 
     private getSynergyCountForUnit(unit: Unit, synergyId: string): number {
@@ -248,14 +401,33 @@ export class HeadlessBattleSimulator {
 
     private calculateCachedSynergies(team: Unit[], map: Map<string, number>) {
         map.clear();
-        const families = new Map<string, Set<string>>();
+        const familyMap = new Map<string, Set<string>>();
+        const eeveeFormsPerSynergy = new Map<string, Set<string>>();
+
         team.forEach(u => {
             u.synergies.forEach(syn => {
-                if (!families.has(syn)) families.set(syn, new Set());
-                families.get(syn)!.add(u.family);
+                if (!familyMap.has(syn)) familyMap.set(syn, new Set());
+                familyMap.get(syn)!.add(u.family);
+
+                if (u.family === 'eevee' && u.templateId !== 'eevee') {
+                    if (!eeveeFormsPerSynergy.has(syn)) eeveeFormsPerSynergy.set(syn, new Set());
+                    eeveeFormsPerSynergy.get(syn)!.add(u.templateId);
+                }
             });
         });
-        families.forEach((set, syn) => map.set(syn, set.size));
+
+        familyMap.forEach((set, syn) => {
+            let count = set.size;
+            if (eeveeFormsPerSynergy.has(syn)) {
+                if (syn === 'BatonPass') {
+                    const uniqueEeveeForms = eeveeFormsPerSynergy.get(syn)!;
+                    count += (uniqueEeveeForms.size - 1);
+                } else {
+                    count += 1;
+                }
+            }
+            map.set(syn, count);
+        });
     }
 
     private async applyBattleStartSynergies(team: Unit[]) {
@@ -272,6 +444,55 @@ export class HeadlessBattleSimulator {
             team.filter(u => u && u.synergies.includes('Starter')).forEach(u => {
                 const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
                 this.growUnit(u, buff, buff, original, true);
+            });
+        }
+
+        const isPlayer = this.initialPlayerSet.has(team[0]);
+        const mySynergies = isPlayer ? this.playerSynergies : this.enemySynergies;
+        const opTeam = isPlayer ? this.enemyTeam : this.playerTeam;
+
+        // Easter Egg: Extreme Evoboost (九彩昇華齊聚頂)
+        // Required: 5 different Eevee evolution forms
+        const eeveeEvolutions = team.filter(u => u && u.family === 'eevee' && u.templateId !== 'eevee');
+        const uniqueEeveeForms = new Set(eeveeEvolutions.map(u => u.templateId));
+        if (uniqueEeveeForms.size >= 5) {
+            this.log(`伊布發動了九彩昇華齊聚頂`);
+            team.forEach(u => {
+                if (u && u.stats.hp > 0) {
+                    this.growUnit(u, 20, 20, null, true);
+                }
+            });
+        }
+
+        // Charm (撒嬌)
+        const charmCount = mySynergies.get('Charm') || 0;
+        if (charmCount >= 2) {
+            const targetCount = charmCount - 1;
+            const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+            if (livingEnemies.length > 0) {
+                const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
+                shuffled.slice(0, targetCount).forEach(target => {
+                    const reducedAmt = Math.floor(target.stats.attack * 0.33);
+                    if (reducedAmt > 0) {
+                        target.stats.attack -= reducedAmt;
+                        this.log(`${target.name} 因撒嬌的眼神，降低了攻擊。`);
+                    }
+                });
+            }
+        }
+
+        // Charge (充電): All Charge units +random Atk (0-4 / 2-6 / 4-10 / 8-15)
+        const chargeCount = mySynergies.get('Charge') || 0;
+        if (chargeCount >= 2) {
+            let minBoost = 0;
+            let maxBoost = 4;
+            if (chargeCount >= 5) { minBoost = 8; maxBoost = 15; }
+            else if (chargeCount >= 4) { minBoost = 4; maxBoost = 10; }
+            else if (chargeCount >= 3) { minBoost = 2; maxBoost = 6; }
+
+            team.filter(u => u && u.synergies.includes('Charge')).forEach(u => {
+                const boost = minBoost + Math.floor(Math.random() * (maxBoost - minBoost + 1));
+                if (boost > 0) u.stats.attack += boost;
             });
         }
 
@@ -411,7 +632,53 @@ export class HeadlessBattleSimulator {
                 if (e.source === unit) {
                     if (this.getSynergyCountForUnit(unit, 'Cave') >= 2) {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
-                        this.growUnit(unit, 2, 0, original);
+                        const isAtk = Math.random() < 0.5;
+                        this.growUnit(unit, isAtk ? 0 : 1, isAtk ? 1 : 0, original);
+                    }
+                }
+            });
+        }
+        if (unit.synergies.includes('SwordDance')) {
+            this.eventBus.on('ON_MOVE', async (e) => {
+                if (e.source === unit) {
+                    const count = this.getSynergyCountForUnit(unit, 'SwordDance');
+                    const buff = count >= 2 ? 2 : 0;
+                    if (buff > 0) {
+                        const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
+                        this.growUnit(unit, 0, buff, original);
+                    }
+                }
+            });
+        }
+        if (unit.synergies.includes('Roost')) {
+            this.eventBus.on('ON_MOVE', async (e) => {
+                if (e.source === unit) {
+                    const count = this.getSynergyCountForUnit(unit, 'Roost');
+                    const buff = count >= 2 ? 2 : 0;
+                    if (buff > 0) {
+                        const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
+                        this.growUnit(unit, buff, 0, original);
+                    }
+                }
+            });
+        }
+        // Triplets
+        if (unit.synergies.includes('Triplets') && this.getSynergyCountForUnit(unit, 'Triplets') >= 3) {
+            const isAtk = Math.random() < 0.5;
+            const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
+            this.growUnit(unit, isAtk ? 0 : 3, isAtk ? 3 : 0, original, true);
+        }
+
+        // BatonPass logic moved to handleDeath
+
+        if (unit.family === 'heracross') {
+            this.eventBus.on('ON_HURT', (e) => {
+                if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
+                    const state = this.unitStates.get(unit) || {};
+                    if (!state.heracrossTriggered) {
+                        state.heracrossTriggered = true;
+                        this.buffAttack(unit, unit.stats.attack);
+                        this.unitStates.set(unit, state);
                     }
                 }
             });
@@ -493,6 +760,93 @@ export class HeadlessBattleSimulator {
                 }
             });
         }
+
+        // Psyduck Family: Kill -> Random Ally Perm HP
+        if (unit.family === 'psyduck') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                if (this.unitStates.get(unit)?.isSilenced) return;
+                if (e.context.killer === unit) {
+                    const { myTeam } = this.getTeams(unit);
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const targetCount = unit.level;
+                        const hpBuff = 2;
+                        const atkBuff = 1;
+                        const shuffled = [...living].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+                        targets.forEach(target => {
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                            this.growUnit(target, hpBuff, atkBuff, original, true);
+                        });
+                    }
+                }
+            });
+        }
+
+        // Bellsprout Family: Ally Death -> Random Ally Perm Atk/HP
+        if (unit.family === 'bellsprout') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                if (this.unitStates.get(unit)?.isSilenced) return;
+                const { myTeam } = this.getTeams(unit);
+                if (e.source && e.source !== unit && myTeam.includes(e.source)) {
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const targetCount = unit.level;
+                        const buff = 1; // +1 atk, +1 hp
+                        const shuffled = [...living].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+                        targets.forEach(target => {
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                            this.growUnit(target, buff, buff, original, true);
+                        });
+                    }
+                }
+            });
+        }
+
+        // Vulpix Family: Kill -> Random Ally Perm ATK
+        if (unit.family === 'vulpix') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                if (this.unitStates.get(unit)?.isSilenced) return;
+                if (e.context.killer === unit) {
+                    const { myTeam } = this.getTeams(unit);
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const targetCount = unit.level;
+                        const atkBuff = 2;
+                        const hpBuff = 1;
+                        const shuffled = [...living].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+                        targets.forEach(target => {
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                            this.growUnit(target, hpBuff, atkBuff, original, true);
+                        });
+                    }
+                }
+            });
+        }
+
+        // Togepi Family: After Attack Permanent Buff + Double Damage Chance (Super Luck)
+        if (unit.family === 'togepi') {
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
+                    const amount = unit.level; // Lv1:+1, Lv2:+2, Lv3:+3
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
+                    this.growUnit(unit, 0, amount, original, true);
+                }
+            });
+
+            this.eventBus.on('BEFORE_HURT', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (e.context.source === unit && !s?.isSilenced) {
+                    if (Math.random() < 0.5) {
+                        e.context.amount *= 2;
+                        this.log(`${unit.name} 發動了超幸運`);
+                    }
+                }
+            });
+        }
         if (unit.family === 'sprigatito') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 const { myTeam } = this.getTeams(unit);
@@ -556,6 +910,26 @@ export class HeadlessBattleSimulator {
                 for (let i = 0; i < count; i++) {
                     const { myTeam: currentTeam } = this.getTeams(unit);
                     await this.spawnUnit(currentTeam, deathIdx + i, 'mouse', 1, stats, stats, true);
+                }
+                await this.compactTeams();
+            });
+        }
+
+        if (unit.family === 'geodude' && unit.templateId !== 'stone') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (s?.isSilenced || e.source !== unit) return;
+                const { myTeam: initialTeam } = this.getTeams(unit);
+                let deathIdx = initialTeam.indexOf(unit);
+                if (deathIdx === -1) {
+                    deathIdx = initialTeam.findIndex(u => !u || u.stats.hp <= 0);
+                    if (deathIdx === -1) deathIdx = 0;
+                }
+                const count = unit.level >= 3 ? 5 : 2;
+                const stats = [0, 1, 2, 5][unit.level] || 1;
+                for (let i = 0; i < count; i++) {
+                    const { myTeam: currentTeam } = this.getTeams(unit);
+                    await this.spawnUnit(currentTeam, deathIdx + i, 'stone', 1, stats, stats, true);
                 }
                 await this.compactTeams();
             });
@@ -671,10 +1045,171 @@ export class HeadlessBattleSimulator {
                 }
             });
         }
+
+        if (unit.family === 'cubone') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (s?.isSilenced || e.source !== unit) return;
+                const { opTeam } = this.getTeams(unit);
+                const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+                if (livingEnemies.length > 0) {
+                    const target = livingEnemies[Math.floor(Math.random() * livingEnemies.length)];
+                    const ratio = [0, 0.33, 0.5, 1.0][unit.level] || 0.33;
+                    const dmg = Math.ceil(unit.stats.attack * ratio);
+                    if (dmg > 0) await this.dealDamage(unit, target, dmg, true);
+                }
+            });
+        }
+
+        if (unit.family === 'murkrow') {
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (s?.isSilenced || unit.stats.hp <= 0) return;
+                if (e.source === unit) {
+                    const { myTeam } = this.getTeams(unit);
+                    const aliveCount = myTeam.filter(u => u && u.stats.hp > 0).length;
+                    if (aliveCount <= 1) return;
+                    const idx = myTeam.indexOf(unit);
+                    if (idx !== -1 && idx < myTeam.length - 1) {
+                        myTeam.splice(idx, 1);
+                        myTeam.push(unit);
+                        await this.compactTeams();
+                        await this.eventBus.emit({ type: 'ON_MOVE', source: unit, context: { isPassiveMove: true } });
+                    }
+                }
+            });
+
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (s?.isSilenced || unit.stats.hp <= 0) return;
+                const { opTeam } = this.getTeams(unit);
+                if (e.source && opTeam.includes(e.source) && e.source.stats.hp > 0) {
+                    await this.dealDamage(unit, e.source, 5, true);
+                }
+            });
+        }
+
+        // Outrage Synergy: Grow before attack, 25% chance to skip attack
+        if (unit.synergies.includes('Outrage')) {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
+                    const count = this.getSynergyCountForUnit(unit, 'Outrage');
+                    if (count >= 2) {
+                        const amount = count >= 3 ? 5 : 3;
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
+                        this.growUnit(unit, amount, amount, original, true);
+
+                        // 25% chance to skip attack
+                        if (Math.random() < 0.25) {
+                            if (s) s.isAttackSkipped = true;
+                        }
+                    }
+                }
+            });
+        }
+
+        // Mareep Family: Pursuit (閃電拳) on ally attack
+        if (unit.family === 'mareep') {
+            this.eventBus.on('ON_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                const { myTeam } = this.getTeams(unit);
+                if (unit.stats.hp > 0 && !s?.isSilenced && e.source && e.source !== unit && myTeam.includes(e.source)) {
+                    const multipliers = [0, 0.25, 0.33, 0.5];
+                    const mult = multipliers[unit.level] || 0.25;
+                    const dmg = Math.ceil(unit.stats.attack * mult);
+                    if (e.target && e.target.stats.hp > 0) {
+                        this.log(`${unit.name} 對 ${e.target.name} 發動了閃電拳！`);
+                        await this.dealDamage(unit, e.target, dmg, true);
+                    }
+                }
+            });
+        }
+
+        // Happiny Family: Grow HP + Heal random ally on own attack
+        if (unit.family === 'happiny') {
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                const { myTeam } = this.getTeams(unit);
+                if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
+                    const selfGrowths = [0, 1, 2, 5];
+                    const selfGrow = selfGrowths[unit.level] || 1;
+                    const original = this.playerTeam.includes(unit) ? (this.originalPlayerTeam as any)?.find((o: Unit | null) => o && o.id === unit.id) : null;
+                    this.growUnit(unit, selfGrow, 0, original || null, true);
+
+                    const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
+                    if (aliveFriends.length > 0) {
+                        const randomFriend = aliveFriends[Math.floor(Math.random() * aliveFriends.length)];
+                        this.log(`${unit.name} 對 ${randomFriend.name} 發動了生蛋！`);
+                        const fo = null; // Ally buff is temporary
+                        this.growUnit(randomFriend, 5, 0, fo, true);
+                    }
+                }
+            });
+        }
+        // Dratini Family: First damage halved
+        if (unit.family === 'dratini') {
+            this.eventBus.on('BEFORE_HURT', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (e.target === unit && !s?.isSilenced && !s?.firstDamageHalved) {
+                    const source = e.context.source;
+                    const sState = source ? this.unitStates.get(source) || {} : {};
+                    const isBypassing = (source && source.family === 'pinsir' && !sState.isSilenced) ||
+                        (source && source.family === 'sableye' && sState.isAbsoluteKill);
+                    if (isBypassing) return;
+
+                    e.context.amount = Math.ceil(e.context.amount / 2);
+                    if (s) s.firstDamageHalved = true;
+                }
+            });
+        }
+
+        // Larvitar Family: AoE damage before attack + On-hurt permanent growth
+        if (unit.family === 'larvitar') {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
+                    const ratios = [0, 0.25, 0.33, 0.5];
+                    const ratio = ratios[unit.level] || 0.25;
+                    const dmg = Math.ceil(unit.stats.attack * ratio);
+                    const { opTeam } = this.getTeams(unit);
+                    const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+
+                    if (livingEnemies.length > 1) {
+                        const targets = livingEnemies.slice(1);
+                        this.log(`${unit.name} 對後方目標使用了咬碎`);
+                        for (const target of targets) {
+                            await this.dealDamage(unit, target, dmg, true, true);
+                        }
+                    }
+                }
+            });
+
+            this.eventBus.on('ON_HURT', async (e) => {
+                if (e.target === unit && unit.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
+                    // New: +1 HP and +1 ATK
+                    this.growUnit(unit, 1, 1, original, true);
+                }
+            });
+        }
     }
 
     public async performAttack(attacker: Unit, defender: Unit) {
         if (attacker.stats.hp <= 0 || defender.stats.hp <= 0) return;
+
+        // Skip attack logic (e.g., Outrage confusion)
+        const state = this.unitStates.get(attacker);
+        if (state?.isAttackSkipped) {
+            state.isAttackSkipped = false;
+            this.unitStates.set(attacker, state); // Update state after consuming
+            this.log(`${attacker.name} 處於混亂狀態不受控制`);
+            return;
+        }
+
+        // Notify that an attack is starting
+        await this.eventBus.emit({ type: 'ON_ATTACK', source: attacker, target: defender, context: {} });
+
         await this.eventBus.emit({ type: 'BEFORE_ATTACK', source: attacker, target: defender, context: {} });
         const dmg = attacker.stats.attack;
         const promises = [this.dealDamage(attacker, defender, dmg, false)];
@@ -713,20 +1248,34 @@ export class HeadlessBattleSimulator {
             const idx = opTeam.indexOf(defender);
             if (idx !== -1 && idx < opTeam.length - 1 && opTeam[idx + 1] && opTeam[idx + 1]!.stats.hp > 0) {
                 const isEnemyAttacker = this.enemyTeam.includes(attacker);
-                const splashDmg = isEnemyAttacker ? this.playerWins : attacker.scalingValue;
+                const splashDmg = isEnemyAttacker ? Math.max(1, this.playerWins) : attacker.scalingValue;
                 promises.push(this.dealDamage(attacker, opTeam[idx + 1]!, splashDmg, true));
             }
         }
+
+
         if (attacker.family === 'ralts' && !s?.isSilenced) {
             const { opTeam } = this.getTeams(attacker);
             const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (liveEnemies.length > 0) {
                 const target = liveEnemies[liveEnemies.length - 1];
-                const multiplier = attacker.level >= 3 ? 1.0 : 0.5;
+                const multiplier = attacker.level >= 3 ? 1.0 : (attacker.level === 2 ? 0.5 : 0.33);
                 const bonusDmg = Math.ceil(attacker.stats.attack * multiplier);
                 promises.push(this.dealDamage(attacker, target, bonusDmg, true));
             }
         }
+
+        // Bonsly family: Rock Slide targets the last enemy
+        if (attacker.family === 'bonsly' && !s?.isSilenced) {
+            const { opTeam } = this.getTeams(attacker);
+            const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+            if (liveEnemies.length > 0) {
+                const target = liveEnemies[liveEnemies.length - 1]; // Last enemy
+                const dmg = [0, 1, 2, 5][attacker.level] || 1;
+                promises.push(this.dealDamage(attacker, target, dmg, true));
+            }
+        }
+
         await Promise.all(promises);
         if (attacker.family === 'snover' && !s?.isSilenced) {
             const original = this.originalPlayerTeam?.find(u => u && u.id === attacker.id);
@@ -781,7 +1330,7 @@ export class HeadlessBattleSimulator {
                     const targetCount = 2; // Updated from all
                     const shuffled = [...livingAllies].sort(() => 0.5 - Math.random());
                     const selectedTargets = shuffled.slice(0, targetCount);
-                    const dmg = this.playerWins; // Scaling for enemy psychic
+                    const dmg = Math.max(1, this.playerWins); // Scaling for enemy psychic
                     for (const target of selectedTargets) await this.dealDamage(null, target, dmg, true, true);
                 }
             }
@@ -847,6 +1396,7 @@ export class HeadlessBattleSimulator {
     }
 
     private async handleDeath(unit: Unit, killer?: Unit) {
+        // Larvitar Family: Earthquake (Death) removed logic
         if (unit.family === 'sableye' && killer && killer.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
             const state = this.unitStates.get(unit) || {};
             state.isAbsoluteKill = true;
@@ -855,6 +1405,31 @@ export class HeadlessBattleSimulator {
             state.isAbsoluteKill = false;
         }
         await this.eventBus.emit({ type: 'AFTER_DEATH', source: unit, context: { killer } });
+
+        const { myTeam } = this.getTeams(unit);
+
+        // Triplets (三胞胎)
+        if (unit.synergies.includes('Triplets') && this.getSynergyCountForUnit(unit, 'Triplets') >= 3) {
+            const isAtk = Math.random() < 0.5;
+            const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
+            if (original) {
+                this.growUnit(unit, isAtk ? 0 : 3, isAtk ? 3 : 0, original, true);
+            }
+        }
+
+        // BatonPass (接棒)
+        if (unit.synergies.includes('BatonPass') && this.getSynergyCountForUnit(unit, 'BatonPass') >= 2) {
+            const livingAllies = myTeam.filter(u => u && u !== unit && u.stats.hp > 0);
+            if (livingAllies.length > 0) {
+                const target = livingAllies[Math.floor(Math.random() * livingAllies.length)];
+                const inheritedAtk = Math.floor(unit.stats.attack * 0.33);
+                const inheritedHp = Math.floor(unit.stats.maxHp * 0.33);
+                if (inheritedAtk > 0 || inheritedHp > 0) {
+                    this.growUnit(target, inheritedHp, inheritedAtk, null, true);
+                    this.log(`${unit.name} 對 ${target.name} 使用了接棒。`);
+                }
+            }
+        }
         if (this.playerTeam.includes(unit)) {
             const idx = this.playerTeam.indexOf(unit);
             if (this.playerTeam[idx] === unit || (this.playerTeam[idx] && this.playerTeam[idx].stats.hp <= 0)) this.playerTeam[idx] = null as any;
@@ -885,8 +1460,8 @@ export class HeadlessBattleSimulator {
         this.enemyTeam = this.compactTeam(this.enemyTeam);
 
         // Update synergy cache after team changes (units dying or moving)
-        this.calculateCachedSynergies(this.playerTeam.filter(u => u !== null), this.playerSynergies);
-        this.calculateCachedSynergies(this.enemyTeam.filter(u => u !== null), this.enemySynergies);
+        this.calculateCachedSynergies(Array.from(this.participantPlayerUnits), this.playerSynergies);
+        this.calculateCachedSynergies(Array.from(this.participantEnemyUnits), this.enemySynergies);
 
         const allUnits = [...this.playerTeam, ...this.enemyTeam];
         for (let i = 0; i < allUnits.length; i++) {
@@ -940,8 +1515,15 @@ export class HeadlessBattleSimulator {
         this.registerUnitAbilities(newUnit);
     }
 
-    private log(message: string) {
+    public log(message: string) {
         this.logs.push(message);
+    }
+
+    public async delay(_ms: number) { }
+    public async playAnimation(_unit: Unit | Unit[], _anim: string, _duration?: number) { }
+    public playTeamAnimation(_units: Unit[], _anim: string, _duration?: number) { }
+    public async notifySkill(unit: Unit, msg: string) {
+        this.log(`${unit.name} ${msg}`);
     }
 
     public async simulateStep(): Promise<boolean> {

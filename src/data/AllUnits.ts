@@ -30,19 +30,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'charmander', name: '小火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/小火龍00.webp', battleImageUrl: 'assets/小火龍01.webp',
-        description: '同時對後方敵方造成 [N] 點傷害 (每三回合後增強)', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
+        description: '同時對後方敵方造成 N 傷害 (每三場戰鬥後增強)', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
     },
     charmeleon: {
         id: 'charmeleon', name: '火恐龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/火恐龍00.webp', battleImageUrl: 'assets/火恐龍01.webp',
-        description: '同時對後方敵方造成 [N] 點傷害 (每二回合後增強)', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
+        description: '同時對後方敵方造成 N 傷害 (每二場戰鬥後增強)', synergies: ['Starter', 'Fire'], evolveId: 'charizard', isHiddenFromShop: true
     },
     charizard: {
         id: 'charizard', name: '噴火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/噴火龍00.webp', battleImageUrl: 'assets/噴火龍01.webp',
-        description: '同時對後方敵方造成 [N] 點傷害 (每回合後增強)', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
+        description: '同時對後方敵方造成 N 傷害 (每場戰鬥後增強)', synergies: ['Starter', 'Fire'], isHiddenFromShop: true
     },
 
     // 3. Squirtle
@@ -82,7 +82,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'gengar',
         name: '耿鬼',
         tier: 3,
-        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        baseStats: { hp: 1, maxHp: 1, attack: 3 },
         imageUrl: 'assets/耿鬼00.webp',
         battleImageUrl: 'assets/耿鬼01.webp',
         description: '戰鬥開始時，我方全體永久 +3 攻擊。',
@@ -136,19 +136,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'totodile', name: '小鋸鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/小鋸鱷00.webp', battleImageUrl: 'assets/小鋸鱷01.webp',
-        description: '戰鬥開始時，前方友軍 +33% 自身攻擊。', synergies: ['Starter', 'Water'], evolveId: 'croconaw'
+        description: '戰鬥開始時，前方友軍獲得小鋸鱷 33% 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'croconaw'
     },
     croconaw: {
         id: 'croconaw', name: '藍鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/藍鱷00.webp', battleImageUrl: 'assets/藍鱷01.webp',
-        description: '戰鬥開始時，前方友軍 +50% 自身攻擊。', synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍獲得藍鱷 50% 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'feraligatr', isHiddenFromShop: true
     },
     feraligatr: {
         id: 'feraligatr', name: '大力鱷', tier: 2, family: 'totodile',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/大力鱷00.webp', battleImageUrl: 'assets/大力鱷01.webp',
-        description: '戰鬥開始時，前方友軍 +100% 自身攻擊。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '戰鬥開始時，前方友軍獲得大力鱷 100% 攻擊。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 8. Igglybuff (New)
@@ -168,7 +168,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'wigglytuff',
         name: '胖可丁',
         tier: 3,
-        baseStats: { hp: 6, maxHp: 6, attack: 3 },
+        baseStats: { hp: 3, maxHp: 3, attack: 1 },
         imageUrl: 'assets/胖可丁00.webp',
         battleImageUrl: 'assets/胖可丁01.webp',
         description: '戰鬥開始時，我方全體永久 +3 生命。',
@@ -442,19 +442,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'magnemite', name: '小磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/小磁怪00.webp', battleImageUrl: 'assets/小磁怪01.webp',
-        description: '準備結束時，隨機 +1 攻擊或生命 (共 1 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton'
+        description: '準備結束時，永久 +1 攻擊或生命 (共 1 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton'
     },
     magneton: {
         id: 'magneton', name: '三合一磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/三合一磁怪00.webp', battleImageUrl: 'assets/三合一磁怪01.webp',
-        description: '準備結束時，隨機 +1 攻擊或生命 (共 2 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton_final', isHiddenFromShop: true
+        description: '準備結束時，永久 +1 攻擊或生命 (共 2 次)。', synergies: ['Triplets', 'Hard'], evolveId: 'magneton_final', isHiddenFromShop: true
     },
     magneton_final: {
         id: 'magneton_final', name: '三合一磁怪', tier: 2, family: 'magnemite',
         baseStats: { hp: 1, maxHp: 1, attack: 1 },
         imageUrl: 'assets/三合一磁怪00.webp', battleImageUrl: 'assets/三合一磁怪01.webp',
-        description: '準備結束時，隨機 +1 攻擊或生命 (共 3 次)。', synergies: ['Triplets', 'Hard'], isHiddenFromShop: true
+        description: '準備結束時，永久 +1 攻擊或生命 (共 3 次)。', synergies: ['Triplets', 'Hard'], isHiddenFromShop: true
     },
 
     // 23. Houndour
@@ -620,19 +620,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
 
     snover: {
         id: 'snover', name: '雪笠怪', tier: 3, family: 'snover',
-        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        baseStats: { hp: 6, maxHp: 6, attack: 2 },
         imageUrl: 'assets/雪笠怪00.webp', battleImageUrl: 'assets/雪笠怪01.webp',
         description: '攻擊後永久 +1 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], evolveId: 'abomasnow'
     },
     abomasnow: {
         id: 'abomasnow', name: '暴雪王', tier: 3, family: 'snover',
-        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        baseStats: { hp: 6, maxHp: 6, attack: 2 },
         imageUrl: 'assets/暴雪王00.webp', battleImageUrl: 'assets/暴雪王01.webp',
         description: '攻擊後永久 +2 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], evolveId: 'abomasnow_final', isHiddenFromShop: true
     },
     abomasnow_final: {
         id: 'abomasnow_final', name: '暴雪王', tier: 3, family: 'snover',
-        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        baseStats: { hp: 6, maxHp: 6, attack: 2 },
         imageUrl: 'assets/暴雪王00.webp', battleImageUrl: 'assets/暴雪王01.webp',
         description: '攻擊後永久 +5 攻擊並擊退敵方角色。', synergies: ['Grass', 'Snow'], isHiddenFromShop: true
     },
@@ -676,7 +676,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'spiritomb', name: '花岩怪', tier: 5, family: 'spiritomb',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/花岩怪00.webp', battleImageUrl: 'assets/花岩怪01.webp',
-        description: '戰鬥開始時，使 2 個敵方角色的招式無效化。', synergies: ['Ghost', 'Angry']
+        description: '戰鬥開始時，使 2 個敵方招式無效化。', synergies: ['Ghost', 'Angry']
     },
     heracross: {
         id: 'heracross', name: '赫拉克羅斯', tier: 3, family: 'heracross',
@@ -738,6 +738,445 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/魔牆人偶00.webp', battleImageUrl: 'assets/魔牆人偶01.webp',
         description: '我方受到的前 5 次傷害減半。', synergies: ['Psychic', 'Trick']
+    },
+    // 34. Caterpie
+    caterpie: {
+        id: 'caterpie', name: '綠毛蟲', tier: 1, family: 'caterpie',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: 'assets/綠毛蟲00.webp', battleImageUrl: 'assets/綠毛蟲01.webp',
+        description: '戰鬥開始時，後方友軍永久 +1 攻擊。', synergies: ['BugBite'], evolveId: 'metapod'
+    },
+    metapod: {
+        id: 'metapod', name: '鐵甲蛹', tier: 1, family: 'caterpie',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: 'assets/鐵甲蛹00.webp', battleImageUrl: 'assets/鐵甲蛹01.webp',
+        description: '戰鬥開始時，後方友軍永久 +3 攻擊。', synergies: ['BugBite'], evolveId: 'butterfree', isHiddenFromShop: true
+    },
+    butterfree: {
+        id: 'butterfree', name: '巴大蝶', tier: 1, family: 'caterpie',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: 'assets/巴大蝶00.webp', battleImageUrl: 'assets/巴大蝶01.webp',
+        description: '戰鬥開始時，我方全體永久獲得 3 點攻擊。', synergies: ['BugBite', 'Roost'], isHiddenFromShop: true
+    },
+    // 35. Cleffa
+    cleffa: {
+        id: 'cleffa', name: '皮寶寶', tier: 1, family: 'cleffa',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: 'assets/皮寶寶00.webp', battleImageUrl: 'assets/皮寶寶01.webp',
+        description: '戰鬥開始時，後方友軍永久 +1 生命。', synergies: ['Charm'], evolveId: 'clefairy'
+    },
+    clefairy: {
+        id: 'clefairy', name: '皮皮', tier: 1, family: 'cleffa',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: 'assets/皮皮00.webp', battleImageUrl: 'assets/皮皮01.webp',
+        description: '戰鬥開始時，後方友軍永久 +3 生命。', synergies: ['Charm'], evolveId: 'clefable', isHiddenFromShop: true
+    },
+    clefable: {
+        id: 'clefable', name: '皮可西', tier: 3, family: 'cleffa',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: 'assets/皮可西00.webp', battleImageUrl: 'assets/皮可西01.webp',
+        description: '戰鬥開始時，我方全體永久獲得 3 點生命。', synergies: ['Charm'], isHiddenFromShop: true
+    },
+    // 36. Togepi
+    togepi: {
+        id: 'togepi', name: '波克比', tier: 4, family: 'togepi',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: 'assets/波克比00.webp', battleImageUrl: 'assets/波克比01.webp',
+        description: '攻擊後永久+1攻擊並有50%機率傷害翻倍。', synergies: ['Trick'], evolveId: 'togetic'
+    },
+    togetic: {
+        id: 'togetic', name: '波克基古', tier: 4, family: 'togepi',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: 'assets/波克基古00.webp', battleImageUrl: 'assets/波克基古01.webp',
+        description: '攻擊後永久+2攻擊並有50%機率傷害翻倍。', synergies: ['Trick', 'Roost'], evolveId: 'togekiss', isHiddenFromShop: true
+    },
+    togekiss: {
+        id: 'togekiss', name: '波克基斯', tier: 4, family: 'togepi',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        imageUrl: 'assets/波克基斯00.webp', battleImageUrl: 'assets/波克基斯01.webp',
+        description: '攻擊後永久+3攻擊並有50%機率傷害翻倍。', synergies: ['Trick', 'Roost'], isHiddenFromShop: true
+    },
+    // 37. Ekans
+    ekans: {
+        id: 'ekans', name: '阿柏蛇', tier: 1, family: 'ekans',
+        baseStats: { hp: 1, maxHp: 1, attack: 3 },
+        imageUrl: 'assets/阿柏蛇00.webp', battleImageUrl: 'assets/阿柏蛇01.webp',
+        description: '合成與出售時後方友軍 +2 攻擊。', synergies: ['Angry'], evolveId: 'arbok'
+    },
+    arbok: {
+        id: 'arbok', name: '阿柏怪', tier: 1, family: 'ekans',
+        baseStats: { hp: 1, maxHp: 1, attack: 3 },
+        imageUrl: 'assets/阿柏怪00.webp', battleImageUrl: 'assets/阿柏怪01.webp',
+        description: '合成與出售時後方友軍 +5 攻擊。', synergies: ['Angry'], evolveId: 'arbok_final', isHiddenFromShop: true
+    },
+    arbok_final: {
+        id: 'arbok_final', name: '阿柏怪', tier: 1, family: 'ekans',
+        baseStats: { hp: 1, maxHp: 1, attack: 3 },
+        imageUrl: 'assets/阿柏怪00.webp', battleImageUrl: 'assets/阿柏怪01.webp',
+        description: '出售時全體友軍 +10 攻擊。', synergies: ['Angry'], isHiddenFromShop: true
+    },
+    // 38. Wynaut
+    wynaut: {
+        id: 'wynaut', name: '小果然', tier: 1, family: 'wynaut',
+        baseStats: { hp: 3, maxHp: 3, attack: 1 },
+        imageUrl: 'assets/小果然00.webp', battleImageUrl: 'assets/小果然01.webp',
+        description: '合成與出售時後方友軍 +2 生命。', synergies: ['Psychic'], evolveId: 'wobbuffet'
+    },
+    wobbuffet: {
+        id: 'wobbuffet', name: '果然翁', tier: 1, family: 'wynaut',
+        baseStats: { hp: 3, maxHp: 3, attack: 1 },
+        imageUrl: 'assets/果然翁00.webp', battleImageUrl: 'assets/果然翁01.webp',
+        description: '合成與出售時後方友軍 +5 生命。', synergies: ['Psychic'], evolveId: 'wobbuffet_final', isHiddenFromShop: true
+    },
+    wobbuffet_final: {
+        id: 'wobbuffet_final', name: '果然翁', tier: 1, family: 'wynaut',
+        baseStats: { hp: 3, maxHp: 3, attack: 1 },
+        imageUrl: 'assets/果然翁00.webp', battleImageUrl: 'assets/果然翁01.webp',
+        description: '出售時全體友軍 +10 生命。', synergies: ['Psychic'], isHiddenFromShop: true
+    },
+    // 39. Geodude
+    geodude: {
+        id: 'geodude', name: '小拳石', tier: 1, family: 'geodude',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: 'assets/小拳石00.webp', battleImageUrl: 'assets/小拳石01.webp',
+        description: '死亡後召喚 2 隻 1/1 小石頭。', synergies: ['Cave'], evolveId: 'graveler'
+    },
+    graveler: {
+        id: 'graveler', name: '隆隆石', tier: 1, family: 'geodude',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: 'assets/隆隆石00.webp', battleImageUrl: 'assets/隆隆石01.webp',
+        description: '死亡後召喚 2 隻 2/2 小石頭。', synergies: ['Cave'], evolveId: 'golem', isHiddenFromShop: true
+    },
+    golem: {
+        id: 'golem', name: '隆隆岩', tier: 1, family: 'geodude',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: 'assets/隆隆岩00.webp', battleImageUrl: 'assets/隆隆岩01.webp',
+        description: '死亡後召喚 5 隻 5/5 小石頭。', synergies: ['Cave'], isHiddenFromShop: true
+    },
+    stone: {
+        id: 'stone', name: '小石頭', tier: 1, family: 'geodude',
+        baseStats: { hp: 1, maxHp: 1, attack: 1 },
+        imageUrl: 'assets/小拳石00.webp', battleImageUrl: 'assets/小拳石01.webp',
+        description: '小拳石的碎石。', synergies: ['Cave'], isHiddenFromShop: true
+    },
+    // 40. Pichu
+    pichu: {
+        id: 'pichu', name: '皮丘', tier: 2, family: 'pichu',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/皮丘00.webp', battleImageUrl: 'assets/皮丘01.webp',
+        description: '戰鬥開始時，對最弱的敵方造成 N 傷害 (每三場戰鬥後增強)。', synergies: ['Charge', 'Charm'], evolveId: 'pikachu'
+    },
+    pikachu: {
+        id: 'pikachu', name: '皮卡丘', tier: 2, family: 'pichu',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/皮卡丘00.webp', battleImageUrl: 'assets/皮卡丘01.webp',
+        description: '戰鬥開始時，對最弱的敵方造成 N 傷害 (每兩場戰鬥後增強)。', synergies: ['Charge', 'Charm'], evolveId: 'raichu', isHiddenFromShop: true
+    },
+    raichu: {
+        id: 'raichu', name: '雷丘', tier: 2, family: 'pichu',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/雷丘00.webp', battleImageUrl: 'assets/雷丘01.webp',
+        description: '戰鬥開始時，對最弱的敵方造成 N 傷害 (每場戰鬥後增強)。', synergies: ['Charge', 'Charm'], isHiddenFromShop: true
+    },
+    // 41. Eevee
+    eevee: {
+        id: 'eevee', name: '伊布', tier: 3, family: 'eevee',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/伊布00.webp', battleImageUrl: 'assets/伊布01.webp',
+        description: '合成時額外獲得兩倍經驗值且隨機進化。', synergies: ['BatonPass', 'Normal']
+    },
+    flareon: {
+        id: 'flareon', name: '火伊布', tier: 3, family: 'eevee',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/火伊布00.webp', battleImageUrl: 'assets/火伊布01.webp',
+        description: '合成時額外獲得兩倍經驗值；額外累積燃盡羈絆數量。', synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true
+    },
+    vaporeon: {
+        id: 'vaporeon', name: '水伊布', tier: 3, family: 'eevee',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/水伊布00.webp', battleImageUrl: 'assets/水伊布01.webp',
+        description: '合成時額外獲得兩倍經驗值；額外累積潮旋羈絆數量。', synergies: ['Water', 'BatonPass'], isHiddenFromShop: true
+    },
+    jolteon: {
+        id: 'jolteon', name: '雷伊布', tier: 3, family: 'eevee',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/雷伊布00.webp', battleImageUrl: 'assets/雷伊布01.webp',
+        description: '合成時額外獲得兩倍經驗值；額外累積充電羈絆數量。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true
+    },
+    espeon: {
+        id: 'espeon', name: '太陽伊布', tier: 3, family: 'eevee',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/太陽伊布00.webp', battleImageUrl: 'assets/太陽伊布01.webp',
+        description: '合成時額外獲得兩倍經驗值；額外累積念力羈絆數量。', synergies: ['Psychic', 'BatonPass'], isHiddenFromShop: true
+    },
+    umbreon: {
+        id: 'umbreon', name: '月亮伊布', tier: 3, family: 'eevee',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/月亮伊布00.webp', battleImageUrl: 'assets/月亮伊布01.webp',
+        description: '合成時額外獲得兩倍經驗值；額外累積小偷羈絆數量。', synergies: ['Thief', 'BatonPass'], isHiddenFromShop: true
+    },
+    leafeon: {
+        id: 'leafeon', name: '葉伊布', tier: 3, family: 'eevee',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/葉伊布00.webp', battleImageUrl: 'assets/葉伊布01.webp',
+        description: '合成時額外獲得兩倍經驗值；額外累積吸取羈絆數量。', synergies: ['Grass', 'BatonPass'], isHiddenFromShop: true
+    },
+    glaceon: {
+        id: 'glaceon', name: '冰伊布', tier: 3, family: 'eevee',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/冰伊布00.webp', battleImageUrl: 'assets/冰伊布01.webp',
+        description: '合成時額外獲得兩倍經驗值；額外累積降雪羈絆數量。', synergies: ['Snow', 'BatonPass'], isHiddenFromShop: true
+    },
+    sylveon: {
+        id: 'sylveon', name: '仙子伊布', tier: 3, family: 'eevee',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/仙子伊布00.webp', battleImageUrl: 'assets/仙子伊布01.webp',
+        description: '合成時額外獲得兩倍經驗值；額外累積撒嬌羈絆數量。', synergies: ['Charm', 'BatonPass'], isHiddenFromShop: true
+    },
+
+    // 27. Psyduck
+    psyduck: {
+        id: 'psyduck', name: '可達鴨', tier: 3, family: 'psyduck',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/可達鴨00.webp', battleImageUrl: 'assets/可達鴨01.webp',
+        description: '擊殺敵方後，隨機 1 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Psychic'], evolveId: 'golduck'
+    },
+    golduck: {
+        id: 'golduck', name: '哥達鴨', tier: 3, family: 'psyduck',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/哥達鴨00.webp', battleImageUrl: 'assets/哥達鴨01.webp',
+        description: '擊殺敵方後，隨機 2 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Psychic'], evolveId: 'golduck_final', isHiddenFromShop: true
+    },
+    golduck_final: {
+        id: 'golduck_final', name: '哥達鴨', tier: 3, family: 'psyduck',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/哥達鴨00.webp', battleImageUrl: 'assets/哥達鴨01.webp',
+        description: '擊殺敵方後，隨機 3 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Psychic'], isHiddenFromShop: true
+    },
+
+    // 28. Bellsprout
+    bellsprout: {
+        id: 'bellsprout', name: '喇叭芽', tier: 3, family: 'bellsprout',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: 'assets/喇叭芽00.webp', battleImageUrl: 'assets/喇叭芽01.webp',
+        description: '友軍死亡後，隨機 1 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], evolveId: 'weepinbell'
+    },
+    weepinbell: {
+        id: 'weepinbell', name: '口呆花', tier: 3, family: 'bellsprout',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: 'assets/口呆花00.webp', battleImageUrl: 'assets/口呆花01.webp',
+        description: '友軍死亡後，隨機 2 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], evolveId: 'victreebel', isHiddenFromShop: true
+    },
+    victreebel: {
+        id: 'victreebel', name: '大食花', tier: 3, family: 'bellsprout',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: 'assets/大食花00.webp', battleImageUrl: 'assets/大食花01.webp',
+        description: '友軍死亡後，隨機 3 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], isHiddenFromShop: true
+    },
+
+    // 29. Vulpix
+    vulpix: {
+        id: 'vulpix', name: '六尾', tier: 3, family: 'vulpix',
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
+        imageUrl: 'assets/六尾00.webp', battleImageUrl: 'assets/六尾01.webp',
+        description: '擊殺敵方後，隨機 1 位友軍永久 +2 攻擊與 +1 生命。', synergies: ['Fire', 'Charm'], evolveId: 'ninetales'
+    },
+    ninetales: {
+        id: 'ninetales', name: '九尾', tier: 3, family: 'vulpix',
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
+        imageUrl: 'assets/九尾00.webp', battleImageUrl: 'assets/九尾01.webp',
+        description: '擊殺敵方後，隨機 2 位友軍永久 +2 攻擊與 +1 生命。', synergies: ['Fire', 'Charm'], evolveId: 'ninetales_final', isHiddenFromShop: true
+    },
+    ninetales_final: {
+        id: 'ninetales_final', name: '九尾', tier: 3, family: 'vulpix',
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
+        imageUrl: 'assets/九尾00.webp', battleImageUrl: 'assets/九尾01.webp',
+        description: '擊殺敵方後，隨機 3 位友軍永久 +2 攻擊與 +1 生命。', synergies: ['Fire', 'Charm'], isHiddenFromShop: true
+    },
+
+    // 30. Mareep
+    mareep: {
+        id: 'mareep', name: '咩利羊', tier: 4, family: 'mareep',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: 'assets/咩利羊00.webp', battleImageUrl: 'assets/咩利羊01.webp',
+        description: '友軍攻擊時，自身追擊 25% 傷害。', synergies: ['Charge'], evolveId: 'flaaffy'
+    },
+    flaaffy: {
+        id: 'flaaffy', name: '茸茸羊', tier: 4, family: 'mareep',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: 'assets/茸茸羊00.webp', battleImageUrl: 'assets/茸茸羊01.webp',
+        description: '友軍攻擊時，自身追擊 33% 傷害。', synergies: ['Charge'], evolveId: 'ampharos', isHiddenFromShop: true
+    },
+    ampharos: {
+        id: 'ampharos', name: '電龍', tier: 4, family: 'mareep',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        imageUrl: 'assets/電龍00.webp', battleImageUrl: 'assets/電龍01.webp',
+        description: '友軍攻擊時，自身追擊 50% 傷害。', synergies: ['Charge', 'Outrage'], isHiddenFromShop: true
+    },
+
+    // 31. Cubone
+    cubone: {
+        id: 'cubone', name: '卡拉卡拉', tier: 3, family: 'cubone',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/卡拉卡拉00.webp', battleImageUrl: 'assets/卡拉卡拉01.webp',
+        description: '死亡時，對隨機敵方造成 33% 攻擊的傷害。', synergies: ['Cave', 'Angry'], evolveId: 'marowak'
+    },
+    marowak: {
+        id: 'marowak', name: '嘎啦嘎啦', tier: 3, family: 'cubone',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/嘎啦嘎啦00.webp', battleImageUrl: 'assets/嘎啦嘎啦01.webp',
+        description: '死亡時，對隨機敵方造成 50% 攻擊的傷害。', synergies: ['Cave', 'Angry'], evolveId: 'marowak_final', isHiddenFromShop: true
+    },
+    marowak_final: {
+        id: 'marowak_final', name: '嘎啦嘎啦', tier: 3, family: 'cubone',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/嘎啦嘎啦00.webp', battleImageUrl: 'assets/嘎啦嘎啦01.webp',
+        description: '死亡時，對隨機敵方造成 100% 攻擊的傷害。', synergies: ['Cave', 'Angry'], isHiddenFromShop: true
+    },
+
+    // 32. Murkrow
+    murkrow: {
+        id: 'murkrow', name: '黑暗鴉', tier: 4, family: 'murkrow',
+        baseStats: { hp: 6, maxHp: 6, attack: 4 },
+        imageUrl: 'assets/黑暗鴉00.webp', battleImageUrl: 'assets/黑暗鴉01.webp',
+        description: '攻擊後，移動至隊伍最後方；敵方攻擊時，自身追擊 5 傷害。', synergies: ['Thief', 'Roost'], evolveId: 'honchkrow'
+    },
+    honchkrow: {
+        id: 'honchkrow', name: '烏鴉頭頭', tier: 4, family: 'murkrow',
+        baseStats: { hp: 6, maxHp: 6, attack: 4 },
+        imageUrl: 'assets/烏鴉頭頭00.webp', battleImageUrl: 'assets/烏鴉頭頭01.webp',
+        description: '攻擊後，移動至隊伍最後方；敵方攻擊時，自身追擊 5 傷害。', synergies: ['Thief', 'Roost'], evolveId: 'honchkrow_final', isHiddenFromShop: true
+    },
+    honchkrow_final: {
+        id: 'honchkrow_final', name: '烏鴉頭頭', tier: 4, family: 'murkrow',
+        baseStats: { hp: 6, maxHp: 6, attack: 4 },
+        imageUrl: 'assets/烏鴉頭頭00.webp', battleImageUrl: 'assets/烏鴉頭頭01.webp',
+        description: '攻擊後，移動至隊伍最後方；敵方攻擊時，自身追擊 5 傷害。', synergies: ['Thief', 'Roost'], isHiddenFromShop: true
+    },
+    // 33. Bonsly
+    bonsly: {
+        id: 'bonsly', name: '盆才怪', tier: 1, family: 'bonsly',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: 'assets/盆才怪00.webp', battleImageUrl: 'assets/盆才怪01.webp',
+        description: '攻擊時，對敵方末位造成 1 傷害。', synergies: ['Hard'], evolveId: 'sudowoodo'
+    },
+    sudowoodo: {
+        id: 'sudowoodo', name: '樹才怪', tier: 1, family: 'bonsly',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: 'assets/樹才怪00.webp', battleImageUrl: 'assets/樹才怪01.webp',
+        description: '攻擊時，對敵方末位造成 2 傷害。', synergies: ['Hard'], evolveId: 'sudowoodo_final', isHiddenFromShop: true
+    },
+    sudowoodo_final: {
+        id: 'sudowoodo_final', name: '樹才怪', tier: 1, family: 'bonsly',
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
+        imageUrl: 'assets/樹才怪00.webp', battleImageUrl: 'assets/樹才怪01.webp',
+        description: '攻擊時，對敵方末位造成 5 傷害。', synergies: ['Hard'], isHiddenFromShop: true
+    },
+    // 34. Happiny
+    happiny: {
+        id: 'happiny', name: '小福蛋', tier: 4, family: 'happiny',
+        baseStats: { hp: 4, maxHp: 4, attack: 4 },
+        imageUrl: 'assets/小福蛋00.webp', battleImageUrl: 'assets/小福蛋01.webp',
+        description: '攻擊後永久+1生命，同時讓隨機友軍+5生命。', synergies: ['Normal', 'Charm'], evolveId: 'chansey'
+    },
+    chansey: {
+        id: 'chansey', name: '吉利蛋', tier: 4, family: 'happiny',
+        baseStats: { hp: 5, maxHp: 5, attack: 5 },
+        imageUrl: 'assets/吉利蛋00.webp', battleImageUrl: 'assets/吉利蛋01.webp',
+        description: '攻擊後永久+2生命，同時讓隨機友軍+5生命。', synergies: ['Normal', 'Charm'], evolveId: 'blissey', isHiddenFromShop: true
+    },
+    blissey: {
+        id: 'blissey', name: '幸福蛋', tier: 4, family: 'happiny',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        imageUrl: 'assets/幸福蛋00.webp', battleImageUrl: 'assets/幸福蛋01.webp',
+        description: '攻擊後永久+5生命，同時讓隨機友軍+5生命。', synergies: ['Normal', 'Charm'], isHiddenFromShop: true
+    },
+    // 35. Legendary Beasts
+    raikou: {
+        id: 'raikou', name: '雷公', tier: 5, family: 'raikou',
+        baseStats: { hp: 15, maxHp: 15, attack: 15 },
+        imageUrl: 'assets/雷公00.webp', battleImageUrl: 'assets/雷公01.webp',
+        description: '戰鬥開始時，我方全體 +5 生命；對所有敵方造成 4-10 傷害。', synergies: ['Charge']
+    },
+    entei: {
+        id: 'entei', name: '炎帝', tier: 5, family: 'entei',
+        baseStats: { hp: 15, maxHp: 15, attack: 15 },
+        imageUrl: 'assets/炎帝00.webp', battleImageUrl: 'assets/炎帝01.webp',
+        description: '戰鬥開始時，我方全體+ 5 生命；對最強的敵方造成 30 傷害。', synergies: ['Fire']
+    },
+    suicune: {
+        id: 'suicune', name: '水君', tier: 5, family: 'suicune',
+        baseStats: { hp: 15, maxHp: 15, attack: 15 },
+        imageUrl: 'assets/水君00.webp', battleImageUrl: 'assets/水君01.webp',
+        description: '戰鬥開始時，我方全體+ 5 攻擊；對最弱的敵方造成 30 傷害。', synergies: ['Water']
+    },
+    // 36. Dratini Family
+    dratini: {
+        id: 'dratini', name: '迷你龍', tier: 5, family: 'dratini',
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        imageUrl: 'assets/迷你龍00.webp', battleImageUrl: 'assets/迷你龍01.webp',
+        description: '準備結束時，我方全體永久 +1 攻擊與生命；首次受到的傷害減半。', synergies: ['Outrage'], evolveId: 'dragonair'
+    },
+    dragonair: {
+        id: 'dragonair', name: '哈克龍', tier: 5, family: 'dratini',
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        imageUrl: 'assets/哈克龍00.webp', battleImageUrl: 'assets/哈克龍01.webp',
+        description: '準備結束時，我方全體永久 +3 攻擊與生命；首次受到的傷害減半。', synergies: ['Outrage'], evolveId: 'dragonite', isHiddenFromShop: true
+    },
+    dragonite: {
+        id: 'dragonite', name: '快龍', tier: 5, family: 'dratini',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: 'assets/快龍00.webp', battleImageUrl: 'assets/快龍01.webp',
+        description: '準備結束時，我方全體永久 +5 攻擊與生命；首次受到的傷害減半。', synergies: ['Outrage', 'Roost'], isHiddenFromShop: true
+    },
+    // 37. Larvitar Family
+    larvitar: {
+        id: 'larvitar', name: '幼基拉斯', tier: 5, family: 'larvitar',
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        imageUrl: 'assets/幼基拉斯00.webp', battleImageUrl: 'assets/幼基拉斯01.webp',
+        description: '咬碎：同時對後方敵方造成 25% 傷害；受傷後永久 +1 生命與攻擊。', synergies: ['Thief', 'Hard'], evolveId: 'pupitar'
+    },
+    pupitar: {
+        id: 'pupitar', name: '沙基拉斯', tier: 5, family: 'larvitar',
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        imageUrl: 'assets/沙基拉斯00.webp', battleImageUrl: 'assets/沙基拉斯01.webp',
+        description: '咬碎：同時對後方敵方造成 33% 傷害；受傷後永久 +1 生命與攻擊。', synergies: ['Thief', 'Hard'], evolveId: 'tyranitar', isHiddenFromShop: true
+    },
+    tyranitar: {
+        id: 'tyranitar', name: '班基拉斯', tier: 5, family: 'larvitar',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: 'assets/班基拉斯00.webp', battleImageUrl: 'assets/班基拉斯01.webp',
+        description: '咬碎：同時對後方敵方造成 50% 傷害；受傷後永久 +1 生命與攻擊。', synergies: ['Thief', 'Hard'], isHiddenFromShop: true
+    },
+    // 37. Delibird
+    delibird: {
+        id: 'delibird', name: '信使鳥', tier: 3, family: 'delibird',
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
+        imageUrl: 'assets/信使鳥00.webp', battleImageUrl: 'assets/信使鳥01.webp',
+        description: '戰鬥開始時，對隨機敵方造成 5 傷害，隨機友方 +5 生命 (共 1 次)。', synergies: ['Snow', 'BatonPass'],
+        evolveId: 'delibird_2'
+    },
+    delibird_2: {
+        id: 'delibird_2', name: '信使鳥', tier: 3, family: 'delibird',
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
+        imageUrl: 'assets/信使鳥00.webp', battleImageUrl: 'assets/信使鳥01.webp',
+        description: '戰鬥開始時，對隨機敵方造成 5 傷害，隨機友方 +5 生命 (共 2 次)。', synergies: ['Snow', 'BatonPass'],
+        evolveId: 'delibird_3',
+        isHiddenFromShop: true
+    },
+    delibird_3: {
+        id: 'delibird_3', name: '信使鳥', tier: 3, family: 'delibird',
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
+        imageUrl: 'assets/信使鳥00.webp', battleImageUrl: 'assets/信使鳥01.webp',
+        description: '戰鬥開始時，對隨機敵方造成 5 傷害，隨機友方 +5 生命 (共 3 次)。', synergies: ['Snow', 'BatonPass'],
+        isHiddenFromShop: true
+    },
+    // 38. Shuckle
+    shuckle: {
+        id: 'shuckle', name: '壺壺', tier: 4, family: 'shuckle',
+        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        imageUrl: 'assets/壺壺00.webp', battleImageUrl: 'assets/壺壺01.webp',
+        description: '戰鬥開始時，後方友軍獲得壺壺 50% 生命並使隨機敵方招式無效化。', synergies: ['BugBite', 'Hard']
     }
 };
 
@@ -780,6 +1219,29 @@ export const PREFERRED_POSITIONS: Record<string, PreferredPosition> = {
     'pinsir': 'FRONT_MID',
     'farfetchd': 'MID_BACK',
     'natu': 'ALL',
-    'ralts': 'FRONT',
-    'mrmime': 'ALL'
+    ralts: 'FRONT',
+    mrmime: 'ALL',
+    caterpie: 'FRONT_MID',
+    cleffa: 'ALL',
+    togepi: 'ALL',
+    ekans: 'ALL',
+    wynaut: 'ALL',
+    geodude: 'FRONT',
+    pichu: 'FRONT_MID',
+    eevee: 'ALL',
+    'psyduck': 'BACK',
+    'bellsprout': 'BACK',
+    'vulpix': 'BACK',
+    'mareep': 'BACK',
+    'cubone': 'ALL',
+    'murkrow': 'ALL',
+    'bonsly': 'FRONT_MID',
+    'happiny': 'BACK',
+    'raikou': 'ALL',
+    'entei': 'ALL',
+    'suicune': 'FRONT',
+    'dratini': 'ALL',
+    'larvitar': 'ALL',
+    'delibird': 'ALL',
+    'shuckle': 'FRONT_MID'
 };

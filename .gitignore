@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary Reports & Status
+eslint.txt
+eslint_report.json
+lint-errors.txt
+git_status.txt
+git_status_utf8.txt
+full_git_status.txt
+git_status*.txt
