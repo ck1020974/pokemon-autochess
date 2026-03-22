@@ -1936,10 +1936,11 @@ function App() {
                         </div>
 
                         <div className="difficulty-grid" style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(4, 1fr)',
-                            gap: '30px',
-                            maxWidth: '950px',
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            justifyContent: 'center',
+                            gap: '20px',
+                            maxWidth: '1100px',
                             width: '94%',
                             margin: '0 auto'
                         }}>
@@ -1965,7 +1966,8 @@ function App() {
                                         padding: '30px 15px', background: 'rgba(0,0,0,0.4)', border: `1px solid ${d.color}33`,
                                         borderRadius: '24px', cursor: 'pointer',
                                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        width: '100%',
+                                        flex: '1 1 210px',
+                                        maxWidth: '280px',
                                         minHeight: '200px',
                                         backdropFilter: 'blur(10px)',
                                         boxShadow: `0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px ${d.color}11`
