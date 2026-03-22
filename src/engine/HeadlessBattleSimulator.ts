@@ -1185,8 +1185,8 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('ON_HURT', async (e) => {
                 if (e.target === unit && unit.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
-                    // New: +1 HP and +1 ATK
-                    this.growUnit(unit, 1, 1, original, true);
+                    // New: +2 HP and +2 ATK
+                    this.growUnit(unit, 2, 2, original, true);
                 }
             });
         }
