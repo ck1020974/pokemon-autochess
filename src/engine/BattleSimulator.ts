@@ -304,33 +304,13 @@ export class BattleSimulator {
             }
         }
 
-        // Shuckle: Gastro Acid (Start)
+        // Shuckle: Contrary (Start)
         if (unit.family === 'shuckle') {
-            const idx = myTeam.indexOf(unit);
-            if (idx < myTeam.length - 1) { // has back ally
-                const back = myTeam[idx + 1];
-                if (back && back.stats.hp > 0) {
-                    const healAmt = Math.floor(unit.stats.hp * 0.5);
-                    unit.stats.hp -= healAmt; // Shuckle loses HP
-                    // Temporary buff: only modify cloned battle unit, NOT original
-                    back.stats.hp += healAmt;
-                    back.stats.maxHp += healAmt;
-                    back.capStats(); // Enforce 50/50 cap
-                    this.log(`${unit.name} 分歧了 ${healAmt} 點生命給後方的 ${back.name}！`);
-                    this.playAnimation(back, 'glow-green', 600);
-                }
-            }
-
-            // Gastro Acid (Start of Battle)
-            const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0);
-            if (livingEnemies.length > 0) {
-                const target = livingEnemies[Math.floor(Math.random() * livingEnemies.length)];
-                const tState = this.unitStates.get(target) || {};
-                tState.isSilenced = true;
-                tState.isGastroAcid = true;
-                this.unitStates.set(target, tState);
-                this.log(`${unit.name} 對 ${target.name} 使用了胃液，使其招式無效化！`);
-                this.playAnimation(target, 'glow-purple', 600);
+            const buffAtk = Math.floor(unit.stats.hp * 0.5);
+            if (buffAtk > 0) {
+                unit.stats.attack += buffAtk;
+                this.log(`${unit.name}發動了唱反調。`);
+                this.playAnimation(unit, 'jump', 200);
             }
         }
 
@@ -1646,21 +1626,25 @@ export class BattleSimulator {
             });
         }
 
-        // Togepi Family: After Attack Permanent Buff + Double Damage Chance (Super Luck)
+        // Togepi Family: Super Luck (After Attack Buff)
         if (unit.family === 'togepi') {
             this.eventBus.on('AFTER_ATTACK', async (e) => {
-                if (e.source === unit && unit.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-                    const amount = unit.level; // Lv1:+1, Lv2:+2, Lv3:+3
+                const s = this.unitStates.get(unit);
+                const { myTeam } = this.getTeams(unit);
+                if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
+                    const selfAtks = [0, 1, 2, 5];
+                    const selfAtk = selfAtks[unit.level] || 1;
                     const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
-                    this.growUnit(unit, 0, amount, '波克比技能', original, true);
-                }
-            });
+                    // Permanent growth for self
+                    this.growUnit(unit, 0, selfAtk, '超幸運', original, true);
 
-            this.eventBus.on('BEFORE_HURT', async (e) => {
-                if (e.context.source === unit && !this.unitStates.get(unit)?.isSilenced) {
-                    if (Math.random() < 0.5) {
-                        e.context.amount *= 2;
-                        this.log(`${unit.name} 發動了超幸運`);
+                    const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
+                    if (aliveFriends.length > 0) {
+                        const randomFriend = aliveFriends[Math.floor(Math.random() * aliveFriends.length)];
+                        await this.notifySkill(unit, `對 ${randomFriend.name} 發動了超幸運！`);
+                        // Friend buff is temporary (+5 Attack)
+                        this.growUnit(randomFriend, 0, 5, '超幸運', null, true);
+                        this.playAnimation(randomFriend, 'glow-white', 600);
                     }
                 }
             });

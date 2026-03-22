@@ -782,19 +782,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'togepi', name: '波克比', tier: 4, family: 'togepi',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/波克比00.webp', battleImageUrl: 'assets/波克比01.webp',
-        description: '攻擊後永久+1攻擊並有50%機率傷害翻倍。', synergies: ['Trick'], evolveId: 'togetic'
+        description: '攻擊後永久+1攻擊，同時讓隨機友軍+5攻擊。', synergies: ['Trick'], evolveId: 'togetic'
     },
     togetic: {
         id: 'togetic', name: '波克基古', tier: 4, family: 'togepi',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/波克基古00.webp', battleImageUrl: 'assets/波克基古01.webp',
-        description: '攻擊後永久+2攻擊並有50%機率傷害翻倍。', synergies: ['Trick', 'Roost'], evolveId: 'togekiss', isHiddenFromShop: true
+        description: '攻擊後永久+2攻擊，同時讓隨機友軍+5攻擊。', synergies: ['Trick', 'Roost'], evolveId: 'togekiss', isHiddenFromShop: true
     },
     togekiss: {
         id: 'togekiss', name: '波克基斯', tier: 4, family: 'togepi',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/波克基斯00.webp', battleImageUrl: 'assets/波克基斯01.webp',
-        description: '攻擊後永久+3攻擊並有50%機率傷害翻倍。', synergies: ['Trick', 'Roost'], isHiddenFromShop: true
+        description: '攻擊後永久+5攻擊，同時讓隨機友軍+5攻擊。', synergies: ['Trick', 'Roost'], isHiddenFromShop: true
     },
     // 37. Ekans
     ekans: {
@@ -1176,7 +1176,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'shuckle', name: '壺壺', tier: 4, family: 'shuckle',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/壺壺00.webp', battleImageUrl: 'assets/壺壺01.webp',
-        description: '戰鬥開始時，後方友軍獲得壺壺 50% 生命；隨機敵方招式無效化。', synergies: ['BugBite', 'Hard']
+        description: '戰鬥開始獲得自身 50% 生命的攻擊。', synergies: ['BugBite', 'Hard']
     }
 };
 
