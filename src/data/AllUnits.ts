@@ -1115,38 +1115,38 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'dratini', name: '迷你龍', tier: 5, family: 'dratini',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/迷你龍00.webp', battleImageUrl: 'assets/迷你龍01.webp',
-        description: '準備結束時，我方全體永久 +2 攻擊與生命；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Outrage'], evolveId: 'dragonair'
+        description: '準備結束時，我方全體永久 +2 攻擊與生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'dragonair'
     },
     dragonair: {
         id: 'dragonair', name: '哈克龍', tier: 5, family: 'dratini',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/哈克龍00.webp', battleImageUrl: 'assets/哈克龍01.webp',
-        description: '準備結束時，我方全體永久 +3 攻擊與生命；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Outrage'], evolveId: 'dragonite', isHiddenFromShop: true
+        description: '準備結束時，我方全體永久 +3 攻擊與生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'dragonite', isHiddenFromShop: true
     },
     dragonite: {
         id: 'dragonite', name: '快龍', tier: 5, family: 'dratini',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/快龍00.webp', battleImageUrl: 'assets/快龍01.webp',
-        description: '準備結束時，我方全體永久 +5 攻擊與生命；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Outrage', 'Roost'], isHiddenFromShop: true
+        description: '準備結束時，我方全體永久 +5 攻擊與生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage', 'Roost'], isHiddenFromShop: true
     },
     // 37. Larvitar Family
     larvitar: {
         id: 'larvitar', name: '幼基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/幼基拉斯00.webp', battleImageUrl: 'assets/幼基拉斯01.webp',
-        description: '同時對後方一位敵方造成 25% 傷害；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Thief', 'Cave'], evolveId: 'pupitar'
+        description: '同時對後方一位敵方造成 25% 傷害；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Thief', 'Cave'], evolveId: 'pupitar'
     },
     pupitar: {
         id: 'pupitar', name: '沙基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/沙基拉斯00.webp', battleImageUrl: 'assets/沙基拉斯01.webp',
-        description: '同時對後方一位敵方造成 33% 傷害；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Thief', 'Cave'], evolveId: 'tyranitar', isHiddenFromShop: true
+        description: '同時對後方一位敵方造成 33% 傷害；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Thief', 'Cave'], evolveId: 'tyranitar', isHiddenFromShop: true
     },
     tyranitar: {
         id: 'tyranitar', name: '班基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/班基拉斯00.webp', battleImageUrl: 'assets/班基拉斯01.webp',
-        description: '同時對後方一位敵方造成 50% 傷害；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Thief', 'Cave'], isHiddenFromShop: true
+        description: '同時對後方一位敵方造成 50% 傷害；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Thief', 'Cave'], isHiddenFromShop: true
     },
     // 37. Delibird
     delibird: {

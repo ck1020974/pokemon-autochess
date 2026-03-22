@@ -567,22 +567,32 @@ export class BattleSimulator {
         if (unit.family === 'mrmime' && !this.lightScreenActivated.has(side)) {
             await this.notifySkill(unit, `發動了光牆！`);
             await this.playTeamAnimation(myTeam, 'light-screen-anim', 1000);
-            const globalState = this.unitStates.get(unit) || {};
-            globalState.lightScreen = 5;
-            this.unitStates.set(unit, globalState);
             this.lightScreenActivated.add(side);
+
+            const lsMap = (this as any).lightScreenCharges = (this as any).lightScreenCharges || new Map<string, number>();
+            lsMap.set(side, 5);
 
             // Add the damage reduction listener
             this.eventBus.on('BEFORE_HURT', (e) => {
-                if (unit.stats.hp <= 0 || !e.target) return; // Light Screen fades if Mime dies
-                const { myTeam: victimTeam } = this.getTeams(e.target);
+                if (!e.target || unit.stats.hp <= 0) return; // Light Screen fades if Mime dies
+                const { myTeam: victimTeam, side: victimSide } = this.getTeams(e.target);
+                const sourceState = e.context.source ? this.unitStates.get(e.context.source) || {} : {};
+                const isBypassing = (e.context.source && e.context.source.family === 'pinsir' && !sourceState.isSilenced) || (e.context.source && e.context.source.family === 'sableye' && sourceState.isAbsoluteKill);
+
                 if (myTeam === victimTeam) {
-                    const state = this.unitStates.get(unit) || {};
-                    if (state.lightScreen && state.lightScreen > 0) {
-                        e.context.amount = Math.ceil(e.context.amount / 2);
-                        state.lightScreen--;
-                        this.unitStates.set(unit, state);
-                        this.log(`光牆抵擋了 ${e.target.name} 受到的傷害！(剩餘 ${state.lightScreen} 次)`);
+                    const charges = lsMap.get(victimSide) || 0;
+                    if (charges > 0) {
+                        if (!isBypassing) {
+                            e.context.amount = Math.ceil(e.context.amount / 2);
+                            this.log(`光牆抵擋了 ${e.target.name} 受到的傷害！(剩餘 ${charges - 1} 次)`);
+                        } else if (e.context.source?.family === 'pinsir') {
+                            this.log(`${e.context.source.name} 的破格穿透了光牆！`);
+                        }
+                        lsMap.set(victimSide, charges - 1);
+                        this.playTeamAnimation([e.target], 'light-screen-anim', 400);
+                        if (charges - 1 === 0) {
+                            this.log(victimSide === 'player' ? "我方的光牆消失了" : "敵方的光牆消失了");
+                        }
                     }
                 }
             });
@@ -830,6 +840,8 @@ export class BattleSimulator {
 
     private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string, permanentTarget?: Unit | null, silent: boolean = false) {
         if (unit.family === 'sneasel' && atk < 0) atk = 0; // Protection
+        if (hp > 0) hp = Math.min(hp, 50 - unit.stats.maxHp);
+        if (atk > 0) atk = Math.min(atk, 50 - unit.stats.attack);
         if (hp === 0 && atk === 0) return;
 
         // 1. Apply to Battle Clone
@@ -859,6 +871,7 @@ export class BattleSimulator {
             if (!silent) this.log(`${unit.name} 發動了銳利目光！`);
             return; // Protection
         }
+        if (amount > 0) amount = Math.min(amount, 50 - unit.stats.attack);
         unit.addBuff(amount);
         if (!silent) {
             this.log(`${unit.name} ${amount >= 0 ? '提高' : '降低'}了 ${Math.abs(amount)} 攻擊！`);
@@ -1107,6 +1120,8 @@ export class BattleSimulator {
                 }
             });
         }
+
+
 
         // Onix: Move to Back after attack and Reflect Damage
         if (unit.family === 'onix') {
@@ -1486,26 +1501,7 @@ export class BattleSimulator {
             });
         }
 
-        // Dratini Family: First damage halved
-        if (unit.family === 'dratini') {
-            this.eventBus.on('BEFORE_HURT', (e) => {
-                const s = this.unitStates.get(unit);
-                if (e.target === unit && !s?.isSilenced && !s?.firstDamageHalved) {
-                    const source = e.context.source;
-                    const sState = source ? this.unitStates.get(source) || {} : {};
-                    const isBypassing = (source && source.family === 'pinsir' && !sState.isSilenced) ||
-                        (source && source.family === 'sableye' && sState.isAbsoluteKill);
-                    if (isBypassing) return;
 
-                    const state = this.unitStates.get(unit) || {};
-                    state.firstDamageHalved = true;
-                    this.unitStates.set(unit, state);
-                    const oldAmt = e.context.amount;
-                    e.context.amount = Math.ceil(oldAmt / 2);
-                    this.log(`${unit.name} 發動了神奇鱗片，傷害減半！`);
-                }
-            });
-        }
 
         // Chikorita Family: Buff Summons
         if (unit.family === 'chikorita') {
@@ -1704,7 +1700,7 @@ export class BattleSimulator {
                         for (const target of targets) {
                             const original = this.playerTeam.includes(target) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === target.id) : null;
                             this.growUnit(target, 1, 1, '充電光束', original, true);
-                            this.playAnimation(target, 'glow-yellow', 600);
+                            this.playTeamAnimation([target], 'glow-yellow', 1000);
                         }
                     }
                 }
@@ -1956,38 +1952,12 @@ export class BattleSimulator {
     private async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false, silent: boolean = false) {
         if (target.stats.hp <= 0) return;
 
-        const { myTeam, side } = this.getTeams(target);
         const targetState = this.unitStates.get(target) || {};
         const sourceState = source ? this.unitStates.get(source) || {} : {};
         const isBypassing = (source && source.family === 'pinsir' && !sourceState.isSilenced) ||
             (source && source.family === 'sableye' && sourceState.isAbsoluteKill);
 
-        // --- NEW: Light Screen Logic (Halve ALL enemy damage, consumes 1 charge per instance) ---
-        // source === null means it's an environment effect or synergy effect, which we treat as enemy for the defender
-        const isEnemySource = source ? this.getTeams(source).side !== side : true;
 
-        if (isEnemySource) {
-            const aliveMimes = myTeam.filter(u => u && u.family === 'mrmime' && u.stats.hp > 0);
-            for (const mime of aliveMimes) {
-                const mState = this.unitStates.get(mime);
-                if (mState && mState.lightScreen > 0) {
-                    // "Ignore but still deduct": If bypassing, don't reduce amount but still consume charge
-                    if (!isBypassing) {
-                        amount = Math.ceil(amount / 2);
-                    } else if (source && source.family === 'pinsir') {
-                        // Keep the "Bypassing" message consistent if it hits a screen
-                        this.log(`${source.name} 的破格穿透了光牆！`);
-                    }
-
-                    mState.lightScreen--;
-                    this.playTeamAnimation([target], 'light-screen-anim', 400);
-                    if (mState.lightScreen === 0) {
-                        this.log(side === 'player' ? "我方的光牆消失了" : "敵方的光牆消失了");
-                    }
-                    break; // Only one light screen charge consumed per damage instance
-                }
-            }
-        }
 
         // Optimization: Removed overly aggressive source.hp check that broke clash symmetry.
         // Secondary hits (like Kangaskhan) are handled specifically in performAttack.

@@ -339,27 +339,6 @@ export class GameLoop {
             if (this.wins < 8) {
                 // ... logic
             }
-
-            // Larvitar/Dratini/Charmander/Pichu scaling logic
-            this.playerTeam.forEach(u => {
-                if (u && (u.family === 'larvitar' || u.family === 'dratini')) {
-                    if (u.level < 3) {
-                        u.battlesCount++;
-                        if (u.battlesCount >= 3) {
-                            u.battlesCount = 0;
-                            this.handleUnitExpGain(u, 1);
-                        }
-                    }
-                } else if (u && (u.family === 'charmander' || u.family === 'pichu')) {
-                    const threshold = u.family === 'charmander' ? [0, 3, 2, 1][u.level] : 3;
-                    u.battlesCount++;
-                    if (u.battlesCount >= (threshold || 3)) {
-                        u.battlesCount = 0;
-                        u.scalingValue = (u.scalingValue || 3) + 1;
-                        console.log(`${u.name} 的招式威力增強了！(現在：${u.scalingValue})`);
-                    }
-                }
-            });
             this.gymBattleCount++;
         } else if (this.wins < 12) {
             this.eliteBattleCount++;
@@ -408,6 +387,27 @@ export class GameLoop {
             this.playerTeam = this.savedTeam;
             this.savedTeam = [];
         }
+
+        // Larvitar/Dratini/Charmander/Pichu scaling logic (Apply to actual persistent team)
+        this.playerTeam.forEach(u => {
+            if (u && (u.family === 'larvitar' || u.family === 'dratini')) {
+                if (u.level < 3) {
+                    u.battlesCount++;
+                    if (u.battlesCount >= 3) {
+                        u.battlesCount = 0;
+                        this.applyExpToUnit(u, 1);
+                    }
+                }
+            } else if (u && (u.family === 'charmander' || u.family === 'pichu')) {
+                const threshold = u.family === 'charmander' ? [0, 3, 2, 1][u.level] : 3;
+                u.battlesCount++;
+                if (u.battlesCount >= (threshold || 3)) {
+                    u.battlesCount = 0;
+                    u.scalingValue = (u.scalingValue || 3) + 1;
+                    console.log(`${u.name} 的招式威力增強了！(現在：${u.scalingValue})`);
+                }
+            }
+        });
 
         if (result === 'WIN') {
             this.phase = GamePhase.REWARD;

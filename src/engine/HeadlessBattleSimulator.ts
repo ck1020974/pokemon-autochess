@@ -206,21 +206,25 @@ export class HeadlessBattleSimulator {
 
         // Mr. Mime: Light Screen
         if (unit.family === 'mrmime' && !this.lightScreenActivated.has(side)) {
-            const globalState = this.unitStates.get(unit) || {};
-            globalState.lightScreen = 5;
-            this.unitStates.set(unit, globalState);
             this.lightScreenActivated.add(side);
+
+            const lsMap = (this as any).lightScreenCharges = (this as any).lightScreenCharges || new Map<string, number>();
+            lsMap.set(side, 5);
 
             // Add the damage reduction listener
             this.eventBus.on('BEFORE_HURT', (e) => {
                 if (unit.stats.hp <= 0 || !e.target) return; // Light Screen fades if Mime dies
-                const { myTeam: victimTeam } = this.getTeams(e.target);
+                const { myTeam: victimTeam, side: victimSide } = this.getTeams(e.target);
+                const sourceState = e.context.source ? this.unitStates.get(e.context.source) || {} : {};
+                const isBypassing = (e.context.source && e.context.source.family === 'pinsir' && !sourceState.isSilenced) || (e.context.source && e.context.source.family === 'sableye' && sourceState.isAbsoluteKill);
+
                 if (myTeam === victimTeam) {
-                    const state = this.unitStates.get(unit) || {};
-                    if (state.lightScreen && state.lightScreen > 0) {
-                        e.context.amount = Math.ceil(e.context.amount / 2);
-                        state.lightScreen--;
-                        this.unitStates.set(unit, state);
+                    const charges = lsMap.get(victimSide) || 0;
+                    if (charges > 0) {
+                        if (!isBypassing) {
+                            e.context.amount = Math.ceil(e.context.amount / 2);
+                        }
+                        lsMap.set(victimSide, charges - 1);
                     }
                 }
             });
@@ -1393,29 +1397,12 @@ export class HeadlessBattleSimulator {
     }
 
     public async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false, _silent: boolean = false) {
-        if (target.stats.hp <= 0) return;
-
-        const { myTeam, side } = this.getTeams(target);
         const targetState = this.unitStates.get(target) || {};
         const sourceState = source ? this.unitStates.get(source) || {} : {};
         const isBypassing = (source && source.family === 'pinsir' && !sourceState.isSilenced) ||
             (source && source.family === 'sableye' && sourceState.isAbsoluteKill);
 
-        // --- Light Screen Logic ---
-        const isEnemySource = source ? this.getTeams(source).side !== side : true;
-        if (isEnemySource) {
-            const aliveMimes = myTeam.filter(u => u && u.family === 'mrmime' && u.stats.hp > 0);
-            for (const mime of aliveMimes) {
-                const mState = this.unitStates.get(mime);
-                if (mState && mState.lightScreen > 0) {
-                    if (!isBypassing) {
-                        amount = Math.ceil(amount / 2);
-                    }
-                    mState.lightScreen--;
-                    break;
-                }
-            }
-        }
+
 
         if (sourceState.isLethalStrike) {
             sourceState.isLethalStrike = false;

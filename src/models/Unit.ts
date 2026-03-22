@@ -96,9 +96,8 @@ export class Unit {
 
   // Helper for Permanent/Temporary Growth (MaxHP + HP + Atk)
   public addGrowth(hp: number, attack: number) {
-    // Growth logic: Increases both MaxHP and current HP
-    // If unit is at 50/50 Max, it stays at 50/50.
-    // If unit is at 40/50 (damaged), addGrowth(2, 0) brings it to 42/50 (Healing).
+    if (hp > 0) hp = Math.min(hp, 50 - this.stats.maxHp);
+    if (attack > 0) attack = Math.min(attack, 50 - this.stats.attack);
     this.stats.maxHp += hp;
     this.stats.hp += hp;
     this.stats.attack += attack;
@@ -107,6 +106,7 @@ export class Unit {
 
   // Helper for Attack Buff
   public addBuff(attack: number) {
+    if (attack > 0) attack = Math.min(attack, 50 - this.stats.attack);
     this.stats.attack += attack;
     this.capStats();
   }
