@@ -1274,7 +1274,7 @@ export class BattleSimulator {
             });
         }
 
-        // Bellsprout Family: Ally Death -> Random Ally Perm Atk/HP
+        // Bellsprout Family: Ally Summon -> Random Ally Perm Atk/HP
         if (unit.family === 'bellsprout') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
@@ -1353,12 +1353,11 @@ export class BattleSimulator {
                         const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx : deathIdx;
                         await this.spawnUnit(currentTeam, targetIdx, 'bulbasaur', 1, 2, 2, true);
                     } else {
-                        // Bulbasaur (1/2/3 star) -> Original Sprout Logic
-                        const count = [0, 1, 2, 5][unit.level] || 1;
-                        // Description says "1/1 Sprouts" regardless of Bulbasaur level
+                        // Bulbasaur (1 star) -> Spawns 1 seed (Matches description)
+                        const count = 1;
                         const seedStats = 1;
-                        await this.notifySkill(unit, `召喚了 ${count} 隻小種子`);
-                        await this.delay(100); // reduced from 200
+                        await this.notifySkill(unit, `召喚了 1 隻小種子`);
+                        await this.delay(100);
                         for (let i = 0; i < count; i++) {
                             const { myTeam: currentTeam } = this.getTeams(unit);
                             const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;

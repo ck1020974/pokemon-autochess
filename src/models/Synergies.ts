@@ -37,7 +37,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Thief': { id: 'Thief', name: '小偷', icon: '👤', description: '[2/3/4] 戰鬥開始時，從最強的敵方偷取 2/3/5 點攻擊', tiers: [2, 3, 4], color: '#64748b' },
     'Charm': { id: 'Charm', name: '撒嬌', icon: '💖', description: '[2/3/4/5] 戰鬥開始時，隨機 1/2/3/4 位敵方攻擊降低 33%', tiers: [2, 3, 4, 5], color: '#f472b6' },
     'BatonPass': { id: 'BatonPass', name: '接棒', icon: '🏃', description: '[2] 死亡後，隨機1位角色繼承50% 攻擊與生命', tiers: [2], color: '#fb923c' },
-    'Outrage': { id: 'Outrage', name: '逆鱗', icon: '🐲', description: '[2/3] 可能額外再攻擊 1 個敵方或是無法攻擊。(25% 無法、25% 額外、50% 正常)', tiers: [2, 3], color: '#f59e0b' },
+    'Outrage': { id: 'Outrage', name: '逆鱗', icon: '🐲', description: '[2] 可能額外再攻擊 1 個敵方或是無法攻擊。', tiers: [2, 3], color: '#f59e0b' },
 };
 
 export function getSynergyCount(team: any[], synergyId: string): number {

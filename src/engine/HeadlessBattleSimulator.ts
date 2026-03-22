@@ -875,7 +875,8 @@ export class HeadlessBattleSimulator {
                     const { myTeam: currentTeam } = this.getTeams(unit);
                     await this.spawnUnit(currentTeam, deathIdx, 'bulbasaur', 1, 2, 2, true);
                 } else {
-                    const count = [0, 1, 2, 5][unit.level] || 1;
+                    // Bulbasaur (1 star) -> Spawns 1 seed (Matches description)
+                    const count = 1;
                     for (let i = 0; i < count; i++) {
                         const { myTeam: currentTeam } = this.getTeams(unit);
                         await this.spawnUnit(currentTeam, deathIdx + i, 'sprout', 1, 1, 1, true);

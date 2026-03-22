@@ -603,19 +603,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'sableye', name: '勾魂眼', tier: 5, family: 'sableye',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
-        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost', 'Thief'], evolveId: 'sableye_2'
+        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Trick', 'Thief'], evolveId: 'sableye_2'
     },
     sableye_2: {
         id: 'sableye_2', name: '勾魂眼', tier: 5, family: 'sableye',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
-        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost', 'Thief'], evolveId: 'sableye_3', isHiddenFromShop: true
+        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Trick', 'Thief'], evolveId: 'sableye_3', isHiddenFromShop: true
     },
     sableye_3: {
         id: 'sableye_3', name: '勾魂眼', tier: 5, family: 'sableye',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/勾魂眼00.webp', battleImageUrl: 'assets/勾魂眼01.webp',
-        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Ghost', 'Thief'], isHiddenFromShop: true
+        description: '殺死勾魂眼的敵方立即死亡。', synergies: ['Trick', 'Thief'], isHiddenFromShop: true
     },
 
     snover: {
@@ -694,26 +694,26 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'farfetchd', name: '大蔥鴨', tier: 5, family: 'farfetchd',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/大蔥鴨00.webp', battleImageUrl: 'assets/大蔥鴨01.webp',
-        description: '首次攻擊造成 99 傷害。', synergies: ['Normal', 'SwordDance']
+        description: '首次攻擊造成 99 傷害。', synergies: ['Roost', 'SwordDance']
     },
     // --- New Psychic Units ---
     natu: {
         id: 'natu', name: '天然雀', tier: 2, family: 'natu',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/天然雀00.webp', battleImageUrl: 'assets/天然雀01.webp',
-        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Trick'], evolveId: 'xatu'
+        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Roost'], evolveId: 'xatu'
     },
     xatu: {
         id: 'xatu', name: '天然鳥', tier: 2, family: 'natu',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/天然鳥00.webp', battleImageUrl: 'assets/天然鳥01.webp',
-        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Trick'], evolveId: 'xatu_final', isHiddenFromShop: true
+        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Roost'], evolveId: 'xatu_final', isHiddenFromShop: true
     },
     xatu_final: {
         id: 'xatu_final', name: '天然鳥', tier: 2, family: 'natu',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/天然鳥00.webp', battleImageUrl: 'assets/天然鳥01.webp',
-        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Trick'], isHiddenFromShop: true
+        description: '戰鬥開始時，將敵方首位和末位角色調換位置。', synergies: ['Psychic', 'Roost'], isHiddenFromShop: true
     },
     ralts: {
         id: 'ralts', name: '拉魯拉絲', tier: 3, family: 'ralts',
