@@ -1134,19 +1134,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'larvitar', name: '幼基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/幼基拉斯00.webp', battleImageUrl: 'assets/幼基拉斯01.webp',
-        description: '咬碎：同時對後方敵方造成 25% 傷害；受傷後永久 +1 生命與攻擊。', synergies: ['Thief', 'Hard'], evolveId: 'pupitar'
+        description: '咬碎：同時對後方敵方造成 25% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Hard'], evolveId: 'pupitar'
     },
     pupitar: {
         id: 'pupitar', name: '沙基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/沙基拉斯00.webp', battleImageUrl: 'assets/沙基拉斯01.webp',
-        description: '咬碎：同時對後方敵方造成 33% 傷害；受傷後永久 +1 生命與攻擊。', synergies: ['Thief', 'Hard'], evolveId: 'tyranitar', isHiddenFromShop: true
+        description: '咬碎：同時對後方敵方造成 33% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Hard'], evolveId: 'tyranitar', isHiddenFromShop: true
     },
     tyranitar: {
         id: 'tyranitar', name: '班基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/班基拉斯00.webp', battleImageUrl: 'assets/班基拉斯01.webp',
-        description: '咬碎：同時對後方敵方造成 50% 傷害；受傷後永久 +1 生命與攻擊。', synergies: ['Thief', 'Hard'], isHiddenFromShop: true
+        description: '咬碎：同時對後方敵方造成 50% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Hard'], isHiddenFromShop: true
     },
     // 37. Delibird
     delibird: {

@@ -1419,8 +1419,8 @@ export class HeadlessBattleSimulator {
             const livingAllies = myTeam.filter(u => u && u !== unit && u.stats.hp > 0);
             if (livingAllies.length > 0) {
                 const target = livingAllies[Math.floor(Math.random() * livingAllies.length)];
-                const inheritedAtk = Math.floor(unit.stats.attack * 0.33);
-                const inheritedHp = Math.floor(unit.stats.maxHp * 0.33);
+                const inheritedAtk = Math.floor(unit.stats.attack * 0.5);
+                const inheritedHp = Math.floor(unit.stats.maxHp * 0.5);
                 if (inheritedAtk > 0 || inheritedHp > 0) {
                     this.growUnit(target, inheritedHp, inheritedAtk, null, true);
                     this.log(`${unit.name} 對 ${target.name} 使用了接棒。`);

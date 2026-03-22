@@ -1775,8 +1775,8 @@ export class BattleSimulator {
             this.eventBus.on('ON_HURT', async (e) => {
                 if (e.target === unit && unit.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
-                    // New: +1 HP and +1 ATK
-                    this.growUnit(unit, 1, 1, '受傷成長', original, true);
+                    // New: +2 HP and +2 ATK
+                    this.growUnit(unit, 2, 2, '受傷成長', original, true);
                 }
             });
         }
@@ -2097,13 +2097,13 @@ export class BattleSimulator {
             }
         }
 
-        // BatonPass (接棒): Random 1 ally inherits 33% Atk/HP
+        // BatonPass (接棒): Random 1 ally inherits 50% Atk/HP
         if (unit.synergies.includes('BatonPass') && this.getSynergyCountForUnit(unit, 'BatonPass') >= 2 && !this.unitStates.get(unit)?.isSilenced) {
             const livingAllies = myTeam.filter(u => u && u !== unit && u.stats.hp > 0);
             if (livingAllies.length > 0) {
                 const target = livingAllies[Math.floor(Math.random() * livingAllies.length)];
-                const inheritedAtk = Math.floor(unit.stats.attack * 0.33);
-                const inheritedHp = Math.floor(unit.stats.maxHp * 0.33);
+                const inheritedAtk = Math.floor(unit.stats.attack * 0.5);
+                const inheritedHp = Math.floor(unit.stats.maxHp * 0.5);
 
                 if (inheritedAtk > 0 || inheritedHp > 0) {
                     this.growUnit(target, inheritedHp, inheritedAtk, `${unit.name} 的接棒`, null, true);
