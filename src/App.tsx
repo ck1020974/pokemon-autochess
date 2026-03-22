@@ -121,7 +121,7 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
 
     let activeDesc = synergy.description;
     const isActive = (count !== undefined && count >= synergy.tiers[0]) || forceActive;
-    const style = isActive ? { borderColor: synergy.color } : { borderColor: '#444', filter: 'grayscale(1)', opacity: 0.7 };
+    const style = { borderColor: isActive ? synergy.color : '#444' };
 
     // Dynamic [N] replacement for Psychic synergy (Fallback, mainly handled in GameLoop now)
     if (synergy.id === 'Psychic' && (window as any).game) {
