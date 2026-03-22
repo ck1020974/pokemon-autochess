@@ -1772,30 +1772,32 @@ h3 {
     display: flex !important;
     flex-wrap: wrap !important;
     justify-content: center !important;
-    gap: 20px !important;
-    width: 95% !important;
-    max-width: 420px !important;
+    gap: 12px !important;
+    width: 98% !important;
+    max-width: 950px !important;
   }
 
   .difficulty-btn {
-    padding: 30px 15px !important;
-    min-height: 165px !important;
+    padding: 20px 10px !important;
+    min-height: 150px !important;
+    flex: 1 1 110px !important;
+    max-width: 250px !important;
     /* �𡑒刧蝝𡁜㨃�屸�摨� */
     gap: 15px !important;
-    border-radius: 26px !important;
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
   }
 
   .difficulty-btn img {
-    width: 72px !important;
+    width: 60px !important;
     /* 頞��憭折𧙗摨衣� */
-    height: 72px !important;
+    height: 60px !important;
     filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5)) !important;
   }
 
   .difficulty-btn span {
-    font-size: 1.3rem !important;
-    letter-spacing: 2px !important;
+    font-size: 1.1rem !important;
+    letter-spacing: 1px !important;
     font-weight: bold !important;
   }
 
