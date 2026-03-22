@@ -1683,7 +1683,9 @@ h3 {
   }
 
   .difficulty-grid {
-    grid-template-columns: repeat(4, 1fr) !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
     gap: 15px !important;
     width: 95% !important;
     max-width: 900px !important;
@@ -1767,7 +1769,9 @@ h3 {
   }
 
   .difficulty-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
     gap: 20px !important;
     width: 95% !important;
     max-width: 420px !important;

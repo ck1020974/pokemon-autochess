@@ -1717,11 +1717,11 @@ function App() {
 
             {/* Orientation Lock Overlay */}
             {
-                isPortrait && (
+                isPortrait && createPortal(
                     <div style={{
                         position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
                         background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
-                        zIndex: 10001,
+                        zIndex: 2000000,
                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                         color: '#fff', textAlign: 'center', padding: '20px',
                         backdropFilter: 'blur(20px)'
@@ -1741,7 +1741,8 @@ function App() {
                             margin: 0,
                             lineHeight: '1.4'
                         }}>請旋轉手機<br />以開始遊戲</h2>
-                    </div>
+                    </div>,
+                    document.getElementById('modal-root')!
                 )
             }
 
@@ -1842,7 +1843,7 @@ function App() {
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                             <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: v.color, letterSpacing: '2px' }}>{v.name}</span>
                                             <span style={{ fontSize: '0.85rem', color: '#94a3b8', letterSpacing: '1px' }}>{v.subtitle}</span>
-                                            {!v.available && <span style={{ fontSize: '0.75rem', color: '#ef4444', letterSpacing: '1px', marginTop: '5px' }}>(尚未開放)</span>}
+                                            {/* {!v.available && <span style={{ fontSize: '0.75rem', color: '#ef4444', letterSpacing: '1px', marginTop: '5px' }}>(尚未開放)</span>} */}
                                         </div>
                                     </button>
                                 ))}

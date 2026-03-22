@@ -25,7 +25,7 @@ const INCLUDED_FAMILIES = [
 
 export const ModernEdition: GameEdition = {
     id: 'modern',
-    name: '第二版本 (Modern Edition)',
+    name: '第二版本 (現代版)',
     availableUnitIds: Object.keys(ALL_UNITS).filter(id => {
         const u = ALL_UNITS[id];
         if (!u || !u.family || !INCLUDED_FAMILIES.includes(u.family as any)) return false;
