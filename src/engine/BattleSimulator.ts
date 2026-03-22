@@ -109,8 +109,7 @@ export class BattleSimulator {
             targets.forEach(u => {
                 if (atk > 0) u.addBuff(atk);
                 if (hp > 0) {
-                    u.stats.maxHp += hp;
-                    u.stats.hp += hp;
+                    u.addGrowth(hp, 0);
                 }
             });
         });
@@ -295,18 +294,18 @@ export class BattleSimulator {
 
                 if (enemyTarget) {
                     this.playAnimation(enemyTarget, 'gift-flash-anim', 600);
-                    await this.dealDamage(unit, enemyTarget, 5, true);
+                    await this.dealDamage(unit, enemyTarget, unit.abilityPower || 5, true);
                 }
                 if (allyTarget) {
                     this.playAnimation(allyTarget, 'gift-flash-anim', 600);
-                    this.heal(allyTarget, 5);
+                    this.heal(allyTarget, unit.abilityPower || 5);
                 }
             }
         }
 
         // Shuckle: Contrary (Start)
         if (unit.family === 'shuckle') {
-            const buffAtk = Math.floor(unit.stats.hp * 0.5);
+            const buffAtk = Math.floor(unit.stats.hp * 0.33);
             if (buffAtk > 0) {
                 unit.stats.attack += buffAtk;
                 this.log(`${unit.name}發動了唱反調。`);
@@ -316,7 +315,7 @@ export class BattleSimulator {
 
         // Kangaskhan: Parental Bond (Start)
         if (unit.family === 'kangaskhan') {
-            const hpBuff = Math.floor(unit.stats.attack * 0.5);
+            const hpBuff = Math.floor(unit.stats.attack * 0.33);
             if (hpBuff > 0) {
                 const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
                 this.growUnit(unit, hpBuff, 0, '親子愛', original, true);
@@ -1277,12 +1276,13 @@ export class BattleSimulator {
 
         // Bellsprout Family: Ally Death -> Random Ally Perm Atk/HP
         if (unit.family === 'bellsprout') {
-            this.eventBus.on('AFTER_DEATH', async (e) => {
-                if (this.unitStates.get(unit)?.isSilenced) return;
-                const { myTeam } = this.getTeams(unit);
-                // Trigger when ANY OTHER ally fails (source is the one who died)
-                if (e.source && e.source !== unit && myTeam.includes(e.source)) {
-                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+            this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
+                const { side } = this.getTeams(unit);
+                const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
+
+                if (e.source && side === sSide && e.source !== unit) {
+                    const living = this.playerTeam.includes(unit) ? this.playerTeam.filter(u => u && u.stats.hp > 0) : this.enemyTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const targetCount = unit.level;
                         const buff = 1; // +1 atk, +1 hp
@@ -1733,21 +1733,8 @@ export class BattleSimulator {
             });
         }
 
-        // Dratini Family: AoE damage before attack + First damage halved
+        // Dratini Family: First damage halved
         if (unit.family === 'dratini') {
-            this.eventBus.on('BEFORE_ATTACK', async (e) => {
-                const s = this.unitStates.get(unit);
-                if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
-                    const dmg = unit.id === 'dratini' ? 2 : (unit.id === 'dragonair' ? 3 : 5);
-                    this.log(`${unit.name}使用了龍捲風`);
-                    const { opTeam } = this.getTeams(unit);
-                    for (const enemy of opTeam.filter(u => u && u.stats.hp > 0)) {
-                        await this.dealDamage(unit, enemy, dmg, true, true);
-                    }
-                    if (this.onUpdate) this.onUpdate();
-                }
-            });
-
             this.eventBus.on('BEFORE_HURT', (e) => {
                 const s = this.unitStates.get(unit);
                 if (e.target === unit && !s?.isSilenced && !s?.firstDamageHalved) {

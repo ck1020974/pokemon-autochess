@@ -19,6 +19,7 @@ export interface UnitTemplate {
   synergies: string[]; // e.g., ['Starter', 'Normal']
   isHiddenFromShop?: boolean; // If true, this unit cannot appear in the shop
   family?: string; // Family ID for synergy grouping
+  abilityPower?: number; // Optional power value for specific abilities
 }
 
 export class Unit {
@@ -35,6 +36,7 @@ export class Unit {
   public synergies: string[];
   public family: string;
   public scalingValue: number = 1;
+  public abilityPower: number = 0;
   public hasNewPermanentBuff: boolean = false;
 
   constructor(template: UnitTemplate) {
@@ -48,6 +50,7 @@ export class Unit {
     this.evolveId = template.evolveId;
     this.synergies = template.synergies || [];
     this.family = template.family || template.id;
+    this.abilityPower = template.abilityPower || 0;
     this._descriptionTemplate = template.description;
   }
 

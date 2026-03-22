@@ -307,17 +307,17 @@ export class HeadlessBattleSimulator {
                 }
 
                 if (enemyTarget) {
-                    await this.dealDamage(unit, enemyTarget, 5, true);
+                    await this.dealDamage(unit, enemyTarget, unit.abilityPower || 5, true);
                 }
                 if (allyTarget) {
-                    this.heal(allyTarget, 5);
+                    this.heal(allyTarget, unit.abilityPower || 5);
                 }
             }
         }
 
         // Shuckle: Contrary (Start)
         if (unit.family === 'shuckle') {
-            const buffAtk = Math.floor(unit.stats.hp * 0.5);
+            const buffAtk = Math.floor(unit.stats.hp * 0.33);
             if (buffAtk > 0) {
                 unit.stats.attack += buffAtk;
                 this.log(`${unit.name}發動了唱反調。`);
@@ -326,7 +326,7 @@ export class HeadlessBattleSimulator {
 
         // Kangaskhan: Parental Bond (Start)
         if (unit.family === 'kangaskhan') {
-            const hpBuff = Math.floor(unit.stats.attack * 0.5);
+            const hpBuff = Math.floor(unit.stats.attack * 0.33);
             if (hpBuff > 0) {
                 const original = this.playerTeam.includes(unit) ? (this.originalPlayerTeam as any)?.find((o: Unit | null) => o && o.id === unit.id) : null;
                 this.growUnit(unit, hpBuff, 0, original, true);
@@ -771,13 +771,13 @@ export class HeadlessBattleSimulator {
             });
         }
 
-        // Bellsprout Family: Ally Death -> Random Ally Perm Atk/HP
+        // Bellsprout Family: Ally Summon -> Random Ally Perm Atk/HP
         if (unit.family === 'bellsprout') {
-            this.eventBus.on('AFTER_DEATH', async (e) => {
-                if (this.unitStates.get(unit)?.isSilenced) return;
-                const { myTeam } = this.getTeams(unit);
-                if (e.source && e.source !== unit && myTeam.includes(e.source)) {
-                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+            this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
+                const { side } = this.getTeams(unit);
+                const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
+                if (e.source && side === sSide && e.source !== unit) {
+                    const living = this.playerTeam.includes(unit) ? this.playerTeam.filter(u => u && u.stats.hp > 0) : this.enemyTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
                         const targetCount = unit.level;
                         const buff = 1; // +1 atk, +1 hp

@@ -563,19 +563,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'kangaskhan', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '戰鬥開始時，獲得自身 50% 攻擊的生命。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_2'
+        description: '戰鬥開始時，獲得自身 33% 攻擊的生命。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_2'
     },
     kangaskhan_2: {
         id: 'kangaskhan_2', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '戰鬥開始時，獲得自身 50% 攻擊的生命。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
+        description: '戰鬥開始時，獲得自身 33% 攻擊的生命。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
     },
     kangaskhan_3: {
         id: 'kangaskhan_3', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '戰鬥開始時，獲得自身 50% 攻擊的生命。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
+        description: '戰鬥開始時，獲得自身 33% 攻擊的生命。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
     },
 
     // 30. Ditto
@@ -959,19 +959,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'bellsprout', name: '喇叭芽', tier: 3, family: 'bellsprout',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/喇叭芽00.webp', battleImageUrl: 'assets/喇叭芽01.webp',
-        description: '友軍死亡後，隨機 1 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], evolveId: 'weepinbell'
+        description: '召喚友軍後，隨機 1 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], evolveId: 'weepinbell'
     },
     weepinbell: {
         id: 'weepinbell', name: '口呆花', tier: 3, family: 'bellsprout',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/口呆花00.webp', battleImageUrl: 'assets/口呆花01.webp',
-        description: '友軍死亡後，隨機 2 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], evolveId: 'victreebel', isHiddenFromShop: true
+        description: '召喚友軍後，隨機 2 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], evolveId: 'victreebel', isHiddenFromShop: true
     },
     victreebel: {
         id: 'victreebel', name: '大食花', tier: 3, family: 'bellsprout',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/大食花00.webp', battleImageUrl: 'assets/大食花01.webp',
-        description: '友軍死亡後，隨機 3 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], isHiddenFromShop: true
+        description: '召喚友軍後，隨機 3 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], isHiddenFromShop: true
     },
 
     // 29. Vulpix
@@ -1019,19 +1019,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'cubone', name: '卡拉卡拉', tier: 3, family: 'cubone',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/卡拉卡拉00.webp', battleImageUrl: 'assets/卡拉卡拉01.webp',
-        description: '死亡時，對隨機敵方造成 33% 攻擊的傷害。', synergies: ['Cave', 'Angry'], evolveId: 'marowak'
+        description: '死亡時，對隨機敵方造成 33% 攻擊的傷害。', synergies: ['Hard', 'Angry'], evolveId: 'marowak'
     },
     marowak: {
         id: 'marowak', name: '嘎啦嘎啦', tier: 3, family: 'cubone',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/嘎啦嘎啦00.webp', battleImageUrl: 'assets/嘎啦嘎啦01.webp',
-        description: '死亡時，對隨機敵方造成 50% 攻擊的傷害。', synergies: ['Cave', 'Angry'], evolveId: 'marowak_final', isHiddenFromShop: true
+        description: '死亡時，對隨機敵方造成 50% 攻擊的傷害。', synergies: ['Hard', 'Angry'], evolveId: 'marowak_final', isHiddenFromShop: true
     },
     marowak_final: {
         id: 'marowak_final', name: '嘎啦嘎啦', tier: 3, family: 'cubone',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/嘎啦嘎啦00.webp', battleImageUrl: 'assets/嘎啦嘎啦01.webp',
-        description: '死亡時，對隨機敵方造成 100% 攻擊的傷害。', synergies: ['Cave', 'Angry'], isHiddenFromShop: true
+        description: '死亡時，對隨機敵方造成 100% 攻擊的傷害。', synergies: ['Hard', 'Angry'], isHiddenFromShop: true
     },
 
     // 32. Murkrow
@@ -1134,19 +1134,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'larvitar', name: '幼基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/幼基拉斯00.webp', battleImageUrl: 'assets/幼基拉斯01.webp',
-        description: '同時對後方敵方造成 25% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Hard'], evolveId: 'pupitar'
+        description: '同時對後方敵方造成 25% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Dig'], evolveId: 'pupitar'
     },
     pupitar: {
         id: 'pupitar', name: '沙基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/沙基拉斯00.webp', battleImageUrl: 'assets/沙基拉斯01.webp',
-        description: '同時對後方敵方造成 33% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Hard'], evolveId: 'tyranitar', isHiddenFromShop: true
+        description: '同時對後方敵方造成 33% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Dig'], evolveId: 'tyranitar', isHiddenFromShop: true
     },
     tyranitar: {
         id: 'tyranitar', name: '班基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/班基拉斯00.webp', battleImageUrl: 'assets/班基拉斯01.webp',
-        description: '同時對後方敵方造成 50% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Hard'], isHiddenFromShop: true
+        description: '同時對後方敵方造成 50% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Dig'], isHiddenFromShop: true
     },
     // 37. Delibird
     delibird: {
@@ -1154,6 +1154,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/信使鳥00.webp', battleImageUrl: 'assets/信使鳥01.webp',
         description: '戰鬥開始時，對隨機敵方造成 5 傷害，隨機友方 +5 生命 (共 1 次)。', synergies: ['Snow', 'BatonPass'],
+        abilityPower: 3,
         evolveId: 'delibird_2'
     },
     delibird_2: {
@@ -1161,6 +1162,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/信使鳥00.webp', battleImageUrl: 'assets/信使鳥01.webp',
         description: '戰鬥開始時，對隨機敵方造成 5 傷害，隨機友方 +5 生命 (共 2 次)。', synergies: ['Snow', 'BatonPass'],
+        abilityPower: 3,
         evolveId: 'delibird_3',
         isHiddenFromShop: true
     },
@@ -1169,6 +1171,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/信使鳥00.webp', battleImageUrl: 'assets/信使鳥01.webp',
         description: '戰鬥開始時，對隨機敵方造成 5 傷害，隨機友方 +5 生命 (共 3 次)。', synergies: ['Snow', 'BatonPass'],
+        abilityPower: 3,
         isHiddenFromShop: true
     },
     // 38. Shuckle
@@ -1176,7 +1179,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'shuckle', name: '壺壺', tier: 4, family: 'shuckle',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/壺壺00.webp', battleImageUrl: 'assets/壺壺01.webp',
-        description: '戰鬥開始時，獲得自身 50% 生命的攻擊。', synergies: ['BugBite', 'Hard']
+        description: '戰鬥開始時，獲得自身 33% 生命的攻擊。', synergies: ['BugBite', 'Hard']
     }
 };
 

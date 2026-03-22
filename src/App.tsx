@@ -216,7 +216,7 @@ function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
         const units = Object.values(ALL_UNITS)
             .filter(t => {
                 const isEeveeFamily = t.family === 'eevee';
-                const baseCondition = !t.isHiddenFromShop && t.id !== 'sprout';
+                const baseCondition = t.id !== 'sprout';
                 const isAvailable = activeEdition.availableUnitIds.includes(t.id);
                 return t.synergies?.includes(syn.id) && (baseCondition || isEeveeFamily) && isAvailable;
             })
