@@ -125,14 +125,24 @@ export class HeadlessBattleSimulator {
 
     private cloneUnit(unit: Unit): Unit {
         const template = ALL_UNITS[unit.templateId];
+        if (!template) return unit;
+
         const clone = new Unit(template);
-        clone.stats = { ...unit.stats };
+        clone.id = unit.id; // PRESERVE ID
+        clone.name = unit.name;
         clone.level = unit.level;
-        clone.id = unit.id; // CRITICAL FIX: Preserve ID for permanent growth
+        clone.exp = unit.exp;
+        clone.stats = { ...unit.stats };
+        clone.tier = unit.tier;
+        clone.imageUrl = unit.imageUrl;
+        clone.battleImageUrl = unit.battleImageUrl;
+        clone.evolveId = unit.evolveId;
         clone.synergies = [...unit.synergies];
         clone.family = unit.family;
         clone.scalingValue = unit.scalingValue;
-        // Cap stats like in main simulator
+        clone.battlesCount = unit.battlesCount;
+        clone.hasNewPermanentBuff = unit.hasNewPermanentBuff;
+
         clone.capStats();
         this.unitStates.set(clone, {});
         return clone;
@@ -574,7 +584,9 @@ export class HeadlessBattleSimulator {
 
     private growUnit(unit: Unit, hp: number, atk: number, permanentTarget?: Unit | null, _silent: boolean = false) {
         if (unit.family === 'sneasel' && atk < 0) atk = 0;
-        if (hp === 0 && atk === 0) return;
+        const hpToMax = hp > 0 ? Math.min(hp, 50 - unit.stats.maxHp) : hp;
+        const atkToAtk = atk > 0 ? Math.min(atk, 50 - unit.stats.attack) : atk;
+        if (hpToMax === 0 && atkToAtk === 0 && (hp <= 0 || unit.stats.hp >= unit.stats.maxHp)) return;
         unit.addGrowth(hp, atk);
         if (permanentTarget) permanentTarget.addGrowth(hp, atk);
 
@@ -793,7 +805,7 @@ export class HeadlessBattleSimulator {
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
                     const hpBuff = 3;
                     const targetCount = unit.level;
-                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && u.stats.maxHp < 50);
+                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && (u.stats.maxHp < 50 || u.stats.hp < u.stats.maxHp));
                     if (livingEligible.length > 0) {
                         const shuffled = [...livingEligible].sort(() => 0.5 - Math.random());
                         const targets = shuffled.slice(0, targetCount);
@@ -919,7 +931,7 @@ export class HeadlessBattleSimulator {
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
                     const buff = 1;
                     const targetCount = unit.level;
-                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && (u.stats.maxHp < 50 || u.stats.attack < 50));
+                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && (u.stats.maxHp < 50 || u.stats.attack < 50 || u.stats.hp < u.stats.maxHp));
                     if (livingEligible.length > 0) {
                         const shuffled = [...livingEligible].sort(() => 0.5 - Math.random());
                         const targets = shuffled.slice(0, targetCount);
@@ -1229,7 +1241,6 @@ export class HeadlessBattleSimulator {
 
                     if (livingEnemies.length > 1) {
                         const target = livingEnemies[1];
-                        this.log(`${unit.name} 對其後方目標使用了咬碎`);
                         await this.dealDamage(unit, target, dmg, true, true);
                     }
                 }

@@ -840,9 +840,10 @@ export class BattleSimulator {
 
     private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string, permanentTarget?: Unit | null, silent: boolean = false) {
         if (unit.family === 'sneasel' && atk < 0) atk = 0; // Protection
-        if (hp > 0) hp = Math.min(hp, 50 - unit.stats.maxHp);
-        if (atk > 0) atk = Math.min(atk, 50 - unit.stats.attack);
-        if (hp === 0 && atk === 0) return;
+        const hpToMax = hp > 0 ? Math.min(hp, 50 - unit.stats.maxHp) : hp;
+        const atkToAtk = atk > 0 ? Math.min(atk, 50 - unit.stats.attack) : atk;
+        // Early return ONLY if: No MaxHP growth possible AND No Atk growth possible AND (No healing needed OR no hp input)
+        if (hpToMax === 0 && atkToAtk === 0 && (hp <= 0 || unit.stats.hp >= unit.stats.maxHp)) return;
 
         // 1. Apply to Battle Clone
         // Rule: If unit is dead (hp <= 0), don't add HP to it (no mid-battle revival)
@@ -1017,7 +1018,7 @@ export class BattleSimulator {
                 const { myTeam } = this.getTeams(unit);
                 if (e.source && e.source !== unit && myTeam.includes(e.source) && e.target) {
                     await this.delay(200); // Increased delay
-                    this.log(`${unit.name} 發動了二連踢！`);
+
                     await this.playAnimation(unit, 'jump', 200);
                     const dmg = [0, 2, 5, 10][unit.level] || 2;
                     await this.dealDamage(unit, e.target, dmg);
@@ -1211,8 +1212,8 @@ export class BattleSimulator {
                         this.notifySkill(unit, `發動了閃焰高歌！`);
                     }
 
-                    // Buff random living allies who are under HP limit
-                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && u.stats.maxHp < 50);
+                    // Buff random living allies who are under HP limit OR need healing
+                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && (u.stats.maxHp < 50 || u.stats.hp < u.stats.maxHp));
                     if (livingEligible.length > 0) {
                         const shuffled = [...livingEligible].sort(() => 0.5 - Math.random());
                         const targets = shuffled.slice(0, targetCount);
@@ -1567,8 +1568,8 @@ export class BattleSimulator {
                         this.notifySkill(unit, `發動了千變萬花！`);
                     }
 
-                    // Buff random living allies who are under BOTH limits
-                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && (u.stats.maxHp < 50 || u.stats.attack < 50));
+                    // Buff random living allies who are under BOTH limits OR need healing
+                    const livingEligible = myTeam.filter(u => u && u.stats.hp > 0 && (u.stats.maxHp < 50 || u.stats.attack < 50 || u.stats.hp < u.stats.maxHp));
                     if (livingEligible.length > 0) {
                         const shuffled = [...livingEligible].sort(() => 0.5 - Math.random());
                         const targets = shuffled.slice(0, targetCount);
@@ -1595,7 +1596,7 @@ export class BattleSimulator {
                     const ratio = [0, 0.33, 0.5, 1.0][unit.level] || 0.33;
                     const dmg = Math.ceil(unit.stats.attack * ratio);
                     if (dmg > 0) {
-                        this.log(`${unit.name}對${target.name}發動了骨頭迴力鏢`);
+
                         this.playAnimation(unit, 'jump', 200);
                         await this.dealDamage(unit, target, dmg, true);
                     }
@@ -1743,7 +1744,6 @@ export class BattleSimulator {
 
                     if (livingEnemies.length > 1) {
                         const target = livingEnemies[1]; // Target only the first rear enemy
-                        this.log(`${unit.name} 對其後方目標使用了咬碎`);
                         await this.dealDamage(unit, target, dmg, true, true);
                         if (this.onUpdate) this.onUpdate();
                     }
@@ -1762,7 +1762,6 @@ export class BattleSimulator {
 
                     if (livingEnemies.length > 1) {
                         const target = livingEnemies[1]; // Single target at 2nd position
-                        this.log(`${unit.name} 對其後方目標使用了火花`);
                         await this.dealDamage(unit, target, dmg, true, true);
                         if (this.onUpdate) this.onUpdate();
                     }

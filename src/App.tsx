@@ -584,11 +584,29 @@ function App() {
             criticalUrls.add('assets/怨影娃娃01.webp');
             criticalUrls.add('assets/詛咒娃娃01.webp');
 
+            // Dynamic preloading for novice opponents' core units
+            activeEdition.noviceOpponents.forEach((op: any) => {
+                if (op.coreUnits && Array.isArray(op.coreUnits)) {
+                    op.coreUnits.forEach((id: string) => {
+                        const t = ALL_UNITS[id];
+                        if (t) {
+                            if (t.imageUrl) criticalUrls.add(t.imageUrl);
+                            if (t.battleImageUrl) criticalUrls.add(t.battleImageUrl);
+                        }
+                    });
+                }
+            });
+
             // Critical difficulty icons
             criticalUrls.add(normalBall);
             criticalUrls.add(greatBall);
             criticalUrls.add(ultraBall);
             criticalUrls.add(masterBall);
+
+            // Critical Edition Icons
+            criticalUrls.add('icon-192.png');
+            criticalUrls.add('icon-002.png');
+            criticalUrls.add('icon-003.png');
 
             // Critical audio (Early game + Common)
             const criticalMusic = ['start', 'pokemonmart', 'gymfight', 'pokemoncenter', 'gymwin'];
@@ -630,7 +648,27 @@ function App() {
         // Current Opponent Preload
         if (game.currentOpponentId) {
             const op = allEditionOpponents.find((o: any) => o.id === game.currentOpponentId);
-            if (op && op.url) teamUrls.push(op.url);
+            if (op) {
+                if (op.url) teamUrls.push(op.url);
+                if (op.coreUnits && Array.isArray(op.coreUnits)) {
+                    op.coreUnits.forEach((id: string) => {
+                        const t = ALL_UNITS[id];
+                        // Get evolved forms for boss level 2 or 3 too (just basic heuristic: push the base templates, we can't perfectly predict their final generated team, but core units cover 80% of it)
+                        let currentTemplate = t;
+                        for (let i = 0; i < 3; i++) {
+                            if (currentTemplate) {
+                                if (currentTemplate.imageUrl) teamUrls.push(currentTemplate.imageUrl);
+                                if (currentTemplate.battleImageUrl) teamUrls.push(currentTemplate.battleImageUrl);
+                                if (currentTemplate.evolveId && ALL_UNITS[currentTemplate.evolveId]) {
+                                    currentTemplate = ALL_UNITS[currentTemplate.evolveId];
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                }
+            }
         }
 
         if (teamUrls.length > 0) {

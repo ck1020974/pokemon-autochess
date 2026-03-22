@@ -96,11 +96,19 @@ export class Unit {
 
   // Helper for Permanent/Temporary Growth (MaxHP + HP + Atk)
   public addGrowth(hp: number, attack: number) {
-    if (hp > 0) hp = Math.min(hp, 50 - this.stats.maxHp);
-    if (attack > 0) attack = Math.min(attack, 50 - this.stats.attack);
-    this.stats.maxHp += hp;
-    this.stats.hp += hp;
-    this.stats.attack += attack;
+    const hpToMax = hp > 0 ? Math.min(hp, 50 - this.stats.maxHp) : hp;
+    const atkToAtk = attack > 0 ? Math.min(attack, 50 - this.stats.attack) : attack;
+
+    this.stats.maxHp += hpToMax;
+    this.stats.attack += atkToAtk;
+
+    if (hp > 0) {
+      // Heal current HP even if maxHp didn't grow, but cap at new maxHp
+      this.stats.hp = Math.min(this.stats.hp + hp, this.stats.maxHp);
+    } else {
+      this.stats.hp += hpToMax;
+    }
+
     this.capStats();
   }
 
