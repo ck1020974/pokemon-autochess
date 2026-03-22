@@ -1134,26 +1134,26 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'larvitar', name: '幼基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/幼基拉斯00.webp', battleImageUrl: 'assets/幼基拉斯01.webp',
-        description: '同時對後方敵方造成 25% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Dig'], evolveId: 'pupitar'
+        description: '同時對後方敵方造成 25% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Cave'], evolveId: 'pupitar'
     },
     pupitar: {
         id: 'pupitar', name: '沙基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/沙基拉斯00.webp', battleImageUrl: 'assets/沙基拉斯01.webp',
-        description: '同時對後方敵方造成 33% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Dig'], evolveId: 'tyranitar', isHiddenFromShop: true
+        description: '同時對後方敵方造成 33% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Cave'], evolveId: 'tyranitar', isHiddenFromShop: true
     },
     tyranitar: {
         id: 'tyranitar', name: '班基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/班基拉斯00.webp', battleImageUrl: 'assets/班基拉斯01.webp',
-        description: '同時對後方敵方造成 50% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Dig'], isHiddenFromShop: true
+        description: '同時對後方敵方造成 50% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Cave'], isHiddenFromShop: true
     },
     // 37. Delibird
     delibird: {
         id: 'delibird', name: '信使鳥', tier: 3, family: 'delibird',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/信使鳥00.webp', battleImageUrl: 'assets/信使鳥01.webp',
-        description: '戰鬥開始時，對隨機敵方造成 5 傷害，隨機友方 +5 生命 (共 1 次)。', synergies: ['Snow', 'BatonPass'],
+        description: '戰鬥開始時，對隨機敵方造成 3 傷害，隨機友方 +3 生命 (共 1 次)。', synergies: ['Snow', 'BatonPass'],
         abilityPower: 3,
         evolveId: 'delibird_2'
     },
@@ -1161,7 +1161,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'delibird_2', name: '信使鳥', tier: 3, family: 'delibird',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/信使鳥00.webp', battleImageUrl: 'assets/信使鳥01.webp',
-        description: '戰鬥開始時，對隨機敵方造成 5 傷害，隨機友方 +5 生命 (共 2 次)。', synergies: ['Snow', 'BatonPass'],
+        description: '戰鬥開始時，對隨機敵方造成 3 傷害，隨機友方 +3 生命 (共 2 次)。', synergies: ['Snow', 'BatonPass'],
         abilityPower: 3,
         evolveId: 'delibird_3',
         isHiddenFromShop: true
@@ -1170,7 +1170,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'delibird_3', name: '信使鳥', tier: 3, family: 'delibird',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/信使鳥00.webp', battleImageUrl: 'assets/信使鳥01.webp',
-        description: '戰鬥開始時，對隨機敵方造成 5 傷害，隨機友方 +5 生命 (共 3 次)。', synergies: ['Snow', 'BatonPass'],
+        description: '戰鬥開始時，對隨機敵方造成 3 傷害，隨機友方 +3 生命 (共 3 次)。', synergies: ['Snow', 'BatonPass'],
         abilityPower: 3,
         isHiddenFromShop: true
     },
