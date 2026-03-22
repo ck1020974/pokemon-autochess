@@ -163,8 +163,8 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
                             const unitStyle: React.CSSProperties = {
                                 width: '24px', height: '24px', objectFit: 'contain',
                                 borderRadius: '4px', background: 'rgba(0,0,0,0.3)',
-                                filter: isUnitActive ? 'none' : 'grayscale(1) brightness(0.5)',
-                                opacity: isUnitActive ? 1 : 0.5,
+                                filter: isUnitActive ? 'none' : 'grayscale(1)',
+                                opacity: isUnitActive ? 1 : 0.7,
                                 border: 'none'
                             };
                             return <img key={u.id} src={u.imageUrl} alt={u.name} title={u.name} style={unitStyle} />;
@@ -218,7 +218,27 @@ function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
                 const isEeveeFamily = t.family === 'eevee';
                 const baseCondition = t.id !== 'sprout';
                 const isAvailable = activeEdition.availableUnitIds.includes(t.id);
-                return t.synergies?.includes(syn.id) && (baseCondition || isEeveeFamily) && isAvailable;
+                if (!t.synergies?.includes(syn.id) || !(baseCondition || isEeveeFamily) || !isAvailable) return false;
+
+                // For Families (except Eevee), only show the most "basic" representative that has the synergy
+                if (isEeveeFamily) return true;
+
+                const familyUnits = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id));
+                const unitsWithSyn = familyUnits.filter(u => u.synergies?.includes(syn.id));
+
+                const getStageDepth = (uId: string) => {
+                    let depth = 0;
+                    let currId = uId;
+                    while (true) {
+                        const parent = familyUnits.find(p => p.evolveId === currId);
+                        if (parent) { depth++; currId = parent.id; }
+                        else break;
+                    }
+                    return depth;
+                };
+
+                const firstInFamily = unitsWithSyn.sort((a, b) => getStageDepth(a.id) - getStageDepth(b.id))[0];
+                return t.id === firstInFamily?.id;
             })
             .sort((a, b) => {
                 if (a.family === 'eevee' && b.family !== 'eevee') return 1;
