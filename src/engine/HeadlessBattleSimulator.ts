@@ -280,26 +280,6 @@ export class HeadlessBattleSimulator {
             }
         }
 
-        // Mareep Family: Battle Start -> Permanent buff front ally (Lv1/2) or all allies (Lv3)
-        if (unit.family === 'mareep') {
-            const buff = unit.level >= 2 ? 2 : 1;
-            if (unit.level >= 3) {
-                const living = myTeam.filter(u => u && u.stats.hp > 0);
-                living.forEach(ally => {
-                    const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                    this.growUnit(ally, buff, buff, original, true);
-                });
-            } else {
-                const idx = myTeam.indexOf(unit);
-                if (idx > 0) {
-                    const front = myTeam[idx - 1];
-                    if (front && front.stats.hp > 0) {
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
-                        this.growUnit(front, buff, buff, original, true);
-                    }
-                }
-            }
-        }
 
         // Delibird: Gift (Battle Start)
         if (unit.family === 'delibird') {
@@ -307,13 +287,30 @@ export class HeadlessBattleSimulator {
             for (let i = 0; i < times; i++) {
                 const enemies = opTeam.filter(u => u && u.stats.hp > 0);
                 const allies = myTeam.filter(u => u && u.stats.hp > 0);
+
+                let enemyTarget: Unit | null = null;
+                let allyTarget: Unit | null = null;
+
                 if (enemies.length > 0) {
-                    const target = enemies[Math.floor(Math.random() * enemies.length)];
-                    await this.dealDamage(unit, target, 5, true);
+                    enemyTarget = enemies[Math.floor(Math.random() * enemies.length)];
                 }
                 if (allies.length > 0) {
-                    const target = allies[Math.floor(Math.random() * allies.length)];
-                    this.heal(target, 5);
+                    allyTarget = allies[Math.floor(Math.random() * allies.length)];
+                }
+
+                if (allyTarget && enemyTarget) {
+                    this.log(`${unit.name} 對 ${allyTarget.name} 和 ${enemyTarget.name} 使用了禮物`);
+                } else if (allyTarget) {
+                    this.log(`${unit.name} 給 ${allyTarget.name} 送了個禮物！`);
+                } else if (enemyTarget) {
+                    this.log(`${unit.name} 給 ${enemyTarget.name} 送了個禮物！`);
+                }
+
+                if (enemyTarget) {
+                    await this.dealDamage(unit, enemyTarget, 5, true);
+                }
+                if (allyTarget) {
+                    this.heal(allyTarget, 5);
                 }
             }
         }

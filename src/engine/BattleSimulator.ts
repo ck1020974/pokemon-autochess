@@ -267,29 +267,6 @@ export class BattleSimulator {
             }
         }
 
-        // Mareep Family: Battle Start -> Permanent buff front ally (Lv1/2) or all allies (Lv3)
-        if (unit.family === 'mareep') {
-            const buff = unit.level >= 2 ? 2 : 1;
-            if (unit.level >= 3) {
-                await this.notifySkill(unit, `使用了充電！`);
-                for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                    const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
-                    this.growUnit(u, 0, buff, '能力提升', original, true);
-                    await this.delay(65);
-                }
-            } else {
-                const idx = myTeam.indexOf(unit);
-                if (idx > 0) {
-                    const front = myTeam[idx - 1];
-                    if (front) {
-                        await this.notifySkill(unit, `使用了充電！`);
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
-                        this.growUnit(front, 0, buff, '能力提升', original, true);
-                        this.log(`${unit.name} 為 ${front.name} 增加了攻擊！`);
-                    }
-                }
-            }
-        }
 
         // Delibird: Gift (Battle Start)
         if (unit.family === 'delibird') {
@@ -297,17 +274,32 @@ export class BattleSimulator {
             for (let i = 0; i < times; i++) {
                 const enemies = opTeam.filter(u => u && u.stats.hp > 0);
                 const allies = myTeam.filter(u => u && u.stats.hp > 0);
+
+                let enemyTarget: Unit | null = null;
+                let allyTarget: Unit | null = null;
+
                 if (enemies.length > 0) {
-                    const target = enemies[Math.floor(Math.random() * enemies.length)];
-                    this.log(`${unit.name} 給 ${target.name} 送了個禮物！`);
-                    this.playAnimation(target, 'gift-flash-anim', 600);
-                    await this.dealDamage(unit, target, 5, true);
+                    enemyTarget = enemies[Math.floor(Math.random() * enemies.length)];
                 }
                 if (allies.length > 0) {
-                    const target = allies[Math.floor(Math.random() * allies.length)];
-                    this.log(`${unit.name} 給 ${target.name} 送了個禮物！`);
-                    this.playAnimation(target, 'gift-flash-anim', 600);
-                    this.heal(target, 5);
+                    allyTarget = allies[Math.floor(Math.random() * allies.length)];
+                }
+
+                if (allyTarget && enemyTarget) {
+                    this.log(`${unit.name} 對 ${allyTarget.name} 和 ${enemyTarget.name} 使用了禮物`);
+                } else if (allyTarget) {
+                    this.log(`${unit.name} 給 ${allyTarget.name} 送了個禮物！`);
+                } else if (enemyTarget) {
+                    this.log(`${unit.name} 給 ${enemyTarget.name} 送了個禮物！`);
+                }
+
+                if (enemyTarget) {
+                    this.playAnimation(enemyTarget, 'gift-flash-anim', 600);
+                    await this.dealDamage(unit, enemyTarget, 5, true);
+                }
+                if (allyTarget) {
+                    this.playAnimation(allyTarget, 'gift-flash-anim', 600);
+                    this.heal(allyTarget, 5);
                 }
             }
         }
@@ -669,36 +661,6 @@ export class BattleSimulator {
             }
         }
 
-        // Mareep Family: Battle Start -> Permanent buff front ally (Lv1/2) or all allies (Lv3)
-        if (unit.family === 'mareep') {
-            const buff = unit.level >= 2 ? 2 : 1;
-            if (unit.level >= 3) {
-                // Ampharos: buff all allies
-                const living = myTeam.filter(u => u && u.stats.hp > 0);
-                if (living.length > 0) {
-                    await this.notifySkill(unit, `發動了雷霆電磁！`);
-                    for (const ally of living) {
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
-                        this.growUnit(ally, buff, buff, '電龍技能強化', original, true);
-                        await this.delay(60);
-                    }
-                    if (this.onUpdate) this.onUpdate();
-                }
-            } else {
-                // Mareep / Flaaffy: buff front ally in slot ahead
-                const idx = myTeam.indexOf(unit);
-                if (idx > 0) {
-                    const front = myTeam[idx - 1];
-                    if (front && front.stats.hp > 0) {
-                        await this.notifySkill(unit, `發動了充電波動！`);
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
-                        this.growUnit(front, buff, buff, '咩利羊技能強化', original, true);
-                        this.playTeamAnimation([front], 'level-up-anim', 600);
-                        if (this.onUpdate) this.onUpdate();
-                    }
-                }
-            }
-        }
 
         // --- Legendary Beasts ---
 
@@ -2307,7 +2269,7 @@ export class BattleSimulator {
             const el = document.getElementById(newUnit.id);
             if (el) el.classList.add('spawn-anim');
         });
-        this.log(`${newUnit.name} 加入了戰場！`);
+
 
         // 3. Stand up delay removed
 

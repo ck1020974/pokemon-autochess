@@ -1176,7 +1176,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'shuckle', name: '壺壺', tier: 4, family: 'shuckle',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/壺壺00.webp', battleImageUrl: 'assets/壺壺01.webp',
-        description: '戰鬥開始時，後方友軍獲得壺壺 50% 生命並使隨機敵方招式無效化。', synergies: ['BugBite', 'Hard']
+        description: '戰鬥開始時，後方友軍獲得壺壺 50% 生命；隨機敵方招式無效化。', synergies: ['BugBite', 'Hard']
     }
 };
 
