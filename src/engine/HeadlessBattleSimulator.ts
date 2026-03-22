@@ -144,6 +144,19 @@ export class HeadlessBattleSimulator {
         const s = this.unitStates.get(unit);
         if (s?.isSilenced) return;
 
+        // Gastly Family: Atk buff at start
+        if (unit.family === 'gastly') {
+            if (unit.templateId === 'gengar') {
+                myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.buffAttack(u!, 3, true));
+            } else {
+                const idx = myTeam.indexOf(unit);
+                if (idx > 0) {
+                    const front = myTeam[idx - 1];
+                    if (front) this.buffAttack(front, unit.templateId === 'haunter' ? 3 : 1);
+                }
+            }
+        }
+
         // Igglybuff Family: HP buff at start
         if (unit.family === 'igglybuff') {
             if (unit.templateId === 'wigglytuff') {
@@ -197,6 +210,20 @@ export class HeadlessBattleSimulator {
             globalState.lightScreen = 5;
             this.unitStates.set(unit, globalState);
             this.lightScreenActivated.add(side);
+
+            // Add the damage reduction listener
+            this.eventBus.on('BEFORE_HURT', (e) => {
+                if (unit.stats.hp <= 0 || !e.target) return; // Light Screen fades if Mime dies
+                const { myTeam: victimTeam } = this.getTeams(e.target);
+                if (myTeam === victimTeam) {
+                    const state = this.unitStates.get(unit) || {};
+                    if (state.lightScreen && state.lightScreen > 0) {
+                        e.context.amount = Math.ceil(e.context.amount / 2);
+                        state.lightScreen--;
+                        this.unitStates.set(unit, state);
+                    }
+                }
+            });
         }
 
         if (unit.family === 'houndour') {
@@ -254,26 +281,11 @@ export class HeadlessBattleSimulator {
                 this.calculateCachedSynergies(Array.from(this.participantPlayerUnits), this.playerSynergies);
                 this.calculateCachedSynergies(Array.from(this.participantEnemyUnits), this.enemySynergies);
                 this.registerUnitAbilities(unit);
-                const startAbilities = ['gastly', 'igglybuff', 'houndour', 'spiritomb', 'mudkip', 'gulpin', 'totodile', 'pichu', 'caterpie', 'togepi'];
+                const startAbilities = ['gastly', 'totodile', 'delibird', 'shuckle', 'kangaskhan', 'igglybuff', 'caterpie', 'pichu', 'houndour', 'spiritomb', 'raikou', 'entei', 'suicune'];
                 if (startAbilities.includes(unit.family)) await this.executeUnitStartOfBattleAbility(unit);
             }
         }
-        if (unit.family === 'gulpin') {
-            const idx = myTeam.indexOf(unit);
-            if (idx > 0) {
-                const front = myTeam[idx - 1];
-                if (front && front.stats.hp > 0) {
-                    const multiplier = unit.level >= 3 ? 2 : 1;
-                    this.growUnit(unit, front.stats.maxHp * multiplier, front.stats.attack * multiplier);
-                    const fState = this.unitStates.get(front) || {};
-                    fState.isSwallowed = true;
-                    this.unitStates.set(front, fState);
-                    front.stats.hp = 0;
-                    await this.eventBus.emit({ type: 'AFTER_DEATH', source: front, context: { killer: unit } });
-                    await this.compactTeams();
-                }
-            }
-        }
+        // Gulpin & Swalot: Swallow Front Ally (Removed)
 
         // Caterpie Family: Permanent Atk buff at start
         if (unit.family === 'caterpie') {
@@ -898,8 +910,8 @@ export class HeadlessBattleSimulator {
                     if (aliveFriends.length > 0) {
                         const randomFriend = aliveFriends[Math.floor(Math.random() * aliveFriends.length)];
                         this.log(`${unit.name} 對 ${randomFriend.name} 發動了超幸運！`);
-                        // Friend buff is temporary (+5 Attack)
-                        this.growUnit(randomFriend, 0, 5, null, true);
+                        // Friend buff is temporary (+5 Attack for this battle)
+                        this.buffAttack(randomFriend, 5, true);
                     }
                 }
             });
@@ -1227,6 +1239,23 @@ export class HeadlessBattleSimulator {
                 }
             });
         }
+
+        // Charmander Family: Rear damage before own attack (Scaling)
+        if (unit.family === 'charmander') {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
+                    const dmg = unit.scalingValue || 3;
+                    const { opTeam } = this.getTeams(unit);
+                    const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+
+                    if (livingEnemies.length > 1) {
+                        const target = livingEnemies[1]; // Single target at 2nd position
+                        await this.dealDamage(unit, target, dmg, true, true);
+                    }
+                }
+            });
+        }
     }
 
     public async performAttack(attacker: Unit, defender: Unit) {
@@ -1285,16 +1314,7 @@ export class HeadlessBattleSimulator {
                 }
             }
         }
-        // Charmander rework: Splash to neighbor (Inherited from old Totodile)
-        if (attacker.family === 'charmander' && !s?.isSilenced) {
-            const { opTeam } = this.getTeams(attacker);
-            const idx = opTeam.indexOf(defender);
-            if (idx !== -1 && idx < opTeam.length - 1 && opTeam[idx + 1] && opTeam[idx + 1]!.stats.hp > 0) {
-                const isEnemyAttacker = this.enemyTeam.includes(attacker);
-                const splashDmg = isEnemyAttacker ? Math.max(1, this.playerWins) : attacker.scalingValue;
-                promises.push(this.dealDamage(attacker, opTeam[idx + 1]!, splashDmg, true));
-            }
-        }
+
 
 
         if (attacker.family === 'ralts' && !s?.isSilenced) {

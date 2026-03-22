@@ -307,41 +307,7 @@ export class GameLoop {
                 }
             }
 
-            // Cleffa (皮寶寶) family: Backmost perm HP
-            if (u.family === 'cleffa') {
-                if (u.templateId === 'clefable') { // Level 3 / Clefable
-                    this.playerTeam.forEach(target => {
-                        if (target && target !== u) applyBuff(target, 3, 'hp', 'Clefable');
-                    });
-                } else {
-                    const idx = this.playerTeam.indexOf(u);
-                    if (idx < this.playerTeam.length - 1) {
-                        const back = this.playerTeam[idx + 1];
-                        if (back) {
-                            const amount = u.level === 2 ? 3 : 1;
-                            applyBuff(back, amount, 'hp', u.name);
-                        }
-                    }
-                }
-            }
-
-            // Togepi (波克比) family: Backmost perm ATK
-            if (u.family === 'togepi') {
-                if (u.templateId === 'togekiss') { // Level 3 / Togekiss
-                    this.playerTeam.forEach(target => {
-                        if (target && target !== u) applyBuff(target, 3, 'atk', 'Togekiss');
-                    });
-                } else {
-                    const idx = this.playerTeam.indexOf(u);
-                    if (idx < this.playerTeam.length - 1) {
-                        const back = this.playerTeam[idx + 1];
-                        if (back) {
-                            const amount = u.level === 2 ? 3 : 1;
-                            applyBuff(back, amount, 'atk', u.name);
-                        }
-                    }
-                }
-            }
+            // Cleffa / Togepi family: Removed battle-start leftover logic as they have new abilities
 
             // Dratini (迷你龍) family: All allies perm ATK & HP
             if (u.family === 'dratini') {
@@ -371,15 +337,23 @@ export class GameLoop {
                 // ... logic
             }
 
-            // Larvitar/Dratini 3-battle EXP logic
+            // Larvitar/Dratini/Charmander/Pichu scaling logic
             this.playerTeam.forEach(u => {
                 if (u && (u.family === 'larvitar' || u.family === 'dratini')) {
-                    if (u.level < 3) { // Max level is 3
+                    if (u.level < 3) {
                         u.battlesCount++;
                         if (u.battlesCount >= 3) {
                             u.battlesCount = 0;
                             this.handleUnitExpGain(u, 1);
                         }
+                    }
+                } else if (u && (u.family === 'charmander' || u.family === 'pichu')) {
+                    const threshold = u.family === 'charmander' ? [0, 3, 2, 1][u.level] : 3;
+                    u.battlesCount++;
+                    if (u.battlesCount >= (threshold || 3)) {
+                        u.battlesCount = 0;
+                        u.scalingValue = (u.scalingValue || 3) + 1;
+                        console.log(`${u.name} 的招式威力增強了！(現在：${u.scalingValue})`);
                     }
                 }
             });

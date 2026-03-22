@@ -250,6 +250,29 @@ export class BattleSimulator {
             return;
         }
 
+        // Gastly Family: Atk buff at start
+        if (unit.family === 'gastly') {
+            if (unit.templateId === 'gengar') { // Stage 3
+                await this.notifySkill(unit, `耿鬼使用了詭計！`);
+                for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === u!.id);
+                    this.growUnit(u!, 0, 3, '耿鬼技能', original, true);
+                    await this.delay(65);
+                }
+            } else {
+                const idx = myTeam.indexOf(unit);
+                if (idx > 0) {
+                    const front = myTeam[idx - 1];
+                    if (front) {
+                        const amount = unit.templateId === 'haunter' ? 3 : 1;
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
+                        this.growUnit(front, 0, amount, '能力提升', original, true);
+                        this.log(`${unit.name} 為 ${front.name} 提升了攻勢！`);
+                    }
+                }
+            }
+        }
+
         // Totodile Family: Buff front ally (Rework)
         if (unit.family === 'totodile') {
             const idx = myTeam.indexOf(unit);
@@ -484,7 +507,7 @@ export class BattleSimulator {
                 this.registerUnitAbilities(unit);
 
                 // Chain Reaction: If new form has Battle-Start ability, trigger it immediately
-                const startAbilities = ['gastly', 'igglybuff', 'houndour', 'spiritomb', 'mudkip', 'gulpin', 'pichu'];
+                const startAbilities = ['gastly', 'totodile', 'delibird', 'shuckle', 'kangaskhan', 'igglybuff', 'caterpie', 'pichu', 'houndour', 'spiritomb', 'raikou', 'entei', 'suicune'];
                 if (startAbilities.includes(unit.family)) {
                     await this.executeUnitStartOfBattleAbility(unit);
                 }
@@ -548,6 +571,21 @@ export class BattleSimulator {
             globalState.lightScreen = 5;
             this.unitStates.set(unit, globalState);
             this.lightScreenActivated.add(side);
+
+            // Add the damage reduction listener
+            this.eventBus.on('BEFORE_HURT', (e) => {
+                if (unit.stats.hp <= 0 || !e.target) return; // Light Screen fades if Mime dies
+                const { myTeam: victimTeam } = this.getTeams(e.target);
+                if (myTeam === victimTeam) {
+                    const state = this.unitStates.get(unit) || {};
+                    if (state.lightScreen && state.lightScreen > 0) {
+                        e.context.amount = Math.ceil(e.context.amount / 2);
+                        state.lightScreen--;
+                        this.unitStates.set(unit, state);
+                        this.log(`光牆抵擋了 ${e.target.name} 受到的傷害！(剩餘 ${state.lightScreen} 次)`);
+                    }
+                }
+            });
             await this.delay(200);
         }
 
@@ -1019,6 +1057,30 @@ export class BattleSimulator {
                         if (!e.context?.isPassiveMove) {
                             this.log(`${unit.name}發動了劍舞， 提高 ${buff} 攻擊！`);
                         }
+                    }
+                }
+            });
+        }
+
+        // Mareep Family: Ally Kill -> Random Ally Perm Growth
+        if (unit.family === 'mareep') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                const { myTeam } = this.getTeams(unit);
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
+                // Trigger when an ANY ally kills an enemy (killer is on myTeam)
+                if (e.context.killer && myTeam.includes(e.context.killer) && e.context.killer !== unit) {
+                    const buff = 1;
+                    const targetCount = unit.level;
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const shuffled = [...living].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+                        targets.forEach(target => {
+                            const original = this.playerTeam.includes(target) ? this.originalPlayerTeam?.find(o => o && o.id === target.id) : null;
+                            this.growUnit(target, buff, buff, '咩利羊技能', original, true);
+                            this.playTeamAnimation([target], 'glow-white', 600);
+                        });
+                        this.log(`${unit.name} 發動了充電！`);
                     }
                 }
             });
@@ -1625,13 +1687,38 @@ export class BattleSimulator {
                     if (aliveFriends.length > 0) {
                         const randomFriend = aliveFriends[Math.floor(Math.random() * aliveFriends.length)];
                         await this.notifySkill(unit, `對 ${randomFriend.name} 發動了超幸運！`);
-                        // Friend buff is temporary (+5 Attack)
-                        this.growUnit(randomFriend, 0, 5, '超幸運', null, true);
+                        // Friend buff is temporary (+5 Attack for this battle)
+                        this.buffAttack(randomFriend, 5, true);
                         this.playAnimation(randomFriend, 'glow-white', 600);
                     }
                 }
             });
         }
+
+        // Happiny Family: Natural Cure (After Attack HP Buff)
+        if (unit.family === 'happiny') {
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                const { myTeam } = this.getTeams(unit);
+                if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
+                    const selfHps = [0, 1, 2, 5];
+                    const selfHp = selfHps[unit.level] || 1;
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
+                    // Permanent growth for self
+                    this.growUnit(unit, selfHp, 0, '自然回復', original, true);
+
+                    const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
+                    if (aliveFriends.length > 0) {
+                        const randomFriend = aliveFriends[Math.floor(Math.random() * aliveFriends.length)];
+                        await this.notifySkill(unit, `對 ${randomFriend.name} 發動了自然回復！`);
+                        // Friend buff is temporary (+5 HP max for this battle)
+                        this.growUnit(randomFriend, 5, 0, '自然回復', null, true);
+                        this.playAnimation(randomFriend, 'glow-pale-pink', 600);
+                    }
+                }
+            });
+        }
+
 
         // Outrage Synergy: 25% extra, 25% fail, 50% normal
         if (unit.synergies.includes('Outrage')) {
@@ -1717,6 +1804,25 @@ export class BattleSimulator {
                     if (livingEnemies.length > 1) {
                         const target = livingEnemies[1]; // Target only the first rear enemy
                         this.log(`${unit.name} 對其後方目標使用了咬碎`);
+                        await this.dealDamage(unit, target, dmg, true, true);
+                        if (this.onUpdate) this.onUpdate();
+                    }
+                }
+            });
+        }
+
+        // Charmander Family: Rear damage before own attack (Scaling)
+        if (unit.family === 'charmander') {
+            this.eventBus.on('BEFORE_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
+                    const dmg = unit.scalingValue || 3;
+                    const { opTeam } = this.getTeams(unit);
+                    const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+
+                    if (livingEnemies.length > 1) {
+                        const target = livingEnemies[1]; // Single target at 2nd position
+                        this.log(`${unit.name} 對其後方目標使用了火花`);
                         await this.dealDamage(unit, target, dmg, true, true);
                         if (this.onUpdate) this.onUpdate();
                     }
