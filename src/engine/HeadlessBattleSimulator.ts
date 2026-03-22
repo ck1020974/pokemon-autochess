@@ -324,6 +324,16 @@ export class HeadlessBattleSimulator {
             }
         }
 
+        // Kangaskhan: Parental Bond (Start)
+        if (unit.family === 'kangaskhan') {
+            const hpBuff = Math.floor(unit.stats.attack * 0.5);
+            if (hpBuff > 0) {
+                const original = this.playerTeam.includes(unit) ? (this.originalPlayerTeam as any)?.find((o: Unit | null) => o && o.id === unit.id) : null;
+                this.growUnit(unit, hpBuff, 0, original, true);
+                this.log(`${unit.name}發動了親子愛！`);
+            }
+        }
+
         // --- Legendary Beasts ---
 
         // Raikou: All allies +5 HP, all enemies 4-10 damage
@@ -1088,18 +1098,23 @@ export class HeadlessBattleSimulator {
             });
         }
 
-        // Mareep Family: Pursuit (閃電拳) on ally attack
+        // Mareep Family: Charge Beam (充電光束) - Ally kill trigger
         if (unit.family === 'mareep') {
-            this.eventBus.on('ON_ATTACK', async (e) => {
-                const s = this.unitStates.get(unit);
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
                 const { myTeam } = this.getTeams(unit);
-                if (unit.stats.hp > 0 && !s?.isSilenced && e.source && e.source !== unit && myTeam.includes(e.source)) {
-                    const multipliers = [0, 0.25, 0.33, 0.5];
-                    const mult = multipliers[unit.level] || 0.25;
-                    const dmg = Math.ceil(unit.stats.attack * mult);
-                    if (e.target && e.target.stats.hp > 0) {
-                        this.log(`${unit.name} 對 ${e.target.name} 發動了閃電拳！`);
-                        await this.dealDamage(unit, e.target, dmg, true);
+                const { killer } = e.context;
+                if (killer && myTeam.includes(killer)) {
+                    const targetCount = unit.level; // 1, 2, or 3
+                    const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
+                    if (aliveFriends.length > 0) {
+                        const shuffled = [...aliveFriends].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+                        this.log(`${unit.name} 使用了充電光束！`);
+                        for (const target of targets) {
+                            const original = this.playerTeam.includes(target) ? (this.originalPlayerTeam as any)?.find((o: Unit | null) => o && o.id === target.id) : null;
+                            this.growUnit(target, 1, 1, original, true);
+                        }
                     }
                 }
             });
@@ -1193,10 +1208,7 @@ export class HeadlessBattleSimulator {
         const dmg = attacker.stats.attack;
         const promises = [this.dealDamage(attacker, defender, dmg, false)];
         const s = this.unitStates.get(attacker);
-        if (attacker.family === 'kangaskhan' && (attacker.templateId !== attacker.family) && !s?.isSilenced) {
-            await promises[0];
-            if (defender.stats.hp > 0) promises.push(this.dealDamage(attacker, defender, dmg, false));
-        }
+        // Kangaskhan ability moved to StartofBattle
         if (attacker.family === 'doduo' && !s?.isSilenced) {
             if (Math.random() < ([0, 0.25, 0.33, 0.5][attacker.level] || 0.25)) {
                 const { opTeam } = this.getTeams(attacker);

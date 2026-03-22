@@ -314,6 +314,17 @@ export class BattleSimulator {
             }
         }
 
+        // Kangaskhan: Parental Bond (Start)
+        if (unit.family === 'kangaskhan') {
+            const hpBuff = Math.floor(unit.stats.attack * 0.5);
+            if (hpBuff > 0) {
+                const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
+                this.growUnit(unit, hpBuff, 0, '親子愛', original, true);
+                this.log(`${unit.name}發動了親子愛！`);
+                this.playAnimation(unit, 'glow-white', 600);
+            }
+        }
+
         // Gastly Family: Atk buff at start (Swapped from Mankey)
         if (unit.family === 'gastly') {
             if (unit.templateId === 'gengar') { // Stage 3
@@ -1670,18 +1681,30 @@ export class BattleSimulator {
             });
         }
 
-        // Mareep Family: Pursuit (閃電拳) on ally attack
+        // Mareep Family: Charge Beam (充電光束) - Ally kill trigger
         if (unit.family === 'mareep') {
-            this.eventBus.on('ON_ATTACK', async (e) => {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
                 const s = this.unitStates.get(unit);
+                if (unit.stats.hp <= 0 || s?.isSilenced) return;
+
                 const { myTeam } = this.getTeams(unit);
-                if (unit.stats.hp > 0 && !s?.isSilenced && e.source && e.source !== unit && myTeam.includes(e.source)) {
-                    const multipliers = [0, 0.25, 0.33, 0.5];
-                    const mult = multipliers[unit.level] || 0.25;
-                    const dmg = Math.ceil(unit.stats.attack * mult);
-                    if (e.target && e.target.stats.hp > 0) {
-                        await this.notifySkill(unit, `對 ${e.target.name} 發動了閃電拳！`);
-                        await this.dealDamage(unit, e.target, dmg, true);
+                const { killer } = e.context;
+
+                // Trigger if an ally (including self) killed someone
+                if (killer && myTeam.includes(killer)) {
+                    const targetCount = unit.level; // 1, 2, or 3
+                    const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
+
+                    if (aliveFriends.length > 0) {
+                        const shuffled = [...aliveFriends].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+
+                        await this.notifySkill(unit, `使用了充電光束！`);
+                        for (const target of targets) {
+                            const original = this.playerTeam.includes(target) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === target.id) : null;
+                            this.growUnit(target, 1, 1, '充電光束', original, true);
+                            this.playAnimation(target, 'glow-yellow', 600);
+                        }
                     }
                 }
             });
@@ -1792,16 +1815,7 @@ export class BattleSimulator {
         // Base attack
         attackPromises.push(this.dealDamage(attacker, defender, dmg, false));
 
-        // Kangaskhan: Second hit if attacker survives the first hit
-        if (attacker.family === 'kangaskhan' && !this.unitStates.get(attacker)?.isSilenced) {
-            await Promise.all(attackPromises); // Wait for the first hit and any triggers
-            // Re-check survival after the first hit and its consequences (like reflect)
-            if (attacker.stats.hp > 0) {
-                await this.notifySkill(attacker, `發動了親子愛！`);
-                const secondHit = this.dealDamage(attacker, defender, attacker.stats.attack, true);
-                attackPromises.push(secondHit);
-            }
-        }
+        // Kangaskhan ability moved to StartofBattle
 
         // Doduo: Extra hit on same target
         if (attacker.family === 'doduo' && !this.unitStates.get(attacker)?.isSilenced) {

@@ -563,19 +563,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'kangaskhan', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '攻擊後若存活，額外再攻擊一次。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_2'
+        description: '戰鬥開始時，獲得自身 50% 攻擊的生命。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_2'
     },
     kangaskhan_2: {
         id: 'kangaskhan_2', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '攻擊後若存活，額外再攻擊一次。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
+        description: '戰鬥開始時，獲得自身 50% 攻擊的生命。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
     },
     kangaskhan_3: {
         id: 'kangaskhan_3', name: '袋獸', tier: 4, family: 'kangaskhan',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '攻擊後若存活，額外再攻擊一次。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
+        description: '戰鬥開始時，獲得自身 50% 攻擊的生命。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
     },
 
     // 30. Ditto
@@ -999,19 +999,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'mareep', name: '咩利羊', tier: 4, family: 'mareep',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/咩利羊00.webp', battleImageUrl: 'assets/咩利羊01.webp',
-        description: '友軍攻擊時，自身追擊 25% 傷害。', synergies: ['Charge'], evolveId: 'flaaffy'
+        description: '友軍擊殺後，隨機 1 位友軍永久 +1 生命與攻擊。', synergies: ['Charge'], evolveId: 'flaaffy'
     },
     flaaffy: {
         id: 'flaaffy', name: '茸茸羊', tier: 4, family: 'mareep',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/茸茸羊00.webp', battleImageUrl: 'assets/茸茸羊01.webp',
-        description: '友軍攻擊時，自身追擊 33% 傷害。', synergies: ['Charge'], evolveId: 'ampharos', isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 2 位友軍永久 +1 生命與攻擊。', synergies: ['Charge'], evolveId: 'ampharos', isHiddenFromShop: true
     },
     ampharos: {
         id: 'ampharos', name: '電龍', tier: 4, family: 'mareep',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/電龍00.webp', battleImageUrl: 'assets/電龍01.webp',
-        description: '友軍攻擊時，自身追擊 50% 傷害。', synergies: ['Charge', 'Outrage'], isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 3 位友軍永久 +1 生命與攻擊。', synergies: ['Charge', 'Outrage'], isHiddenFromShop: true
     },
 
     // 31. Cubone
@@ -1176,7 +1176,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'shuckle', name: '壺壺', tier: 4, family: 'shuckle',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/壺壺00.webp', battleImageUrl: 'assets/壺壺01.webp',
-        description: '戰鬥開始獲得自身 50% 生命的攻擊。', synergies: ['BugBite', 'Hard']
+        description: '戰鬥開始時，獲得自身 50% 生命的攻擊。', synergies: ['BugBite', 'Hard']
     }
 };
 
