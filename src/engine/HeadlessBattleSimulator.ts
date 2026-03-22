@@ -63,14 +63,16 @@ export class HeadlessBattleSimulator {
         this.enemyTeam.forEach((u, i) => { if (u) allUnits.push({ unit: u, pos: i, isPlayer: false }); });
 
         const getRank = (unit: Unit) => {
+            if (unit.synergies.includes('Trick')) return 5;
             if (unit.family === 'spiritomb') return 5;
             if (unit.family === 'mrmime') return 4;
             if (unit.family === 'natu') return 3;
-            if (unit.family === 'houndour') return 1;
+            if (unit.family === 'houndour') return 0;
 
-            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin'];
-            if (utility.includes(unit.family)) return 2;
-            return 0;
+            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin', 'totodile'];
+            const hasStartupSynergy = unit.synergies.includes('Thief');
+            if (utility.includes(unit.family) || hasStartupSynergy) return 2;
+            return 1;
         };
 
         allUnits.sort((a, b) => {
@@ -377,6 +379,58 @@ export class HeadlessBattleSimulator {
             if (enemies.length > 0) {
                 const weakest = [...enemies].sort((a, b) => a.stats.hp - b.stats.hp)[0];
                 await this.dealDamage(unit, weakest, 30, true);
+            }
+        }
+
+        // Trick Synergy: Swap HP (Temporary)
+        if (unit.synergies.includes('Trick')) {
+            const count = this.getSynergyCountForUnit(unit, 'Trick');
+            if (count >= 2) {
+                const candidates = opTeam.filter(e => e && e.stats.hp > 0);
+                if (candidates.length > 0) {
+                    const target = candidates[Math.floor(Math.random() * candidates.length)];
+                    this.log(`${unit.name} 對 ${target.name} 發動了戲法空間`);
+                    const myHp = unit.stats.hp;
+                    const myMaxHp = unit.stats.maxHp;
+                    const opHp = target.stats.hp;
+                    const opMaxHp = target.stats.maxHp;
+                    unit.stats.hp = opHp;
+                    unit.stats.maxHp = opMaxHp;
+                    target.stats.hp = myHp;
+                    target.stats.maxHp = myMaxHp;
+                    const myState = this.unitStates.get(unit) || {};
+                    myState.hpSwapped = true;
+                    this.unitStates.set(unit, myState);
+                    const opState = this.unitStates.get(target) || {};
+                    opState.hpSwapped = true;
+                    this.unitStates.set(target, opState);
+                    unit.capStats();
+                    target.capStats();
+                }
+            }
+        }
+
+        // Thief Synergy: Steal Atk
+        if (unit.synergies.includes('Thief')) {
+            const count = this.getSynergyCountForUnit(unit, 'Thief');
+            if (count >= 2) {
+                const enemies = opTeam.filter(u => u && u.stats.hp > 0);
+                if (enemies.length > 0) {
+                    let strongest = enemies[0];
+                    let maxAtk = strongest.stats.attack;
+                    for (const e of enemies) {
+                        if (e.stats.attack > maxAtk) {
+                            strongest = e;
+                            maxAtk = e.stats.attack;
+                        }
+                    }
+                    const factor = count >= 4 ? 0.5 : 0.33;
+                    const stealAmt = Math.floor(strongest.stats.attack * factor);
+                    if (stealAmt > 0) {
+                        strongest.stats.attack -= stealAmt;
+                        this.growUnit(unit, 0, stealAmt, null, true);
+                    }
+                }
             }
         }
     }

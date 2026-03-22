@@ -131,13 +131,14 @@ export class BattleSimulator {
 
         // Helper for Category Rank based on User Request Phases
         const getRank = (unit: Unit) => {
+            if (unit.synergies.includes('Trick')) return 5; // Trick swaps HP before Snow
             if (unit.family === 'spiritomb') return 5; // Phase 1: Silence
             if (unit.family === 'mrmime') return 4;    // Phase 2 Part 2: Light Screen
             if (unit.family === 'natu') return 3;      // Phase 2 Part 3: Swap
             if (unit.family === 'houndour') return 0;  // Phase 4: First Strike (Now last priority)
 
             const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin', 'totodile'];
-            const hasStartupSynergy = unit.synergies.includes('Thief') || unit.synergies.includes('Trick');
+            const hasStartupSynergy = unit.synergies.includes('Thief');
             if (utility.includes(unit.family) || hasStartupSynergy) return 2; // Phase 3: Utility/Synergy
 
             return 1; // Standard buffs (Gastly, Igglybuff, Totodile family) now Rank 1

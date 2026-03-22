@@ -148,7 +148,12 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
                 }
             }}
         >
-            {synergy.icon}
+            <span style={{
+                filter: isActive ? 'none' : 'grayscale(1)',
+                opacity: isActive ? 1 : 0.7
+            }}>
+                {synergy.icon}
+            </span>
             {showCount && count !== undefined && <span style={{ position: 'absolute', bottom: -5, right: -5, fontSize: '0.7rem', background: '#000', borderRadius: '50%', padding: '0 4px', border: '1px solid #333', color: '#fff' }}>{count}</span>}
             <div className={`synergy-tooltip ${isEnemy ? 'is-enemy' : ''}`}>
                 <div style={{ fontWeight: 'bold', color: isActive ? synergy.color : '#aaa', marginBottom: '4px' }}>
