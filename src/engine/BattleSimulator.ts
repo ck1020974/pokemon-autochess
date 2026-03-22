@@ -1661,20 +1661,18 @@ export class BattleSimulator {
             });
         }
 
-        // Outrage Synergy: Grow before attack, 25% chance to skip attack
+        // Outrage Synergy: 25% extra, 25% fail, 50% normal
         if (unit.synergies.includes('Outrage')) {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
                     const count = this.getSynergyCountForUnit(unit, 'Outrage');
                     if (count >= 2) {
-                        const amount = count >= 3 ? 5 : 3;
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
-                        this.growUnit(unit, amount, amount, '逆鱗技能', original, true);
-
-                        // 25% chance to skip attack
-                        if (Math.random() < 0.25) {
+                        const rand = Math.random();
+                        if (rand < 0.25) {
                             if (s) s.isAttackSkipped = true;
+                        } else if (rand < 0.50) { // 25% total (33% of remaining 75%)
+                            if (s) s.isExtraAttack = true;
                         }
                     }
                 }
@@ -1802,7 +1800,17 @@ export class BattleSimulator {
         // Base attack
         attackPromises.push(this.dealDamage(attacker, defender, dmg, false));
 
-        // Kangaskhan ability moved to StartofBattle
+        // Outrage: 25% chance of extra random target hit
+        if (state?.isExtraAttack) {
+            state.isExtraAttack = false;
+            const { opTeam } = this.getTeams(attacker);
+            const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
+            if (liveEnemies.length > 0) {
+                const target = liveEnemies[Math.floor(Math.random() * liveEnemies.length)];
+                this.log(`${attacker.name} 對 ${target.name} 發動了逆鱗`);
+                attackPromises.push(this.dealDamage(attacker, target, dmg));
+            }
+        }
 
         // Doduo: Extra hit on same target
         if (attacker.family === 'doduo' && !this.unitStates.get(attacker)?.isSilenced) {
