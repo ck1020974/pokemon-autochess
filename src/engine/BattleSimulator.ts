@@ -405,8 +405,8 @@ export class BattleSimulator {
                 const weakest = [...livingEnemies].sort((a, b) => a!.stats.hp - b!.stats.hp)[0];
                 if (weakest) {
                     await this.notifySkill(unit, `使用了電光一閃！`);
-                    // Use scalingValue (default to 3 if somehow undefined)
-                    const dmg = unit.scalingValue || 3;
+                    // Use scalingValue (default to 1)
+                    const dmg = unit.scalingValue || 1;
                     await this.dealDamage(unit, weakest, dmg, true);
                     this.log(`${unit.name} 對 ${weakest.name} 使用了電光一閃。`);
                 }
@@ -670,15 +670,10 @@ export class BattleSimulator {
 
         // --- Legendary Beasts ---
 
-        // Raikou: All allies +5 HP, all enemies 5-15 damage
+        // Raikou: all enemies 5-15 damage
         if (unit.family === 'raikou') {
             await this.notifySkill(unit, `使用了打雷！`);
             this.log(`雷公使用了打雷，向敵方劈下暴雷`);
-
-            // All allies +5 HP
-            for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                this.growUnit(ally, 5, 0, '雷公技能', null, true);
-            }
 
             // All enemies 5-15 damage
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
@@ -711,14 +706,9 @@ export class BattleSimulator {
             if (this.onUpdate) this.onUpdate();
         }
 
-        // Suicune: All allies +5 ATK, weakest enemy 50 damage
+        // Suicune: weakest enemy 50 damage
         if (unit.family === 'suicune') {
             await this.notifySkill(unit, `使用了水砲！`);
-
-            // All allies +5 ATK
-            for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                this.buffAttack(ally, 5, true);
-            }
 
             // Weakest enemy 50 damage
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
@@ -1062,29 +1052,6 @@ export class BattleSimulator {
             });
         }
 
-        // Mareep Family: Ally Kill -> Random Ally Perm Growth
-        if (unit.family === 'mareep') {
-            this.eventBus.on('AFTER_DEATH', async (e) => {
-                const { myTeam } = this.getTeams(unit);
-                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
-                // Trigger when an ANY ally kills an enemy (killer is on myTeam)
-                if (e.context.killer && myTeam.includes(e.context.killer) && e.context.killer !== unit) {
-                    const buff = 1;
-                    const targetCount = unit.level;
-                    const living = myTeam.filter(u => u && u.stats.hp > 0);
-                    if (living.length > 0) {
-                        const shuffled = [...living].sort(() => 0.5 - Math.random());
-                        const targets = shuffled.slice(0, targetCount);
-                        targets.forEach(target => {
-                            const original = this.playerTeam.includes(target) ? this.originalPlayerTeam?.find(o => o && o.id === target.id) : null;
-                            this.growUnit(target, buff, buff, '咩利羊技能', original, true);
-                            this.playTeamAnimation([target], 'glow-white', 600);
-                        });
-                        this.log(`${unit.name} 發動了充電！`);
-                    }
-                }
-            });
-        }
 
         // Roost: HP on Move
         if (unit.synergies.includes('Roost')) {
@@ -1695,29 +1662,6 @@ export class BattleSimulator {
             });
         }
 
-        // Happiny Family: Natural Cure (After Attack HP Buff)
-        if (unit.family === 'happiny') {
-            this.eventBus.on('AFTER_ATTACK', async (e) => {
-                const s = this.unitStates.get(unit);
-                const { myTeam } = this.getTeams(unit);
-                if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
-                    const selfHps = [0, 1, 2, 5];
-                    const selfHp = selfHps[unit.level] || 1;
-                    const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
-                    // Permanent growth for self
-                    this.growUnit(unit, selfHp, 0, '自然回復', original, true);
-
-                    const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
-                    if (aliveFriends.length > 0) {
-                        const randomFriend = aliveFriends[Math.floor(Math.random() * aliveFriends.length)];
-                        await this.notifySkill(unit, `對 ${randomFriend.name} 發動了自然回復！`);
-                        // Friend buff is temporary (+5 HP max for this battle)
-                        this.growUnit(randomFriend, 5, 0, '自然回復', null, true);
-                        this.playAnimation(randomFriend, 'glow-pale-pink', 600);
-                    }
-                }
-            });
-        }
 
 
         // Outrage Synergy: 25% extra, 25% fail, 50% normal

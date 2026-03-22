@@ -34,7 +34,7 @@ export class GameLoop {
 
     public charmanderN: number = 1;
     public charmanderCounter: number = 0;
-    public pichuN: number = 3;
+    public pichuN: number = 1;
     public pichuCounter: number = 0;
     public psychicN: number = 2;
 
@@ -196,31 +196,34 @@ export class GameLoop {
         this.playerTeam = compacted;
     }
 
-    private applyPrepEndSynergies() {
-        // Unique Count Helper
-        const getUniqueCount = (units: Unit[], synergyId?: string) => {
-            const families = new Set(units.map(u => u.family));
-            let count = families.size;
+    // Public helper: counts unique synergy families, with Eevee form special rule
+    public getUniqueCount(units: Unit[], synergyId?: string): number {
+        const families = new Set(units.map(u => u.family));
+        let count = families.size;
 
-            if (synergyId) {
-                const eeveeUnits = units.filter(u => u.family === 'eevee');
-                if (eeveeUnits.length > 0) {
-                    if (synergyId === 'BatonPass') {
-                        // Baton Pass: Unique Eevee forms count as different
-                        const uniqueForms = new Set(eeveeUnits.map(u => u.templateId));
-                        count += (uniqueForms.size - 1);
-                    } else {
-                        // Elemental Synergy: If there's an Eevee form that matches the synergy, it counts as 2
-                        const matches = eeveeUnits.some(u => {
-                            const template = ALL_UNITS[u.templateId];
-                            return template.synergies.includes(synergyId) && u.templateId !== 'eevee';
-                        });
-                        if (matches) count += 1; // Base 1 + Bonus 1 = 2
-                    }
+        if (synergyId) {
+            const eeveeUnits = units.filter(u => u.family === 'eevee');
+            if (eeveeUnits.length > 0) {
+                if (synergyId === 'BatonPass') {
+                    // Baton Pass: Unique Eevee forms count as different
+                    const uniqueForms = new Set(eeveeUnits.map(u => u.templateId));
+                    count += (uniqueForms.size - 1);
+                } else {
+                    // Elemental Synergy: If there's an Eevee form that matches the synergy, it counts as 2
+                    const matches = eeveeUnits.some(u => {
+                        const template = ALL_UNITS[u.templateId];
+                        return template.synergies.includes(synergyId) && u.templateId !== 'eevee';
+                    });
+                    if (matches) count += 1; // Base 1 + Bonus 1 = 2
                 }
             }
-            return count;
-        };
+        }
+        return count;
+    }
+
+    private applyPrepEndSynergies() {
+        // Unique Count Helper (delegated to class method)
+        const getUniqueCount = (units: Unit[], synergyId?: string) => this.getUniqueCount(units, synergyId);
 
         // Helper: Apply Synergy Buff
         const applyBuff = (unit: Unit, amount: number, type: 'hp' | 'atk', source: string) => {
@@ -463,8 +466,8 @@ export class GameLoop {
 
         // --- Player Psychic Scaling (Round-based) ---
         const psychicUnits = this.playerTeam.filter(u => u && u.synergies.includes('Psychic')) as Unit[];
-        const families = new Set(psychicUnits.map(u => u.family));
-        const pCount = families.size;
+        // getUniqueCount correctly handles Espeon (Eevee form) as +1
+        const pCount = this.getUniqueCount(psychicUnits, 'Psychic');
         if (pCount >= 2) {
             let increment = 0;
             if (pCount >= 4) {

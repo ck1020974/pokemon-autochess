@@ -197,7 +197,7 @@ export class HeadlessBattleSimulator {
                 for (const e of livingEnemies) {
                     if (e.stats.hp < weakest.stats.hp) weakest = e;
                 }
-                const dmg = unit.scalingValue || 3;
+                const dmg = unit.scalingValue || 1;
                 // dealDamage in Headless is async if it calls notifySkill but here it's simplified
                 await this.dealDamage(unit, weakest, dmg, true);
                 this.log(`${unit.name} 使用了電光一閃。`);
@@ -365,12 +365,8 @@ export class HeadlessBattleSimulator {
 
         // --- Legendary Beasts ---
 
-        // Raikou: All allies +5 HP, all enemies 5-15 damage
+        // Raikou: all enemies 5-15 damage
         if (unit.family === 'raikou') {
-            const aliveAllies = myTeam.filter(u => u && u.stats.hp > 0);
-            for (const ally of aliveAllies) {
-                this.growUnit(ally, 5, 0, null, true);
-            }
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
             for (const enemy of enemies) {
                 const dmg = 5 + Math.floor(Math.random() * 11);
@@ -395,12 +391,8 @@ export class HeadlessBattleSimulator {
             }
         }
 
-        // Suicune: All allies +5 ATK, weakest enemy 50 damage
+        // Suicune: weakest enemy 50 damage
         if (unit.family === 'suicune') {
-            const aliveAllies = myTeam.filter(u => u && u.stats.hp > 0);
-            for (const ally of aliveAllies) {
-                this.buffAttack(ally, 5, true);
-            }
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (enemies.length > 0) {
                 const weakest = [...enemies].sort((a, b) => a.stats.hp - b.stats.hp)[0];

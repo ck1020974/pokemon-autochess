@@ -1096,7 +1096,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'raikou', name: '雷公', tier: 5, family: 'raikou',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/雷公00.webp', battleImageUrl: 'assets/雷公01.webp',
-        description: '戰鬥開始時，我方全體 +5 生命；對所有敵方造成 5-15 傷害。', synergies: ['Charge']
+        description: '戰鬥開始時，對所有敵方造成 5-15 傷害。', synergies: ['Charge']
     },
     entei: {
         id: 'entei', name: '炎帝', tier: 5, family: 'entei',
@@ -1108,7 +1108,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'suicune', name: '水君', tier: 5, family: 'suicune',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/水君00.webp', battleImageUrl: 'assets/水君01.webp',
-        description: '戰鬥開始時，我方全體 +5 攻擊；對最弱的敵方造成 50 傷害。', synergies: ['Water']
+        description: '戰鬥開始時，對最弱的敵方造成 50 傷害。', synergies: ['Water']
     },
     // 36. Dratini Family
     dratini: {
