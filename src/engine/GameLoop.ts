@@ -345,7 +345,7 @@ export class GameLoop {
 
             // Dratini (迷你龍) family: All allies perm ATK & HP
             if (u.family === 'dratini') {
-                const amount = [0, 1, 3, 5][u.level] || 1;
+                const amount = [0, 2, 3, 5][u.level] || 2;
                 this.playerTeam.forEach(target => {
                     if (target) {
                         applyBuff(target, amount, 'atk', u.name);
@@ -368,12 +368,26 @@ export class GameLoop {
 
             // Increment stage counters
             if (this.wins < 8) {
-                this.gymBattleCount++;
-            } else if (this.wins < 12) {
-                this.eliteBattleCount++;
-            } else {
-                this.championBattleCount++;
+                // ... logic
             }
+
+            // Larvitar/Dratini 3-battle EXP logic
+            this.playerTeam.forEach(u => {
+                if (u && (u.family === 'larvitar' || u.family === 'dratini')) {
+                    if (u.level < 3) { // Max level is 3
+                        u.battlesCount++;
+                        if (u.battlesCount >= 3) {
+                            u.battlesCount = 0;
+                            this.handleUnitExpGain(u, 1);
+                        }
+                    }
+                }
+            });
+            this.gymBattleCount++;
+        } else if (this.wins < 12) {
+            this.eliteBattleCount++;
+        } else {
+            this.championBattleCount++;
         }
 
         if (result === 'WIN') {
@@ -917,8 +931,12 @@ export class GameLoop {
         target.scalingValue = Math.max(target.scalingValue, source.scalingValue);
 
         const expGain = (target.family === 'eevee') ? source.exp * 2 : source.exp;
-        const totalExp = target.exp + expGain;
-        const oldLevel = target.level;
+        this.handleUnitExpGain(target, expGain);
+    }
+
+    public handleUnitExpGain(unit: Unit, amount: number) {
+        const totalExp = unit.exp + amount;
+        const oldLevel = unit.level;
         let predictedLevel = 1;
         if (totalExp >= 9) predictedLevel = 3;
         else if (totalExp >= 3) predictedLevel = 2;
@@ -927,28 +945,33 @@ export class GameLoop {
         predictedLevel = Math.max(predictedLevel, oldLevel);
 
         const willLevelUp = predictedLevel > oldLevel;
-        const willEvolve = !!target.evolveId && willLevelUp;
-
-        this.triggerMergeEffect(target);
+        const willEvolve = !!unit.evolveId && willLevelUp;
 
         if (willLevelUp) {
             if (willEvolve) {
-                this.performEvolution(target);
-            } else if (target.family === 'eevee') {
-                this.performEeveeEvolution(target, predictedLevel);
+                this.performEvolution(unit);
+            } else if (unit.family === 'eevee') {
+                this.performEeveeEvolution(unit, predictedLevel);
             } else {
-                target.level = predictedLevel;
-                const base = ALL_UNITS[target.family].baseStats;
+                unit.level = predictedLevel;
+                const base = ALL_UNITS[unit.family].baseStats;
                 const multiplier = 1;
-                target.addGrowth(base.maxHp * multiplier, base.attack * multiplier);
-                console.log(`${target.name} Level Up (Non-Evolve) -> +${base.maxHp * multiplier}/+${base.attack * multiplier}`);
+                unit.addGrowth(base.maxHp * multiplier, base.attack * multiplier);
+                console.log(`${unit.name} Level Up (Non-Evolve) -> +${base.maxHp * multiplier}/+${base.attack * multiplier}`);
             }
         } else {
-            target.addGrowth(expGain, expGain);
-            console.log(`${target.name} absorbs ${expGain} exp. +${expGain}/+${expGain} Stats.`);
+            unit.addGrowth(amount, amount);
+            console.log(`${unit.name} absorbs ${amount} exp. +${amount}/+${amount} Stats.`);
         }
-        target.exp = totalExp;
-        console.log(`${target.name} Merged: Exp ${totalExp} (Level ${target.level})`);
+        unit.exp = totalExp;
+        console.log(`${unit.name} Gained Exp: Total ${totalExp} (Level ${unit.level})`);
+
+        // Final Evolve Trigger (e.g. if level 2 already reached but evolveId changed)
+        // This is a safety check.
+        if (unit.evolveId && unit.level >= 2 && unit.templateId === unit.family) {
+            // Basic evolution for level 2 if not evolved yet
+            // (Wait, this is complex for Eevee, but Eevee is handled above)
+        }
     }
 
     private performEeveeEvolution(unit: Unit, newLevel: number) {

@@ -1096,57 +1096,57 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'raikou', name: '雷公', tier: 5, family: 'raikou',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/雷公00.webp', battleImageUrl: 'assets/雷公01.webp',
-        description: '戰鬥開始時，我方全體 +5 生命；對所有敵方造成 4-10 傷害。', synergies: ['Charge']
+        description: '戰鬥開始時，我方全體 +5 生命；對所有敵方造成 5-15 傷害。', synergies: ['Charge']
     },
     entei: {
         id: 'entei', name: '炎帝', tier: 5, family: 'entei',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/炎帝00.webp', battleImageUrl: 'assets/炎帝01.webp',
-        description: '戰鬥開始時，我方全體+ 5 生命；對最強的敵方造成 30 傷害。', synergies: ['Fire']
+        description: '戰鬥開始時，對最強的敵方造成 50 傷害。', synergies: ['Fire']
     },
     suicune: {
         id: 'suicune', name: '水君', tier: 5, family: 'suicune',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/水君00.webp', battleImageUrl: 'assets/水君01.webp',
-        description: '戰鬥開始時，我方全體+ 5 攻擊；對最弱的敵方造成 30 傷害。', synergies: ['Water']
+        description: '戰鬥開始時，我方全體 +5 攻擊；對最弱的敵方造成 50 傷害。', synergies: ['Water']
     },
     // 36. Dratini Family
     dratini: {
         id: 'dratini', name: '迷你龍', tier: 5, family: 'dratini',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/迷你龍00.webp', battleImageUrl: 'assets/迷你龍01.webp',
-        description: '準備結束時，我方全體永久 +1 攻擊與生命；首次受到的傷害減半。', synergies: ['Outrage'], evolveId: 'dragonair'
+        description: '準備結束時，我方全體永久 +2 攻擊與生命；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Outrage'], evolveId: 'dragonair'
     },
     dragonair: {
         id: 'dragonair', name: '哈克龍', tier: 5, family: 'dratini',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/哈克龍00.webp', battleImageUrl: 'assets/哈克龍01.webp',
-        description: '準備結束時，我方全體永久 +3 攻擊與生命；首次受到的傷害減半。', synergies: ['Outrage'], evolveId: 'dragonite', isHiddenFromShop: true
+        description: '準備結束時，我方全體永久 +3 攻擊與生命；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Outrage'], evolveId: 'dragonite', isHiddenFromShop: true
     },
     dragonite: {
         id: 'dragonite', name: '快龍', tier: 5, family: 'dratini',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/快龍00.webp', battleImageUrl: 'assets/快龍01.webp',
-        description: '準備結束時，我方全體永久 +5 攻擊與生命；首次受到的傷害減半。', synergies: ['Outrage', 'Roost'], isHiddenFromShop: true
+        description: '準備結束時，我方全體永久 +5 攻擊與生命；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Outrage', 'Roost'], isHiddenFromShop: true
     },
     // 37. Larvitar Family
     larvitar: {
         id: 'larvitar', name: '幼基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/幼基拉斯00.webp', battleImageUrl: 'assets/幼基拉斯01.webp',
-        description: '同時對後方敵方造成 25% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Cave'], evolveId: 'pupitar'
+        description: '同時對後方一位敵方造成 25% 傷害；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Thief', 'Cave'], evolveId: 'pupitar'
     },
     pupitar: {
         id: 'pupitar', name: '沙基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/沙基拉斯00.webp', battleImageUrl: 'assets/沙基拉斯01.webp',
-        description: '同時對後方敵方造成 33% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Cave'], evolveId: 'tyranitar', isHiddenFromShop: true
+        description: '同時對後方一位敵方造成 33% 傷害；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Thief', 'Cave'], evolveId: 'tyranitar', isHiddenFromShop: true
     },
     tyranitar: {
         id: 'tyranitar', name: '班基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/班基拉斯00.webp', battleImageUrl: 'assets/班基拉斯01.webp',
-        description: '同時對後方敵方造成 50% 傷害；受傷後永久 +2 生命與攻擊。', synergies: ['Thief', 'Cave'], isHiddenFromShop: true
+        description: '同時對後方一位敵方造成 50% 傷害；每三場戰鬥後獲得 1 點經驗值。', synergies: ['Thief', 'Cave'], isHiddenFromShop: true
     },
     // 37. Delibird
     delibird: {

@@ -37,6 +37,7 @@ export class Unit {
   public family: string;
   public scalingValue: number = 1;
   public abilityPower: number = 0;
+  public battlesCount: number = 0;
   public hasNewPermanentBuff: boolean = false;
 
   constructor(template: UnitTemplate) {

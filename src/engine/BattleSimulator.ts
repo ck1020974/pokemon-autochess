@@ -131,19 +131,17 @@ export class BattleSimulator {
 
         // Helper for Category Rank based on User Request Phases
         const getRank = (unit: Unit) => {
-            if (unit.synergies.includes('Trick')) return 5; // Trick swaps HP before Snow
-            if (unit.family === 'spiritomb') return 5; // Phase 1: Silence
-            if (unit.family === 'mrmime') return 4;    // Phase 2 Part 2: Light Screen
-            if (unit.family === 'natu') return 3;      // Phase 2 Part 3: Swap
-            if (unit.family === 'houndour') return 0;  // Phase 4: First Strike (Now last priority)
+            if (unit.family === 'spiritomb') return 6; // Rank 6: Silence
+            if (unit.synergies.includes('Trick') || unit.family === 'mrmime') return 5; // Rank 5: Trick, Light Screen
+            if (unit.synergies.includes('Snow') || unit.family === 'natu') return 4; // Rank 4: Snow, Natu family
+            if (unit.family === 'ditto') return 3; // Rank 3: Transform
+            if (unit.family === 'houndour' || ['raikou', 'entei', 'suicune'].includes(unit.family)) return 0; // Rank 0
 
-            const utility = ['ditto', 'gastly', 'igglybuff', 'mudkip', 'gulpin', 'totodile'];
             const hasStartupSynergy = unit.synergies.includes('Thief');
-            if (utility.includes(unit.family) || hasStartupSynergy) return 2; // Phase 3: Utility/Synergy
+            if (hasStartupSynergy) return 2; // Phase 3: Utility/Synergy
 
-            return 1; // Standard buffs (Gastly, Igglybuff, Totodile family) now Rank 1
+            return 1; // Default
         };
-
         // Sort by Priority: Rank (Desc) > Position (Asc) > Attack (Desc) > HP (Desc) > Random
         allUnits.sort((a, b) => {
             const rankA = getRank(a.unit);
@@ -171,10 +169,13 @@ export class BattleSimulator {
             }
         };
 
-        // --- PHASE 1: Spiritomb ---
+        // --- PHASE 1: Spiritomb (Rank 6) ---
+        await executePhaseQueue(6);
+
+        // --- PHASE 2: Trick & Light Screen (Rank 5) ---
         await executePhaseQueue(5);
 
-        // --- PHASE 2: Environment & Weather (Snow, then Light Screen) ---
+        // --- PHASE 3: Snow (handled manually) & Natu (Rank 4) ---
         const hasSnow = (this.playerSynergies.get('Snow') || 0) >= 2 || (this.enemySynergies.get('Snow') || 0) >= 2;
         if (hasSnow) {
             this.log("四周開始降下冰雹，冰雹襲擊了雙方隊伍！");
@@ -192,20 +193,18 @@ export class BattleSimulator {
             }
             await this.delay(400);
         }
-
-        // Phase 2 Part 2: Mr. Mime (Light Screen)
         await executePhaseQueue(4);
 
-        // Phase 2 Part 3: Natu
+        // --- PHASE 4: Ditto (Rank 3) ---
         await executePhaseQueue(3);
 
-        // --- PHASE 3: Character & Synergy Function/Enhancement ---
+        // --- PHASE 5: Utility/Thief (Rank 2) ---
         await executePhaseQueue(2);
 
-        // --- PHASE 4: Houndour (First Strike) ---
+        // --- PHASE 6: Standards (Rank 1) ---
         await executePhaseQueue(1);
 
-        // --- OTHERS: (Totodile, etc.) ---
+        // --- PHASE 7: Finishers (Rank 0) ---
         await executePhaseQueue(0);
 
         await this.applyBattleStartSynergies(this.playerTeam.filter(u => u !== null));
@@ -325,28 +324,6 @@ export class BattleSimulator {
             }
         }
 
-        // Gastly Family: Atk buff at start (Swapped from Mankey)
-        if (unit.family === 'gastly') {
-            if (unit.templateId === 'gengar') { // Stage 3
-                await this.notifySkill(unit, `耿鬼使用了詭計！`);
-                for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                    const original = this.originalPlayerTeam?.find(o => o && o.id === u!.id);
-                    this.growUnit(u!, 0, 3, '耿鬼技能', original, true);
-                    await this.delay(65);
-                }
-            } else {
-                const idx = myTeam.indexOf(unit);
-                if (idx > 0) {
-                    const front = myTeam[idx - 1];
-                    if (front) {
-                        const amount = unit.templateId === 'haunter' ? 3 : 1;
-                        const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
-                        this.growUnit(front, 0, amount, '能力提升', original, true);
-                        this.log(`${unit.name} 為 ${front.name} 提升了攻勢！`);
-                    }
-                }
-            }
-        }
 
         // Igglybuff Family: HP buff at start (Swapped from Dwebble)
         if (unit.family === 'igglybuff') {
@@ -655,7 +632,7 @@ export class BattleSimulator {
 
         // --- Legendary Beasts ---
 
-        // Raikou: All allies +5 HP, all enemies 4-10 damage
+        // Raikou: All allies +5 HP, all enemies 5-15 damage
         if (unit.family === 'raikou') {
             await this.notifySkill(unit, `使用了打雷！`);
             this.log(`雷公使用了打雷，向敵方劈下暴雷`);
@@ -665,25 +642,20 @@ export class BattleSimulator {
                 this.growUnit(ally, 5, 0, '雷公技能', null, true);
             }
 
-            // All enemies 4-10 damage
+            // All enemies 5-15 damage
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
             for (const enemy of enemies) {
-                const dmg = 4 + Math.floor(Math.random() * 7); // 4 to 10
+                const dmg = 5 + Math.floor(Math.random() * 11); // 5 to 15
                 await this.dealDamage(unit, enemy, dmg, true, true);
             }
             if (this.onUpdate) this.onUpdate();
         }
 
-        // Entei: All allies +5 HP, strongest enemy 30 damage
+        // Entei: Strongest enemy 50 damage
         if (unit.family === 'entei') {
             await this.notifySkill(unit, `使用了大字爆炎！`);
 
-            // All allies +5 HP
-            for (const ally of myTeam.filter(u => u && u.stats.hp > 0)) {
-                this.growUnit(ally, 5, 0, '炎帝技能', null, true);
-            }
-
-            // Strongest enemy 30 damage
+            // Strongest enemy 50 damage
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (enemies.length > 0) {
                 let strongest = enemies[0];
@@ -696,12 +668,12 @@ export class BattleSimulator {
                     }
                 }
                 this.log(`炎帝使用了大字爆炎，燒盡了 ${strongest.name}`);
-                await this.dealDamage(unit, strongest, 30, true);
+                await this.dealDamage(unit, strongest, 50, true);
             }
             if (this.onUpdate) this.onUpdate();
         }
 
-        // Suicune: All allies +5 ATK, weakest enemy 30 damage
+        // Suicune: All allies +5 ATK, weakest enemy 50 damage
         if (unit.family === 'suicune') {
             await this.notifySkill(unit, `使用了水砲！`);
 
@@ -710,12 +682,12 @@ export class BattleSimulator {
                 this.buffAttack(ally, 5, true);
             }
 
-            // Weakest enemy 30 damage
+            // Weakest enemy 50 damage
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (enemies.length > 0) {
                 const weakest = [...enemies].sort((a, b) => a.stats.hp - b.stats.hp)[0];
                 this.log(`水君使用了水砲，向 ${weakest.name} 猛烈地噴射`);
-                await this.dealDamage(unit, weakest, 30, true);
+                await this.dealDamage(unit, weakest, 50, true);
             }
             if (this.onUpdate) this.onUpdate();
         }
@@ -1731,18 +1703,7 @@ export class BattleSimulator {
             });
         }
 
-        // Dratini Family: First damage halved
-        if (unit.family === 'dratini') {
-            this.eventBus.on('BEFORE_HURT', (e) => {
-                const s = this.unitStates.get(unit);
-                if (e.target === unit && !s?.isSilenced && !s?.firstDamageHalved) {
-                    e.context.amount = Math.ceil(e.context.amount / 2);
-                    if (s) s.firstDamageHalved = true;
-                }
-            });
-        }
-
-        // Larvitar Family: AoE damage before attack + On-hurt permanent growth
+        // Larvitar Family: Single targets damage before own attack
         if (unit.family === 'larvitar') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
@@ -1754,21 +1715,11 @@ export class BattleSimulator {
                     const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
 
                     if (livingEnemies.length > 1) {
-                        const targets = livingEnemies.slice(1); // Targets are all except the front-most
-                        this.log(`${unit.name} 對後方目標使用了咬碎`);
-                        for (const target of targets) {
-                            await this.dealDamage(unit, target, dmg, true, true);
-                        }
+                        const target = livingEnemies[1]; // Target only the first rear enemy
+                        this.log(`${unit.name} 對其後方目標使用了咬碎`);
+                        await this.dealDamage(unit, target, dmg, true, true);
                         if (this.onUpdate) this.onUpdate();
                     }
-                }
-            });
-
-            this.eventBus.on('ON_HURT', async (e) => {
-                if (e.target === unit && unit.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-                    const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
-                    // New: +2 HP and +2 ATK
-                    this.growUnit(unit, 2, 2, '受傷成長', original, true);
                 }
             });
         }
