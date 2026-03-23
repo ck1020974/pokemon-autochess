@@ -58,7 +58,7 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
         Object.values(ALL_UNITS).forEach(template => {
             // Filter by hidden status AND availability in the current edition
             const isAvailable = activeEdition.availableUnitIds.includes(template.id);
-            const isEeveeEvolution = template.family === 'eevee' && template.id !== 'eevee';
+            const isEeveeEvolution = template.family === 'eevee' && template.id !== 'eevee' && !template.id.endsWith('_final');
             // Exclude base eevee from grid, but show its 8 evolutions (8 boxes total)
             if (isAvailable && isEeveeEvolution && template.tier >= 1 && template.tier <= 5 && template.id !== 'sprout') {
                 groups[template.tier].push(template);
@@ -156,7 +156,8 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
         // Special Case: Eevee family path (Eevee -> Evolution -> Evolution)
         if (startUnit.family === 'eevee' && startUnit.id !== 'eevee') {
             const eevee = ALL_UNITS['eevee'];
-            return [eevee, startUnit, startUnit];
+            const stage3 = ALL_UNITS[startUnit.id + '_final'] || startUnit;
+            return [eevee, startUnit, stage3];
         }
 
         const path: UnitTemplate[] = [];
