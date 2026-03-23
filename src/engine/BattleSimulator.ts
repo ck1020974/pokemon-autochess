@@ -313,12 +313,8 @@ export class BattleSimulator {
                     allyTarget = allies[Math.floor(Math.random() * allies.length)];
                 }
 
-                if (allyTarget && enemyTarget) {
-                    this.log(`${unit.name} 對 ${allyTarget.name} 和 ${enemyTarget.name} 使用了禮物`);
-                } else if (allyTarget) {
-                    this.log(`${unit.name} 給 ${allyTarget.name} 送了個禮物！`);
-                } else if (enemyTarget) {
-                    this.log(`${unit.name} 給 ${enemyTarget.name} 送了個禮物！`);
+                if (allyTarget || enemyTarget) {
+                    this.log(`${unit.name} 對 ${allyTarget?.name || '目標'} 和 ${enemyTarget?.name || '目標'} 使用了禮物`);
                 }
 
                 if (enemyTarget) {
@@ -394,7 +390,7 @@ export class BattleSimulator {
                     const back = myTeam[idx + 1];
                     if (back) {
                         const amount = unit.level === 2 ? 3 : 1;
-                        await this.notifySkill(unit, `吐絲纏繞了！`);
+                        await this.notifySkill(unit, `發動了"鱗粉"`);
 
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, 0, amount, '能力提升', original, true);
@@ -420,7 +416,7 @@ export class BattleSimulator {
                     const back = myTeam[idx + 1];
                     if (back) {
                         const amount = unit.level === 2 ? 3 : 1;
-                        await this.notifySkill(unit, `使用了屏息！`);
+                        await this.notifySkill(unit, `發動了"友情防守"`);
 
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, amount, 0, '能力提升', original, true);
@@ -616,9 +612,8 @@ export class BattleSimulator {
                     if (charges > 0) {
                         if (!isBypassing) {
                             e.context.amount = Math.ceil(e.context.amount / 2);
-                            this.log(`光牆抵擋了 ${e.target.name} 受到的傷害！(剩餘 ${charges - 1} 次)`);
                         } else if (e.context.source?.family === 'pinsir') {
-                            this.log(`${e.context.source.name} 的破格穿透了光牆！`);
+                            // Mold Breaker log is enough, no need for specific bypass log
                         }
                         lsMap.set(victimSide, charges - 1);
                         this.playTeamAnimation([e.target], 'light-screen-anim', 400);
@@ -714,7 +709,7 @@ export class BattleSimulator {
 
         // Raikou: all enemies 5-15 damage
         if (unit.family === 'raikou') {
-            await this.notifySkill(unit, `使用了打雷！`);
+            // Removed notifySkill as per request
             this.log(`雷公使用了打雷，向敵方劈下暴雷`);
 
             // All enemies 5-15 damage
@@ -728,7 +723,7 @@ export class BattleSimulator {
 
         // Entei: Strongest enemy 50 damage
         if (unit.family === 'entei') {
-            await this.notifySkill(unit, `使用了大字爆炎！`);
+            // Removed notifySkill as per request
 
             // Strongest enemy 50 damage
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
@@ -750,7 +745,7 @@ export class BattleSimulator {
 
         // Suicune: weakest enemy 50 damage
         if (unit.family === 'suicune') {
-            await this.notifySkill(unit, `使用了水砲！`);
+            // Removed notifySkill as per request
 
             // Weakest enemy 50 damage
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
@@ -901,7 +896,7 @@ export class BattleSimulator {
 
     private buffAttack(unit: Unit, amount: number, silent: boolean = false) {
         if (unit.family === 'sneasel' && amount < 0) {
-            if (!silent) this.log(`${unit.name} 發動了銳利目光！`);
+            // Removed log as per request
             return; // Protection
         }
         if (amount > 0) amount = Math.min(amount, 50 - unit.stats.attack);
@@ -976,7 +971,7 @@ export class BattleSimulator {
                     if (this.waterDebuffedTargets.has(e.target)) return;
 
                     if (e.target.family === 'sneasel') {
-                        this.log(`${e.target.name} 發動了銳利目光！`);
+                        // Removed log as per request
                         return;
                     }
                     const count = this.getSynergyCountForUnit(unit, 'Water');

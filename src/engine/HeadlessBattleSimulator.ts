@@ -322,6 +322,7 @@ export class HeadlessBattleSimulator {
                     const back = myTeam[idx + 1];
                     if (back) {
                         const amount = unit.level === 2 ? 3 : 1;
+                        this.log(`${unit.name} 發動了"鱗粉"`);
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, 0, amount, original, true);
                     }
@@ -344,6 +345,7 @@ export class HeadlessBattleSimulator {
                     const back = myTeam[idx + 1];
                     if (back) {
                         const amount = unit.level === 2 ? 3 : 1;
+                        this.log(`${unit.name} 發動了"友情防守"`);
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, amount, 0, original, true);
                     }
@@ -369,12 +371,8 @@ export class HeadlessBattleSimulator {
                     allyTarget = allies[Math.floor(Math.random() * allies.length)];
                 }
 
-                if (allyTarget && enemyTarget) {
-                    this.log(`${unit.name} 對 ${allyTarget.name} 和 ${enemyTarget.name} 使用了禮物`);
-                } else if (allyTarget) {
-                    this.log(`${unit.name} 給 ${allyTarget.name} 送了個禮物！`);
-                } else if (enemyTarget) {
-                    this.log(`${unit.name} 給 ${enemyTarget.name} 送了個禮物！`);
+                if (allyTarget || enemyTarget) {
+                    this.log(`${unit.name} 對 ${allyTarget?.name || '目標'} 和 ${enemyTarget?.name || '目標'} 使用了禮物`);
                 }
 
                 if (enemyTarget) {
@@ -391,6 +389,7 @@ export class HeadlessBattleSimulator {
             const buffAtk = Math.floor(unit.stats.hp * 0.33);
             if (buffAtk > 0) {
                 unit.stats.attack += buffAtk;
+                // No change needed for shuckle as '唱反調' is correct or at least not requested to change
                 unit.capStats();
                 this.log(`${unit.name}發動了唱反調。`);
             }
