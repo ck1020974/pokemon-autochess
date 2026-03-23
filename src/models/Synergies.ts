@@ -21,8 +21,8 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Cave': { id: 'Cave', name: '挖洞', icon: '🕳️', description: '[2] 移動後永久 +1 攻擊或生命', tiers: [2], color: '#78350f' },
     'Angry': { id: 'Angry', name: '憤怒', icon: '💢', description: '[2/4] 受傷後，全體友軍 +2/10 攻擊', tiers: [2, 4], color: '#dc2626' },
     'Snow': { id: 'Snow', name: '降雪', icon: '❄️', description: '[2] 戰鬥開始時，其他角色受到生命 33% 傷害', tiers: [2], color: '#bae6fd' },
-    'SwordDance': { id: 'SwordDance', name: '劍舞', icon: '⚔️', description: '[2] 移動後永久 +2 攻擊', tiers: [2], color: '#fca5a5' },
-    'Roost': { id: 'Roost', name: '羽棲', icon: '🪽', description: '[2] 移動後永久 +2 生命', tiers: [2], color: '#bae6fd' },
+    'SwordDance': { id: 'SwordDance', name: '劍舞', icon: '⚔️', description: '[2] 移動後永久 +2 攻擊 (每場戰鬥限3次)', tiers: [2], color: '#fca5a5' },
+    'Roost': { id: 'Roost', name: '羽棲', icon: '🪽', description: '[2] 移動後永久 +2 生命 (每場戰鬥限3次)', tiers: [2], color: '#bae6fd' },
     'Psychic': {
         id: 'Psychic',
         name: '念力',

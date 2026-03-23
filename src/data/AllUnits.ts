@@ -30,7 +30,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'charmander', name: '小火龍', tier: 1, family: 'charmander',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/小火龍00.webp', battleImageUrl: 'assets/小火龍01.webp',
-        description: '同時對後方敵方造成 N 傷害 (每二場戰鬥後增強)', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
+        description: '同時對後方敵方造成 N 傷害 (每兩場戰鬥後增強)', synergies: ['Starter', 'Fire'], evolveId: 'charmeleon'
     },
     charmeleon: {
         id: 'charmeleon', name: '火恐龍', tier: 1, family: 'charmander',
@@ -282,19 +282,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'quaxly', name: '潤水鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/潤水鴨00.webp', battleImageUrl: 'assets/潤水鴨01.webp',
-        description: '友軍擊殺後，隨機 1 位友軍永久 +2 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
+        description: '友軍擊殺後，隨機 1 位友軍永久 +2 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'quaxwell'
     },
     quaxwell: {
         id: 'quaxwell', name: '湧躍鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/湧躍鴨00.webp', battleImageUrl: 'assets/湧躍鴨01.webp',
-        description: '友軍擊殺後，隨機 2 位友軍永久 +2 攻擊值。', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 2 位友軍永久 +2 攻擊。', synergies: ['Starter', 'Water'], evolveId: 'quaquaval', isHiddenFromShop: true
     },
     quaquaval: {
         id: 'quaquaval', name: '狂歡浪舞鴨', tier: 4, family: 'quaxly',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/狂歡浪舞鴨00.webp', battleImageUrl: 'assets/狂歡浪舞鴨01.webp',
-        description: '友軍擊殺後，隨機 3 位友軍永久 +2 攻擊值。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '友軍擊殺後，隨機 3 位友軍永久 +2 攻擊。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 15. Rattata (Loop same name for stage 3)
@@ -422,19 +422,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'slowpoke', name: '呆呆獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/呆呆獸00.webp', battleImageUrl: 'assets/呆呆獸01.webp',
-        description: '首次受傷後，回復 33％ 生命值。', synergies: ['Water', 'Psychic'], evolveId: 'slowbro'
+        description: '首次受傷後，回復 33％ 生命。', synergies: ['Water', 'Psychic'], evolveId: 'slowbro'
     },
     slowbro: {
         id: 'slowbro', name: '呆殼獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/呆殼獸00.webp', battleImageUrl: 'assets/呆殼獸01.webp',
-        description: '首次受傷後，回復 33％ 生命值。', synergies: ['Water', 'Psychic'], evolveId: 'slowbro_final', isHiddenFromShop: true
+        description: '首次受傷後，回復 33％ 生命。', synergies: ['Water', 'Psychic'], evolveId: 'slowbro_final', isHiddenFromShop: true
     },
     slowbro_final: {
         id: 'slowbro_final', name: '呆殼獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/呆殼獸00.webp', battleImageUrl: 'assets/呆殼獸01.webp',
-        description: '首次受傷後，回復 100％ 生命值。', synergies: ['Water', 'Psychic'], isHiddenFromShop: true
+        description: '首次受傷後，回復 100％ 生命。', synergies: ['Water', 'Psychic'], isHiddenFromShop: true
     },
 
     // 22. Magnemite
@@ -482,19 +482,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'sneasel', name: '狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/狃拉00.webp', battleImageUrl: 'assets/狃拉01.webp',
-        description: '攻擊時 33% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], evolveId: 'weavile'
+        description: '攻擊時 33% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'Thief'], evolveId: 'weavile'
     },
     weavile: {
         id: 'weavile', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '攻擊時 33% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], evolveId: 'weavile_final', isHiddenFromShop: true
+        description: '攻擊時 33% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'Thief'], evolveId: 'weavile_final', isHiddenFromShop: true
     },
     weavile_final: {
         id: 'weavile_final', name: '瑪狃拉', tier: 4, family: 'sneasel',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/瑪狃拉00.webp', battleImageUrl: 'assets/瑪狃拉01.webp',
-        description: '攻擊時 33% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'SwordDance'], isHiddenFromShop: true
+        description: '攻擊時 33% 機率再攻擊 1 個敵方，攻擊不會被降低。', synergies: ['Snow', 'Thief'], isHiddenFromShop: true
     },
 
     // 25. Shuppet (Tier 1)
@@ -1163,19 +1163,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'dratini', name: '迷你龍', tier: 5, family: 'dratini',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/迷你龍00.webp', battleImageUrl: 'assets/迷你龍01.webp',
-        description: '準備結束時，我方全體永久 +2 攻擊與生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'dragonair'
+        description: '準備結束時，全體永久 +2 攻擊與生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'dragonair'
     },
     dragonair: {
         id: 'dragonair', name: '哈克龍', tier: 5, family: 'dratini',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/哈克龍00.webp', battleImageUrl: 'assets/哈克龍01.webp',
-        description: '準備結束時，我方全體永久 +3 攻擊與生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'dragonite', isHiddenFromShop: true
+        description: '準備結束時，全體永久 +3 攻擊與生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'dragonite', isHiddenFromShop: true
     },
     dragonite: {
         id: 'dragonite', name: '快龍', tier: 5, family: 'dratini',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/快龍00.webp', battleImageUrl: 'assets/快龍01.webp',
-        description: '準備結束時，我方全體永久 +5 攻擊與生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage', 'Roost'], isHiddenFromShop: true
+        description: '準備結束時，全體永久 +5 攻擊與生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage', 'Roost'], isHiddenFromShop: true
     },
     // 37. Larvitar Family
     larvitar: {

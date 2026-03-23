@@ -334,10 +334,10 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "EXTREME", "category": "EXP", "item": "神奇糖果", "effect": "讓角色成長的神奇糖果，隨機1名角色EXP+3", "imageUrl": "item/神奇糖果.png" },
 
     // --- LIVES (Health Recovery) ---
-    { "difficulty": "EASY", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命值+1", "imageUrl": "item/愛心糖飾.png" },
-    { "difficulty": "NORMAL", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命值+1", "imageUrl": "item/愛心糖飾.png" },
-    { "difficulty": "HARD", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命值+2", "imageUrl": "item/愛心糖飾.png" },
-    { "difficulty": "EXTREME", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命值+2", "imageUrl": "item/愛心糖飾.png" },
+    { "difficulty": "EASY", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命+1", "imageUrl": "item/愛心糖飾.png" },
+    { "difficulty": "NORMAL", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命+1", "imageUrl": "item/愛心糖飾.png" },
+    { "difficulty": "HARD", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命+2", "imageUrl": "item/愛心糖飾.png" },
+    { "difficulty": "EXTREME", "category": "LIVES", "item": "愛心糖飾", "effect": "愛心形狀的糖果，玩家生命+2", "imageUrl": "item/愛心糖飾.png" },
 
     // --- EVOLUTIONARY ITEMS (PERM_NONE Variants) ---
     { "difficulty": "EASY", "category": "PERM_NONE", "item": "幸運蛋", "effect": "滿載著幸福的蛋，未進化過角色+1攻擊或生命", "imageUrl": "item/幸運蛋.png" },

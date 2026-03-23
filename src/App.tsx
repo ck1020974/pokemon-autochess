@@ -1771,7 +1771,7 @@ function App() {
                                     {tutorialStep === 8 && "點擊或拖曳角色合成\n🎯任務：購買並合成小火龍"}
                                     {tutorialStep === 9 && "開啟羈絆來提高強度\n🎯任務：購買火球鼠"}
                                     {tutorialStep === 10 && "挑戰更強的訓練家\n🎯任務：點擊戰鬥按鈕"}
-                                    {tutorialStep === 11 && "戰敗時將減少生命值\n生命值歸零將結束遊戲‼️"}
+                                    {tutorialStep === 11 && "戰敗時將減少生命\n生命歸零將結束遊戲‼️"}
                                 </div>
                             </div>
                         )}

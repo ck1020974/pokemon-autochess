@@ -86,8 +86,8 @@ export class BattleSimulator {
         if (!this.battleBuffs || this.battleBuffs.length === 0) return;
 
         this.battleBuffs.forEach(reward => {
-            const atkMatch = reward.effect.match(/\+(\d+)\s*(?:攻擊力?|攻)/);
-            const hpMatch = reward.effect.match(/\+(\d+)\s*(?:生命值?|HP)/);
+            const atkMatch = reward.effect.match(/\+(\d+)\s*(?:攻擊?|攻)/);
+            const hpMatch = reward.effect.match(/\+(\d+)\s*(?:生命?|HP)/);
             const atk = atkMatch ? parseInt(atkMatch[1]) : 0;
             const hp = hpMatch ? parseInt(hpMatch[1]) : 0;
 
@@ -296,7 +296,7 @@ export class BattleSimulator {
                     await this.notifySkill(unit, `發動了強壯之顎`);
                     this.buffAttack(front, buffAtk, true);
                     this.playTeamAnimation([front], 'level-up-anim', 600);
-                    // this.log(`${unit.name} 發動了強壯之顎，提升了 ${front.name} 的攻擊力！`); // Redundant
+                    // this.log(`${unit.name} 發動了強壯之顎，提升了 ${front.name} 的攻擊！`); // Redundant
                 }
             }
         }
@@ -1109,9 +1109,15 @@ export class BattleSimulator {
         if (unit.synergies.includes('SwordDance')) {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit) {
+                    const state = this.unitStates.get(unit) || {};
+                    const triggers = state.swordDanceTriggers || 0;
+                    if (triggers >= 3) return;
+
                     const count = this.getSynergyCountForUnit(unit, 'SwordDance');
                     const buff = count >= 2 ? 2 : 0;
                     if (buff > 0) {
+                        state.swordDanceTriggers = triggers + 1;
+                        this.unitStates.set(unit, state);
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, 0, buff, '劍舞', original, true);
                         if (!e.context?.isPassiveMove) {
@@ -1127,9 +1133,15 @@ export class BattleSimulator {
         if (unit.synergies.includes('Roost')) {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit) {
+                    const state = this.unitStates.get(unit) || {};
+                    const triggers = state.roostTriggers || 0;
+                    if (triggers >= 3) return;
+
                     const count = this.getSynergyCountForUnit(unit, 'Roost');
                     const buff = count >= 2 ? 2 : 0;
                     if (buff > 0) {
+                        state.roostTriggers = triggers + 1;
+                        this.unitStates.set(unit, state);
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, buff, 0, '羽棲', original, true);
                         if (!e.context?.isPassiveMove) {

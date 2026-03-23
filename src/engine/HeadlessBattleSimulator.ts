@@ -781,9 +781,15 @@ export class HeadlessBattleSimulator {
         if (unit.synergies.includes('SwordDance')) {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit) {
+                    const state = this.unitStates.get(unit) || {};
+                    const triggers = state.swordDanceTriggers || 0;
+                    if (triggers >= 3) return;
+
                     const count = this.getSynergyCountForUnit(unit, 'SwordDance');
                     const buff = count >= 2 ? 2 : 0;
                     if (buff > 0) {
+                        state.swordDanceTriggers = triggers + 1;
+                        this.unitStates.set(unit, state);
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, 0, buff, original, true);
                     }
@@ -793,9 +799,15 @@ export class HeadlessBattleSimulator {
         if (unit.synergies.includes('Roost')) {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit) {
+                    const state = this.unitStates.get(unit) || {};
+                    const triggers = state.roostTriggers || 0;
+                    if (triggers >= 3) return;
+
                     const count = this.getSynergyCountForUnit(unit, 'Roost');
                     const buff = count >= 2 ? 2 : 0;
                     if (buff > 0) {
+                        state.roostTriggers = triggers + 1;
+                        this.unitStates.set(unit, state);
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, buff, 0, original, true);
                     }
