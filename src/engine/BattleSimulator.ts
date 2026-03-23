@@ -124,8 +124,6 @@ export class BattleSimulator {
     public async init() {
         this.spiritombTriggered.clear();
         this.lightScreenActivated.clear();
-        this.playerSynergies.clear();
-        this.enemySynergies.clear();
         this.processedDeaths.clear();
         this.houndoomLogged.clear();
         this.natuLogged.clear();
