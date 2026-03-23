@@ -569,7 +569,10 @@ export class HeadlessBattleSimulator {
         // Charm (撒嬌)
         const charmCount = mySynergies.get('Charm') || 0;
         if (charmCount >= 2) {
-            const targetCount = charmCount - 1;
+            let targetCount = 1;
+            if (charmCount >= 5) targetCount = 4;
+            else if (charmCount >= 3) targetCount = 2;
+
             const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (livingEnemies.length > 0) {
                 const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
@@ -589,7 +592,6 @@ export class HeadlessBattleSimulator {
             let minBoost = 0;
             let maxBoost = 4;
             if (chargeCount >= 5) { minBoost = 8; maxBoost = 15; }
-            else if (chargeCount >= 4) { minBoost = 4; maxBoost = 10; }
             else if (chargeCount >= 3) { minBoost = 2; maxBoost = 6; }
 
             team.filter(u => u && u.synergies.includes('Charge')).forEach(u => {
@@ -644,7 +646,7 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('BEFORE_ATTACK', (e) => {
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
-                    const buff = count >= 5 ? 10 : (count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0)));
+                    const buff = count >= 5 ? 10 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
                     if (buff > 0 && unit.stats.hp > 1) {
                         unit.stats.hp -= 1;
                         this.buffAttack(unit, buff, true);
@@ -665,7 +667,7 @@ export class HeadlessBattleSimulator {
                     if (this.grassHealedTargets.has(e.target)) return;
 
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
-                    const healAmount = count >= 5 ? 10 : (count >= 4 ? 6 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
+                    const healAmount = count >= 5 ? 12 : (count >= 3 ? 5 : (count >= 2 ? 2 : 0));
                     if (healAmount > 0) {
                         this.heal(unit, healAmount);
                         this.grassHealedTargets.add(e.target);
@@ -682,7 +684,7 @@ export class HeadlessBattleSimulator {
                 if (unit.stats.hp <= 0) return;
                 if (e.source === unit && e.target && e.target.stats.hp > 0 && e.target.family !== 'sneasel') {
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const debuff = count >= 5 ? 5 : (count >= 4 ? 3 : (count >= 3 ? 2 : (count >= 2 ? 1 : 0)));
+                    const debuff = count >= 5 ? 10 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (debuff > 0 && e.target.stats.attack > 1) {
                         e.target.stats.attack = Math.max(1, e.target.stats.attack - debuff);
                     }
@@ -731,7 +733,7 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('ON_HURT', (e) => {
                 if (e.target === unit && this.getSynergyCountForUnit(unit, 'Angry') >= 2) {
                     const count = this.getSynergyCountForUnit(unit, 'Angry');
-                    const buff = count >= 4 ? 8 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
+                    const buff = count >= 4 ? 10 : (count >= 2 ? 2 : 0);
                     const { myTeam, side } = this.getTeams(unit);
                     myTeam.forEach(u => {
                         if (u && u.stats.hp > 0) this.buffAttack(u, buff, true);

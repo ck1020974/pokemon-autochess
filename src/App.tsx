@@ -250,9 +250,9 @@ function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
                 return t.id === firstInFamily?.id;
             })
             .sort((a, b) => {
-                if (a.family === 'eevee' && b.family !== 'eevee') return 1;
-                if (b.family === 'eevee' && a.family !== 'eevee') return -1;
-                return a.tier - b.tier;
+                if (a.tier !== b.tier) return a.tier - b.tier;
+                // Secondary sort by definition order in ALL_UNITS is implicit because values() preserves order
+                return 0;
             });
 
         return {

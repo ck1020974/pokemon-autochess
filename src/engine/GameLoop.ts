@@ -133,7 +133,7 @@ export class GameLoop {
             if (u && u.family === 'pichu') {
                 u.scalingValue = this.pichuN;
                 const freq = [0, '三', '二', ''][u.level] || '三';
-                const suffix = u.level === 3 ? '每回合' : `每${freq}回合`;
+                const suffix = u.level === 3 ? '每場' : `每${freq}場`;
                 u.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (${suffix}後增強)。`;
             }
         });
@@ -149,7 +149,7 @@ export class GameLoop {
             if (u && u.family === 'pichu') {
                 u.scalingValue = this.pichuN;
                 const freq = [0, '三', '二', ''][u.level] || '三';
-                const suffix = u.level === 3 ? '每回合' : `每${freq}回合`;
+                const suffix = u.level === 3 ? '每場' : `每${freq}場`;
                 u.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (${suffix}後增強)。`;
             }
         });
@@ -169,7 +169,7 @@ export class GameLoop {
 
         // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
-        const template = '[2/3/4] 兩回合後，對隨機 2 位敵方造成 [N] 傷害 (每場戰鬥後增強)';
+        const template = '[2/3/5] 兩回合後，對隨機 2 位敵方造成 [N] 傷害 (每場戰鬥後增強)';
         psychic.description = template.replace('[N]', Math.floor(this.psychicN).toString());
     }
 
@@ -236,22 +236,22 @@ export class GameLoop {
             }
         };
 
-        // Normal (2/3/4) [Blessing]: Frontmost Friend -> +1/3/5 HP Permanent
+        // Normal (2/3/5) [Blessing]: Frontmost Friend -> +2/4/10 HP Permanent
         const normalUnits = this.playerTeam.filter(u => u && u.synergies.includes('Normal')) as Unit[];
         const normalCount = getUniqueCount(normalUnits, 'Normal');
         if (normalCount >= 2) {
-            const buff = normalCount >= 5 ? 10 : (normalCount >= 4 ? 6 : (normalCount >= 3 ? 4 : 2));
+            const buff = normalCount >= 5 ? 10 : (normalCount >= 3 ? 4 : 2);
             const frontUnit = this.playerTeam.find(u => u !== null);
             if (frontUnit) {
                 applyBuff(frontUnit, buff, 'hp', 'Normal');
             }
         }
 
-        // Ghost (2/3/4) [Shadow]: Frontmost Friend -> +1/3/5 Atk Permanent
+        // Ghost (2/3/5) [Shadow]: Frontmost Friend -> +2/4/10 Atk Permanent
         const ghostUnits = this.playerTeam.filter(u => u && u.synergies.includes('Ghost')) as Unit[];
         const ghostCount = getUniqueCount(ghostUnits, 'Ghost');
         if (ghostCount >= 2) {
-            const buff = ghostCount >= 5 ? 10 : (ghostCount >= 4 ? 6 : (ghostCount >= 3 ? 4 : 2));
+            const buff = ghostCount >= 5 ? 10 : (ghostCount >= 3 ? 4 : 2);
             const frontUnit = this.playerTeam.find(u => u !== null);
             if (frontUnit) {
                 applyBuff(frontUnit, buff, 'atk', 'Ghost');
@@ -478,7 +478,7 @@ export class GameLoop {
         const pCount = this.getUniqueCount(psychicUnits, 'Psychic');
         if (pCount >= 2) {
             let increment = 0;
-            if (pCount >= 4) {
+            if (pCount >= 5) {
                 increment = 2;
             } else if (pCount === 3) {
                 // Odd Round +2, Even Round +1 (Turn 1 is odd)
@@ -1017,7 +1017,7 @@ export class GameLoop {
             unit.evolveId = newTemplate.evolveId;
             unit.synergies = newTemplate.synergies || [];
             unit.tier = newTemplate.tier;
-            
+
             if (targetLevel !== undefined) {
                 unit.level = targetLevel;
             } else {

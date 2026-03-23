@@ -259,7 +259,7 @@ export class BattleSimulator {
         // Gastly Family: Atk buff at start
         if (unit.family === 'gastly') {
             if (unit.templateId === 'gengar') { // Stage 3
-                await this.notifySkill(unit, `耿鬼使用了詭計！`);
+                await this.notifySkill(unit, `使用了詭計`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === u!.id);
                     this.growUnit(u!, 0, 3, '耿鬼技能', original, true);
@@ -287,7 +287,7 @@ export class BattleSimulator {
                 if (front && front.stats.hp > 0) {
                     const ratio = [0, 0.33, 0.5, 1.0][unit.level] || 0.33;
                     const buffAtk = Math.ceil(unit.stats.attack * ratio);
-                    await this.notifySkill(unit, `發動了強壯之顎！`);
+                    await this.notifySkill(unit, `發動了強壯之顎`);
                     this.buffAttack(front, buffAtk, true);
                     this.playTeamAnimation([front], 'level-up-anim', 600);
                     // this.log(`${unit.name} 發動了強壯之顎，提升了 ${front.name} 的攻擊力！`); // Redundant
@@ -334,7 +334,7 @@ export class BattleSimulator {
             if (buffAtk > 0) {
                 unit.stats.attack += buffAtk;
                 unit.capStats();
-                await this.notifySkill(unit, `發動了唱反調`); // Standardized
+                await this.notifySkill(unit, `發動了唱反調`);
                 this.playAnimation(unit, 'jump', 200);
             }
         }
@@ -345,7 +345,7 @@ export class BattleSimulator {
             if (hpBuff > 0) {
                 const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
                 this.growUnit(unit, hpBuff, 0, '親子愛', original, true);
-                await this.notifySkill(unit, `發動了親子愛`); // Standardized
+                await this.notifySkill(unit, `發動了親子愛`);
                 this.playAnimation(unit, 'glow-white', 600);
             }
         }
@@ -354,7 +354,7 @@ export class BattleSimulator {
         // Igglybuff Family: HP buff at start (Swapped from Dwebble)
         if (unit.family === 'igglybuff') {
             if (unit.templateId === 'wigglytuff') { // Stage 3
-                await this.notifySkill(unit, `胖可丁使用了治癒波動！`);
+                await this.notifySkill(unit, `使用了治癒波動`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === u!.id);
                     this.growUnit(u!, 3, 0, '胖可丁技能', original, true);
@@ -378,7 +378,7 @@ export class BattleSimulator {
         if (unit.family === 'caterpie') {
             const isStage3 = (unit.level >= 3);
             if (isStage3) {
-                await this.notifySkill(unit, `巴大蝶使用了蝶舞！`);
+                await this.notifySkill(unit, `使用了蝶舞`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
                     this.growUnit(u, 0, 3, '能力提升', original, true);
@@ -390,7 +390,7 @@ export class BattleSimulator {
                     const back = myTeam[idx + 1];
                     if (back) {
                         const amount = unit.level === 2 ? 3 : 1;
-                        await this.notifySkill(unit, `發動了"鱗粉"`);
+                        await this.notifySkill(unit, `發動了鱗粉`);
 
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, 0, amount, '能力提升', original, true);
@@ -404,7 +404,7 @@ export class BattleSimulator {
         if (unit.family === 'cleffa') {
             const isStage3 = (unit.level >= 3);
             if (isStage3) {
-                await this.notifySkill(unit, `皮可西使用了月亮之力！`);
+                await this.notifySkill(unit, `使用了月亮之力`);
                 for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
                     const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
                     this.growUnit(u, 3, 0, '能力提升', original, true);
@@ -416,7 +416,7 @@ export class BattleSimulator {
                     const back = myTeam[idx + 1];
                     if (back) {
                         const amount = unit.level === 2 ? 3 : 1;
-                        await this.notifySkill(unit, `發動了"友情防守"`);
+                        await this.notifySkill(unit, `發動了友情防守`);
 
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, amount, 0, '能力提升', original, true);
@@ -434,7 +434,7 @@ export class BattleSimulator {
                 // Sort by current HP ascending to find the weakest
                 const weakest = [...livingEnemies].sort((a, b) => a!.stats.hp - b!.stats.hp)[0];
                 if (weakest) {
-                    await this.notifySkill(unit, `使用了電光一閃！`);
+                    await this.notifySkill(unit, `使用了電光一閃`);
                     // Use scalingValue (default to 1)
                     const dmg = unit.scalingValue || 1;
                     await this.dealDamage(unit, weakest, dmg, true, true); // Silent damage hit
@@ -479,7 +479,7 @@ export class BattleSimulator {
             const livingEnemies = opTeam.filter(e => e && e.stats.hp > 0 && e.family !== 'spiritomb');
             if (livingEnemies.length > 0) {
                 const targets = [...livingEnemies].sort(() => 0.5 - Math.random()).slice(0, 2);
-                await this.notifySkill(unit, `封印了對手的招式！`);
+                await this.notifySkill(unit, `封印了對手的招式`);
                 await this.delay(400);
                 for (const t of targets) {
                     const tState = this.unitStates.get(t) || {};
@@ -555,7 +555,7 @@ export class BattleSimulator {
                 const timesToExecute = 1;
 
                 if (timesToExecute > 0) {
-                    await this.notifySkill(unit, `使用了瞬間移動！`);
+                    await this.notifySkill(unit, `使用了瞬間移動`);
                 }
 
                 for (let t = 0; t < timesToExecute; t++) {
@@ -593,7 +593,7 @@ export class BattleSimulator {
 
         // Mr. Mime: Light Screen (Once per team)
         if (unit.family === 'mrmime' && !this.lightScreenActivated.has(side)) {
-            await this.notifySkill(unit, `發動了光牆！`);
+            await this.notifySkill(unit, `發動了光牆`);
             await this.playTeamAnimation(myTeam, 'light-screen-anim', 1000);
             this.lightScreenActivated.add(side);
 
@@ -632,7 +632,7 @@ export class BattleSimulator {
         if (unit.synergies.includes('Thief')) {
             const count = this.getSynergyCountForUnit(unit, 'Thief');
             if (count >= 2) {
-                const buff = count >= 4 ? 5 : (count >= 3 ? 3 : 2);
+                const buff = count >= 5 ? 5 : 2;
                 const candidates = opTeam.filter(e => e && e.stats.hp > 0);
                 if (candidates.length > 0) {
                     // Find strongest: sum of HP and Attack
@@ -647,7 +647,7 @@ export class BattleSimulator {
                     }
 
                     this.log(`${unit.name} 對 ${strongest.name} 發動了小偷`);
-                    await this.notifySkill(unit, `發動了小偷！`);
+                    await this.notifySkill(unit, `發動了小偷`);
 
                     const stealAmt = Math.min(strongest.stats.attack - 1, buff);
                     if (stealAmt > 0) {
@@ -826,10 +826,13 @@ export class BattleSimulator {
             });
         }
 
-        // Charm (撒嬌): Random 2/3/4 enemies -33% Atk
+        // Charm (撒嬌): Random 1/2/4 enemies -33% Atk
         const charmCount = mySynergies.get('Charm') || 0;
         if (charmCount >= 2) {
-            const targetCount = charmCount - 1;
+            let targetCount = 1;
+            if (charmCount >= 5) targetCount = 4;
+            else if (charmCount >= 3) targetCount = 2;
+
             const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (livingEnemies.length > 0) {
                 const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
@@ -851,7 +854,6 @@ export class BattleSimulator {
             let minBoost = 0;
             let maxBoost = 4;
             if (chargeCount >= 5) { minBoost = 8; maxBoost = 15; }
-            else if (chargeCount >= 4) { minBoost = 4; maxBoost = 10; }
             else if (chargeCount >= 3) { minBoost = 2; maxBoost = 6; }
 
             team.filter(u => u && u.synergies.includes('Charge')).forEach(u => {
@@ -927,7 +929,7 @@ export class BattleSimulator {
             this.eventBus.on('BEFORE_ATTACK', (e) => {
                 if (e.source === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Fire');
-                    const buff = count >= 5 ? 12 : (count >= 4 ? 7 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
+                    const buff = count >= 5 ? 10 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
                     if (buff > 0 && unit.stats.hp > 1) {
                         unit.stats.hp -= 1;
                         this.buffAttack(unit, buff, true);
@@ -950,7 +952,7 @@ export class BattleSimulator {
                     if (this.grassHealedTargets.has(e.target)) return;
 
                     const count = this.getSynergyCountForUnit(unit, 'Grass');
-                    const heal = count >= 5 ? 12 : (count >= 4 ? 7 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
+                    const heal = count >= 5 ? 12 : (count >= 3 ? 5 : (count >= 2 ? 2 : 0));
                     if (heal > 0 && unit.stats.hp > 0) {
                         this.heal(unit, heal);
                         this.grassHealedTargets.add(e.target);
@@ -975,7 +977,7 @@ export class BattleSimulator {
                         return;
                     }
                     const count = this.getSynergyCountForUnit(unit, 'Water');
-                    const debuff = count >= 5 ? 10 : (count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0)));
+                    const debuff = count >= 5 ? 10 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (debuff > 0 && e.target.stats.attack > 1) {
                         const amountReduced = Math.min(e.target.stats.attack - 1, debuff);
                         e.target.stats.attack -= amountReduced;
@@ -997,7 +999,7 @@ export class BattleSimulator {
                     const buffAmount = [0, 1, 2, 5][unit.level] || 1;
                     const isAtk = Math.random() < 0.5;
                     await this.delay(150); // Delay for visual pacing
-                    await this.notifySkill(unit, `發動了健美！`);
+                    await this.notifySkill(unit, `發動了健美`);
                     await this.playAnimation(unit, 'jump', 200);
                     this.growUnit(unit, isAtk ? 0 : buffAmount, isAtk ? buffAmount : 0, '水躍魚技能');
                 }
@@ -1065,7 +1067,7 @@ export class BattleSimulator {
             this.eventBus.on('ON_HURT', (e) => {
                 if (e.target === unit) {
                     const count = this.getSynergyCountForUnit(unit, 'Angry');
-                    const buff = count >= 4 ? 10 : (count >= 3 ? 5 : (count >= 2 ? 2 : 0));
+                    const buff = count >= 4 ? 10 : (count >= 2 ? 2 : 0);
                     if (buff > 0) {
                         const { myTeam } = this.getTeams(unit);
                         myTeam.forEach(u => {
@@ -1601,7 +1603,7 @@ export class BattleSimulator {
                                 this.unitStates.set(u, us);
                             }
                         });
-                        this.notifySkill(unit, `發動了千變萬花！`);
+                        this.notifySkill(unit, `發動了千變萬花`);
                     }
 
                     // Buff random living allies who are under BOTH limits OR need healing
@@ -1733,7 +1735,7 @@ export class BattleSimulator {
                         const shuffled = [...aliveFriends].sort(() => 0.5 - Math.random());
                         const targets = shuffled.slice(0, targetCount);
 
-                        await this.notifySkill(unit, `使用了充電光束！`);
+                        await this.notifySkill(unit, `使用了充電光束`);
                         for (const target of targets) {
                             const original = this.playerTeam.includes(target) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === target.id) : null;
                             this.growUnit(target, 1, 1, '充電光束', original, true);
@@ -1885,7 +1887,7 @@ export class BattleSimulator {
                 const neighbor = opTeam[idx + 1];
                 if (neighbor && neighbor.stats.hp > 0) {
                     const splashDmg = attacker.scalingValue;
-                    await this.notifySkill(attacker, `發動了噴射火焰！`);
+                    await this.notifySkill(attacker, `發動了噴射火焰`);
                     attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
                 }
             }
@@ -1932,7 +1934,7 @@ export class BattleSimulator {
                     if (behind) {
                         team[idx] = behind;
                         team[idx + 1] = defender;
-                        await this.notifySkill(attacker, `對 ${defender.name} 使用了木槌！`);
+                        await this.notifySkill(attacker, `對 ${defender.name} 使用了木槌`);
                         await this.compactTeams();
                         await this.delay(300);
                         await this.eventBus.emit({ type: 'ON_MOVE', source: defender, context: {} });
@@ -2277,7 +2279,7 @@ export class BattleSimulator {
     }
 
     private async notifySkill(unit: Unit, message: string) {
-        const fullMsg = `${unit.name} ${message}！`;
+        const fullMsg = `${unit.name} ${message}${message.endsWith('！') || message.endsWith('!') ? '' : '！'}`;
         this.log(fullMsg);
         await this.delay(250); // 0.25s pause for visual feedback
     }
