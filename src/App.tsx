@@ -117,7 +117,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 // Synergy Icon Component
 function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive }: any) {
     const [localOpen, setLocalOpen] = useState(false);
-    
+
     // Use side-aware ID if setActiveSynergyId is provided (mainly for summary screen)
     const synergyKey = (side && synergy.id) ? `${side}-${synergy.id}` : synergy.id;
     const isForcedOpen = setActiveSynergyId ? (activeSynergyId === synergyKey) : localOpen;
@@ -206,16 +206,25 @@ function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
         let count = familySet.size;
 
         // Eevee Family Special Counting Logic
-        const eeveeUnits = potentialUnits.filter(u => u.family === 'eevee');
-        if (eeveeUnits.length > 0) {
+        const evolvedEeveeUnits = potentialUnits.filter(u => u.family === 'eevee' && u.templateId !== 'eevee');
+        if (evolvedEeveeUnits.length > 0) {
             if (synId === 'BatonPass') {
-                // Baton Pass: Unique Eevee forms count as different
-                const uniqueForms = new Set(eeveeUnits.map(u => u.templateId));
-                count += (uniqueForms.size - 1);
+                // Baton Pass: Unique Eevee forms count as different families, each with its level bonus
+                let totalEeveePoints = 0;
+                const formsMap = new Map<string, number>(); // templateId -> maxLevel
+                evolvedEeveeUnits.forEach(u => {
+                    const currentMax = formsMap.get(u.templateId) || 0;
+                    if (u.level > currentMax) formsMap.set(u.templateId, u.level);
+                });
+                formsMap.forEach((level) => {
+                    totalEeveePoints += (level >= 3 ? 3 : 2);
+                });
+                // Subtract 1 because Eevee family was already counted as 1 in familySet.size
+                count += (totalEeveePoints - 1);
             } else {
-                // Elemental Synergy: If there's an Eevee form that matches the synergy, it counts as 2
-                const hasEvolvedEevee = eeveeUnits.some(u => u.templateId !== 'eevee');
-                if (hasEvolvedEevee) count += 1; // Base 1 (family) + 1 (bonus) = 2
+                // Elemental Synergy: Add bonus based on the highest level of matching evolved Eevee
+                const maxLevel = Math.max(...evolvedEeveeUnits.map(u => u.level));
+                count += (maxLevel >= 3 ? 2 : 1);
             }
         }
 
@@ -226,11 +235,17 @@ function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
             .filter(t => {
                 const isEeveeFamily = t.family === 'eevee';
                 const baseCondition = t.id !== 'sprout';
-                const isAvailable = activeEdition.availableUnitIds.includes(t.id);
+                // Fix: Include evolved forms even if they are not in shop (isHiddenFromShop)
+                const isAvailable = activeEdition.availableUnitIds.includes(t.id) || (isEeveeFamily && t.id.includes('_final'));
                 if (!t.synergies?.includes(syn.id) || !(baseCondition || isEeveeFamily) || !isAvailable) return false;
 
                 // For Families (except Eevee), only show the most "basic" representative that has the synergy
-                if (isEeveeFamily) return true;
+                // For Eevee, show ALL unique evolved forms related to this synergy
+                if (isEeveeFamily) {
+                    if (t.id === 'eevee') return true;
+                    // If multiple stages of same evolution exist (e.g. flareon and flareon_final), only show flareon
+                    return !t.id.endsWith('_final');
+                }
 
                 const familyUnits = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id));
                 const unitsWithSyn = familyUnits.filter(u => u.synergies?.includes(syn.id));

@@ -895,7 +895,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'flareon_final', name: '火伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火伊布00.webp', battleImageUrl: 'assets/火伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值；額外累積兩次燃盡羈絆數量。', synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true
+        description: '額外累積兩次燃盡羈絆數量。', synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true
     },
     vaporeon: {
         id: 'vaporeon', name: '水伊布', tier: 3, family: 'eevee',
@@ -907,7 +907,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'vaporeon_final', name: '水伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/水伊布00.webp', battleImageUrl: 'assets/水伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值；額外累積兩次潮旋羈絆數量。', synergies: ['Water', 'BatonPass'], isHiddenFromShop: true
+        description: '額外累積兩次潮旋羈絆數量。', synergies: ['Water', 'BatonPass'], isHiddenFromShop: true
     },
     jolteon: {
         id: 'jolteon', name: '雷伊布', tier: 3, family: 'eevee',
@@ -919,7 +919,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'jolteon_final', name: '雷伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/雷伊布00.webp', battleImageUrl: 'assets/雷伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值；額外累積兩次充電羈絆數量。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true
+        description: '額外累積兩次充電羈絆數量。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true
     },
     espeon: {
         id: 'espeon', name: '太陽伊布', tier: 3, family: 'eevee',
@@ -931,7 +931,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'espeon_final', name: '太陽伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/太陽伊布00.webp', battleImageUrl: 'assets/太陽伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值；額外累積兩次念力羈絆數量。', synergies: ['Psychic', 'BatonPass'], isHiddenFromShop: true
+        description: '額外累積兩次念力羈絆數量。', synergies: ['Psychic', 'BatonPass'], isHiddenFromShop: true
     },
     umbreon: {
         id: 'umbreon', name: '月亮伊布', tier: 3, family: 'eevee',
@@ -943,7 +943,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'umbreon_final', name: '月亮伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/月亮伊布00.webp', battleImageUrl: 'assets/月亮伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值；額外累積兩次小偷羈絆數量。', synergies: ['Thief', 'BatonPass'], isHiddenFromShop: true
+        description: '額外累積兩次小偷羈絆數量。', synergies: ['Thief', 'BatonPass'], isHiddenFromShop: true
     },
     leafeon: {
         id: 'leafeon', name: '葉伊布', tier: 3, family: 'eevee',
@@ -955,7 +955,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'leafeon_final', name: '葉伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/葉伊布00.webp', battleImageUrl: 'assets/葉伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值；額外累積兩次吸取羈絆數量。', synergies: ['Grass', 'BatonPass'], isHiddenFromShop: true
+        description: '額外累積兩次吸取羈絆數量。', synergies: ['Grass', 'BatonPass'], isHiddenFromShop: true
     },
     glaceon: {
         id: 'glaceon', name: '冰伊布', tier: 3, family: 'eevee',
@@ -967,7 +967,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'glaceon_final', name: '冰伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/冰伊布00.webp', battleImageUrl: 'assets/冰伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值；額外累積兩次降雪羈絆數量。', synergies: ['Snow', 'BatonPass'], isHiddenFromShop: true
+        description: '額外累積兩次降雪羈絆數量。', synergies: ['Snow', 'BatonPass'], isHiddenFromShop: true
     },
     sylveon: {
         id: 'sylveon', name: '仙子伊布', tier: 3, family: 'eevee',
@@ -979,7 +979,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'sylveon_final', name: '仙子伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/仙子伊布00.webp', battleImageUrl: 'assets/仙子伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值；額外累積兩次撒嬌羈絆數量。', synergies: ['Charm', 'BatonPass'], isHiddenFromShop: true
+        description: '額外累積兩次撒嬌羈絆數量。', synergies: ['Charm', 'BatonPass'], isHiddenFromShop: true
     },
 
     // 27. Psyduck

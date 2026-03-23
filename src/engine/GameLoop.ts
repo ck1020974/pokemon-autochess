@@ -202,17 +202,25 @@ export class GameLoop {
         let count = families.size;
 
         if (synergyId) {
-            const eeveeUnits = units.filter(u => u.family === 'eevee');
-            if (eeveeUnits.length > 0) {
+            const evolvedEeveeUnits = units.filter(u => u.family === 'eevee' && u.templateId !== 'eevee');
+            if (evolvedEeveeUnits.length > 0) {
                 if (synergyId === 'BatonPass') {
-                    // Baton Pass: Unique Eevee forms count as different
-                    const uniqueForms = new Set(eeveeUnits.map(u => u.templateId));
-                    count += (uniqueForms.size - 1);
+                    // Sync with Simulator & App.tsx: count each unique form + star bonus
+                    let totalEeveePoints = 0;
+                    const formsMap = new Map<string, number>();
+                    evolvedEeveeUnits.forEach(u => {
+                        const m = formsMap.get(u.templateId.replace('_final', '')) || 0;
+                        if (u.level > m) formsMap.set(u.templateId.replace('_final', ''), u.level);
+                    });
+                    formsMap.forEach(level => {
+                        totalEeveePoints += (level >= 3 ? 3 : 2);
+                    });
+                    count += (totalEeveePoints - 1); // Subtract 1 (original Eevee family count)
                 } else {
-                    // Elemental Synergy: 1★/2★ eevee evo = +1 bonus, 3★ = +2 bonus
-                    const matchingEeveeEvo = eeveeUnits.filter(u => {
+                    // Elemental Synergy: Add bonus based on the highest level matching evolved form
+                    const matchingEeveeEvo = evolvedEeveeUnits.filter(u => {
                         const template = ALL_UNITS[u.templateId];
-                        return template.synergies.includes(synergyId) && u.templateId !== 'eevee';
+                        return template.synergies.includes(synergyId);
                     });
                     if (matchingEeveeEvo.length > 0) {
                         const maxLevel = Math.max(...matchingEeveeEvo.map(u => u.level));

@@ -30,8 +30,9 @@ export class BattleSimulator {
     private isSimulatingStep = false;
     private queuedKillRewards: (() => Promise<void>)[] = [];
     // Cached Synergies (Persist through death)
-    private playerSynergies = new Map<string, number>();
-    private enemySynergies = new Map<string, number>();
+    private playerSynergies: Map<string, number> = new Map();
+    private enemySynergies: Map<string, number> = new Map();
+    private processedDeaths: Set<string> = new Set(); // Reset per battle to prevent double AFTER_DEATH
     private participantPlayerUnits = new Set<Unit>();
     private participantEnemyUnits = new Set<Unit>();
     private psychicN: number = 2;
@@ -105,6 +106,8 @@ export class BattleSimulator {
                 const synergyId = reward.synergyId;
                 targets = [...playerUnits, ...(this.enemyTeam.filter(u => u !== null) as Unit[])]
                     .filter(u => u.synergies.includes(synergyId));
+            } else if (reward.effect.includes('我方')) {
+                targets = playerUnits;
             } else if (reward.synergyId) {
                 targets = playerUnits.filter(u => u.synergies.includes(reward.synergyId));
             }
@@ -121,6 +124,9 @@ export class BattleSimulator {
     public async init() {
         this.spiritombTriggered.clear();
         this.lightScreenActivated.clear();
+        this.playerSynergies.clear();
+        this.enemySynergies.clear();
+        this.processedDeaths.clear();
         this.houndoomLogged.clear();
         this.natuLogged.clear();
         this.fireLogged.clear();
@@ -766,11 +772,10 @@ export class BattleSimulator {
     }
 
     private calculateCachedSynergies(team: Unit[], map: Map<string, number>) {
-        map.clear(); // CRITICAL: Reset before recalculating
+        map.clear();
         const familyMap = new Map<string, Set<string>>();
-        const eeveeFormsPerSynergy = new Map<string, Set<string>>();
-        // Track max level of eevee evolution forms per synergy (for +2 counting)
-        const eeveeMaxLevelPerSynergy = new Map<string, number>();
+        const evolvedEeveeForms = new Map<string, Set<string>>(); // syn -> Set<templateId>
+        const evolvedEeveeMaxLevelPerForm = new Map<string, number>(); // syn_templateId -> maxLevel
 
         team.forEach(u => {
             u.synergies.forEach(syn => {
@@ -778,11 +783,12 @@ export class BattleSimulator {
                 familyMap.get(syn)!.add(u.family);
 
                 if (u.family === 'eevee' && u.templateId !== 'eevee') {
-                    if (!eeveeFormsPerSynergy.has(syn)) eeveeFormsPerSynergy.set(syn, new Set());
-                    eeveeFormsPerSynergy.get(syn)!.add(u.templateId);
-                    // Track the highest level eevee evo for this synergy
-                    const prevLevel = eeveeMaxLevelPerSynergy.get(syn) || 0;
-                    if (u.level > prevLevel) eeveeMaxLevelPerSynergy.set(syn, u.level);
+                    if (!evolvedEeveeForms.has(syn)) evolvedEeveeForms.set(syn, new Set());
+                    evolvedEeveeForms.get(syn)!.add(u.templateId);
+
+                    const key = `${syn}_${u.templateId}`;
+                    const prevMax = evolvedEeveeMaxLevelPerForm.get(key) || 0;
+                    if (u.level > prevMax) evolvedEeveeMaxLevelPerForm.set(key, u.level);
                 }
             });
         });
@@ -791,17 +797,25 @@ export class BattleSimulator {
             let count = set.size;
 
             // Eevee Special Logic
-            if (eeveeFormsPerSynergy.has(syn)) {
+            if (evolvedEeveeForms.has(syn)) {
                 if (syn === 'BatonPass') {
-                    // Baton Pass: Unique Eevee forms count as different families
-                    const uniqueEeveeForms = eeveeFormsPerSynergy.get(syn)!;
-                    // We already counted family 'eevee' as 1 in set.size if any form was present.
-                    // Add the remaining N-1 forms.
-                    count += (uniqueEeveeForms.size - 1);
+                    // Baton Pass: Every unique evolved form counts as a family + star bonus (similar to App.tsx)
+                    let totalEeveePoints = 0;
+                    const forms = evolvedEeveeForms.get(syn)!;
+                    forms.forEach(formId => {
+                        const level = evolvedEeveeMaxLevelPerForm.get(`${syn}_${formId}`) || 1;
+                        totalEeveePoints += (level >= 3 ? 3 : 2);
+                    });
+                    count += (totalEeveePoints - 1); // Subtract 1 already counted by 'eevee' family
                 } else {
-                    // Elemental Synergies: 1★/2★ eevee evo = +1, 3★ eevee evo = +2
-                    const maxLevel = eeveeMaxLevelPerSynergy.get(syn) || 1;
-                    count += (maxLevel >= 3 ? 2 : 1);
+                    // Elemental: Max bonus from any one matching evolved form
+                    const forms = evolvedEeveeForms.get(syn)!;
+                    let maxL = 1;
+                    forms.forEach(formId => {
+                        const l = evolvedEeveeMaxLevelPerForm.get(`${syn}_${formId}`) || 1;
+                        if (l > maxL) maxL = l;
+                    });
+                    count += (maxL >= 3 ? 2 : 1);
                 }
             }
 
@@ -2073,8 +2087,11 @@ export class BattleSimulator {
     }
 
     private async handleDeath(unit: Unit, killer?: Unit) {
-        // Log removed per user request: "不要在說明角色倒下，戰鬥訊息太多了"
-        // this.log(`${unit.name} 倒下了！`);
+        // Prevent double death processing for the same unit instance in one battle
+        if (this.processedDeaths.has(unit.id)) return;
+        this.processedDeaths.add(unit.id);
+
+        // (rest of handleDeath remains identical except for BatonPass message sync)
 
         // (Shuckle death-trigger removed: Gastro Acid only fires at battle start)
 

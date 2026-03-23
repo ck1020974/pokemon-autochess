@@ -16,6 +16,7 @@ export class HeadlessBattleSimulator {
     private natuLogged: Set<string> = new Set();
     private playerSynergies = new Map<string, number>();
     private enemySynergies = new Map<string, number>();
+    private processedDeaths: Set<string> = new Set();
     private participantPlayerUnits = new Set<Unit>();
     private participantEnemyUnits = new Set<Unit>();
     private originalPlayerTeam: (Unit | null)[] | null = null;
@@ -504,9 +505,8 @@ export class HeadlessBattleSimulator {
     private calculateCachedSynergies(team: Unit[], map: Map<string, number>) {
         map.clear();
         const familyMap = new Map<string, Set<string>>();
-        const eeveeFormsPerSynergy = new Map<string, Set<string>>();
-        // Track max level of eevee evolution forms per synergy (for +2 counting)
-        const eeveeMaxLevelPerSynergy = new Map<string, number>();
+        const evolvedEeveeForms = new Map<string, Set<string>>(); // syn -> Set<templateId>
+        const evolvedEeveeMaxLevelPerForm = new Map<string, number>(); // syn_templateId -> maxLevel
 
         team.forEach(u => {
             u.synergies.forEach(syn => {
@@ -514,27 +514,41 @@ export class HeadlessBattleSimulator {
                 familyMap.get(syn)!.add(u.family);
 
                 if (u.family === 'eevee' && u.templateId !== 'eevee') {
-                    if (!eeveeFormsPerSynergy.has(syn)) eeveeFormsPerSynergy.set(syn, new Set());
-                    eeveeFormsPerSynergy.get(syn)!.add(u.templateId);
-                    // Track the highest level eevee evo for this synergy
-                    const prevLevel = eeveeMaxLevelPerSynergy.get(syn) || 0;
-                    if (u.level > prevLevel) eeveeMaxLevelPerSynergy.set(syn, u.level);
+                    if (!evolvedEeveeForms.has(syn)) evolvedEeveeForms.set(syn, new Set());
+                    evolvedEeveeForms.get(syn)!.add(u.templateId);
+
+                    const key = `${syn}_${u.templateId}`;
+                    const prevMax = evolvedEeveeMaxLevelPerForm.get(key) || 0;
+                    if (u.level > prevMax) evolvedEeveeMaxLevelPerForm.set(key, u.level);
                 }
             });
         });
 
         familyMap.forEach((set, syn) => {
             let count = set.size;
-            if (eeveeFormsPerSynergy.has(syn)) {
+
+            // Eevee Special Logic
+            if (evolvedEeveeForms.has(syn)) {
                 if (syn === 'BatonPass') {
-                    const uniqueEeveeForms = eeveeFormsPerSynergy.get(syn)!;
-                    count += (uniqueEeveeForms.size - 1);
+                    // Sync with BattleSimulator & App.tsx
+                    let totalEeveePoints = 0;
+                    const forms = evolvedEeveeForms.get(syn)!;
+                    forms.forEach(formId => {
+                        const level = evolvedEeveeMaxLevelPerForm.get(`${syn}_${formId}`) || 1;
+                        totalEeveePoints += (level >= 3 ? 3 : 2);
+                    });
+                    count += (totalEeveePoints - 1);
                 } else {
-                    // 1★/2★ eevee evo = +1, 3★ eevee evo = +2
-                    const maxLevel = eeveeMaxLevelPerSynergy.get(syn) || 1;
-                    count += (maxLevel >= 3 ? 2 : 1);
+                    const forms = evolvedEeveeForms.get(syn)!;
+                    let maxL = 1;
+                    forms.forEach(formId => {
+                        const l = evolvedEeveeMaxLevelPerForm.get(`${syn}_${formId}`) || 1;
+                        if (l > maxL) maxL = l;
+                    });
+                    count += (maxL >= 3 ? 2 : 1);
                 }
             }
+
             map.set(syn, count);
         });
     }
@@ -1499,6 +1513,8 @@ export class HeadlessBattleSimulator {
     }
 
     private async handleDeath(unit: Unit, killer?: Unit) {
+        if (this.processedDeaths.has(unit.id)) return;
+        this.processedDeaths.add(unit.id);
         // Larvitar Family: Earthquake (Death) removed logic
         if (unit.family === 'sableye' && killer && killer.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
             const state = this.unitStates.get(unit) || {};
