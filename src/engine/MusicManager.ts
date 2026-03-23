@@ -126,15 +126,16 @@ class MusicManager {
 
         for (let i = 0; i < names.length; i++) {
             const isLast = i === names.length - 1;
-            const audio = await this.playOneShot(names[i]);
+            const name = names[i];
 
             if (isLast && lastLoop) {
-                audio.loop = true;
-                this.currentAudio = audio;
-                // Since playOneShot finishes when 'ended' triggers, 
-                // we need to make sure we don't 'await' it if we want it to loop.
-                // Wait, if it's the last one and loops, playOneShot won't ever resolve.
-                // Let's refactor this a bit.
+                // For the last track in a looping sequence, use play() directly
+                // so it sets loop=true before starting.
+                this.play(name, true);
+                return;
+            } else {
+                // Otherwise play it once and wait for it to finish
+                await this.playOneShot(name);
             }
         }
     }
@@ -145,16 +146,34 @@ class MusicManager {
     private playOneShot(name: string): Promise<HTMLAudioElement> {
         return new Promise((resolve) => {
             this.stop();
-            const audio = new Audio(`${this.musicPath}${name}.OGG`);
+
+            let audio = this.audioCache.get(name);
+            if (!audio) {
+                audio = new Audio(`${this.musicPath}${name}.OGG`);
+                this.audioCache.set(name, audio);
+            }
+
             audio.loop = false;
             audio.muted = this.muted;
             audio.volume = this.defaultVolume;
-            audio.onended = () => resolve(audio);
-            audio.play().catch(e => {
-                console.warn("Music play failed:", e);
+            audio.currentTime = 0;
+
+            const onFinished = () => {
+                audio.removeEventListener('ended', onFinished);
+                audio.removeEventListener('pause', onFinished);
                 resolve(audio);
+            };
+
+            audio.addEventListener('ended', onFinished);
+            audio.addEventListener('pause', onFinished);
+
+            audio.play().catch(e => {
+                console.warn(`One-shot music play failed for ${name}:`, e);
+                onFinished();
             });
+
             this.currentAudio = audio;
+            this.currentTrackName = name;
         });
     }
 

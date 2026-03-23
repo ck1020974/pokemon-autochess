@@ -801,8 +801,7 @@ function App() {
                 } else if (game.wins < 12) {
                     music.play('victoryroad', true);
                 } else {
-                    // Won against Champion
-                    music.stop();
+                    // Won against Champion - Keep playing victory music
                 }
             } else if (game.lastResult === 'LOSS' || game.lastResult === 'DRAW') {
                 // Ensure room music is playing (the recover sequence might have started in battleResult effect)
@@ -1591,7 +1590,7 @@ function App() {
     };
 
     const handleRewardSelect = (reward: any) => {
-        music.stop(); // Stop the victory music (gymwin/elitefourwin/championwin)
+        // Only stop if we are transition back to shop, which is handled below.
         game.applyReward(reward);
         setRewardChoices([]); // Clear UI state immediately
 
