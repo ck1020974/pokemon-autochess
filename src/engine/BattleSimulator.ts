@@ -861,6 +861,9 @@ export class BattleSimulator {
                     const reducedAmt = Math.ceil(target.stats.attack * 0.33);
                     if (reducedAmt > 0) {
                         target.stats.attack -= reducedAmt;
+                        const state = this.unitStates.get(target) || {};
+                        state.isCharmed = true;
+                        this.unitStates.set(target, state);
                         this.playAnimation(target, 'glow-pale-pink', 500);
                     }
                 }

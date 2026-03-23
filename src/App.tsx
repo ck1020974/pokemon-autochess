@@ -56,7 +56,7 @@ interface ConfirmDialogState {
 // --- Helper Components ---
 
 // UnitCard with Direct Lock & Silence Support
-function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock }: any) {
+function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock, isCharmed }: any) {
     if (!unit || unit.stats.hp <= 0) {
         return (
             <div className="slot-placeholder">
@@ -110,6 +110,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
                 <span className="stat-atk">{unit.stats.attack}</span>
                 <span className="stat-hp" style={{ color: hpSwapped ? '#a855f7' : undefined }}>{unit.stats.hp}</span>
             </div>
+            {isCharmed && <div className="charm-status-icon" title="受到撒嬌影響 (攻擊降低)">❤️</div>}
         </div>
     );
 }
@@ -2752,6 +2753,7 @@ function App() {
                                         silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
                                         gastroAcid={unit ? simulatorRef.current?.unitStates.get(unit)?.isGastroAcid : false}
                                         hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
+                                        isCharmed={unit ? simulatorRef.current?.unitStates.get(unit)?.isCharmed : false}
                                         isEvolving={unit && evolvingUnitId === unit.id}
                                     />
                                 </div>
@@ -2774,6 +2776,7 @@ function App() {
                                         silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
                                         gastroAcid={unit ? simulatorRef.current?.unitStates.get(unit)?.isGastroAcid : false}
                                         hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
+                                        isCharmed={unit ? simulatorRef.current?.unitStates.get(unit)?.isCharmed : false}
                                         isEvolving={unit && evolvingUnitId === unit.id}
                                     />
                                 </div>
@@ -3032,7 +3035,7 @@ function App() {
                                         {selected.unit.synergies.map((synId: string) => {
                                             const syn = SYNERGIES[synId];
                                             if (!syn) return null;
-                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} forceActive={true} />;
+                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} forceActive={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />;
                                         })}
                                     </div>
                                 </div>

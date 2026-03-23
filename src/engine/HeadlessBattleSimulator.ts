@@ -601,7 +601,9 @@ export class HeadlessBattleSimulator {
                     const reducedAmt = Math.floor(target.stats.attack * 0.33);
                     if (reducedAmt > 0) {
                         target.stats.attack -= reducedAmt;
-                        // this.log(`${target.name} 因撒嬌的眼神，降低了攻擊。`);
+                        const state = this.unitStates.get(target) || {};
+                        state.isCharmed = true;
+                        this.unitStates.set(target, state);
                     }
                 });
             }

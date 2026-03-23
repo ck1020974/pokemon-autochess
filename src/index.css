@@ -1065,7 +1065,7 @@ h3 {
   /* Wider desktop tooltips */
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  z-index: 100000;
+  z-index: 200000;
   /* Highest layer */
   opacity: 0;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1094,7 +1094,31 @@ h3 {
   right: 0;
   width: max-content;
   max-width: 250px;
-  z-index: 99999;
+  z-index: 200000;
+}
+
+/* Charm Status Icon */
+.charm-status-icon {
+  position: absolute;
+  top: -20px;
+  right: -5px;
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 5px rgba(244, 114, 182, 0.8));
+  animation: heart-float 1.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes heart-float {
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-5px) scale(1.2);
+  }
 }
 
 /* Detail Panel Adjustment */
