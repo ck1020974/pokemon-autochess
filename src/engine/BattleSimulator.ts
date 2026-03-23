@@ -24,6 +24,9 @@ export class BattleSimulator {
     private originalPlayerTeam?: (Unit | null)[];
     private houndoomLogged: Set<string> = new Set();
     private natuLogged: Set<string> = new Set();
+    private fireLogged: Set<string> = new Set();
+    private grassLogged: Set<string> = new Set();
+    private angryLoggedThisTurn: Set<string> = new Set();
     private isSimulatingStep = false;
     private queuedKillRewards: (() => Promise<void>)[] = [];
     // Cached Synergies (Persist through death)
@@ -120,6 +123,9 @@ export class BattleSimulator {
         this.lightScreenActivated.clear();
         this.houndoomLogged.clear();
         this.natuLogged.clear();
+        this.fireLogged.clear();
+        this.grassLogged.clear();
+        this.angryLoggedThisTurn.clear();
         this.waterDebuffedTargets.clear();
 
         await this.compactTeams();
@@ -267,7 +273,7 @@ export class BattleSimulator {
                         const amount = unit.templateId === 'haunter' ? 3 : 1;
                         const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
                         this.growUnit(front, 0, amount, '能力提升', original, true);
-                        this.log(`${unit.name} 為 ${front.name} 提升了攻勢！`);
+                        // this.log(`${unit.name} 為 ${front.name} 提升了攻勢！`); // Removed redundant log
                     }
                 }
             }
@@ -282,9 +288,9 @@ export class BattleSimulator {
                     const ratio = [0, 0.33, 0.5, 1.0][unit.level] || 0.33;
                     const buffAtk = Math.ceil(unit.stats.attack * ratio);
                     await this.notifySkill(unit, `發動了強壯之顎！`);
-                    this.buffAttack(front, buffAtk);
+                    this.buffAttack(front, buffAtk, true);
                     this.playTeamAnimation([front], 'level-up-anim', 600);
-                    this.log(`${unit.name} 發動了強壯之顎，提升了 ${front.name} 的攻擊力！`);
+                    // this.log(`${unit.name} 發動了強壯之顎，提升了 ${front.name} 的攻擊力！`); // Redundant
                 }
             }
         }
@@ -332,7 +338,7 @@ export class BattleSimulator {
             if (buffAtk > 0) {
                 unit.stats.attack += buffAtk;
                 unit.capStats();
-                this.log(`${unit.name}發動了唱反調。`);
+                await this.notifySkill(unit, `發動了唱反調`); // Standardized
                 this.playAnimation(unit, 'jump', 200);
             }
         }
@@ -343,7 +349,7 @@ export class BattleSimulator {
             if (hpBuff > 0) {
                 const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
                 this.growUnit(unit, hpBuff, 0, '親子愛', original, true);
-                this.log(`${unit.name}發動了親子愛！`);
+                await this.notifySkill(unit, `發動了親子愛`); // Standardized
                 this.playAnimation(unit, 'glow-white', 600);
             }
         }
@@ -366,7 +372,7 @@ export class BattleSimulator {
                         const amount = unit.templateId === 'jigglypuff' ? 3 : 1;
                         const original = this.originalPlayerTeam?.find(o => o && o.id === front.id);
                         this.growUnit(front, amount, 0, '能力提升', original, true);
-                        this.log(`${unit.name} 為 ${front.name} 增加了生命！`);
+                        // this.log(`${unit.name} 為 ${front.name} 增加了生命！`); // Redundant
                     }
                 }
             }
@@ -392,7 +398,7 @@ export class BattleSimulator {
 
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, 0, amount, '能力提升', original, true);
-                        this.log(`${unit.name} 為 ${back.name} 增加了攻擊！`);
+                        // this.log(`${unit.name} 為 ${back.name} 增加了攻擊！`); // Redundant
                     }
                 }
             }
@@ -418,7 +424,7 @@ export class BattleSimulator {
 
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, amount, 0, '能力提升', original, true);
-                        this.log(`${unit.name} 為 ${back.name} 增加了生命！`);
+                        // this.log(`${unit.name} 為 ${back.name} 增加了生命！`); // Redundant
                         this.playAnimation(back, 'glow-pale-pink', 600);
                     }
                 }
@@ -435,8 +441,8 @@ export class BattleSimulator {
                     await this.notifySkill(unit, `使用了電光一閃！`);
                     // Use scalingValue (default to 1)
                     const dmg = unit.scalingValue || 1;
-                    await this.dealDamage(unit, weakest, dmg, true);
-                    this.log(`${unit.name} 對 ${weakest.name} 使用了電光一閃。`);
+                    await this.dealDamage(unit, weakest, dmg, true, true); // Silent damage hit
+                    // this.log(`${unit.name} 對 ${weakest.name} 使用了電光一閃。`); // Redundant
                 }
             }
         }
@@ -498,13 +504,11 @@ export class BattleSimulator {
             }
 
             if (target && target.stats.hp > 0) {
-                const originalName = unit.name;
-
                 // 1. Play animation (Start) - Don't await yet
                 const animPromise = this.playAnimation(unit, 'morph', 500);
 
-                // 2. Log skill first so it uses original name
-                this.log(`${originalName} 對 ${target.name} 使用了變身！`);
+                // 2. Log skill first
+                await this.notifySkill(unit, `使用了變身`); // Standardized
 
                 // 3. Wait for the peak of the blur (250ms)
                 await this.delay(250);
@@ -717,7 +721,7 @@ export class BattleSimulator {
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
             for (const enemy of enemies) {
                 const dmg = 5 + Math.floor(Math.random() * 11); // 5 to 15
-                await this.dealDamage(unit, enemy, dmg, true, true);
+                await this.dealDamage(unit, enemy, dmg, true, true); // Silent damage
             }
             if (this.onUpdate) this.onUpdate();
         }
@@ -739,7 +743,7 @@ export class BattleSimulator {
                     }
                 }
                 this.log(`炎帝使用了大字爆炎，燒盡了 ${strongest.name}`);
-                await this.dealDamage(unit, strongest, 50, true);
+                await this.dealDamage(unit, strongest, 50, true, true); // Silent damage
             }
             if (this.onUpdate) this.onUpdate();
         }
@@ -753,7 +757,7 @@ export class BattleSimulator {
             if (enemies.length > 0) {
                 const weakest = [...enemies].sort((a, b) => a.stats.hp - b.stats.hp)[0];
                 this.log(`水君使用了水砲，向 ${weakest.name} 猛烈地噴射`);
-                await this.dealDamage(unit, weakest, 50, true);
+                await this.dealDamage(unit, weakest, 50, true, true); // Silent damage
             }
             if (this.onUpdate) this.onUpdate();
         }
@@ -839,7 +843,7 @@ export class BattleSimulator {
                     const reducedAmt = Math.floor(target.stats.attack * 0.33);
                     if (reducedAmt > 0) {
                         target.stats.attack -= reducedAmt;
-                        this.log(`${target.name} 因撒嬌的眼神，降低了攻擊。`);
+                        // this.log(`${target.name} 因撒嬌的眼神，降低了攻擊。`); // Simplified
                         this.playAnimation(target, 'glow-pale-pink', 500);
                     }
                 }
@@ -931,8 +935,11 @@ export class BattleSimulator {
                     const buff = count >= 5 ? 12 : (count >= 4 ? 7 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0)));
                     if (buff > 0 && unit.stats.hp > 1) {
                         unit.stats.hp -= 1;
-                        this.buffAttack(unit, buff);
-                        this.log(`${unit.name} 燃盡全身的火焰！`);
+                        this.buffAttack(unit, buff, true);
+                        if (!this.fireLogged.has(unit.id)) {
+                            this.log(`${unit.name} 燃盡全身的火焰！`);
+                            this.fireLogged.add(unit.id);
+                        }
                     }
                 }
             });
@@ -952,8 +959,10 @@ export class BattleSimulator {
                     if (heal > 0 && unit.stats.hp > 0) {
                         this.heal(unit, heal);
                         this.grassHealedTargets.add(e.target);
-                        // Message remains same as per user instruction (none provided for Grass)
-                        this.log(`${unit.name} 吸取了 ${heal} 生命`);
+                        if (!this.grassLogged.has(unit.id)) {
+                            this.log(`${unit.name} 吸取了對手的生命`);
+                            this.grassLogged.add(unit.id);
+                        }
                     }
                 }
             });
@@ -1015,7 +1024,7 @@ export class BattleSimulator {
                         const newAmt = Math.max(1, oldAmt - reduction);
                         if (newAmt < oldAmt) {
                             e.context.amount = newAmt;
-                            this.log(`${unit.name} 發動了縮殼！`);
+                            // this.log(`${unit.name} 發動了縮殼！`); // Removed redundant text
                         }
                     }
                 }
@@ -1070,8 +1079,11 @@ export class BattleSimulator {
                             }
                         });
                         const side = this.playerTeam.includes(unit) ? '我方' : '敵方';
-                        this.log(`${unit.name} 因憤怒的力量提高了 ${side} ${buff} 攻擊！`);
-                        if (this.onUpdate) this.onUpdate();
+                        const sideKey = side === '我方' ? 'player' : 'enemy';
+                        if (!this.angryLoggedThisTurn.has(sideKey)) {
+                            this.log(`${unit.name} 因憤怒的力量提高了 ${side}隊伍的 攻擊！`);
+                            this.angryLoggedThisTurn.add(sideKey);
+                        }
                     }
                 }
             });
@@ -1087,7 +1099,7 @@ export class BattleSimulator {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, 0, buff, '劍舞', original, true);
                         if (!e.context?.isPassiveMove) {
-                            this.log(`${unit.name}發動了劍舞， 提高 ${buff} 攻擊！`);
+                            this.playAnimation(unit, 'sword-dance', 600);
                         }
                     }
                 }
@@ -1105,7 +1117,7 @@ export class BattleSimulator {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         this.growUnit(unit, buff, 0, '羽棲', original, true);
                         if (!e.context?.isPassiveMove) {
-                            this.log(`${unit.name}發動了羽棲， 提高 ${buff} 生命！`);
+                            this.playAnimation(unit, 'roost', 600);
                         }
                     }
                 }
@@ -1543,7 +1555,8 @@ export class BattleSimulator {
                     await this.delay(150);
                     await this.notifySkill(unit, `對 ${e.source.name} 發動了甜甜香氣！`);
                     await this.playAnimation(unit, 'jump', 200);
-                    this.growUnit(e.source, 0, buff);
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === e.source!.id);
+                    this.growUnit(e.source, 0, buff, '甜甜香氣', original, true);
                 }
             });
         }
@@ -2336,6 +2349,7 @@ export class BattleSimulator {
         if (!pFront || !eFront) return false;
 
         this.turnCount++;
+        this.angryLoggedThisTurn.clear();
 
 
         const pEl = document.getElementById(pFront.id);

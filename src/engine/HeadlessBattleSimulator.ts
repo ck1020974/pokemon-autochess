@@ -24,6 +24,9 @@ export class HeadlessBattleSimulator {
     private playerAttackCount: number = 0;
     private enemyAttackCount: number = 0;
     private psychicTriggered: Set<string> = new Set();
+    private fireLogged: Set<string> = new Set();
+    private grassLogged: Set<string> = new Set();
+    private angryLoggedThisTurn: Set<string> = new Set();
 
     constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], _playerWins: number = 0) {
         this.playerWins = _playerWins;
@@ -55,6 +58,9 @@ export class HeadlessBattleSimulator {
         this.lightScreenActivated.clear();
         this.natuLogged.clear();
         this.grassHealedTargets.clear();
+        this.fireLogged.clear();
+        this.grassLogged.clear();
+        this.angryLoggedThisTurn.clear();
 
         await this.compactTeams();
 
@@ -162,7 +168,7 @@ export class HeadlessBattleSimulator {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0) {
                     const front = myTeam[idx - 1];
-                    if (front) this.buffAttack(front, unit.templateId === 'haunter' ? 3 : 1);
+                    if (front) this.buffAttack(front, unit.templateId === 'haunter' ? 3 : 1, true);
                 }
             }
         }
@@ -175,7 +181,8 @@ export class HeadlessBattleSimulator {
                 const idx = myTeam.indexOf(unit);
                 if (idx > 0) {
                     const front = myTeam[idx - 1];
-                    if (front) this.growUnit(front, unit.templateId === 'jigglypuff' ? 3 : 1, 0);
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === front?.id);
+                    if (front) this.growUnit(front, unit.templateId === 'jigglypuff' ? 3 : 1, 0, original, true);
                 }
             }
         }
@@ -209,8 +216,7 @@ export class HeadlessBattleSimulator {
                 }
                 const dmg = unit.scalingValue || 1;
                 // dealDamage in Headless is async if it calls notifySkill but here it's simplified
-                await this.dealDamage(unit, weakest, dmg, true);
-                this.log(`${unit.name} 使用了電光一閃。`);
+                await this.dealDamage(unit, weakest, dmg, true, true);
             }
         }
 
@@ -248,7 +254,7 @@ export class HeadlessBattleSimulator {
                 if (livingEnemies.length > 0) {
                     let target = livingEnemies[0];
                     for (const e of livingEnemies) if (e.stats.hp < target.stats.hp) target = e;
-                    await this.dealDamage(unit, target, 4, true);
+                    await this.dealDamage(unit, target, 4, true, true);
                 } else break;
             }
         }
@@ -272,7 +278,7 @@ export class HeadlessBattleSimulator {
                 if (front && front.stats.hp > 0) {
                     const ratio = [0, 0.33, 0.5, 1.0][unit.level] || 0.33;
                     const buffAtk = Math.ceil(unit.stats.attack * ratio);
-                    this.buffAttack(front, buffAtk);
+                    this.buffAttack(front, buffAtk, true);
                 }
             }
         }
@@ -372,7 +378,7 @@ export class HeadlessBattleSimulator {
                 }
 
                 if (enemyTarget) {
-                    await this.dealDamage(unit, enemyTarget, unit.abilityPower || 5, true);
+                    await this.dealDamage(unit, enemyTarget, unit.abilityPower || 5, true, true);
                 }
                 if (allyTarget) {
                     this.heal(allyTarget, unit.abilityPower || 5);
@@ -424,7 +430,7 @@ export class HeadlessBattleSimulator {
                         maxPower = power;
                     }
                 }
-                await this.dealDamage(unit, strongest, 50, true);
+                await this.dealDamage(unit, strongest, 50, true, true);
             }
         }
 
@@ -433,7 +439,7 @@ export class HeadlessBattleSimulator {
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (enemies.length > 0) {
                 const weakest = [...enemies].sort((a, b) => a.stats.hp - b.stats.hp)[0];
-                await this.dealDamage(unit, weakest, 50, true);
+                await this.dealDamage(unit, weakest, 50, true, true);
             }
         }
 
@@ -572,7 +578,7 @@ export class HeadlessBattleSimulator {
                     const reducedAmt = Math.floor(target.stats.attack * 0.33);
                     if (reducedAmt > 0) {
                         target.stats.attack -= reducedAmt;
-                        this.log(`${target.name} 因撒嬌的眼神，降低了攻擊。`);
+                        // this.log(`${target.name} 因撒嬌的眼神，降低了攻擊。`);
                     }
                 });
             }
@@ -600,7 +606,7 @@ export class HeadlessBattleSimulator {
                 if (target.synergies.includes('Snow')) continue;
                 let dmg = Math.ceil(target.stats.maxHp * 0.33);
                 if (dmg >= target.stats.hp) dmg = Math.max(0, target.stats.hp - 1);
-                if (dmg > 0) await this.dealDamage(null, target, dmg, true, true);
+                if (dmg > 0) await this.dealDamage(null, target, dmg, true, true); // Silent
             }
         }
     }
@@ -642,7 +648,11 @@ export class HeadlessBattleSimulator {
                     const buff = count >= 5 ? 10 : (count >= 4 ? 5 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0)));
                     if (buff > 0 && unit.stats.hp > 1) {
                         unit.stats.hp -= 1;
-                        this.buffAttack(unit, buff);
+                        this.buffAttack(unit, buff, true);
+                        if (!this.fireLogged.has(unit.id)) {
+                            this.log(`${unit.name} 燃盡全身的火焰！`);
+                            this.fireLogged.add(unit.id);
+                        }
                     }
                 }
             });
@@ -660,6 +670,10 @@ export class HeadlessBattleSimulator {
                     if (healAmount > 0) {
                         this.heal(unit, healAmount);
                         this.grassHealedTargets.add(e.target);
+                        if (!this.grassLogged.has(unit.id)) {
+                            this.log(`${unit.name} 吸取了對手的生命`);
+                            this.grassLogged.add(unit.id);
+                        }
                     }
                 }
             });
@@ -709,7 +723,7 @@ export class HeadlessBattleSimulator {
                     const dmg = [0, 1, 2, 5][unit.level] || 1;
                     const allUnits = [...this.playerTeam, ...this.enemyTeam].filter(u => u && u !== unit && u.stats.hp > 0);
                     for (const target of allUnits) {
-                        await this.dealDamage(unit, target, dmg, true, true);
+                        await this.dealDamage(unit, target, dmg, true, true); // Silent
                     }
                 }
             });
@@ -719,10 +733,15 @@ export class HeadlessBattleSimulator {
                 if (e.target === unit && this.getSynergyCountForUnit(unit, 'Angry') >= 2) {
                     const count = this.getSynergyCountForUnit(unit, 'Angry');
                     const buff = count >= 4 ? 8 : (count >= 3 ? 4 : (count >= 2 ? 2 : 0));
-                    const { myTeam } = this.getTeams(unit);
+                    const { myTeam, side } = this.getTeams(unit);
                     myTeam.forEach(u => {
-                        if (u && u.stats.hp > 0) this.buffAttack(u, buff);
+                        if (u && u.stats.hp > 0) this.buffAttack(u, buff, true);
                     });
+                    if (!this.angryLoggedThisTurn.has(side)) {
+                        const sideName = side === 'player' ? '我方' : '敵方';
+                        this.log(`${unit.name} 因憤怒的力量提高了 ${sideName}隊伍的 攻擊！`);
+                        this.angryLoggedThisTurn.add(side);
+                    }
                 }
             });
         }
@@ -744,7 +763,7 @@ export class HeadlessBattleSimulator {
                     const buff = count >= 2 ? 2 : 0;
                     if (buff > 0) {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
-                        this.growUnit(unit, 0, buff, original);
+                        this.growUnit(unit, 0, buff, original, true);
                     }
                 }
             });
@@ -756,7 +775,7 @@ export class HeadlessBattleSimulator {
                     const buff = count >= 2 ? 2 : 0;
                     if (buff > 0) {
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
-                        this.growUnit(unit, buff, 0, original);
+                        this.growUnit(unit, buff, 0, original, true);
                     }
                 }
             });
