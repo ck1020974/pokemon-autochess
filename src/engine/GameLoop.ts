@@ -105,7 +105,7 @@ export class GameLoop {
 
     public refreshSpecialDescriptions() {
         // Update templates so shop shows CURRENT N value and correct frequency
-        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每二場戰鬥後增強)`;
+        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每兩場戰鬥後增強)`;
         ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)`;
         ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)`;
 
@@ -126,13 +126,13 @@ export class GameLoop {
         this.shop.slots.forEach(u => {
             if (u && u.family === 'charmander') {
                 u.scalingValue = this.charmanderN;
-                const freq = [0, '二', '', ''][u.level] || '二';
+                const freq = [0, '兩', '', ''][u.level] || '兩';
                 const suffix = u.level >= 2 ? '每場' : `每${freq}場`;
                 u.description = `同時對後方敵方造成 [N] 傷害 (${suffix}戰鬥後增強)`;
             }
             if (u && u.family === 'pichu') {
                 u.scalingValue = this.pichuN;
-                const freq = [0, '三', '二', ''][u.level] || '三';
+                const freq = [0, '三', '兩', ''][u.level] || '三';
                 const suffix = u.level === 3 ? '每場' : `每${freq}場`;
                 u.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (${suffix}後增強)。`;
             }
@@ -142,13 +142,13 @@ export class GameLoop {
         this.playerTeam.forEach(u => {
             if (u && u.family === 'charmander') {
                 u.scalingValue = this.charmanderN;
-                const freq = [0, '二', '', ''][u.level] || '二';
+                const freq = [0, '兩', '', ''][u.level] || '兩';
                 const suffix = u.level >= 2 ? '每場' : `每${freq}場`;
                 u.description = `同時對後方敵方造成 [N] 傷害 (${suffix}戰鬥後增強)`;
             }
             if (u && u.family === 'pichu') {
                 u.scalingValue = this.pichuN;
-                const freq = [0, '三', '二', ''][u.level] || '三';
+                const freq = [0, '三', '兩', ''][u.level] || '三';
                 const suffix = u.level === 3 ? '每場' : `每${freq}場`;
                 u.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (${suffix}後增強)。`;
             }
