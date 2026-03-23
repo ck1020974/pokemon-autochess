@@ -1,4 +1,4 @@
-import type { OpponentDefinition } from '../data/AllOpponents';
+import type { OpponentDefinition } from '../data/opponents/classic';
 
 export interface GameEdition {
     /** Edition ID, e.g., 'classic', 'expansion_a' */

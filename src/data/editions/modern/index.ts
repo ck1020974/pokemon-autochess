@@ -6,7 +6,7 @@ import {
     MODERN_ADVANCED_OPPONENTS,
     MODERN_ELITE_OPPONENTS,
     MODERN_CHAMPION_OPPONENTS
-} from '../../ModernOpponents';
+} from '../../opponents/modern';
 
 const INCLUDED_FAMILIES = [
     'bulbasaur', 'charmander', 'squirtle',

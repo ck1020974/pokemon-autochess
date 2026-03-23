@@ -3,7 +3,7 @@ import { Unit } from '../models/Unit';
 import { ALL_UNITS } from '../data/AllUnits';
 import { HeadlessBattleSimulator } from './HeadlessBattleSimulator';
 import { writeFileSync } from 'fs';
-import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS, CHAMPION_OPPONENTS } from '../data/AllOpponents';
+import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS, CHAMPION_OPPONENTS } from '../data/opponents/classic';
 import { SYNERGIES } from '../models/Synergies';
 
 const TOTAL_BATTLES = 5000;

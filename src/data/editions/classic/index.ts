@@ -6,7 +6,7 @@ import {
     ADVANCED_OPPONENTS,
     ELITE_OPPONENTS,
     CHAMPION_OPPONENTS
-} from '../../AllOpponents';
+} from '../../opponents/classic';
 
 export const ClassicEdition: GameEdition = {
     id: 'classic',

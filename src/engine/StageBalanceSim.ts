@@ -3,8 +3,8 @@ import { Unit } from '../models/Unit';
 import { ALL_UNITS } from '../data/AllUnits';
 import { HeadlessBattleSimulator } from './HeadlessBattleSimulator';
 import { writeFileSync } from 'fs';
-import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS, CHAMPION_OPPONENTS } from '../data/AllOpponents';
-import type { OpponentDefinition } from '../data/AllOpponents';
+import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS, CHAMPION_OPPONENTS } from '../data/opponents/classic';
+import type { OpponentDefinition } from '../data/opponents/classic';
 import { SYNERGIES } from '../models/Synergies';
 
 const SIMS_PER_BOSS = 1000;

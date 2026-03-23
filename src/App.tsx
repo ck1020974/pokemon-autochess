@@ -563,7 +563,7 @@ function App() {
             const backgroundUrls = new Set<string>();
 
             Object.values(ALL_UNITS).forEach(t => {
-                const isCriticalTier = t.tier <= 2 || t.id === 'sprout';
+                const isCriticalTier = t.tier <= 3 || t.id === 'sprout';
 
                 if (t.imageUrl) {
                     if (isCriticalTier) criticalUrls.add(t.imageUrl);
@@ -612,6 +612,11 @@ function App() {
             criticalUrls.add('icon-002.png');
             criticalUrls.add('icon-003.png');
 
+            // --- Move Reward item images to Critical load ---
+            REWARD_DATA.forEach(reward => {
+                if (reward.imageUrl) criticalUrls.add(reward.imageUrl);
+            });
+
             // Critical audio (Early game + Common)
             const criticalMusic = ['start', 'pokemonmart', 'gymfight', 'pokemoncenter', 'gymwin'];
 
@@ -626,10 +631,7 @@ function App() {
                 const backgroundMusic = ['victoryroad', 'level up', 'recover', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin'];
                 console.log(`[系統] 開始背景載入剩餘資源 (${backgroundUrls.size} 個影像, ${backgroundMusic.length} 首音樂)...`);
 
-                // Add reward item images to background load
-                REWARD_DATA.forEach(reward => {
-                    if (reward.imageUrl) backgroundUrls.add(reward.imageUrl);
-                });
+                // Reward items moved to Critical batch above
 
                 await loadAssets(Array.from(backgroundUrls), true, backgroundMusic);
                 console.log(`[系統] 背景資源載入完成！`);
