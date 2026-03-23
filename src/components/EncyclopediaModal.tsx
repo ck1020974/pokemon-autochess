@@ -294,8 +294,8 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
                                                                 if (!isAvailable || t.id === 'sprout') return false;
                                                                 if (!t.synergies?.includes(syn.id)) return false;
 
-                                                                // Always include Eevee family separately (all evolutions)
-                                                                if (t.family === 'eevee') return true;
+                                                                // Always include Eevee family separately (all evolutions), but avoid duplicates
+                                                                if (t.family === 'eevee') return !t.id.endsWith('_final') && t.id !== 'eevee';
 
                                                                 // For other families, only show the FIRST unit in the family that has the synergy
                                                                 const familyUnits = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id));
