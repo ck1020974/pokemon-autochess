@@ -128,13 +128,13 @@ export class GameLoop {
                 u.scalingValue = this.charmanderN;
                 const freq = [0, '二', '', ''][u.level] || '二';
                 const suffix = u.level >= 2 ? '每場' : `每${freq}場`;
-                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${suffix}戰鬥後增強)`;
+                u.description = `同時對後方敵方造成 [N] 傷害 (${suffix}戰鬥後增強)`;
             }
             if (u && u.family === 'pichu') {
                 u.scalingValue = this.pichuN;
                 const freq = [0, '三', '二', ''][u.level] || '三';
                 const suffix = u.level === 3 ? '每場' : `每${freq}場`;
-                u.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (${suffix}後增強)。`;
+                u.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (${suffix}後增強)。`;
             }
         });
 
@@ -144,13 +144,13 @@ export class GameLoop {
                 u.scalingValue = this.charmanderN;
                 const freq = [0, '二', '', ''][u.level] || '二';
                 const suffix = u.level >= 2 ? '每場' : `每${freq}場`;
-                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${suffix}戰鬥後增強)`;
+                u.description = `同時對後方敵方造成 [N] 傷害 (${suffix}戰鬥後增強)`;
             }
             if (u && u.family === 'pichu') {
                 u.scalingValue = this.pichuN;
                 const freq = [0, '三', '二', ''][u.level] || '三';
                 const suffix = u.level === 3 ? '每場' : `每${freq}場`;
-                u.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (${suffix}後增強)。`;
+                u.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (${suffix}後增強)。`;
             }
         });
 
@@ -159,11 +159,11 @@ export class GameLoop {
             const enemyScale = this.wins + 1;
             if (u && u.family === 'charmander') {
                 u.scalingValue = enemyScale;
-                u.description = `同時對後方敵方造成 ${enemyScale} 傷害 (數值為勝場數 + 1)`;
+                u.description = `同時對後方敵方造成 [N] 傷害 (數值為勝場數 + 1)`;
             }
             if (u && u.family === 'pichu') {
                 u.scalingValue = enemyScale; // Force same scaling for enemy Pichu
-                u.description = `戰鬥開始時，對最弱的敵方造成 ${enemyScale} 傷害 (數值為勝場數 + 1)`;
+                u.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (數值為勝場數 + 1)`;
             }
         });
 

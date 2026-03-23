@@ -314,15 +314,16 @@ export class BattleSimulator {
                 }
 
                 if (allyTarget || enemyTarget) {
+                    await this.notifySkill(unit, `發動了禮物`);
                     this.log(`${unit.name} 對 ${allyTarget?.name || '目標'} 和 ${enemyTarget?.name || '目標'} 使用了禮物`);
                 }
 
                 if (enemyTarget) {
-                    this.playAnimation(enemyTarget, 'gift-flash-anim', 600);
+                    this.playAnimation(enemyTarget, 'glow-white-anim', 600);
                     await this.dealDamage(unit, enemyTarget, unit.abilityPower || 5, true);
                 }
                 if (allyTarget) {
-                    this.playAnimation(allyTarget, 'gift-flash-anim', 600);
+                    this.playAnimation(allyTarget, 'glow-white-anim', 600);
                     this.heal(allyTarget, unit.abilityPower || 5);
                 }
             }
@@ -838,10 +839,9 @@ export class BattleSimulator {
                 const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
                 const selected = shuffled.slice(0, targetCount);
                 for (const target of selected) {
-                    const reducedAmt = Math.floor(target.stats.attack * 0.33);
+                    const reducedAmt = Math.ceil(target.stats.attack * 0.33);
                     if (reducedAmt > 0) {
                         target.stats.attack -= reducedAmt;
-                        // this.log(`${target.name} 因撒嬌的眼神，降低了攻擊。`); // Simplified
                         this.playAnimation(target, 'glow-pale-pink', 500);
                     }
                 }
@@ -1721,7 +1721,8 @@ export class BattleSimulator {
         if (unit.family === 'mareep') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const s = this.unitStates.get(unit);
-                if (unit.stats.hp <= 0 || s?.isSilenced) return;
+                // Ensure unit is ALIVE and it wasn't the one who died
+                if (unit.stats.hp <= 0 || s?.isSilenced || e.source === unit) return;
 
                 const { myTeam } = this.getTeams(unit);
                 const { killer } = e.context;

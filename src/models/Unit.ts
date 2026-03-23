@@ -52,6 +52,7 @@ export class Unit {
     this.synergies = template.synergies || [];
     this.family = template.family || template.id;
     this.abilityPower = template.abilityPower || 0;
+    this.scalingValue = (template as any).scalingValue || 1;
     this._descriptionTemplate = template.description;
   }
 
