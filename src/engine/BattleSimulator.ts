@@ -325,12 +325,12 @@ export class BattleSimulator {
                 }
 
                 if (enemyTarget) {
-                    this.playAnimation(enemyTarget, 'glow-white-anim', 600);
-                    await this.dealDamage(unit, enemyTarget, unit.abilityPower || 5, true);
+                    this.playAnimation(enemyTarget, 'glow-white', 600);
+                    await this.dealDamage(unit, enemyTarget, 3, true);
                 }
                 if (allyTarget) {
-                    this.playAnimation(allyTarget, 'glow-white-anim', 600);
-                    this.heal(allyTarget, unit.abilityPower || 5);
+                    this.playAnimation(allyTarget, 'glow-white', 600);
+                    this.heal(allyTarget, 3);
                 }
             }
         }
@@ -620,7 +620,7 @@ export class BattleSimulator {
                         if (!isBypassing) {
                             e.context.amount = Math.ceil(e.context.amount / 2);
                         } else if (e.context.source?.family === 'pinsir') {
-                            // Mold Breaker log is enough, no need for specific bypass log
+                            this.log(`${e.context.source.name} 發動了破格，無視了光牆！`);
                         }
                         lsMap.set(victimSide, charges - 1);
                         this.playTeamAnimation([e.target], 'light-screen-anim', 400);
@@ -2054,6 +2054,10 @@ export class BattleSimulator {
                 if (this.onUpdate) this.onUpdate();
                 return;
             }
+        } else if (target.family === 'diglett' && !targetState.isSilenced && !isSkillDamage && isBypassing && source?.family === 'pinsir') {
+            // Check if bypass actually happened (would have dodged)
+            // Note: We assume any "hit" might be because of bypass if it's a Diglett.
+            this.log(`${source.name} 發動了破格！`);
         }
 
         // Emitting BEFORE_HURT allows skills like Mimikyu to nullify damage
@@ -2067,12 +2071,7 @@ export class BattleSimulator {
             return;
         }
 
-        // Pinsir/Sableye ignore reductions
-        if (isBypassing && source) {
-            if (source.family === 'pinsir') {
-                this.log(`${source.name} 發動了破格！`);
-            }
-        }
+        // Pinsir/Sableye ignore reductions - logic handled below for specific bypasses
 
         const preHp = target.stats.hp;
         target.stats.hp -= amount;
@@ -2085,6 +2084,9 @@ export class BattleSimulator {
             targetState.hardUsed = true;
             this.unitStates.set(target, targetState);
             this.log(`${target.name} 發動了結實！`);
+        } else if (target.stats.hp <= 0 && preHp > 1 && isBypassing && source?.family === 'pinsir' && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2) {
+            // Mold Breaker bypassed Sturdy
+            this.log(`${source.name} 發動了破格，無視了結實效果！`);
         }
 
         // Emit ON_HURT for triggers (like Steelix reflection)

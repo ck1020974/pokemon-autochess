@@ -377,10 +377,10 @@ export class HeadlessBattleSimulator {
                 }
 
                 if (enemyTarget) {
-                    await this.dealDamage(unit, enemyTarget, unit.abilityPower || 5, true, true);
+                    await this.dealDamage(unit, enemyTarget, 3, true, true);
                 }
                 if (allyTarget) {
-                    this.heal(allyTarget, unit.abilityPower || 5);
+                    this.heal(allyTarget, 3);
                 }
             }
         }
@@ -1504,6 +1504,8 @@ export class HeadlessBattleSimulator {
         }
         if (target.family === 'diglett' && !targetState.isSilenced && !isSkillDamage && !isBypassing) {
             if (Math.random() < ([0, 0.25, 0.33, 0.5][target.level] || 0.25)) return;
+        } else if (target.family === 'diglett' && !targetState.isSilenced && !isSkillDamage && isBypassing && source?.family === 'pinsir') {
+            this.log(`${source.name} 發動了破格！`);
         }
         if (!isBypassing) {
             if (target.family === 'squirtle' && !targetState.isSilenced) {
@@ -1524,6 +1526,9 @@ export class HeadlessBattleSimulator {
             target.stats.hp = 1;
             targetState.hardUsed = true;
             this.unitStates.set(target, targetState);
+            this.log(`${target.name} 發動了結實！`);
+        } else if (target.stats.hp <= 0 && preHp > 1 && isBypassing && source?.family === 'pinsir' && target.synergies.includes('Hard') && this.getSynergyCountForUnit(target, 'Hard') >= 2) {
+            this.log(`${source.name} 發動了破格，無視了結實效果！`);
         }
         await this.eventBus.emit({ type: 'ON_HURT', target, context: { source, amount, isSkillDamage } });
         if (target.stats.hp <= 0) {
