@@ -115,9 +115,12 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive }: any) {
+function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive }: any) {
     const [localOpen, setLocalOpen] = useState(false);
-    const isForcedOpen = setActiveSynergyId ? (activeSynergyId === synergy.id) : localOpen;
+    
+    // Use side-aware ID if setActiveSynergyId is provided (mainly for summary screen)
+    const synergyKey = (side && synergy.id) ? `${side}-${synergy.id}` : synergy.id;
+    const isForcedOpen = setActiveSynergyId ? (activeSynergyId === synergyKey) : localOpen;
 
     let activeDesc = synergy.description;
     const isActive = (count !== undefined && count >= synergy.tiers[0]) || forceActive;
@@ -125,7 +128,8 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
 
     // Dynamic [N] replacement for Psychic synergy (Fallback, mainly handled in GameLoop now)
     if (synergy.id === 'Psychic' && (window as any).game) {
-        activeDesc = activeDesc.replace('[N]', (window as any).game.psychicN.toString());
+        const val = isEnemy ? ((window as any).game.wins + 1) : (window as any).game.psychicN;
+        activeDesc = activeDesc.replace('[N]', val.toString());
     }
 
     return (
@@ -136,7 +140,7 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
             onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 if (setActiveSynergyId) {
-                    setActiveSynergyId(isForcedOpen ? null : synergy.id);
+                    setActiveSynergyId(isForcedOpen ? null : synergyKey);
                 } else {
                     setLocalOpen(!isForcedOpen);
                 }
@@ -1096,7 +1100,7 @@ function App() {
             const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
             const activeBuffs = [...game.nextBattleBuffs];
             game.nextBattleBuffs = []; // Clear buffs after consumption
-            const enemyPsychicN = Math.max(1, game.wins);
+            const enemyPsychicN = game.wins + 1;
             simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, enemyPsychicN, false, activeBuffs);
             const currentSim = simulatorRef.current;
 
@@ -2324,6 +2328,7 @@ function App() {
                                                             activeFamilies={syn.activeFamilies}
                                                             className="summary-synergy-item"
                                                             showCount={true}
+                                                            side="PLAYER"
                                                             activeSynergyId={activeSynergyId}
                                                             setActiveSynergyId={setActiveSynergyId}
                                                         />
@@ -2366,6 +2371,8 @@ function App() {
                                                                     activeFamilies={syn.activeFamilies}
                                                                     className="summary-synergy-item"
                                                                     showCount={true}
+                                                                    isEnemy={true}
+                                                                    side="ENEMY"
                                                                     activeSynergyId={activeSynergyId}
                                                                     setActiveSynergyId={setActiveSynergyId}
                                                                 />

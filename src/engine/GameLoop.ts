@@ -105,9 +105,9 @@ export class GameLoop {
 
     public refreshSpecialDescriptions() {
         // Update templates so shop shows CURRENT N value and correct frequency
-        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每三回合後增強)`;
-        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每二回合後增強)`;
-        ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每回合後增強)`;
+        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每二場戰鬥後增強)`;
+        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)`;
+        ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)`;
 
         // Sync static template scaling values to current global N
         (ALL_UNITS.charmander as any).scalingValue = this.charmanderN;
@@ -126,9 +126,9 @@ export class GameLoop {
         this.shop.slots.forEach(u => {
             if (u && u.family === 'charmander') {
                 u.scalingValue = this.charmanderN;
-                const freq = [0, '三', '二', ''][u.level] || '三';
-                const suffix = u.level === 3 ? '每回合' : `每${freq}回合`;
-                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${suffix}後增強)`;
+                const freq = [0, '二', '', ''][u.level] || '二';
+                const suffix = u.level >= 2 ? '每場' : `每${freq}場`;
+                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${suffix}戰鬥後增強)`;
             }
             if (u && u.family === 'pichu') {
                 u.scalingValue = this.pichuN;
@@ -142,9 +142,9 @@ export class GameLoop {
         this.playerTeam.forEach(u => {
             if (u && u.family === 'charmander') {
                 u.scalingValue = this.charmanderN;
-                const freq = [0, '三', '二', ''][u.level] || '三';
-                const suffix = u.level === 3 ? '每回合' : `每${freq}回合`;
-                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${suffix}後增強)`;
+                const freq = [0, '二', '', ''][u.level] || '二';
+                const suffix = u.level >= 2 ? '每場' : `每${freq}場`;
+                u.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (${suffix}戰鬥後增強)`;
             }
             if (u && u.family === 'pichu') {
                 u.scalingValue = this.pichuN;
@@ -154,16 +154,16 @@ export class GameLoop {
             }
         });
 
-        // Sync opponent's units on board (Enemy uses Player wins as scaling value)
+        // Sync opponent's units on board (Enemy uses Player wins + 1 as scaling value)
         this.opponentTeam.forEach(u => {
-            const enemyScale = Math.max(1, this.wins);
+            const enemyScale = this.wins + 1;
             if (u && u.family === 'charmander') {
                 u.scalingValue = enemyScale;
-                u.description = `同時對後方敵方造成 ${enemyScale} 傷害 (數值固定為我方勝場數)`;
+                u.description = `同時對後方敵方造成 ${enemyScale} 傷害 (數值為勝場數 + 1)`;
             }
             if (u && u.family === 'pichu') {
                 u.scalingValue = enemyScale; // Force same scaling for enemy Pichu
-                u.description = `戰鬥開始時，對最弱的敵方造成 ${enemyScale} 傷害 (數值固定為我方勝場數)`;
+                u.description = `戰鬥開始時，對最弱的敵方造成 ${enemyScale} 傷害 (數值為勝場數 + 1)`;
             }
         });
 
@@ -439,9 +439,17 @@ export class GameLoop {
         });
         if (maxCharmanderLevel > 0) {
             this.charmanderCounter++;
-            const threshold = [0, 3, 2, 1][maxCharmanderLevel] || 3;
+            const threshold = [0, 2, 1, 1][maxCharmanderLevel] || 1;
             if (this.charmanderCounter >= threshold) {
-                this.charmanderN++;
+                // Increment logic
+                if (maxCharmanderLevel === 3) {
+                    // Charizard: Odd +1, Even +2
+                    const inc = (this.turn % 2 === 1) ? 1 : 2;
+                    this.charmanderN += inc;
+                } else {
+                    // Charmander/Charmeleon: +1
+                    this.charmanderN += 1;
+                }
                 this.charmanderCounter = 0;
                 console.log(`小火龍家族技能增強！目前威力：${this.charmanderN}`);
             }
