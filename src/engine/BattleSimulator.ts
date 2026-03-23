@@ -1161,7 +1161,14 @@ export class BattleSimulator {
         if (unit.synergies.includes('Cave')) {
             this.eventBus.on('ON_MOVE', async (e) => {
                 if (e.source === unit) {
+                    const state = this.unitStates.get(unit) || {};
+                    const triggers = state.caveTriggers || 0;
+                    if (triggers >= 3) return;
+
                     if (this.getSynergyCountForUnit(unit, 'Cave') >= 2) {
+                        state.caveTriggers = triggers + 1;
+                        this.unitStates.set(unit, state);
+
                         const original = this.originalPlayerTeam?.find(u => u && u.id === unit.id);
                         const isAtk = Math.random() < 0.5;
                         this.growUnit(unit, isAtk ? 0 : 1, isAtk ? 1 : 0, '挖洞', original, e.context?.isPassiveMove || false);

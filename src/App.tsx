@@ -2193,7 +2193,9 @@ function App() {
                 (game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER) && (() => {
                     const mvp = [...game.playerTeam].filter(u => u).reduce((max: any, current: any) => {
                         if (!max) return current;
-                        return (current.stats.attack > max.stats.attack) ? current : max;
+                        const currentScore = current.battlesCount * 1000 + (current.stats.attack + current.stats.maxHp);
+                        const maxScore = max.battlesCount * 1000 + (max.stats.attack + max.stats.maxHp);
+                        return (currentScore > maxScore) ? current : max;
                     }, null);
 
                     const totalGames = game.wins + (game.drawCount || 0) + (game.lossCount || 0);

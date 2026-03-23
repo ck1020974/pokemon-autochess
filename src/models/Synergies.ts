@@ -18,7 +18,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Water': { id: 'Water', name: '潮旋', icon: '💧', description: '[2/3/5] 攻擊前使目標 -1/3/10 攻擊 (同對象限1次)', tiers: [2, 3, 5], color: '#60a5fa' },
     'Triplets': { id: 'Triplets', name: '三胞胎', icon: '👨‍👧‍👦', description: '[3] 死亡後永久 +3 攻擊或生命', tiers: [3], color: '#fcd34d' },
     'Hard': { id: 'Hard', name: '堅硬', icon: '🛡️', description: '[2] 抵擋首次死亡，保留 1 生命', tiers: [2], color: '#9ca3af' },
-    'Cave': { id: 'Cave', name: '挖洞', icon: '🕳️', description: '[2] 移動後永久 +1 攻擊或生命', tiers: [2], color: '#78350f' },
+    'Cave': { id: 'Cave', name: '挖洞', icon: '🕳️', description: '[2] 移動後永久 +1 攻擊或生命 (每場戰鬥限3次)', tiers: [2], color: '#78350f' },
     'Angry': { id: 'Angry', name: '憤怒', icon: '💢', description: '[2/4] 受傷後，全體友軍 +2/10 攻擊', tiers: [2, 4], color: '#dc2626' },
     'Snow': { id: 'Snow', name: '降雪', icon: '❄️', description: '[2] 戰鬥開始時，其他角色受到生命 33% 傷害', tiers: [2], color: '#bae6fd' },
     'SwordDance': { id: 'SwordDance', name: '劍舞', icon: '⚔️', description: '[2] 移動後永久 +2 攻擊 (每場戰鬥限3次)', tiers: [2], color: '#fca5a5' },
