@@ -209,12 +209,15 @@ export class GameLoop {
                     const uniqueForms = new Set(eeveeUnits.map(u => u.templateId));
                     count += (uniqueForms.size - 1);
                 } else {
-                    // Elemental Synergy: If there's an Eevee form that matches the synergy, it counts as 2
-                    const matches = eeveeUnits.some(u => {
+                    // Elemental Synergy: 1★/2★ eevee evo = +1 bonus, 3★ = +2 bonus
+                    const matchingEeveeEvo = eeveeUnits.filter(u => {
                         const template = ALL_UNITS[u.templateId];
                         return template.synergies.includes(synergyId) && u.templateId !== 'eevee';
                     });
-                    if (matches) count += 1; // Base 1 + Bonus 1 = 2
+                    if (matchingEeveeEvo.length > 0) {
+                        const maxLevel = Math.max(...matchingEeveeEvo.map(u => u.level));
+                        count += (maxLevel >= 3 ? 2 : 1);
+                    }
                 }
             }
         }
@@ -968,21 +971,33 @@ export class GameLoop {
 
     private performEeveeEvolution(unit: Unit, newLevel: number) {
         unit.level = newLevel;
-        // Only evolve if currently base form Eevee
+        // Case 1: Base Eevee evolving
         if (unit.templateId === 'eevee') {
             const forms = ['flareon', 'vaporeon', 'jolteon', 'espeon', 'umbreon', 'leafeon', 'glaceon', 'sylveon'];
-            const chosen = forms[Math.floor(Math.random() * forms.length)];
-            const template = ALL_UNITS[chosen];
+            let chosen = forms[Math.floor(Math.random() * forms.length)];
+            if (newLevel === 3) chosen += '_final';
 
+            const template = ALL_UNITS[chosen];
             unit.templateId = template.id;
             unit.name = template.name;
             unit.imageUrl = template.battleImageUrl || template.imageUrl;
             unit.battleImageUrl = template.battleImageUrl;
             unit.description = template.description;
             unit.synergies = [...template.synergies];
-            console.log(`伊布進化了！變成了 ${unit.name}`);
+            console.log(`伊布進化了！變成了 ${unit.name} (等級 ${unit.level})`);
+        }
+        // Case 2: Existing Evo reaching Level 3
+        else if (newLevel === 3 && !unit.templateId.endsWith('_final')) {
+            const finalId = unit.templateId + '_final';
+            const template = ALL_UNITS[finalId];
+            if (template) {
+                unit.templateId = template.id;
+                unit.name = template.name;
+                unit.description = template.description;
+                console.log(`${unit.name} 晉升為三星完全體形態！`);
+            }
         } else {
-            console.log(`${unit.name} 等級提升，保持原有型態。`);
+            console.log(`${unit.name} 等級提升至 ${unit.level}，保持原有型態。`);
         }
 
         // Apply Growth (Same as non-evolve logic but for Eevee)

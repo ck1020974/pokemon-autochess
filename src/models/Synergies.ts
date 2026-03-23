@@ -36,7 +36,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Charge': { id: 'Charge', name: '充電', icon: '⚡', description: '[2/3/5] 戰鬥開始時，隨機增加 0~15 攻擊', tiers: [2, 3, 5], color: '#fde047' },
     'Thief': { id: 'Thief', name: '小偷', icon: '👤', description: '[2/5] 戰鬥開始時，從最強的敵方偷取 2/5 點攻擊', tiers: [2, 5], color: '#64748b' },
     'Charm': { id: 'Charm', name: '撒嬌', icon: '💖', description: '[2/3/5] 戰鬥開始時，隨機 1/2/4 位敵方攻擊降低 33%', tiers: [2, 3, 5], color: '#f472b6' },
-    'BatonPass': { id: 'BatonPass', name: '接棒', icon: '🏃', description: '[2] 死亡後，隨機1位角色繼承50% 攻擊與生命', tiers: [2], color: '#fb923c' },
+    'BatonPass': { id: 'BatonPass', name: '接棒', icon: '🏃', description: '[2/5] 死亡後，隨機1位角色繼承 50%/100% 攻擊與生命', tiers: [2, 5], color: '#fb923c' },
     'Outrage': { id: 'Outrage', name: '逆鱗', icon: '🐲', description: '[2] 可能額外再攻擊 1 個敵方或是無法攻擊。', tiers: [2, 3], color: '#f59e0b' },
 };
 

@@ -769,6 +769,8 @@ export class BattleSimulator {
         map.clear(); // CRITICAL: Reset before recalculating
         const familyMap = new Map<string, Set<string>>();
         const eeveeFormsPerSynergy = new Map<string, Set<string>>();
+        // Track max level of eevee evolution forms per synergy (for +2 counting)
+        const eeveeMaxLevelPerSynergy = new Map<string, number>();
 
         team.forEach(u => {
             u.synergies.forEach(syn => {
@@ -778,6 +780,9 @@ export class BattleSimulator {
                 if (u.family === 'eevee' && u.templateId !== 'eevee') {
                     if (!eeveeFormsPerSynergy.has(syn)) eeveeFormsPerSynergy.set(syn, new Set());
                     eeveeFormsPerSynergy.get(syn)!.add(u.templateId);
+                    // Track the highest level eevee evo for this synergy
+                    const prevLevel = eeveeMaxLevelPerSynergy.get(syn) || 0;
+                    if (u.level > prevLevel) eeveeMaxLevelPerSynergy.set(syn, u.level);
                 }
             });
         });
@@ -794,9 +799,9 @@ export class BattleSimulator {
                     // Add the remaining N-1 forms.
                     count += (uniqueEeveeForms.size - 1);
                 } else {
-                    // Elemental Synergies: If any matching Eevee form exists, it counts as 2 instead of 1.
-                    // (Matching logic: The form must have the synergy in its definition, which we already verified by eeveeFormsPerSynergy inclusion)
-                    count += 1;
+                    // Elemental Synergies: 1★/2★ eevee evo = +1, 3★ eevee evo = +2
+                    const maxLevel = eeveeMaxLevelPerSynergy.get(syn) || 1;
+                    count += (maxLevel >= 3 ? 2 : 1);
                 }
             }
 
@@ -821,7 +826,7 @@ export class BattleSimulator {
             this.log(`伊布發動了九彩昇華齊聚頂`);
             team.forEach(u => {
                 if (u && u.stats.hp > 0) {
-                    this.growUnit(u, 20, 20, '九彩昇華齊聚頂', null, true);
+                    this.growUnit(u, 10, 10, '九彩昇華齊聚頂', null, true);
                     this.playAnimation(u, 'glow-rainbow', 1000);
                 }
             });
@@ -2099,17 +2104,20 @@ export class BattleSimulator {
             }
         }
 
-        // BatonPass (接棒): Random 1 ally inherits 50% Atk/HP
+        // BatonPass (接棒): Random 1 ally inherits 50% (>=2) or 100% (>=5) Atk/HP
         if (unit.synergies.includes('BatonPass') && this.getSynergyCountForUnit(unit, 'BatonPass') >= 2 && !this.unitStates.get(unit)?.isSilenced) {
+            const batonCount = this.getSynergyCountForUnit(unit, 'BatonPass');
+            const inheritRatio = batonCount >= 5 ? 1.0 : 0.5;
             const livingAllies = myTeam.filter(u => u && u !== unit && u.stats.hp > 0);
             if (livingAllies.length > 0) {
                 const target = livingAllies[Math.floor(Math.random() * livingAllies.length)];
-                const inheritedAtk = Math.floor(unit.stats.attack * 0.5);
-                const inheritedHp = Math.floor(unit.stats.maxHp * 0.5);
+                const inheritedAtk = Math.floor(unit.stats.attack * inheritRatio);
+                const inheritedHp = Math.floor(unit.stats.maxHp * inheritRatio);
 
                 if (inheritedAtk > 0 || inheritedHp > 0) {
                     this.growUnit(target, inheritedHp, inheritedAtk, `${unit.name} 的接棒`, null, true);
-                    this.log(`${unit.name} 對 ${target.name} 使用了接棒。`);
+                    const pct = inheritRatio === 1.0 ? '100%' : '50%';
+                    this.log(`${unit.name} 對 ${target.name} 使用了接棒（繼承 ${pct}）。`);
                     this.playAnimation(target, 'glow-orange', 600);
                 }
             }
