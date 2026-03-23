@@ -323,6 +323,28 @@ export class HeadlessBattleSimulator {
             }
         }
 
+        // Cleffa Family: Permanent HP buff at start
+        if (unit.family === 'cleffa') {
+            const isStage3 = (unit.level >= 3);
+            if (isStage3) {
+                const living = myTeam.filter(u => u && u.stats.hp > 0);
+                living.forEach(u => {
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
+                    this.growUnit(u, 3, 0, original, true);
+                });
+            } else {
+                const idx = myTeam.indexOf(unit);
+                if (idx < myTeam.length - 1) { // back ally
+                    const back = myTeam[idx + 1];
+                    if (back) {
+                        const amount = unit.level === 2 ? 3 : 1;
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
+                        this.growUnit(back, amount, 0, original, true);
+                    }
+                }
+            }
+        }
+
 
         // Delibird: Gift (Battle Start)
         if (unit.family === 'delibird') {
@@ -363,6 +385,7 @@ export class HeadlessBattleSimulator {
             const buffAtk = Math.floor(unit.stats.hp * 0.33);
             if (buffAtk > 0) {
                 unit.stats.attack += buffAtk;
+                unit.capStats();
                 this.log(`${unit.name}發動了唱反調。`);
             }
         }

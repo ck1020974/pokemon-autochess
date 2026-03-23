@@ -935,6 +935,13 @@ export class GameLoop {
                 const multiplier = 1;
                 unit.addGrowth(base.maxHp * multiplier, base.attack * multiplier);
                 console.log(`${unit.name} Level Up (Non-Evolve) -> +${base.maxHp * multiplier}/+${base.attack * multiplier}`);
+
+                // Special: Trigger effect for certain families on Level Up (Synthesis)
+                const mergeTriggerFamilies = ['mankey', 'dwebble', 'ekans', 'wynaut'];
+                if (mergeTriggerFamilies.includes(unit.family)) {
+                    console.log(`${unit.name} (等級 ${unit.level}) 觸發了級別提升效果`);
+                    this.triggerMergeEffect(unit);
+                }
             }
         } else {
             unit.addGrowth(amount, amount);
@@ -944,10 +951,10 @@ export class GameLoop {
         console.log(`${unit.name} Gained Exp: Total ${totalExp} (Level ${unit.level})`);
 
         // Final Evolve Trigger (e.g. if level 2 already reached but evolveId changed)
-        // This is a safety check.
+        // This is a safety check to ensure 2-star units are evolved correctly.
         if (unit.evolveId && unit.level >= 2 && unit.templateId === unit.family) {
-            // Basic evolution for level 2 if not evolved yet
-            // (Wait, this is complex for Eevee, but Eevee is handled above)
+            console.log(`Safety Evolve Trigger for ${unit.name} (Level ${unit.level})`);
+            this.performEvolution(unit, unit.level);
         }
     }
 
@@ -975,7 +982,7 @@ export class GameLoop {
         unit.addGrowth(base.maxHp, base.attack);
     }
 
-    private performEvolution(unit: Unit) {
+    private performEvolution(unit: Unit, targetLevel?: number) {
         if (!unit.evolveId) return;
 
         const newTemplate = ALL_UNITS[unit.evolveId];
@@ -988,13 +995,26 @@ export class GameLoop {
 
             unit.templateId = newTemplate.id;
             unit.name = newTemplate.name;
+
+            // Special: Trigger effect for certain families on Evolution (Synthesis)
+            const evolveTriggerFamilies = ['mankey', 'dwebble', 'ekans', 'wynaut'];
+            if (evolveTriggerFamilies.includes(unit.family)) {
+                console.log(`${unit.name} (進化) 觸發了合成效果`);
+                this.triggerMergeEffect(unit);
+            }
+
             unit.description = newTemplate.description;
             unit.imageUrl = newTemplate.battleImageUrl || newTemplate.imageUrl;
             unit.battleImageUrl = newTemplate.battleImageUrl;
             unit.evolveId = newTemplate.evolveId;
             unit.synergies = newTemplate.synergies || [];
             unit.tier = newTemplate.tier;
-            unit.level += 1;
+            
+            if (targetLevel !== undefined) {
+                unit.level = targetLevel;
+            } else {
+                unit.level += 1;
+            }
 
             console.log(`Evolution! ${unit.name} (Stage ${unit.level}) with Bonus + ${bonus.maxHp}/+${bonus.attack}`);
         }

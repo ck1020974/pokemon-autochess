@@ -331,6 +331,7 @@ export class BattleSimulator {
             const buffAtk = Math.floor(unit.stats.hp * 0.33);
             if (buffAtk > 0) {
                 unit.stats.attack += buffAtk;
+                unit.capStats();
                 this.log(`${unit.name}發動了唱反調。`);
                 this.playAnimation(unit, 'jump', 200);
             }
@@ -392,6 +393,33 @@ export class BattleSimulator {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, 0, amount, '能力提升', original, true);
                         this.log(`${unit.name} 為 ${back.name} 增加了攻擊！`);
+                    }
+                }
+            }
+        }
+
+        // Cleffa Family: Permanent HP buff at start
+        if (unit.family === 'cleffa') {
+            const isStage3 = (unit.level >= 3);
+            if (isStage3) {
+                await this.notifySkill(unit, `皮可西使用了月亮之力！`);
+                for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
+                    const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
+                    this.growUnit(u, 3, 0, '能力提升', original, true);
+                    await this.delay(65);
+                }
+            } else {
+                const idx = myTeam.indexOf(unit);
+                if (idx < myTeam.length - 1) { // back ally
+                    const back = myTeam[idx + 1];
+                    if (back) {
+                        const amount = unit.level === 2 ? 3 : 1;
+                        await this.notifySkill(unit, `使用了屏息！`);
+
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
+                        this.growUnit(back, amount, 0, '能力提升', original, true);
+                        this.log(`${unit.name} 為 ${back.name} 增加了生命！`);
+                        this.playAnimation(back, 'glow-pale-pink', 600);
                     }
                 }
             }
