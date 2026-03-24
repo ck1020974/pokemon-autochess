@@ -7,7 +7,7 @@ export const MODERN_NOVICE_OPPONENTS: OpponentDefinition[] = [
     { id: 'mn_1', name: '武藏', url: 'gym/武藏.webp', coreUnits: ['ekans', 'meowth'], difficulty: 'EASY' },
     { id: 'mn_2', name: '小次郎', url: 'gym/小次郎.webp', coreUnits: ['wynaut', 'meowth'], difficulty: 'EASY' },
     { id: 'mn_3', name: '小霞', url: 'gym/小霞01.webp', coreUnits: ['squirtle', 'clefairy'], difficulty: 'EASY' },
-    { id: 'mn_4', name: '克麗絲', url: 'gym/克麗絲.webp', coreUnits: ['totodile'], difficulty: 'EASY' },
+    { id: 'mn_4', name: '克莉絲', url: 'gym/克莉絲01.webp', coreUnits: ['totodile'], difficulty: 'EASY' },
     { id: 'mn_5', name: '琴音', url: 'gym/琴音01.webp', coreUnits: ['chikorita'], difficulty: 'EASY' },
     { id: 'mn_6', name: '馬志士', url: 'gym/馬志士.webp', coreUnits: ['pichu', 'magnemite', 'magnemite'], difficulty: 'EASY' },
     { id: 'mn_7', name: '莉莉艾', url: 'gym/莉莉艾.webp', coreUnits: ['clefairy', 'clefairy', 'eevee'], difficulty: 'EASY' },
@@ -25,7 +25,7 @@ export const MODERN_NOVICE_OPPONENTS: OpponentDefinition[] = [
 
 export const MODERN_INTERM_OPPONENTS: OpponentDefinition[] = [
     // EASY
-    { id: 'mi_1', name: '莉佳', url: 'gym/莉佳.webp', coreUnits: ['bulbasaur', 'chikorita', 'bellsprout'], difficulty: 'EASY' },
+    { id: 'mi_1', name: '莉佳', url: 'gym/莉佳01.webp', coreUnits: ['bulbasaur', 'chikorita', 'bellsprout'], difficulty: 'EASY' },
     { id: 'mi_2', name: '小茜', url: 'gym/小茜.webp', coreUnits: ['clefairy', 'clefairy'], difficulty: 'EASY' },
     { id: 'mi_3', name: '阿馴', url: 'gym/阿馴.webp', coreUnits: ['heracross'], difficulty: 'EASY' },
     { id: 'mi_4', name: '瓢太', url: 'gym/瓢太.webp', coreUnits: ['magnemite', 'bonsly', 'geodude'], difficulty: 'EASY' },
@@ -82,7 +82,7 @@ export const MODERN_ELITE_OPPONENTS: OpponentDefinition[] = [
     // HARD
     { id: 'me_7', name: '小霞', url: 'gym/小霞03.webp', coreUnits: ['vaporeon', 'squirtle', 'golduck', 'totodile', 'togepi'], difficulty: 'HARD' },
     { id: 'me_8', name: '小智', url: 'gym/小智.webp', coreUnits: ['farfetchd', 'larvitar', 'pichu', 'mrmime', 'charmander'], difficulty: 'HARD' },
-    { id: 'me_9', name: '阿渡', url: 'elitefour/阿渡.webp', coreUnits: ['doduo', 'magnemite', 'charmander', 'dratini', 'dratini'], difficulty: 'HARD' },
+    { id: 'me_9', name: '阿渡', url: 'elitefour/阿渡01.webp', coreUnits: ['doduo', 'magnemite', 'charmander', 'dratini', 'dratini'], difficulty: 'HARD' },
     { id: 'me_10', name: '大吾', url: 'champion/大吾01.webp', coreUnits: ['shuckle', 'larvitar', 'magnemite', 'diglett', 'cubone'], difficulty: 'HARD' },
     { id: 'me_11', name: '丹帝', url: 'champion/丹帝01.webp', coreUnits: ['charmander', 'dratini', 'heracross', 'pinsir', 'farfetchd'], difficulty: 'HARD' },
     { id: 'me_12', name: '柯拿', url: 'elitefour/科拿.webp', coreUnits: ['delibird', 'golduck', 'sneasel', 'squirtle', 'totodile'], difficulty: 'HARD' },
