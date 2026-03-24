@@ -425,8 +425,6 @@ export class BattleSimulator {
 
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, amount, 0, '能力提升', original, true);
-                        // this.log(`${unit.name} 為 ${back.name} 增加了生命！`); // Redundant
-                        this.playAnimation(back, 'charm', 600);
                     }
                 }
             }
