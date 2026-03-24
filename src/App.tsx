@@ -56,7 +56,7 @@ interface ConfirmDialogState {
 // --- Helper Components ---
 
 // UnitCard with Direct Lock & Silence Support
-function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock, isCharmed, synergyHighlight }: any) {
+function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock, synergyHighlight }: any) {
     if (!unit || unit.stats.hp <= 0) {
         return (
             <div className="slot-placeholder">
@@ -110,7 +110,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
                 <span className="stat-atk">{unit.stats.attack}</span>
                 <span className="stat-hp" style={{ color: hpSwapped ? '#a855f7' : undefined }}>{unit.stats.hp}</span>
             </div>
-            {isCharmed && <div className="charm-status-icon" title="受到撒嬌影響 (攻擊降低)">❤️</div>}
+            {/* isCharmed icon removed as requested, replaced by animation in BattleSimulator */}
         </div>
     );
 }
@@ -1117,10 +1117,18 @@ function App() {
             const currentSim = simulatorRef.current;
 
             currentSim.onUpdate = () => {
-                if (simulatorRef.current) {
-                    setLogs([...simulatorRef.current.logs]);
+                const updateUI = () => {
+                    if (simulatorRef.current) {
+                        setLogs([...simulatorRef.current.logs]);
+                    }
+                    setBattleTick((t: number) => t + 1);
+                };
+
+                if ((document as any).startViewTransition) {
+                    (document as any).startViewTransition(() => updateUI());
+                } else {
+                    updateUI();
                 }
-                setBattleTick((t: number) => t + 1);
             };
             setLogs([]);
 
@@ -1131,8 +1139,19 @@ function App() {
 
                 try {
                     const keepGoing = await simulatorRef.current.simulateStep();
-                    setLogs([...simulatorRef.current.logs]);
-                    setBattleTick((t: number) => t + 1);
+                    
+                    const updateAfterStep = () => {
+                        if (simulatorRef.current) {
+                            setLogs([...simulatorRef.current.logs]);
+                        }
+                        setBattleTick((t: number) => t + 1);
+                    };
+
+                    if ((document as any).startViewTransition) {
+                        (document as any).startViewTransition(() => updateAfterStep());
+                    } else {
+                        updateAfterStep();
+                    }
 
                     if (!keepGoing) {
                         if (interval) clearInterval(interval);
@@ -2944,7 +2963,7 @@ function App() {
             {/* Detail Panel */}
             {
                 selected && (
-                    <div className="detail-panel" onClick={e => e.stopPropagation()}>
+                    <div className="detail-panel" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                         {/* Close Button (Top Left X) */}
                         <button
                             style={{

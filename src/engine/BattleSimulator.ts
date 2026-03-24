@@ -426,7 +426,7 @@ export class BattleSimulator {
                         const original = this.originalPlayerTeam?.find(o => o && o.id === back.id);
                         this.growUnit(back, amount, 0, '能力提升', original, true);
                         // this.log(`${unit.name} 為 ${back.name} 增加了生命！`); // Redundant
-                        this.playAnimation(back, 'glow-pale-pink', 600);
+                        this.playAnimation(back, 'charm', 600);
                     }
                 }
             }
@@ -857,7 +857,7 @@ export class BattleSimulator {
                         const state = this.unitStates.get(target) || {};
                         state.isCharmed = true;
                         this.unitStates.set(target, state);
-                        this.playAnimation(target, 'glow-pale-pink', 500);
+                        this.playAnimation(target, 'charm', 600);
                     }
                 }
             }
