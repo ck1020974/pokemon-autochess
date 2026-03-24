@@ -210,18 +210,13 @@ function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
         const evolvedEeveeUnits = potentialUnits.filter(u => u.family === 'eevee' && u.templateId !== 'eevee');
         if (evolvedEeveeUnits.length > 0) {
             if (synId === 'BatonPass') {
-                // Baton Pass: Unique Eevee forms count as different families, each with its level bonus
-                let totalEeveePoints = 0;
-                const formsMap = new Map<string, number>(); // templateId -> maxLevel
+                // Baton Pass: Every unique evolved form counts as 1 (no star bonus, fix doubling)
+                const formsMap = new Map<string, number>(); // templateId -> level (level is ignored now)
                 evolvedEeveeUnits.forEach(u => {
-                    const currentMax = formsMap.get(u.templateId) || 0;
-                    if (u.level > currentMax) formsMap.set(u.templateId, u.level);
-                });
-                formsMap.forEach((level) => {
-                    totalEeveePoints += (level >= 3 ? 3 : 2);
+                    formsMap.set(u.templateId, u.level);
                 });
                 // Subtract 1 because Eevee family was already counted as 1 in familySet.size
-                count += (totalEeveePoints - 1);
+                count += (formsMap.size - 1);
             } else {
                 // Elemental Synergy: Add bonus based on the highest level of matching evolved Eevee
                 const maxLevel = Math.max(...evolvedEeveeUnits.map(u => u.level));

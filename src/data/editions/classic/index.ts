@@ -10,7 +10,7 @@ import {
 
 export const ClassicEdition: GameEdition = {
     id: 'classic',
-    name: '經典版 (第一至九代混合)',
+    name: '作者：柚C老師',
     /** 
      * The Classic edition includes ALL current units. 
      * We just extract all the keys from the ALL_UNITS pool.

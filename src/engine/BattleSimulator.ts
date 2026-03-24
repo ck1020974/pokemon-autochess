@@ -797,14 +797,9 @@ export class BattleSimulator {
             // Eevee Special Logic
             if (evolvedEeveeForms.has(syn)) {
                 if (syn === 'BatonPass') {
-                    // Baton Pass: Every unique evolved form counts as a family + star bonus (similar to App.tsx)
-                    let totalEeveePoints = 0;
+                    // Baton Pass: Every unique evolved form counts as 1 (no star bonus, fix doubling)
                     const forms = evolvedEeveeForms.get(syn)!;
-                    forms.forEach(formId => {
-                        const level = evolvedEeveeMaxLevelPerForm.get(`${syn}_${formId}`) || 1;
-                        totalEeveePoints += (level >= 3 ? 3 : 2);
-                    });
-                    count += (totalEeveePoints - 1); // Subtract 1 already counted by 'eevee' family
+                    count += (forms.size - 1); // Subtract 1 already counted by 'eevee' family
                 } else {
                     // Elemental: Max bonus from any one matching evolved form
                     const forms = evolvedEeveeForms.get(syn)!;

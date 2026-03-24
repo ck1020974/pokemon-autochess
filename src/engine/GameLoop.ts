@@ -205,17 +205,13 @@ export class GameLoop {
             const evolvedEeveeUnits = units.filter(u => u.family === 'eevee' && u.templateId !== 'eevee');
             if (evolvedEeveeUnits.length > 0) {
                 if (synergyId === 'BatonPass') {
-                    // Sync with Simulator & App.tsx: count each unique form + star bonus
-                    let totalEeveePoints = 0;
+                    // Baton Pass: Every unique evolved form counts as 1 (no star bonus, fix doubling)
                     const formsMap = new Map<string, number>();
                     evolvedEeveeUnits.forEach(u => {
-                        const m = formsMap.get(u.templateId.replace('_final', '')) || 0;
-                        if (u.level > m) formsMap.set(u.templateId.replace('_final', ''), u.level);
+                        const baseId = u.templateId.replace('_final', '');
+                        formsMap.set(baseId, u.level);
                     });
-                    formsMap.forEach(level => {
-                        totalEeveePoints += (level >= 3 ? 3 : 2);
-                    });
-                    count += (totalEeveePoints - 1); // Subtract 1 (original Eevee family count)
+                    count += (formsMap.size - 1); // Subtract 1 already counted by 'eevee' family
                 } else {
                     // Elemental Synergy: Add bonus based on the highest level matching evolved form
                     const matchingEeveeEvo = evolvedEeveeUnits.filter(u => {
@@ -1091,14 +1087,15 @@ export class GameLoop {
         // Removed caterpie logic because it was moved to battle start.
 
         if (unit.family === 'ekans') {
-            if (unit.templateId === 'arbok_final') { // Level 3
+            const isLevel3 = unit.level >= 3 || unit.templateId === 'arbok_final';
+            if (isLevel3) {
                 this.playerTeam.filter(u => u && u !== unit).forEach(u => u!.addBuff(10));
             } else {
                 const idx = this.playerTeam.indexOf(unit);
-                if (idx < this.playerTeam.length - 1) {
+                if (idx !== -1 && idx < this.playerTeam.length - 1) {
                     const back = this.playerTeam[idx + 1];
                     if (back) {
-                        const amount = unit.templateId === 'arbok' ? 5 : 2;
+                        const amount = (unit.templateId === 'arbok' || unit.level >= 2) ? 5 : 2;
                         back.addBuff(amount);
                     }
                 }
@@ -1106,14 +1103,15 @@ export class GameLoop {
         }
 
         if (unit.family === 'wynaut') {
-            if (unit.templateId === 'wobbuffet_final') { // Level 3
+            const isLevel3 = unit.level >= 3 || unit.templateId === 'wobbuffet_final';
+            if (isLevel3) {
                 this.playerTeam.filter(u => u && u !== unit).forEach(u => u!.addGrowth(10, 0));
             } else {
                 const idx = this.playerTeam.indexOf(unit);
-                if (idx < this.playerTeam.length - 1) {
+                if (idx !== -1 && idx < this.playerTeam.length - 1) {
                     const back = this.playerTeam[idx + 1];
                     if (back) {
-                        const amount = unit.templateId === 'wobbuffet' ? 5 : 2;
+                        const amount = (unit.templateId === 'wobbuffet' || unit.level >= 2) ? 5 : 2;
                         back.addGrowth(amount, 0);
                     }
                 }
