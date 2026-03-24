@@ -932,6 +932,16 @@ export class GameLoop {
 
         target.scalingValue = Math.max(target.scalingValue || 1, source.scalingValue || 1);
 
+        // --- Added: Mankey/Dwebble/Ekans/Wynaut Combine Trigger ---
+        // Trigger BEFORE exp gain to use current level for bonus calculation
+        const mergeTriggerFamilies = ['mankey', 'dwebble', 'ekans', 'wynaut'];
+        if (mergeTriggerFamilies.includes(target.family)) {
+            // Lvl 3 only triggers on Sell, so we skip here
+            if (target.level < 3) {
+                this.triggerMergeEffect(target);
+            }
+        }
+
         const expGain = (target.family === 'eevee') ? source.exp * 2 : source.exp;
         this.handleUnitExpGain(target, expGain);
     }
@@ -971,13 +981,6 @@ export class GameLoop {
                 const multiplier = 1;
                 unit.addGrowth(base.maxHp * multiplier, base.attack * multiplier);
                 console.log(`${unit.name} Level Up (Non-Evolve) -> +${base.maxHp * multiplier}/+${base.attack * multiplier}`);
-
-                // Special: Trigger effect for certain families on Level Up (Synthesis)
-                const mergeTriggerFamilies = ['mankey', 'dwebble', 'ekans', 'wynaut'];
-                if (mergeTriggerFamilies.includes(unit.family)) {
-                    console.log(`${unit.name} (等級 ${unit.level}) 觸發了級別提升效果`);
-                    this.triggerMergeEffect(unit);
-                }
             }
         } else {
             unit.addGrowth(amount, amount);
@@ -1044,13 +1047,6 @@ export class GameLoop {
             unit.templateId = newTemplate.id;
             unit.name = newTemplate.name;
 
-            // Special: Trigger effect for certain families on Evolution (Synthesis)
-            const evolveTriggerFamilies = ['mankey', 'dwebble', 'ekans', 'wynaut'];
-            if (evolveTriggerFamilies.includes(unit.family)) {
-                console.log(`${unit.name} (進化) 觸發了合成效果`);
-                this.triggerMergeEffect(unit);
-            }
-
             unit.description = newTemplate.description;
             unit.imageUrl = newTemplate.battleImageUrl || newTemplate.imageUrl;
             unit.battleImageUrl = newTemplate.battleImageUrl;
@@ -1080,7 +1076,7 @@ export class GameLoop {
                 if (idx > 0) {
                     const front = team[idx - 1];
                     if (front) {
-                        const amount = unit.level === 2 ? 4 : 2;
+                        const amount = unit.level === 2 ? 4 : 2; // Fixed: Lvl 2 gives +4
                         front.addBuff(amount);
                     }
                 }
@@ -1116,7 +1112,7 @@ export class GameLoop {
                 if (idx !== -1 && idx < this.playerTeam.length - 1) {
                     const back = this.playerTeam[idx + 1];
                     if (back) {
-                        const amount = (unit.templateId === 'arbok' || unit.level >= 2) ? 5 : 2;
+                        const amount = (unit.templateId === 'arbok' || unit.level >= 2) ? 4 : 2;
                         back.addBuff(amount);
                     }
                 }
@@ -1132,7 +1128,7 @@ export class GameLoop {
                 if (idx !== -1 && idx < this.playerTeam.length - 1) {
                     const back = this.playerTeam[idx + 1];
                     if (back) {
-                        const amount = (unit.templateId === 'wobbuffet' || unit.level >= 2) ? 5 : 2;
+                        const amount = (unit.templateId === 'wobbuffet' || unit.level >= 2) ? 4 : 2;
                         back.addGrowth(amount, 0);
                     }
                 }
