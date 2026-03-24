@@ -2155,8 +2155,7 @@ export class BattleSimulator {
 
                 if (inheritedAtk > 0 || inheritedHp > 0) {
                     this.growUnit(target, inheritedHp, inheritedAtk, `${unit.name} 的接棒`, null, true);
-                    const pct = inheritRatio === 1.0 ? '100%' : '50%';
-                    this.log(`${unit.name} 對 ${target.name} 使用了接棒（繼承 ${pct}）。`);
+                    this.log(`${unit.name} 對 ${target.name} 使用了接棒。`);
                     this.playAnimation(target, 'glow-orange', 600);
                 }
             }

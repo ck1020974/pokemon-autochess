@@ -56,7 +56,7 @@ interface ConfirmDialogState {
 // --- Helper Components ---
 
 // UnitCard with Direct Lock & Silence Support
-function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock, isCharmed }: any) {
+function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock, isCharmed, synergyHighlight }: any) {
     if (!unit || unit.stats.hp <= 0) {
         return (
             <div className="slot-placeholder">
@@ -68,7 +68,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
     return (
         <div
             id={unit.id}
-            className={`unit-card tier-${unit.tier || 1} ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${gastroAcid ? 'is-gastro-acid' : ''} ${isSelected ? 'is-selected' : ''} ${showMergeGlow ? 'is-mergeable' : ''} ${isEvolving ? 'is-evolving' : ''}`}
+            className={`unit-card tier-${unit.tier || 1} ${frozen ? 'frozen' : ''} ${flipped ? 'flipped' : ''} ${silenced ? 'is-silenced' : ''} ${gastroAcid ? 'is-gastro-acid' : ''} ${isSelected ? 'is-selected' : ''} ${showMergeGlow ? 'is-mergeable' : ''} ${isEvolving ? 'is-evolving' : ''} ${synergyHighlight ? 'synergy-highlight' : ''}`}
             onClick={(e) => { e.stopPropagation(); onClick(); }}
             draggable={draggable}
             onDragStart={onDragStart}
@@ -1607,6 +1607,7 @@ function App() {
         ? (initialPlayerTeamForSynergy.length > 0 ? initialPlayerTeamForSynergy : displayPlayerTeam)
         : displayPlayerTeam;
     const synergyStatus = getSynergyStatus(activeTeamForSynergy, activeEdition);
+    const activeSyn = activeSynergyId ? (SYNERGIES as any)[activeSynergyId] : null;
 
     return (
         <div className="game-container" onClick={() => {
@@ -2357,7 +2358,7 @@ function App() {
                                                     if (!u) return <div key={i} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.03)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.1)' }} />;
                                                     const img00 = u.imageUrl.replace('01.webp', '00.webp');
                                                     return (
-                                                        <div key={i} className="summary-unit-card">
+                                                        <div key={i} className={`summary-unit-card ${activeSyn && u && activeSyn.families.includes(u.family) ? 'synergy-highlight' : ''}`}>
                                                             {mvp?.id === u.id && <div className="mvp-badge"> MVP</div>}
                                                             <div className="summary-unit-img-wrapper">
                                                                 <img
@@ -2401,7 +2402,7 @@ function App() {
                                                             if (!u) return <div key={`enemy-${i}`} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.01)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.05)' }} />;
                                                             const img00 = u.imageUrl.replace('01.webp', '00.webp');
                                                             return (
-                                                                <div key={`enemy-${i}`} className="summary-unit-card">
+                                                                <div key={`enemy-${i}`} className={`summary-unit-card ${activeSyn && u && activeSyn.families.includes(u.family) ? 'synergy-highlight' : ''}`}>
                                                                     <div className="summary-unit-img-wrapper">
                                                                         <img
                                                                             src={img00}
@@ -2754,6 +2755,7 @@ function App() {
                                         hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
                                         isCharmed={unit ? simulatorRef.current?.unitStates.get(unit)?.isCharmed : false}
                                         isEvolving={unit && evolvingUnitId === unit.id}
+                                        synergyHighlight={activeSyn && unit && activeSyn.families.includes(unit.family)}
                                     />
                                 </div>
                             );
@@ -2777,6 +2779,7 @@ function App() {
                                         hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
                                         isCharmed={unit ? simulatorRef.current?.unitStates.get(unit)?.isCharmed : false}
                                         isEvolving={unit && evolvingUnitId === unit.id}
+                                        synergyHighlight={activeSyn && unit && activeSyn.families.includes(unit.family)}
                                     />
                                 </div>
                             );
@@ -2861,6 +2864,7 @@ function App() {
                                                 showMergeGlow={unit && (unit as any).isMergeable}
                                                 isEvolving={unit && evolvingUnitId === unit.id}
                                                 tutorialHighlightLock={false}
+                                                synergyHighlight={activeSyn && unit && activeSyn.families.includes(unit.family)}
                                             />
                                         </div>
                                     );
