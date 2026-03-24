@@ -1262,6 +1262,37 @@ h3 {
   animation: morph calc(0.5s / var(--anim-speed)) ease-in-out;
 }
 
+@keyframes charm-heart {
+  0% {
+    transform: translate(-50%, 0) scale(0);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -20px) scale(1.2);
+    opacity: 1;
+  }
+  80% {
+    transform: translate(-50%, -40px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -60px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.charm-anim::after {
+  content: '💖';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  font-size: 1.5rem;
+  z-index: 100;
+  pointer-events: none;
+  animation: charm-heart calc(0.6s / var(--anim-speed)) ease-out forwards;
+  filter: drop-shadow(0 0 5px rgba(244, 114, 182, 0.5));
+}
+
 /* --- Mobile Responsiveness (Optimized for Landscape) --- */
 @media (max-width: 950px) or (max-height: 500px) {
   #root {

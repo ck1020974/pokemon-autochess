@@ -73,8 +73,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
             draggable={draggable}
             onDragStart={onDragStart}
             style={{
-                cursor: isInteractive ? 'pointer' : 'default',
-                viewTransitionName: `unit-${unit.id}` as any
+                cursor: isInteractive ? 'pointer' : 'default'
             }}
         >
             <div className="floor-marker"></div>
@@ -1117,18 +1116,10 @@ function App() {
             const currentSim = simulatorRef.current;
 
             currentSim.onUpdate = () => {
-                const updateUI = () => {
-                    if (simulatorRef.current) {
-                        setLogs([...simulatorRef.current.logs]);
-                    }
-                    setBattleTick((t: number) => t + 1);
-                };
-
-                if ((document as any).startViewTransition) {
-                    (document as any).startViewTransition(() => updateUI());
-                } else {
-                    updateUI();
+                if (simulatorRef.current) {
+                    setLogs([...simulatorRef.current.logs]);
                 }
+                setBattleTick((t: number) => t + 1);
             };
             setLogs([]);
 
@@ -1140,18 +1131,10 @@ function App() {
                 try {
                     const keepGoing = await simulatorRef.current.simulateStep();
                     
-                    const updateAfterStep = () => {
-                        if (simulatorRef.current) {
-                            setLogs([...simulatorRef.current.logs]);
-                        }
-                        setBattleTick((t: number) => t + 1);
-                    };
-
-                    if ((document as any).startViewTransition) {
-                        (document as any).startViewTransition(() => updateAfterStep());
-                    } else {
-                        updateAfterStep();
+                    if (simulatorRef.current) {
+                        setLogs([...simulatorRef.current.logs]);
                     }
+                    setBattleTick((t: number) => t + 1);
 
                     if (!keepGoing) {
                         if (interval) clearInterval(interval);
@@ -1621,7 +1604,8 @@ function App() {
         ? (initialPlayerTeamForSynergy.length > 0 ? initialPlayerTeamForSynergy : displayPlayerTeam)
         : displayPlayerTeam;
     const synergyStatus = getSynergyStatus(activeTeamForSynergy, activeEdition);
-    const activeSyn = activeSynergyId ? (SYNERGIES as any)[activeSynergyId] : null;
+    const activeSynId = activeSynergyId?.includes('-') ? activeSynergyId.split('-').pop() : activeSynergyId;
+    const activeSyn = activeSynId ? (SYNERGIES as any)[activeSynId] : null;
 
     return (
         <div className="game-container" onClick={() => {
