@@ -911,8 +911,18 @@ export class GameLoop {
     }
 
     private mergeUnits(target: Unit, source: Unit) {
-        const sourcePower = source.stats.attack + source.stats.maxHp;
-        const targetPower = target.stats.attack + target.stats.maxHp;
+        // Defensive: Check if source or stats are missing (for the 85 missing-stats units)
+        if (!source || !source.stats) {
+            console.error(`ERROR: source unit or stats missing in mergeUnits for ${target.name}`);
+            return;
+        }
+        if (!target || !target.stats) {
+            console.error(`ERROR: target unit or stats missing in mergeUnits`);
+            return;
+        }
+
+        const sourcePower = (source.stats.attack || 0) + (source.stats.maxHp || 0);
+        const targetPower = (target.stats.attack || 0) + (target.stats.maxHp || 0);
 
         if (sourcePower > targetPower) {
             target.stats = { ...source.stats };
@@ -920,7 +930,7 @@ export class GameLoop {
             target.battleImageUrl = source.battleImageUrl;
         }
 
-        target.scalingValue = Math.max(target.scalingValue, source.scalingValue);
+        target.scalingValue = Math.max(target.scalingValue || 1, source.scalingValue || 1);
 
         const expGain = (target.family === 'eevee') ? source.exp * 2 : source.exp;
         this.handleUnitExpGain(target, expGain);
@@ -945,8 +955,19 @@ export class GameLoop {
             } else if (unit.family === 'eevee') {
                 this.performEeveeEvolution(unit, predictedLevel);
             } else {
+                // Robust Check: Ensure baseStats exists for the family template
+                const familyTemplate = ALL_UNITS[unit.family];
+                const base = familyTemplate?.baseStats || { hp: 1, maxHp: 1, attack: 1 };
+
+                if (!familyTemplate) {
+                    console.error(`ERROR: Missing template for family ${unit.family} during evolution of ${unit.name}`);
+                } else if (!familyTemplate.baseStats) {
+                    console.warn(`WARNING: Missing baseStats for family ${unit.family}. Falling back to 1/1/1.`);
+                }
+
+                console.log(`進化為 ${unit.name} (Base: ${familyTemplate?.baseStats ? 'ok' : 'FALLBACK'})`);
+
                 unit.level = predictedLevel;
-                const base = ALL_UNITS[unit.family].baseStats;
                 const multiplier = 1;
                 unit.addGrowth(base.maxHp * multiplier, base.attack * multiplier);
                 console.log(`${unit.name} Level Up (Non-Evolve) -> +${base.maxHp * multiplier}/+${base.attack * multiplier}`);
@@ -1005,7 +1026,7 @@ export class GameLoop {
         }
 
         // Apply Growth (Same as non-evolve logic but for Eevee)
-        const base = ALL_UNITS[unit.family].baseStats;
+        const base = ALL_UNITS[unit.family]?.baseStats || { hp: 1, maxHp: 1, attack: 1 }; // Defensive check
         unit.addGrowth(base.maxHp, base.attack);
     }
 
@@ -1017,7 +1038,7 @@ export class GameLoop {
 
         if (newTemplate && baseTemplate) {
             const multiplier = 1;
-            const bonus = baseTemplate.baseStats;
+            const bonus = baseTemplate.baseStats || { hp: 0, maxHp: 0, attack: 0 }; // Defensive check
             unit.addGrowth(bonus.maxHp * multiplier, bonus.attack * multiplier);
 
             unit.templateId = newTemplate.id;
@@ -1128,7 +1149,7 @@ export class GameLoop {
         clone.name = unit.name;
         clone.level = unit.level;
         clone.exp = unit.exp;
-        clone.stats = { ...unit.stats };
+        clone.stats = { ...unit.stats || {} }; // Ensure stats object exists
         clone.tier = unit.tier;
         clone.imageUrl = unit.imageUrl;
         clone.battleImageUrl = unit.battleImageUrl;

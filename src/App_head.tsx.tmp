@@ -1,0 +1,72 @@
+import * as React from 'react';
+import { createPortal } from 'react-dom';
+// Last updated: 2026-03-06 - Balance Fix Deploy
+import { useState, useEffect, useRef } from 'react';
+import './index.css';
+import { GameLoop, GamePhase } from './engine/GameLoop';
+import { music } from './engine/MusicManager';
+
+import { BattleSimulator } from './engine/BattleSimulator';
+import type { BattleLog } from './engine/BattleSimulator';
+import { ALL_UNITS, PREFERRED_POSITIONS } from './data/AllUnits';
+import type { PreferredPosition } from './data/AllUnits';
+import { SYNERGIES } from './models/Synergies';
+import { EncyclopediaModal } from './components/EncyclopediaModal';
+import { TutorialModal } from './components/TutorialModal';
+import { Unit } from './models/Unit';
+import { REWARD_DATA } from './models/RewardData';
+import type { GameEdition } from './models/Edition';
+import { ClassicEdition } from './data/editions/classic';
+import { ModernEdition } from './data/editions/modern';
+
+// Difficulty Icons
+import normalBall from './assets/普通.webp';
+import greatBall from './assets/超級.webp';
+import ultraBall from './assets/高級.webp';
+import masterBall from './assets/大師.webp';
+
+const getInitialEdition = (): GameEdition => {
+    const params = new URLSearchParams(window.location.search);
+    const v = params.get('v');
+    const edition = params.get('edition');
+    if (v === '2' || edition === 'modern') {
+        return ModernEdition;
+    }
+    return ClassicEdition;
+};
+
+// --- Error Boundary ---
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
+    constructor(props: any) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+    static getDerivedStateFromError(error: any) {
+        return { hasError: true, error };
+    }
+    componentDidCatch(error: any, errorInfo: any) {
+        console.error("React Error Boundary caught an error:", error, errorInfo);
+    }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div style={{ padding: '40px', color: '#fff', background: '#1e293b', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                    <h1 style={{ color: '#ef4444' }}>糟糕！遊戲發生了錯誤 😵</h1>
+                    <p style={{ maxWidth: '600px', margin: '20px 0', opacity: 0.8 }}>
+                        這通常是由於數據不完整或狀態異常引起的。請點擊下方的按鈕嘗試重新開始。
+                    </p>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '15px', borderRadius: '8px', marginBottom: '30px', textAlign: 'left', fontFamily: 'monospace', width: '80%', maxWidth: '800px', overflowX: 'auto' }}>
+                        <div style={{ color: '#ef4444', marginBottom: '10px' }}>{this.state.error?.toString()}</div>
+                    </div>
+                    <button
+                        onClick={() => window.location.reload()}
+                        style={{ padding: '12px 30px', borderRadius: '30px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}
+                    >
+                        重新啟動遊戲
+                    </button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}

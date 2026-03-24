@@ -19,6 +19,12 @@ import type { GameEdition } from './models/Edition';
 import { ClassicEdition } from './data/editions/classic';
 import { ModernEdition } from './data/editions/modern';
 
+// Difficulty Icons
+import normalBall from './assets/普通.webp';
+import greatBall from './assets/超級.webp';
+import ultraBall from './assets/高級.webp';
+import masterBall from './assets/大師.webp';
+
 const getInitialEdition = (): GameEdition => {
     const params = new URLSearchParams(window.location.search);
     const v = params.get('v');
@@ -29,11 +35,41 @@ const getInitialEdition = (): GameEdition => {
     return ClassicEdition;
 };
 
-// Difficulty Icons
-import normalBall from './assets/普通.webp';
-import greatBall from './assets/超級.webp';
-import ultraBall from './assets/高級.webp';
-import masterBall from './assets/大師.webp';
+// --- Error Boundary ---
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
+    constructor(props: any) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+    static getDerivedStateFromError(error: any) {
+        return { hasError: true, error };
+    }
+    componentDidCatch(error: any, errorInfo: any) {
+        console.error("React Error Boundary caught an error:", error, errorInfo);
+    }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div style={{ padding: '40px', color: '#fff', background: '#1e293b', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                    <h1 style={{ color: '#ef4444' }}>糟糕！遊戲發生了錯誤 😵</h1>
+                    <p style={{ maxWidth: '600px', margin: '20px 0', opacity: 0.8 }}>
+                        這通常是由於數據不完整或狀態異常引起的。請點擊下方的按鈕嘗試重新開始。
+                    </p>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '15px', borderRadius: '8px', marginBottom: '30px', textAlign: 'left', fontFamily: 'monospace', width: '80%', maxWidth: '800px', overflowX: 'auto' }}>
+                        <div style={{ color: '#ef4444', marginBottom: '10px' }}>{this.state.error?.toString()}</div>
+                    </div>
+                    <button
+                        onClick={() => window.location.reload()}
+                        style={{ padding: '12px 30px', borderRadius: '30px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}
+                    >
+                        重新啟動遊戲
+                    </button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
 
 // --- Types ---
 interface SelectedUnitState {
@@ -57,7 +93,8 @@ interface ConfirmDialogState {
 
 // UnitCard with Direct Lock & Silence Support
 function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock, synergyHighlight }: any) {
-    if (!unit || unit.stats.hp <= 0) {
+    // Robust Check: Ensure unit and its stats exist
+    if (!unit || !unit.stats || unit.stats.hp <= 0) {
         return (
             <div className="slot-placeholder">
                 <div className="floor-marker"></div>
@@ -1130,7 +1167,7 @@ function App() {
 
                 try {
                     const keepGoing = await simulatorRef.current.simulateStep();
-                    
+
                     if (simulatorRef.current) {
                         setLogs([...simulatorRef.current.logs]);
                     }
@@ -1251,51 +1288,61 @@ function App() {
     };
 
     const handleReroll = () => {
-        if (!isTutorialActionAllowed('REROLL')) {
-            if (tutorialStep > 0) triggerShake();
-            return;
+        try {
+            if (!isTutorialActionAllowed('REROLL')) {
+                if (tutorialStep > 0) triggerShake();
+                return;
+            }
+            game.reroll();
+            if (tutorialStep === 5) {
+                // Force 2 Charmanders in the shop for Step 6 double lock tutorial
+                game.shop.slots = [
+                    new Unit(ALL_UNITS.charmander),
+                    new Unit(ALL_UNITS.charmander),
+                    new Unit(ALL_UNITS.squirtle)
+                ];
+                setTutorialStep(6);
+            }
+            update();
+        } catch (err) {
+            console.error("Failed to reroll:", err);
         }
-        game.reroll();
-        if (tutorialStep === 5) {
-            // Force 2 Charmanders in the shop for Step 6 double lock tutorial
-            game.shop.slots = [
-                new Unit(ALL_UNITS.charmander),
-                new Unit(ALL_UNITS.charmander),
-                new Unit(ALL_UNITS.squirtle)
-            ];
-            setTutorialStep(6);
-        }
-        update();
     };
+
     const handleBuy = () => {
-        if (selected && selected.source === 'SHOP') {
-            if (!isTutorialActionAllowed('BUY', selected.index)) {
-                if (tutorialStep > 0) triggerShake();
-                return;
-            }
-            const shopUnit = game.shop.slots[selected.index];
-            if (shopUnit && game.gold < 3) {
-                if (tutorialStep > 0) triggerShake();
-                setGoldErrorAnim(true);
-                setTimeout(() => setGoldErrorAnim(false), 400);
-                return;
-            }
-
-            const targetIdx = game.buyUnit(selected.index);
-            if (shopUnit && targetIdx !== null) {
-                const targetUnit = game.playerTeam[targetIdx];
-                if (targetUnit && targetUnit.level > shopUnit.level) {
-                    triggerEvolutionEffect(targetUnit);
+        try {
+            if (selected && selected.source === 'SHOP') {
+                if (!isTutorialActionAllowed('BUY', selected.index)) {
+                    if (tutorialStep > 0) triggerShake();
+                    return;
+                }
+                const shopUnit = game.shop.slots[selected.index];
+                if (shopUnit && (game.gold < 3)) {
+                    if (tutorialStep > 0) triggerShake();
+                    setGoldErrorAnim(true);
+                    setTimeout(() => setGoldErrorAnim(false), 400);
+                    return;
                 }
 
-                // Auto-advance step 9 after buying cyndaquil
-                if (tutorialStep === 9 && shopUnit.family === 'cyndaquil') {
-                    setTutorialStep(10);
-                }
+                const targetIdx = game.buyUnit(selected.index);
+                if (shopUnit && targetIdx !== null) {
+                    const targetUnit = game.playerTeam[targetIdx];
+                    if (targetUnit && targetUnit.level > shopUnit.level) {
+                        triggerEvolutionEffect(targetUnit);
+                    }
 
-                setSelected(null);
-                update();
+                    // Auto-advance step 9 after buying cyndaquil
+                    if (tutorialStep === 9 && shopUnit.family === 'cyndaquil') {
+                        setTutorialStep(10);
+                    }
+
+                    setSelected(null);
+                    update();
+                }
             }
+        } catch (err) {
+            console.error("Failed to buy unit:", err);
+            // Optionally alert user or just ignore to prevent total crash
         }
     };
     const handleSell = () => {
@@ -1395,69 +1442,73 @@ function App() {
     };
 
     const handleSelect = (unit: Unit | null, index: number, source: 'SHOP' | 'BOARD' | 'ENEMY') => {
-        // --- Fallback for mobile/touch: Click Source -> Click Target ---
-        if (game.phase === GamePhase.SHOP && selected) {
-            const { index: sourceIndex, source: sourceLoc } = selected;
+        try {
+            // --- Fallback for mobile/touch: Click Source -> Click Target ---
+            if (game.phase === GamePhase.SHOP && selected) {
+                const { index: sourceIndex, source: sourceLoc } = selected;
 
-            // If we click a valid target location (the Board) while holding something
-            if (source === 'BOARD') {
-                if (sourceLoc === 'BOARD') {
-                    if (!isTutorialActionAllowed('MOVE_BOARD')) return;
-                    // Try to Move or Synthesize
-                    if (sourceIndex !== index) {
-                        const oldLevel = game.playerTeam[sourceIndex]?.level || 0;
-                        game.moveUnit(sourceIndex, index);
-                        const targetUnit = game.playerTeam[index];
-                        if (targetUnit && targetUnit.level > oldLevel) {
-                            triggerEvolutionEffect(targetUnit);
+                // If we click a valid target location (the Board) while holding something
+                if (source === 'BOARD') {
+                    if (sourceLoc === 'BOARD') {
+                        if (!isTutorialActionAllowed('MOVE_BOARD')) return;
+                        // Try to Move or Synthesize
+                        if (sourceIndex !== index) {
+                            const oldLevel = game.playerTeam[sourceIndex]?.level || 0;
+                            game.moveUnit(sourceIndex, index);
+                            const targetUnit = game.playerTeam[index];
+                            if (targetUnit && targetUnit.level > oldLevel) {
+                                triggerEvolutionEffect(targetUnit);
+                            }
+                            setSelected(null);
+                            update();
+                            return;
                         }
-                        setSelected(null);
-                        update();
-                        return;
-                    }
-                } else if (sourceLoc === 'SHOP') {
-                    if (!isTutorialActionAllowed('BUY', sourceIndex)) return;
-                    // Try to Buy or Synthesize from Shop
-                    const shopUnit = game.shop.slots[sourceIndex];
-                    if (shopUnit && game.gold < 3) {
-                        setGoldErrorAnim(true);
-                        setTimeout(() => setGoldErrorAnim(false), 400);
-                        return;
-                    }
+                    } else if (sourceLoc === 'SHOP') {
+                        if (!isTutorialActionAllowed('BUY', sourceIndex)) return;
+                        // Try to Buy or Synthesize from Shop
+                        const shopUnit = game.shop.slots[sourceIndex];
+                        if (shopUnit && game.gold < 3) {
+                            setGoldErrorAnim(true);
+                            setTimeout(() => setGoldErrorAnim(false), 400);
+                            return;
+                        }
 
-                    const targetIdx = game.buyUnit(sourceIndex, index);
-                    if (shopUnit && targetIdx !== null) {
-                        const targetUnit = game.playerTeam[targetIdx];
-                        if (targetUnit && targetUnit.level > shopUnit.level) {
-                            triggerEvolutionEffect(targetUnit);
+                        const targetIdx = game.buyUnit(sourceIndex, index);
+                        if (shopUnit && targetIdx !== null) {
+                            const targetUnit = game.playerTeam[targetIdx];
+                            if (targetUnit && targetUnit.level > shopUnit.level) {
+                                triggerEvolutionEffect(targetUnit);
+                            }
+                            setSelected(null);
+                            update();
+                            return;
                         }
-                        setSelected(null);
-                        update();
-                        return;
                     }
                 }
             }
-        }
 
-        if (unit) {
-            if (source === 'BOARD' && !isTutorialActionAllowed('SELECT_BOARD', unit.family)) {
-                if (tutorialStep > 0) triggerShake();
-                return;
-            }
-            if (source === 'SHOP' && !isTutorialActionAllowed('BUY', index) && tutorialStep > 0) {
-                triggerShake();
-                return; // Prevent highlighting invalid shop items
-            }
+            if (unit) {
+                if (source === 'BOARD' && !isTutorialActionAllowed('SELECT_BOARD', unit.family)) {
+                    if (tutorialStep > 0) triggerShake();
+                    return;
+                }
+                if (source === 'SHOP' && !isTutorialActionAllowed('BUY', index) && tutorialStep > 0) {
+                    triggerShake();
+                    return; // Prevent highlighting invalid shop items
+                }
 
-            // Toggle selection if clicking the same unit
-            if (selected && selected.unit === unit && selected.source === source && selected.index === index) {
-                setSelected(null);
+                // Toggle selection if clicking the same unit
+                if (selected && selected.unit === unit && selected.source === source && selected.index === index) {
+                    setSelected(null);
+                } else {
+                    setSelected({ unit, index, source });
+                }
             } else {
-                setSelected({ unit, index, source });
+                // Clicking empty slot
+                setSelected(null);
             }
-        } else {
-            // Clicking empty slot
-            setSelected(null);
+        } catch (err) {
+            console.error("Failed to select/handle interaction:", err);
         }
     };
 
@@ -1486,56 +1537,62 @@ function App() {
     };
 
     const onDrop = (e: React.DragEvent, targetIndex: number) => {
-        e.preventDefault();
+        try {
+            e.preventDefault();
 
-        const sourceItem = draggedItem || (selected?.source !== 'ENEMY' ? selected : null);
+            const sourceItem = draggedItem || (selected?.source !== 'ENEMY' ? selected : null);
 
-        if (sourceItem) {
-            const { index: sourceIndex, source } = sourceItem;
+            if (sourceItem) {
+                const { index: sourceIndex, source } = sourceItem;
 
-            if (source === 'BOARD') {
-                if (!isTutorialActionAllowed('MOVE_BOARD')) {
-                    setDraggedItem(null);
-                    setSelected(null);
-                    return;
-                }
-                if (sourceIndex !== targetIndex) {
-                    const oldLevel = game.playerTeam[sourceIndex]?.level || 0;
-                    game.moveUnit(sourceIndex, targetIndex);
-                    const targetUnit = game.playerTeam[targetIndex];
-                    if (targetUnit && targetUnit.level > oldLevel) {
-                        triggerEvolutionEffect(targetUnit);
+                if (source === 'BOARD') {
+                    if (!isTutorialActionAllowed('MOVE_BOARD')) {
+                        setDraggedItem(null);
+                        setSelected(null);
+                        return;
                     }
-                    update();
-                }
-            } else if (source === 'SHOP') {
-                if (!isTutorialActionAllowed('BUY', sourceIndex)) {
-                    setDraggedItem(null);
-                    setSelected(null);
-                    return;
-                }
-                const shopUnit = game.shop.slots[sourceIndex];
-
-                if (shopUnit && game.gold < 3) {
-                    setGoldErrorAnim(true);
-                    setTimeout(() => setGoldErrorAnim(false), 400);
-                    setDraggedItem(null);
-                    setSelected(null);
-                    return;
-                }
-
-                const targetIdx = game.buyUnit(sourceIndex, targetIndex);
-                if (shopUnit && targetIdx !== null) {
-                    const targetUnit = game.playerTeam[targetIdx];
-                    if (targetUnit && targetUnit.level > shopUnit.level) {
-                        triggerEvolutionEffect(targetUnit);
+                    if (sourceIndex !== targetIndex) {
+                        const oldLevel = game.playerTeam[sourceIndex]?.level || 0;
+                        game.moveUnit(sourceIndex, targetIndex);
+                        const targetUnit = game.playerTeam[targetIndex];
+                        if (targetUnit && targetUnit.level > oldLevel) {
+                            triggerEvolutionEffect(targetUnit);
+                        }
+                        update();
                     }
-                    update();
+                } else if (source === 'SHOP') {
+                    if (!isTutorialActionAllowed('BUY', sourceIndex)) {
+                        setDraggedItem(null);
+                        setSelected(null);
+                        return;
+                    }
+                    const shopUnit = game.shop.slots[sourceIndex];
+
+                    if (shopUnit && game.gold < 3) {
+                        setGoldErrorAnim(true);
+                        setTimeout(() => setGoldErrorAnim(false), 400);
+                        setDraggedItem(null);
+                        setSelected(null);
+                        return;
+                    }
+
+                    const targetIdx = game.buyUnit(sourceIndex, targetIndex);
+                    if (shopUnit && targetIdx !== null) {
+                        const targetUnit = game.playerTeam[targetIdx];
+                        if (targetUnit && targetUnit.level > shopUnit.level) {
+                            triggerEvolutionEffect(targetUnit);
+                        }
+                        update();
+                    }
                 }
             }
+            setDraggedItem(null);
+            setSelected(null);
+        } catch (err) {
+            console.error("Failed to drop unit:", err);
+            setDraggedItem(null);
+            setSelected(null);
         }
-        setDraggedItem(null);
-        setSelected(null);
     };
 
     const handleOpponentSelect = (opponent: { id?: string, name: string, url: string, difficulty?: string }) => {
@@ -3070,4 +3127,12 @@ function App() {
     );
 }
 
-export default App;
+function AppWrapper() {
+    return (
+        <ErrorBoundary>
+            <App />
+        </ErrorBoundary>
+    );
+}
+
+export default AppWrapper;
