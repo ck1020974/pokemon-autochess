@@ -152,7 +152,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateIds, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive }: any) {
+function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateIds, activeFamilies, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive }: any) {
     const [localOpen, setLocalOpen] = useState(false);
 
     // Use side-aware ID if setActiveSynergyId is provided (mainly for summary screen)
@@ -205,7 +205,9 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateId
                 {units && units.length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '4px' }}>
                         {units.map((u: any) => {
-                            const isUnitActive = activeTemplateIds?.has(u.id) || false;
+                            const isUnitActive = (u.family === 'eevee')
+                                ? (activeTemplateIds?.has(u.id) || false)
+                                : (activeFamilies?.has(u.family) || false);
                             const unitStyle: React.CSSProperties = {
                                 width: '24px', height: '24px', objectFit: 'contain',
                                 borderRadius: '4px', background: 'rgba(0,0,0,0.3)',
@@ -306,7 +308,8 @@ function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
             count,
             isActive,
             units,
-            activeTemplateIds
+            activeTemplateIds,
+            activeFamilies: familySet
         };
     });
 
@@ -1661,7 +1664,20 @@ function App() {
         : displayPlayerTeam;
     const synergyStatus = getSynergyStatus(activeTeamForSynergy, activeEdition);
     const activeSynId = activeSynergyId?.includes('-') ? activeSynergyId.split('-').pop() : activeSynergyId;
-    const activeSyn = activeSynId ? (SYNERGIES as any)[activeSynId] : null;
+    const isEnemySynergy = activeSynergyId && activeSynergyId.startsWith('ENEMY-');
+
+    let activeSyn = null;
+    if (activeSynId) {
+        if (isEnemySynergy) {
+            const enemyStatus = getSynergyStatus(initialEnemyTeamForSynergy.length > 0 ? initialEnemyTeamForSynergy : (game.opponentTeam || []), activeEdition);
+            activeSyn = enemyStatus.find((s: any) => s.id === activeSynId);
+        } else {
+            activeSyn = synergyStatus.find(s => s.id === activeSynId);
+        }
+        if (!activeSyn) {
+            activeSyn = (SYNERGIES as any)[activeSynId];
+        }
+    }
 
     return (
         <div className="game-container" onClick={() => {
@@ -2399,7 +2415,7 @@ function App() {
                                                             synergy={syn}
                                                             count={syn.count}
                                                             units={syn.units}
-                                                            activeTemplateIds={syn.activeTemplateIds}
+                                                            activeTemplateIds={syn.activeTemplateIds} activeFamilies={syn.activeFamilies}
                                                             className="summary-synergy-item"
                                                             showCount={true}
                                                             side="PLAYER"
@@ -2412,7 +2428,7 @@ function App() {
                                                     if (!u) return <div key={i} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.03)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.1)' }} />;
                                                     const img00 = u.imageUrl.replace('01.webp', '00.webp');
                                                     return (
-                                                        <div key={i} className={`summary-unit-card ${activeSyn && u && activeSyn.activeTemplateIds.has(u.templateId) ? 'synergy-highlight' : ''}`}>
+                                                        <div key={i} className={`summary-unit-card ${activeSyn && u && activeSyn.activeTemplateIds?.has(u.templateId) ? 'synergy-highlight' : ''}`}>
                                                             {mvp?.id === u.id && <div className="mvp-badge"> MVP</div>}
                                                             <div className="summary-unit-img-wrapper">
                                                                 <img
@@ -2442,7 +2458,7 @@ function App() {
                                                                     synergy={syn}
                                                                     count={syn.count}
                                                                     units={syn.units}
-                                                                    activeTemplateIds={syn.activeTemplateIds}
+                                                                    activeTemplateIds={syn.activeTemplateIds} activeFamilies={syn.activeFamilies}
                                                                     className="summary-synergy-item"
                                                                     showCount={true}
                                                                     isEnemy={true}
@@ -2456,7 +2472,7 @@ function App() {
                                                             if (!u) return <div key={`enemy-${i}`} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.01)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.05)' }} />;
                                                             const img00 = u.imageUrl.replace('01.webp', '00.webp');
                                                             return (
-                                                                <div key={`enemy-${i}`} className={`summary-unit-card ${activeSyn && u && activeSyn.activeTemplateIds.has(u.templateId) ? 'synergy-highlight' : ''}`}>
+                                                                <div key={`enemy-${i}`} className={`summary-unit-card ${activeSyn && u && activeSyn.activeTemplateIds?.has(u.templateId) ? 'synergy-highlight' : ''}`}>
                                                                     <div className="summary-unit-img-wrapper">
                                                                         <img
                                                                             src={img00}
@@ -2747,7 +2763,7 @@ function App() {
                             synergy={syn}
                             count={syn.count}
                             units={syn.units}
-                            activeTemplateIds={syn.activeTemplateIds}
+                            activeTemplateIds={syn.activeTemplateIds} activeFamilies={syn.activeFamilies}
                             className=""
                             activeSynergyId={activeSynergyId}
                             setActiveSynergyId={setActiveSynergyId}
@@ -2759,7 +2775,7 @@ function App() {
                 {(initialEnemyTeam.length > 0 || displayEnemyTeam) && (
                     <div className="board-synergies" style={{ left: 'auto', right: '10px', flexDirection: 'row-reverse' }}>
                         {getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || []), activeEdition).map(syn => (
-                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeTemplateIds={syn.activeTemplateIds} isEnemy={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />
+                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeTemplateIds={syn.activeTemplateIds} activeFamilies={syn.activeFamilies} isEnemy={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />
                         ))}
                     </div>
                 )}
@@ -2918,7 +2934,7 @@ function App() {
                                                 showMergeGlow={unit && (unit as any).isMergeable}
                                                 isEvolving={unit && evolvingUnitId === unit.id}
                                                 tutorialHighlightLock={false}
-                                                synergyHighlight={activeSyn && unit && activeSyn.activeTemplateIds.has(unit.templateId)}
+                                                synergyHighlight={activeSyn && unit && activeSyn.activeTemplateIds?.has(unit.templateId)}
                                             />
                                         </div>
                                     );
@@ -3092,7 +3108,7 @@ function App() {
                                         {selected.unit.synergies.map((synId: string) => {
                                             const syn = SYNERGIES[synId];
                                             if (!syn) return null;
-                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} forceActive={true} activeTemplateIds={new Set([selected.unit.templateId])} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />;
+                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} forceActive={true} activeTemplateIds={new Set([selected.unit.templateId])} activeFamilies={new Set([selected.unit.family])} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />;
                                         })}
                                     </div>
                                 </div>

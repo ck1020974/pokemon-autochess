@@ -1,0 +1,157 @@
+﻿
+src\App.tsx:155:functi
+on SynergyIcon({ syner
+gy, count, showCount =
+ true, units, activeTe
+mplateIds, isEnemy, si
+de, onMouseEnter, clas
+sName, activeSynergyId
+, setActiveSynergyId, 
+forceActive }: any) {
+src\App.tsx:158:    //
+ Use side-aware ID if 
+setActiveSynergyId is 
+provided (mainly for s
+ummary screen)
+src\App.tsx:160:    co
+nst isForcedOpen = set
+ActiveSynergyId ? (act
+iveSynergyId === syner
+gyKey) : localOpen;
+src\App.tsx:179:      
+          if (setActiv
+eSynergyId) {
+src\App.tsx:180:      
+              setActiv
+eSynergyId(isForcedOpe
+n ? null : synergyKey)
+;
+src\App.tsx:187:      
+          if (setActiv
+eSynergyId) {
+src\App.tsx:371:      
+  setActiveSynergyId(n
+ull);
+src\App.tsx:399:    co
+nst [activeSynergyId, 
+setActiveSynergyId] = 
+useState<string | null
+>(null);
+src\App.tsx:1663:    c
+onst activeSynId = act
+iveSynergyId?.includes
+('-') ? activeSynergyI
+d.split('-').pop() : a
+ctiveSynergyId;
+src\App.tsx:1664:    c
+onst activeSyn = activ
+eSynId ? (SYNERGIES as
+ any)[activeSynId] : n
+ull;
+src\App.tsx:1669:     
+       setActiveSynerg
+yId(null);
+src\App.tsx:2325:     
+                      
+ onClick={() => setAct
+iveSynergyId(null)}
+src\App.tsx:2406:     
+                      
+                      
+           activeSyner
+gyId={activeSynergyId}
+src\App.tsx:2407:     
+                      
+                      
+           setActiveSy
+nergyId={setActiveSyne
+rgyId}
+src\App.tsx:2415:     
+                      
+                      
+       <div key={i} cl
+assName={`summary-unit
+-card ${activeSyn && u
+ && activeSyn.activeTe
+mplateIds.has(u.templa
+teId) ? 'synergy-highl
+ight' : ''}`}>
+src\App.tsx:2450:     
+                      
+                      
+                   act
+iveSynergyId={activeSy
+nergyId}
+src\App.tsx:2451:     
+                      
+                      
+                   set
+ActiveSynergyId={setAc
+tiveSynergyId}
+src\App.tsx:2459:     
+                      
+                      
+               <div ke
+y={`enemy-${i}`} class
+Name={`summary-unit-ca
+rd ${activeSyn && u &&
+ activeSyn.activeTempl
+ateIds.has(u.templateI
+d) ? 'synergy-highligh
+t' : ''}`}>
+src\App.tsx:2752:     
+                      
+ activeSynergyId={acti
+veSynergyId}
+src\App.tsx:2753:     
+                      
+ setActiveSynergyId={s
+etActiveSynergyId}
+src\App.tsx:2762:     
+                      
+ <SynergyIcon key={syn
+.id} synergy={syn} cou
+nt={syn.count} units={
+syn.units} activeTempl
+ateIds={syn.activeTemp
+lateIds} isEnemy={true
+} activeSynergyId={act
+iveSynergyId} setActiv
+eSynergyId={setActiveS
+ynergyId} />
+src\App.tsx:2812:     
+                      
+             synergyHi
+ghlight={activeSyn && 
+unit && unit.synergies
+.includes(activeSyn.id
+)}
+src\App.tsx:2836:     
+                      
+             synergyHi
+ghlight={activeSyn && 
+unit && unit.synergies
+.includes(activeSyn.id
+)}
+src\App.tsx:2921:     
+                      
+                     s
+ynergyHighlight={activ
+eSyn && unit && active
+Syn.activeTemplateIds.
+has(unit.templateId)}
+src\App.tsx:3095:     
+                      
+                 retur
+n <SynergyIcon key={sy
+nId} synergy={syn} sho
+wCount={false} forceAc
+tive={true} activeTemp
+lateIds={new Set([sele
+cted.unit.templateId])
+} activeSynergyId={act
+iveSynergyId} setActiv
+eSynergyId={setActiveS
+ynergyId} />;
+
+
