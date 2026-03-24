@@ -320,19 +320,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
     // 16. Diglett
     diglett: {
         id: 'diglett', name: '地鼠', tier: 2, family: 'diglett',
-        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/地鼠00.webp', battleImageUrl: 'assets/地鼠01.webp',
         description: '有 25% 機率閃避攻擊（不含招式傷害）。', synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio'
     },
     dugtrio: {
         id: 'dugtrio', name: '三地鼠', tier: 2, family: 'diglett',
-        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/三地鼠00.webp', battleImageUrl: 'assets/三地鼠01.webp',
         description: '有 33% 機率閃避攻擊（不含招式傷害）。', synergies: ['Triplets', 'Cave'], evolveId: 'dugtrio_final', isHiddenFromShop: true
     },
     dugtrio_final: {
         id: 'dugtrio_final', name: '三地鼠', tier: 2, family: 'diglett',
-        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/三地鼠00.webp', battleImageUrl: 'assets/三地鼠01.webp',
         description: '有 50% 機率閃避攻擊（不含招式傷害）。', synergies: ['Triplets', 'Cave'], isHiddenFromShop: true
     },
@@ -400,19 +400,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
     // 20. Doduo
     doduo: {
         id: 'doduo', name: '嘟嘟', tier: 2, family: 'doduo',
-        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/嘟嘟00.webp', battleImageUrl: 'assets/嘟嘟01.webp',
         description: '有 25% 機率額外攻擊一次。', synergies: ['Triplets', 'Angry'], evolveId: 'dodrio'
     },
     dodrio: {
         id: 'dodrio', name: '嘟嘟利', tier: 2, family: 'doduo',
-        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/嘟嘟利00.webp', battleImageUrl: 'assets/嘟嘟利01.webp',
         description: '有 33% 機率額外攻擊一次。', synergies: ['Triplets', 'Angry'], evolveId: 'dodrio_final', isHiddenFromShop: true
     },
     dodrio_final: {
         id: 'dodrio_final', name: '嘟嘟利', tier: 2, family: 'doduo',
-        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/嘟嘟利00.webp', battleImageUrl: 'assets/嘟嘟利01.webp',
         description: '有 50% 機率額外攻擊一次。', synergies: ['Triplets', 'Angry'], isHiddenFromShop: true
     },

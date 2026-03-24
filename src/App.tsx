@@ -2356,7 +2356,7 @@ function App() {
                                                     if (!u) return <div key={i} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.03)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.1)' }} />;
                                                     const img00 = u.imageUrl.replace('01.webp', '00.webp');
                                                     return (
-                                                        <div key={i} className={`summary-unit-card ${activeSyn && u && activeSyn.families.includes(u.family) ? 'synergy-highlight' : ''}`}>
+                                                        <div key={i} className={`summary-unit-card ${activeSyn && u && u.synergies.includes(activeSyn.id) ? 'synergy-highlight' : ''}`}>
                                                             {mvp?.id === u.id && <div className="mvp-badge"> MVP</div>}
                                                             <div className="summary-unit-img-wrapper">
                                                                 <img
@@ -2400,7 +2400,7 @@ function App() {
                                                             if (!u) return <div key={`enemy-${i}`} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.01)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.05)' }} />;
                                                             const img00 = u.imageUrl.replace('01.webp', '00.webp');
                                                             return (
-                                                                <div key={`enemy-${i}`} className={`summary-unit-card ${activeSyn && u && activeSyn.families.includes(u.family) ? 'synergy-highlight' : ''}`}>
+                                                                <div key={`enemy-${i}`} className={`summary-unit-card ${activeSyn && u && u.synergies.includes(activeSyn.id) ? 'synergy-highlight' : ''}`}>
                                                                     <div className="summary-unit-img-wrapper">
                                                                         <img
                                                                             src={img00}
@@ -2753,7 +2753,7 @@ function App() {
                                         hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
                                         isCharmed={unit ? simulatorRef.current?.unitStates.get(unit)?.isCharmed : false}
                                         isEvolving={unit && evolvingUnitId === unit.id}
-                                        synergyHighlight={activeSyn && unit && activeSyn.families.includes(unit.family)}
+                                        synergyHighlight={activeSyn && unit && unit.synergies.includes(activeSyn.id)}
                                     />
                                 </div>
                             );
@@ -2777,7 +2777,7 @@ function App() {
                                         hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
                                         isCharmed={unit ? simulatorRef.current?.unitStates.get(unit)?.isCharmed : false}
                                         isEvolving={unit && evolvingUnitId === unit.id}
-                                        synergyHighlight={activeSyn && unit && activeSyn.families.includes(unit.family)}
+                                        synergyHighlight={activeSyn && unit && unit.synergies.includes(activeSyn.id)}
                                     />
                                 </div>
                             );
@@ -2862,7 +2862,7 @@ function App() {
                                                 showMergeGlow={unit && (unit as any).isMergeable}
                                                 isEvolving={unit && evolvingUnitId === unit.id}
                                                 tutorialHighlightLock={false}
-                                                synergyHighlight={activeSyn && unit && activeSyn.families.includes(unit.family)}
+                                                synergyHighlight={activeSyn && unit && unit.synergies.includes(activeSyn.id)}
                                             />
                                         </div>
                                     );
