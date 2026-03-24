@@ -73,6 +73,7 @@ export const MODERN_ADVANCED_OPPONENTS: OpponentDefinition[] = [
     { id: 'ma_18', name: '莉莉艾02', url: 'gym/莉莉艾02.webp', coreUnits: ['happiny', 'sylveon', 'cleffa', 'togepi'], difficulty: 'HARD' },
     { id: 'ma_19', name: '紫羅蘭02', url: 'gym/紫羅蘭02.webp', coreUnits: ['caterpie', 'caterpie', 'pinsir', 'shuckle', 'togepi'], difficulty: 'HARD' },
     { id: 'ma_20', name: '娜琪', url: 'gym/娜琪.webp', coreUnits: ['natu', 'togepi', 'togepi', 'murkrow'], difficulty: 'HARD' },
+    { id: 'ma_21', name: '芽米', url: 'gym/芽米.webp', coreUnits: ['clefairy', 'kangaskhan', 'doduo', 'happiny', 'eevee'], difficulty: 'HARD' },
 ];
 
 export const MODERN_ELITE_OPPONENTS: OpponentDefinition[] = [
@@ -102,6 +103,9 @@ export const MODERN_ELITE_OPPONENTS: OpponentDefinition[] = [
     { id: 'me_24', name: '志米', url: 'elitefour/志米.webp', coreUnits: ['squirtle', 'vaporeon', 'delibird', 'togepi', 'sneasel'], difficulty: 'VERY_HARD' },
     { id: 'me_25', name: '小照', url: 'gym/小照.webp', coreUnits: ['pichu', 'mrmime', 'totodile'], difficulty: 'NORMAL' },
     { id: 'me_26', name: '明耀', url: 'gym/明耀.webp', coreUnits: ['pichu', 'mrmime', 'cyndaquil'], difficulty: 'NORMAL' },
+    { id: 'me_27', name: '望羅01', url: 'gym/望羅01.webp', coreUnits: ['togepi', 'togepi', 'dratini', 'happiny', 'clefairy'], difficulty: 'VERY_HARD' },
+    { id: 'me_28', name: '越橘', url: 'gym/越橘.webp', coreUnits: ['sneasel', 'persian', 'larvitar', 'murkrow', 'umbreon'], difficulty: 'VERY_HARD' },
+    { id: 'me_29', name: '小椿', url: 'gym/小椿.webp', coreUnits: ['dratini', 'charmander', 'mareep', 'togepi', 'natu'], difficulty: 'VERY_HARD' },
 ];
 
 export const MODERN_CHAMPION_OPPONENTS: OpponentDefinition[] = [
@@ -113,4 +117,7 @@ export const MODERN_CHAMPION_OPPONENTS: OpponentDefinition[] = [
     { id: 'mc_6', name: '迷可利', url: 'champion/迷可利.webp', coreUnits: ['vaporeon', 'espeon', 'squirtle', 'psyduck', 'mrmime'], difficulty: 'VERY_HARD' },
     { id: 'mc_7', name: '竹蘭02', url: 'champion/竹蘭02.webp', coreUnits: ['raikou', 'shuckle', 'sneasel', 'murkrow', 'togepi'], difficulty: 'VERY_HARD' },
     { id: 'mc_8', name: '赤紅02', url: 'champion/赤紅02.webp', coreUnits: ['raikou', 'entei', 'suicune', 'pichu'], difficulty: 'VERY_HARD' },
+    { id: 'mc_9', name: '望羅02', url: 'gym/望羅02.webp', coreUnits: ['sneasel', 'togepi', 'shuckle', 'farfetchd', 'dratini'], difficulty: 'VERY_HARD' },
+    { id: 'mc_10', name: '剛石', url: 'gym/剛石.webp', coreUnits: ['leafeon', 'vaporeon', 'umbreon', 'squirtle', 'larvitar'], difficulty: 'VERY_HARD' },
+    { id: 'mc_11', name: '珠貝', url: 'gym/珠貝.webp', coreUnits: ['flareon', 'espeon', 'glaceon', 'cyndaquil', 'mrmime'], difficulty: 'VERY_HARD' },
 ];
