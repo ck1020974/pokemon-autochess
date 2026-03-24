@@ -513,13 +513,15 @@ export class HeadlessBattleSimulator {
                 if (!familyMap.has(syn)) familyMap.set(syn, new Set());
                 familyMap.get(syn)!.add(u.family);
 
-                if (u.family === 'eevee' && u.templateId !== 'eevee') {
+                if (u.family === 'eevee') {
                     if (!evolvedEeveeForms.has(syn)) evolvedEeveeForms.set(syn, new Set());
                     evolvedEeveeForms.get(syn)!.add(u.templateId);
 
-                    const key = `${syn}_${u.templateId}`;
-                    const prevMax = evolvedEeveeMaxLevelPerForm.get(key) || 0;
-                    if (u.level > prevMax) evolvedEeveeMaxLevelPerForm.set(key, u.level);
+                    if (u.templateId !== 'eevee') {
+                        const key = `${syn}_${u.templateId}`;
+                        const prevMax = evolvedEeveeMaxLevelPerForm.get(key) || 0;
+                        if (u.level > prevMax) evolvedEeveeMaxLevelPerForm.set(key, u.level);
+                    }
                 }
             });
         });
@@ -530,14 +532,9 @@ export class HeadlessBattleSimulator {
             // Eevee Special Logic
             if (evolvedEeveeForms.has(syn)) {
                 if (syn === 'BatonPass') {
-                    // Sync with BattleSimulator & App.tsx
-                    let totalEeveePoints = 0;
+                    // Baton Pass: Every unique template in Eevee family counts as 1 (Character Identity)
                     const forms = evolvedEeveeForms.get(syn)!;
-                    forms.forEach(formId => {
-                        const level = evolvedEeveeMaxLevelPerForm.get(`${syn}_${formId}`) || 1;
-                        totalEeveePoints += (level >= 3 ? 3 : 2);
-                    });
-                    count += (totalEeveePoints - 1);
+                    count = (count - 1) + forms.size; // Subtract 'eevee' family once, add all unique forms
                 } else {
                     const forms = evolvedEeveeForms.get(syn)!;
                     let maxL = 1;

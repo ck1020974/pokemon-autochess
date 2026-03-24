@@ -778,13 +778,15 @@ export class BattleSimulator {
                 if (!familyMap.has(syn)) familyMap.set(syn, new Set());
                 familyMap.get(syn)!.add(u.family);
 
-                if (u.family === 'eevee' && u.templateId !== 'eevee') {
+                if (u.family === 'eevee') {
                     if (!evolvedEeveeForms.has(syn)) evolvedEeveeForms.set(syn, new Set());
                     evolvedEeveeForms.get(syn)!.add(u.templateId);
 
-                    const key = `${syn}_${u.templateId}`;
-                    const prevMax = evolvedEeveeMaxLevelPerForm.get(key) || 0;
-                    if (u.level > prevMax) evolvedEeveeMaxLevelPerForm.set(key, u.level);
+                    if (u.templateId !== 'eevee') {
+                        const key = `${syn}_${u.templateId}`;
+                        const prevMax = evolvedEeveeMaxLevelPerForm.get(key) || 0;
+                        if (u.level > prevMax) evolvedEeveeMaxLevelPerForm.set(key, u.level);
+                    }
                 }
             });
         });
@@ -795,9 +797,9 @@ export class BattleSimulator {
             // Eevee Special Logic
             if (evolvedEeveeForms.has(syn)) {
                 if (syn === 'BatonPass') {
-                    // Baton Pass: Every unique evolved form counts as 1 (no star bonus, fix doubling)
+                    // Baton Pass: Every unique template in Eevee family counts as 1 (Character Identity)
                     const forms = evolvedEeveeForms.get(syn)!;
-                    count += (forms.size - 1); // Subtract 1 already counted by 'eevee' family
+                    count = (count - 1) + forms.size; // Subtract 'eevee' family once, add all unique forms
                 } else {
                     // Elemental: Max bonus from any one matching evolved form
                     const forms = evolvedEeveeForms.get(syn)!;

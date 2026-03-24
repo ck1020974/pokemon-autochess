@@ -22,7 +22,7 @@ export const NOVICE_OPPONENTS: OpponentDefinition[] = [
     { id: 'novice_12', name: '藤樹', url: 'gym/藤樹.webp', coreUnits: ['mankey', 'mankey', 'mankey'], difficulty: 'EASY' },
     { id: 'novice_13', name: '馬志士', url: 'gym/馬志士.webp', coreUnits: ['magnemite', 'magnemite', 'magnemite'], difficulty: 'EASY' },
     { id: 'novice_14', name: '菜種', url: 'gym/菜種.webp', coreUnits: ['bulbasaur', 'bulbasaur', 'bulbasaur'], difficulty: 'HARD' },
-    { id: 'novice_15', name: '莉莉艾', url: 'gym/莉莉艾.webp', coreUnits: ['igglybuff', 'igglybuff', 'squirtle'], difficulty: 'EASY' },
+    { id: 'novice_15', name: '莉莉艾', url: 'gym/莉莉艾01.webp', coreUnits: ['igglybuff', 'igglybuff', 'squirtle'], difficulty: 'EASY' },
     { id: 'novice_16', name: '小智', url: 'gym/小智.webp', coreUnits: ['charmander', 'bulbasaur', 'squirtle'], difficulty: 'HARD' },
 ];
 
@@ -87,13 +87,12 @@ export const ELITE_OPPONENTS: OpponentDefinition[] = [
     { id: 'elite_13', name: '大葉', url: 'elitefour/大葉.webp', coreUnits: ['drifloon', 'onix', 'torchic', 'houndour', 'fuecoco'], difficulty: 'VERY_HARD' },
     { id: 'elite_14', name: '小剛', url: 'gym/小剛03.webp', coreUnits: ['mudkip', 'diglett', 'dwebble', 'onix', 'onix'], difficulty: 'NORMAL' },
     { id: 'elite_15', name: '小霞', url: 'gym/小霞03.webp', coreUnits: ['mudkip', 'squirtle', 'slowpoke', 'totodile', 'quaxly'], difficulty: 'NORMAL' },
-    { id: 'elite_16', name: '赤焰松', url: 'elitefour/赤焰松.webp', coreUnits: ['houndour', 'shuppet', 'torchic', 'charmander', 'fuecoco'], difficulty: 'VERY_HARD' },
-    { id: 'elite_17', name: '水梧桐', url: 'elitefour/水梧桐.webp', coreUnits: ['totodile', 'sneasel', 'mudkip', 'squirtle', 'quaxly'], difficulty: 'VERY_HARD' },
     { id: 'elite_18', name: '大木博士', url: 'elitefour/大木博士.webp', coreUnits: ['charmander', 'squirtle', 'bulbasaur', 'ditto', 'mrmime'], difficulty: 'HARD' },
     { id: 'elite_19', name: '花月', url: 'elitefour/花月.webp', coreUnits: ['rattata', 'treecko', 'houndour', 'mimikyu', 'sneasel'], difficulty: 'HARD' },
     { id: 'elite_20', name: '芙蓉', url: 'elitefour/芙蓉.webp', coreUnits: ['sableye', 'shuppet', 'shuppet', 'gastly'], difficulty: 'VERY_HARD' },
     { id: 'elite_21', name: '一樹', url: 'elitefour/一樹.webp', coreUnits: ['natu', 'natu', 'slowpoke', 'ralts', 'mrmime'], difficulty: 'HARD' },
     { id: 'elite_22', name: '赤日', url: 'elitefour/赤日.webp', coreUnits: ['sneasel', 'houndour', 'gastly', 'snover', 'spiritomb'], difficulty: 'VERY_HARD' },
+    { id: 'elite_23', name: '帕琦拉', url: 'elitefour/帕琦拉.webp', coreUnits: ['houndour', 'houndour', 'sableye', 'cyndaquil', 'gastly'], difficulty: 'VERY_HARD' },
 ];
 
 export const CHAMPION_OPPONENTS: OpponentDefinition[] = [
@@ -103,4 +102,6 @@ export const CHAMPION_OPPONENTS: OpponentDefinition[] = [
     { id: 'champion_4', name: '赤紅', url: 'champion/赤紅02.webp', coreUnits: ['charmeleon', 'wartortle', 'ivysaur', 'farfetchd', 'ditto', 'kangaskhan'], difficulty: 'NORMAL' },
     { id: 'champion_5', name: '丹帝', url: 'champion/丹帝02.webp', coreUnits: ['charmander', 'gastly', 'heracross', 'farfetchd', 'drifloon'], difficulty: 'HARD' },
     { id: 'champion_6', name: '小智', url: 'gym/小智.webp', coreUnits: ['farfetchd', 'treecko', 'gastly', 'mrmime', 'charmander'], difficulty: 'HARD' },
+    { id: 'champion_7', name: '赤焰松', url: 'elitefour/赤焰松.webp', coreUnits: ['houndour', 'shuppet', 'torchic', 'charmander', 'fuecoco'], difficulty: 'VERY_HARD' },
+    { id: 'champion_8', name: '水梧桐', url: 'elitefour/水梧桐.webp', coreUnits: ['totodile', 'sneasel', 'mudkip', 'squirtle', 'quaxly'], difficulty: 'VERY_HARD' },
 ];

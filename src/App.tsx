@@ -152,7 +152,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive }: any) {
+function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateIds, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive }: any) {
     const [localOpen, setLocalOpen] = useState(false);
 
     // Use side-aware ID if setActiveSynergyId is provided (mainly for summary screen)
@@ -205,7 +205,7 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeFamilies, 
                 {units && units.length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '4px' }}>
                         {units.map((u: any) => {
-                            const isUnitActive = activeFamilies?.has(u.family) || false;
+                            const isUnitActive = activeTemplateIds?.has(u.id) || false;
                             const unitStyle: React.CSSProperties = {
                                 width: '24px', height: '24px', objectFit: 'contain',
                                 borderRadius: '4px', background: 'rgba(0,0,0,0.3)',
@@ -237,26 +237,25 @@ function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
         const synId = syn.id;
         const potentialUnits = teamUnits.filter(u => u.synergies.includes(synId));
 
+        const activeTemplateIds = new Set(potentialUnits.map(u => u.templateId));
         const familySet = new Set(potentialUnits.map(u => u.family));
-        const activeFamilies = new Set(potentialUnits.map(u => u.family));
 
         let count = familySet.size;
 
         // Eevee Family Special Counting Logic
-        const evolvedEeveeUnits = potentialUnits.filter(u => u.family === 'eevee' && u.templateId !== 'eevee');
-        if (evolvedEeveeUnits.length > 0) {
+        const eeveeFamilyUnits = potentialUnits.filter(u => u.family === 'eevee');
+        if (eeveeFamilyUnits.length > 0) {
             if (synId === 'BatonPass') {
-                // Baton Pass: Every unique evolved form counts as 1 (no star bonus, fix doubling)
-                const formsMap = new Map<string, number>(); // templateId -> level (level is ignored now)
-                evolvedEeveeUnits.forEach(u => {
-                    formsMap.set(u.templateId, u.level);
-                });
-                // Subtract 1 because Eevee family was already counted as 1 in familySet.size
-                count += (formsMap.size - 1);
+                // Baton Pass: Every unique template in Eevee family counts as 1 (Character Identity)
+                const uniqueEeveeTemplates = new Set(eeveeFamilyUnits.map(u => u.templateId));
+                count = (familySet.size - 1) + uniqueEeveeTemplates.size;
             } else {
                 // Elemental Synergy: Add bonus based on the highest level of matching evolved Eevee
-                const maxLevel = Math.max(...evolvedEeveeUnits.map(u => u.level));
-                count += (maxLevel >= 3 ? 2 : 1);
+                const evolvedEeveeUnits = eeveeFamilyUnits.filter(u => u.templateId !== 'eevee');
+                if (evolvedEeveeUnits.length > 0) {
+                    const maxLevel = Math.max(...evolvedEeveeUnits.map(u => u.level));
+                    count += (maxLevel >= 3 ? 2 : 1);
+                }
             }
         }
 
@@ -307,7 +306,7 @@ function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
             count,
             isActive,
             units,
-            activeFamilies
+            activeTemplateIds
         };
     });
 
@@ -2400,7 +2399,7 @@ function App() {
                                                             synergy={syn}
                                                             count={syn.count}
                                                             units={syn.units}
-                                                            activeFamilies={syn.activeFamilies}
+                                                            activeTemplateIds={syn.activeTemplateIds}
                                                             className="summary-synergy-item"
                                                             showCount={true}
                                                             side="PLAYER"
@@ -2413,7 +2412,7 @@ function App() {
                                                     if (!u) return <div key={i} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.03)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.1)' }} />;
                                                     const img00 = u.imageUrl.replace('01.webp', '00.webp');
                                                     return (
-                                                        <div key={i} className={`summary-unit-card ${activeSyn && u && u.synergies.includes(activeSyn.id) ? 'synergy-highlight' : ''}`}>
+                                                        <div key={i} className={`summary-unit-card ${activeSyn && u && activeSyn.activeTemplateIds.has(u.templateId) ? 'synergy-highlight' : ''}`}>
                                                             {mvp?.id === u.id && <div className="mvp-badge"> MVP</div>}
                                                             <div className="summary-unit-img-wrapper">
                                                                 <img
@@ -2443,7 +2442,7 @@ function App() {
                                                                     synergy={syn}
                                                                     count={syn.count}
                                                                     units={syn.units}
-                                                                    activeFamilies={syn.activeFamilies}
+                                                                    activeTemplateIds={syn.activeTemplateIds}
                                                                     className="summary-synergy-item"
                                                                     showCount={true}
                                                                     isEnemy={true}
@@ -2457,7 +2456,7 @@ function App() {
                                                             if (!u) return <div key={`enemy-${i}`} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.01)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.05)' }} />;
                                                             const img00 = u.imageUrl.replace('01.webp', '00.webp');
                                                             return (
-                                                                <div key={`enemy-${i}`} className={`summary-unit-card ${activeSyn && u && u.synergies.includes(activeSyn.id) ? 'synergy-highlight' : ''}`}>
+                                                                <div key={`enemy-${i}`} className={`summary-unit-card ${activeSyn && u && activeSyn.activeTemplateIds.has(u.templateId) ? 'synergy-highlight' : ''}`}>
                                                                     <div className="summary-unit-img-wrapper">
                                                                         <img
                                                                             src={img00}
@@ -2748,7 +2747,7 @@ function App() {
                             synergy={syn}
                             count={syn.count}
                             units={syn.units}
-                            activeFamilies={syn.activeFamilies}
+                            activeTemplateIds={syn.activeTemplateIds}
                             className=""
                             activeSynergyId={activeSynergyId}
                             setActiveSynergyId={setActiveSynergyId}
@@ -2760,7 +2759,7 @@ function App() {
                 {(initialEnemyTeam.length > 0 || displayEnemyTeam) && (
                     <div className="board-synergies" style={{ left: 'auto', right: '10px', flexDirection: 'row-reverse' }}>
                         {getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || []), activeEdition).map(syn => (
-                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeFamilies={syn.activeFamilies} isEnemy={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />
+                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeTemplateIds={syn.activeTemplateIds} isEnemy={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />
                         ))}
                     </div>
                 )}
@@ -2919,7 +2918,7 @@ function App() {
                                                 showMergeGlow={unit && (unit as any).isMergeable}
                                                 isEvolving={unit && evolvingUnitId === unit.id}
                                                 tutorialHighlightLock={false}
-                                                synergyHighlight={activeSyn && unit && unit.synergies.includes(activeSyn.id)}
+                                                synergyHighlight={activeSyn && unit && activeSyn.activeTemplateIds.has(unit.templateId)}
                                             />
                                         </div>
                                     );
@@ -3093,7 +3092,7 @@ function App() {
                                         {selected.unit.synergies.map((synId: string) => {
                                             const syn = SYNERGIES[synId];
                                             if (!syn) return null;
-                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} forceActive={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />;
+                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} forceActive={true} activeTemplateIds={new Set([selected.unit.templateId])} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />;
                                         })}
                                     </div>
                                 </div>
