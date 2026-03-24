@@ -7,7 +7,7 @@ export const MODERN_NOVICE_OPPONENTS: OpponentDefinition[] = [
     { id: 'mn_1', name: '武藏', url: 'gym/武藏.webp', coreUnits: ['ekans', 'meowth'], difficulty: 'EASY' },
     { id: 'mn_2', name: '小次郎', url: 'gym/小次郎.webp', coreUnits: ['wynaut', 'meowth'], difficulty: 'EASY' },
     { id: 'mn_3', name: '小霞', url: 'gym/小霞01.webp', coreUnits: ['squirtle', 'clefairy'], difficulty: 'EASY' },
-    { id: 'mn_4', name: '克莉絲', url: 'gym/克莉絲01.webp', coreUnits: ['totodile'], difficulty: 'EASY' },
+    { id: 'mn_4', name: '克麗絲', url: 'gym/克麗絲01.webp', coreUnits: ['totodile'], difficulty: 'EASY' },
     { id: 'mn_5', name: '琴音', url: 'gym/琴音01.webp', coreUnits: ['chikorita'], difficulty: 'EASY' },
     { id: 'mn_6', name: '馬志士', url: 'gym/馬志士.webp', coreUnits: ['pichu', 'magnemite', 'magnemite'], difficulty: 'EASY' },
     { id: 'mn_7', name: '莉莉艾', url: 'gym/莉莉艾.webp', coreUnits: ['clefairy', 'clefairy', 'eevee'], difficulty: 'EASY' },
