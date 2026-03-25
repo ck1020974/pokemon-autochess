@@ -2439,12 +2439,12 @@ function App() {
                                 </div>
 
                                 {/* Content Area */}
-                                <div className="summary-tab-content">
+                                <div className="summary-tab-content" onClick={() => setActiveSynergyId(null)}>
                                     {summaryTab === 'team' ? (
                                         <div className="summary-team-display" style={{ marginTop: '-5px' }}>
                                             <div className="summary-units-grid">
                                                 {/* Synergy Display repositioned to top-left of this grid via CSS absolute positioning */}
-                                                <div className="summary-synergies-row">
+                                                <div className="summary-synergies-row" onClick={(e) => e.stopPropagation()}>
                                                     {getSynergyStatus(initialPlayerTeamForSynergy.length > 0 ? initialPlayerTeamForSynergy : game.playerTeam, activeEdition).map(syn => (
                                                         <SynergyIcon
                                                             key={syn.id}
@@ -2801,6 +2801,7 @@ function App() {
                             units={syn.units}
                             activeTemplateIds={syn.activeTemplateIds} activeFamilies={syn.activeFamilies}
                             className=""
+                            side="PLAYER"
                             activeSynergyId={activeSynergyId}
                             setActiveSynergyId={setActiveSynergyId}
                             disabled={!!battleResult}
@@ -2812,7 +2813,7 @@ function App() {
                 {(initialEnemyTeam.length > 0 || displayEnemyTeam) && (
                     <div className="board-synergies" style={{ left: 'auto', right: '10px', flexDirection: 'row-reverse' }}>
                         {getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || []), activeEdition).map(syn => (
-                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeTemplateIds={syn.activeTemplateIds} activeFamilies={syn.activeFamilies} isEnemy={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} disabled={!!battleResult} />
+                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeTemplateIds={syn.activeTemplateIds} activeFamilies={syn.activeFamilies} isEnemy={true} side="ENEMY" activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} disabled={!!battleResult} />
                         ))}
                     </div>
                 )}
@@ -3145,7 +3146,7 @@ function App() {
                                         {selected.unit.synergies.map((synId: string) => {
                                             const syn = SYNERGIES[synId];
                                             if (!syn) return null;
-                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} forceActive={true} activeTemplateIds={new Set([selected.unit.templateId])} activeFamilies={new Set([selected.unit.family])} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />;
+                                            return <SynergyIcon key={synId} synergy={syn} showCount={false} forceActive={true} activeTemplateIds={new Set([selected.unit.templateId])} activeFamilies={new Set([selected.unit.family])} side="PLAYER" activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />;
                                         })}
                                     </div>
                                 </div>

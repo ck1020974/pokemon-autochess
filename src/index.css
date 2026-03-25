@@ -1058,9 +1058,14 @@ h3 {
 
 @media (hover: hover) {
   .synergy-icon:hover {
-    transform: scale(1.2);
+    transform: scale(1.2) !important;
     z-index: 99999 !important;
   }
+}
+
+.synergy-icon.force-visible {
+  transform: scale(1.2) !important;
+  z-index: 99999 !important;
 }
 
 .synergy-tooltip {
@@ -1096,8 +1101,8 @@ h3 {
 }
 
 .synergy-tooltip.is-enemy {
-  left: 110%;
-  right: auto;
+  right: 110%;
+  left: auto;
   text-align: left;
 }
 
@@ -2470,6 +2475,12 @@ h3 {
   opacity: 1 !important;
 }
 
+/* Force summary tooltips to the right regardless of side */
+.summary-synergy-item .synergy-tooltip {
+  left: 110% !important;
+  right: auto !important;
+}
+
 /* --- Game Summary Screen --- */
 .summary-container {
   background: rgba(255, 255, 255, 0.05);
@@ -2713,7 +2724,8 @@ h3 {
 }
 
 .summary-synergy-item {
-  zoom: 1.1;
+  transform: scale(1.1);
+  transform-origin: center;
   /* Slightly larger in summary */
 }
 
