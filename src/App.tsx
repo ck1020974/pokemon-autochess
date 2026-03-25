@@ -2058,7 +2058,7 @@ function App() {
                                 filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
                                 fontWeight: 900
                             }}>
-                                準備進入冒險
+                                POKEMON<br />AUTOCHESS
                             </h1>
                         </div>
 
@@ -2076,7 +2076,7 @@ function App() {
                                 }} />
                             </div>
                             <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
-                                正在載入 {activeEdition.name} 初期資源... {loadingProgress}%
+                                版本資源載入中... {loadingProgress}%
                             </p>
                         </div>
                     </div>
