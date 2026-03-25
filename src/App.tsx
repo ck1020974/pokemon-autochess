@@ -2038,7 +2038,6 @@ function App() {
                 )
             }
 
-            {/* Stage 2 Loading Overlay (After selecting version, before difficulty) */}
             {
                 !hasStarted && selectedVersionId && !hasLoaded && (
                     <div className="startup-overlay"
@@ -2050,33 +2049,33 @@ function App() {
                         }}>
                         <div style={{ textAlign: 'center', marginBottom: '10px' }}>
                             <h1 style={{
-                                fontSize: '4rem',
+                                fontSize: '5rem',
                                 margin: '0',
-                                letterSpacing: '8px',
+                                letterSpacing: '12px',
                                 background: 'linear-gradient(to bottom, #fff, #94a3b8)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
-                                filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.1))',
+                                filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
                                 fontWeight: 900
                             }}>
                                 準備進入冒險
                             </h1>
                         </div>
 
-                        <div className="loading-container" style={{ width: '500px', textAlign: 'center' }}>
+                        <div className="loading-container" style={{ width: '600px', textAlign: 'center' }}>
                             <div className="loading-bar-wrapper" style={{
-                                width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)',
-                                borderRadius: '2px', overflow: 'hidden', marginBottom: '20px',
+                                width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)',
+                                borderRadius: '3px', overflow: 'hidden', marginBottom: '20px',
                                 border: '1px solid rgba(255,255,255,0.05)'
                             }}>
                                 <div className="loading-bar-fill" style={{
                                     width: `${loadingProgress}%`, height: '100%',
-                                    background: 'linear-gradient(90deg, #10b981, #059669)',
+                                    background: 'linear-gradient(90deg, #60a5fa, #3b82f6)',
                                     transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    boxShadow: '0 0 10px rgba(16, 185, 129, 0.5)'
+                                    boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)'
                                 }} />
                             </div>
-                            <p style={{ color: '#94a3b8', fontSize: '0.9rem', letterSpacing: '2px', margin: 0, opacity: 0.7 }}>
+                            <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
                                 正在載入 {activeEdition.name} 初期資源... {loadingProgress}%
                             </p>
                         </div>
