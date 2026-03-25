@@ -1241,6 +1241,13 @@ function App() {
 
     // Handle Battle Result Music
     useEffect(() => {
+        if (!battleResult) return;
+
+        if (game.isGameOver()) {
+            music.stop();
+            return;
+        }
+
         if (battleResult === 'WIN') {
             const currentWins = game.wins;
 
@@ -2442,7 +2449,6 @@ function App() {
                                                             side="PLAYER"
                                                             activeSynergyId={activeSynergyId}
                                                             setActiveSynergyId={setActiveSynergyId}
-                                                            disabled={true}
                                                         />
                                                     ))}
                                                 </div>
@@ -2487,7 +2493,6 @@ function App() {
                                                                     side="ENEMY"
                                                                     activeSynergyId={activeSynergyId}
                                                                     setActiveSynergyId={setActiveSynergyId}
-                                                                    disabled={true}
                                                                 />
                                                             ))}
                                                         </div>
