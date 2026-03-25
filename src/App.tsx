@@ -863,6 +863,8 @@ function App() {
                 // Initial game start (no last result)
                 music.play('pokemonmart', true);
             }
+        } else if (game.phase === GamePhase.GAME_OVER || game.phase === GamePhase.VICTORY) {
+            music.stop();
         } else {
             setBattleElapsedSeconds(0);
         }
@@ -1662,6 +1664,12 @@ function App() {
             if (game.lives < hpBefore) {
                 setHpLossAnim(true);
                 setTimeout(() => setHpLossAnim(false), 800);
+            }
+
+            // Ensure music stops if game is over
+            const currentPhase = game.phase as string;
+            if (currentPhase === GamePhase.GAME_OVER || currentPhase === GamePhase.VICTORY) {
+                music.stop();
             }
         }
 
