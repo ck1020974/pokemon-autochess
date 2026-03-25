@@ -111,15 +111,17 @@ class MusicManager {
     /**
      * Play a single track. Automatically chooses between streaming (BGM) and buffer (SFX).
      */
-    public async play(name: string, loop: boolean = true): Promise<void> {
-        // Increment request ID to invalidate any previous pending play calls
-        const requestId = ++this.lastRequestId;
-
+    public async play(name: string, loop: boolean = true, requestId?: number): Promise<void> {
         if (this.currentTrackName === name && (this.currentSource || (this.bgmElement && !this.bgmElement.paused))) {
             return;
         }
 
-        this.stop();
+        // Only stop if this is a fresh request or from a different sequence
+        if (!requestId || requestId !== this.lastRequestId) {
+            this.stop();
+        }
+
+        const currentId = requestId || this.lastRequestId;
         const ctx = this.initContext();
 
         try {
@@ -127,8 +129,8 @@ class MusicManager {
                 let buffer = this.bufferCache.get(name);
                 if (!buffer) {
                     await this.preload([name]);
-                    // Check if a newer request came in while preloading
-                    if (requestId !== this.lastRequestId) return;
+                    // Check for interruption
+                    if (currentId !== this.lastRequestId) return;
                     buffer = this.bufferCache.get(name);
                 }
                 if (!buffer) return;
@@ -152,7 +154,6 @@ class MusicManager {
                     this.bgmElement.crossOrigin = "anonymous";
                 }
 
-                // Synchronously prepare element
                 this.bgmElement.pause();
                 this.bgmElement.src = `${this.musicPath}${name}.OGG`;
                 this.bgmElement.loop = loop;
@@ -166,14 +167,12 @@ class MusicManager {
                 const gainNode = ctx.createGain();
                 gainNode.gain.setValueAtTime(this.muted ? 0 : this.defaultVolume, ctx.currentTime);
 
-                // Disconnect previous connections if any (though stop() should have handled it)
                 this.bgmMediaSource.disconnect();
                 this.bgmMediaSource.connect(gainNode);
                 gainNode.connect(ctx.destination);
 
                 await this.bgmElement.play();
-                // Check if a newer request came in while starting play
-                if (requestId !== this.lastRequestId) {
+                if (currentId !== this.lastRequestId) {
                     this.bgmElement.pause();
                     return;
                 }
@@ -226,23 +225,26 @@ class MusicManager {
     }
 
     public async playSequence(names: string[], lastLoop: boolean = true): Promise<void> {
-        const sequenceId = this.lastRequestId;
+        const sequenceId = ++this.lastRequestId;
         for (let i = 0; i < names.length; i++) {
             if (sequenceId !== this.lastRequestId) return;
             const isLast = i === names.length - 1;
             const name = names[i];
 
             if (isLast && lastLoop) {
-                await this.play(name, true);
+                await this.play(name, true, sequenceId);
             } else {
-                await this.playOneShot(name);
+                await this.playOneShot(name, sequenceId);
             }
         }
     }
 
-    public async playOneShot(name: string): Promise<void> {
-        const requestId = ++this.lastRequestId;
-        this.stop();
+    public async playOneShot(name: string, requestId?: number): Promise<void> {
+        if (!requestId || requestId !== this.lastRequestId) {
+            this.stop();
+        }
+
+        const currentId = requestId || this.lastRequestId;
         const ctx = this.initContext();
 
         try {
@@ -250,7 +252,7 @@ class MusicManager {
                 let buffer = this.bufferCache.get(name);
                 if (!buffer) {
                     await this.preload([name]);
-                    if (requestId !== this.lastRequestId) return;
+                    if (currentId !== this.lastRequestId) return;
                     buffer = this.bufferCache.get(name);
                 }
                 if (!buffer) return;
@@ -307,7 +309,7 @@ class MusicManager {
                     };
                     this.bgmElement?.addEventListener('ended', onEnded);
                     this.bgmElement?.play().then(() => {
-                        if (requestId !== this.lastRequestId) {
+                        if (currentId !== this.lastRequestId) {
                             this.bgmElement?.pause();
                         }
                     });
