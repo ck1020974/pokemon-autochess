@@ -782,19 +782,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'togepi', name: '波克比', tier: 4, family: 'togepi',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/波克比00.webp', battleImageUrl: 'assets/波克比01.webp',
-        description: '攻擊後永久+1攻擊，同時讓隨機友軍+5攻擊。', synergies: ['Trick'], evolveId: 'togetic'
+        description: '攻擊後自身與後方手下永久 +1 攻擊。', synergies: ['Trick'], evolveId: 'togetic'
     },
     togetic: {
         id: 'togetic', name: '波克基古', tier: 4, family: 'togepi',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/波克基古00.webp', battleImageUrl: 'assets/波克基古01.webp',
-        description: '攻擊後永久+2攻擊，同時讓隨機友軍+5攻擊。', synergies: ['Trick', 'Roost'], evolveId: 'togekiss', isHiddenFromShop: true
+        description: '攻擊後自身與後方手下永久 +3 攻擊。', synergies: ['Trick', 'Roost'], evolveId: 'togekiss', isHiddenFromShop: true
     },
     togekiss: {
         id: 'togekiss', name: '波克基斯', tier: 4, family: 'togepi',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/波克基斯00.webp', battleImageUrl: 'assets/波克基斯01.webp',
-        description: '攻擊後永久+5攻擊，同時讓隨機友軍+5攻擊。', synergies: ['Trick', 'Roost'], isHiddenFromShop: true
+        description: '攻擊後自身與後方手下永久 +5 攻擊。', synergies: ['Trick', 'Roost'], isHiddenFromShop: true
     },
     // 37. Ekans
     ekans: {
@@ -1125,19 +1125,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'happiny', name: '小福蛋', tier: 4, family: 'happiny',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/小福蛋00.webp', battleImageUrl: 'assets/小福蛋01.webp',
-        description: '攻擊後永久+1生命，同時讓隨機友軍+5生命。', synergies: ['Normal', 'Charm'], evolveId: 'chansey'
+        description: '攻擊後自身與後方手下永久 +1 生命。', synergies: ['Normal', 'Charm'], evolveId: 'chansey'
     },
     chansey: {
         id: 'chansey', name: '吉利蛋', tier: 4, family: 'happiny',
         baseStats: { hp: 5, maxHp: 5, attack: 5 },
         imageUrl: 'assets/吉利蛋00.webp', battleImageUrl: 'assets/吉利蛋01.webp',
-        description: '攻擊後永久+2生命，同時讓隨機友軍+5生命。', synergies: ['Normal', 'Charm'], evolveId: 'blissey', isHiddenFromShop: true
+        description: '攻擊後自身與後方手下永久 +3 生命。', synergies: ['Normal', 'Charm'], evolveId: 'blissey', isHiddenFromShop: true
     },
     blissey: {
         id: 'blissey', name: '幸福蛋', tier: 4, family: 'happiny',
         baseStats: { hp: 6, maxHp: 6, attack: 6 },
         imageUrl: 'assets/幸福蛋00.webp', battleImageUrl: 'assets/幸福蛋01.webp',
-        description: '攻擊後永久+5生命，同時讓隨機友軍+5生命。', synergies: ['Normal', 'Charm'], isHiddenFromShop: true
+        description: '攻擊後自身與後方手下永久 +5 生命。', synergies: ['Normal', 'Charm'], isHiddenFromShop: true
     },
     // 35. Legendary Beasts
     raikou: {

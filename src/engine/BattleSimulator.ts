@@ -348,8 +348,8 @@ export class BattleSimulator {
         if (unit.family === 'kangaskhan') {
             const hpBuff = Math.floor(unit.stats.attack * 0.33);
             if (hpBuff > 0) {
-                const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
-                this.growUnit(unit, hpBuff, 0, '親子愛', original, true);
+                // Kangaskhan's buff is temporary (not passed to originalPlayerTeam)
+                this.growUnit(unit, hpBuff, 0, '親子愛', null, true);
                 await this.notifySkill(unit, `發動了親子愛`);
                 this.playAnimation(unit, 'glow-white', 600);
             }
@@ -1719,19 +1719,20 @@ export class BattleSimulator {
                 const s = this.unitStates.get(unit);
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
-                    const selfAtks = [0, 1, 2, 5];
-                    const selfAtk = selfAtks[unit.level] || 1;
+                    const atks = [0, 1, 3, 5];
+                    const buffAtk = atks[unit.level] || 1;
                     const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
                     // Permanent growth for self
-                    this.growUnit(unit, 0, selfAtk, '超幸運', original, true);
+                    this.growUnit(unit, 0, buffAtk, '超幸運', original, true);
 
-                    const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
-                    if (aliveFriends.length > 0) {
-                        const randomFriend = aliveFriends[Math.floor(Math.random() * aliveFriends.length)];
-                        await this.notifySkill(unit, `對 ${randomFriend.name} 發動了超幸運！`);
-                        // Friend buff is temporary (+5 Attack for this battle)
-                        this.buffAttack(randomFriend, 5, true);
-                        this.playAnimation(randomFriend, 'glow-white', 600);
+                    const idx = myTeam.indexOf(unit);
+                    const backUnit = (idx !== -1 && idx < myTeam.length - 1) ? myTeam[idx + 1] : null;
+                    if (backUnit && backUnit.stats.hp > 0) {
+                        await this.notifySkill(unit, `對 ${backUnit.name} 發動了超幸運！`);
+                        const backOriginal = this.playerTeam.includes(backUnit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === backUnit.id) : null;
+                        // Permanent growth for back ally
+                        this.growUnit(backUnit, 0, buffAtk, '超幸運', backOriginal, true);
+                        this.playAnimation(backUnit, 'glow-white', 600);
                     }
                 }
             });
@@ -1793,18 +1794,20 @@ export class BattleSimulator {
                 const s = this.unitStates.get(unit);
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
-                    const selfGrowths = [0, 1, 2, 5];
-                    const selfGrow = selfGrowths[unit.level] || 1;
+                    const hps = [0, 1, 3, 5];
+                    const buffHp = hps[unit.level] || 1;
                     const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
-                    this.growUnit(unit, selfGrow, 0, '生蛋技能', original, true);
+                    // Permanent growth for self
+                    this.growUnit(unit, buffHp, 0, '生蛋技能', original, true);
 
-                    const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
-                    if (aliveFriends.length > 0) {
-                        const randomFriend = aliveFriends[Math.floor(Math.random() * aliveFriends.length)];
-                        await this.notifySkill(unit, `對 ${randomFriend.name} 發動了生蛋！`);
-                        const fo = null; // Ally buff is temporary
-                        this.growUnit(randomFriend, 5, 0, '生蛋技能', fo, true);
-                        this.playAnimation(randomFriend, 'glow-green', 600);
+                    const idx = myTeam.indexOf(unit);
+                    const backUnit = (idx !== -1 && idx < myTeam.length - 1) ? myTeam[idx + 1] : null;
+                    if (backUnit && backUnit.stats.hp > 0) {
+                        await this.notifySkill(unit, `對 ${backUnit.name} 發動了生蛋！`);
+                        const backOriginal = this.playerTeam.includes(backUnit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === backUnit.id) : null;
+                        // Permanent growth for back ally
+                        this.growUnit(backUnit, buffHp, 0, '生蛋技能', backOriginal, true);
+                        this.playAnimation(backUnit, 'glow-green', 600);
                     }
                 }
             });
