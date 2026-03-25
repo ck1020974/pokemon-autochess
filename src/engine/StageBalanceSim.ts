@@ -31,6 +31,7 @@ function applyStatsByLevel(unit: Unit, targetLevel: number) {
         unit.stats.maxHp += bHp;
         unit.stats.attack += bAtk;
     }
+    unit.capStats();
 }
 
 // --- 敵方陣容生成 ---
@@ -153,6 +154,7 @@ function generatePlayerTeamForStage(stageId: string): Unit[] {
             } else {
                 u.stats.attack += totalAtkBonus;
             }
+            u.capStats();
         }
 
         team.push(u);

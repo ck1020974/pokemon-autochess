@@ -489,6 +489,7 @@ export class HeadlessBattleSimulator {
                     const stealAmt = Math.floor(strongest.stats.attack * factor);
                     if (stealAmt > 0) {
                         strongest.stats.attack -= stealAmt;
+                        strongest.capStats();
                         this.growUnit(unit, 0, stealAmt, null, true);
                     }
                 }
@@ -598,6 +599,7 @@ export class HeadlessBattleSimulator {
                     const reducedAmt = Math.floor(target.stats.attack * 0.33);
                     if (reducedAmt > 0) {
                         target.stats.attack -= reducedAmt;
+                        target.capStats();
                         const state = this.unitStates.get(target) || {};
                         state.isCharmed = true;
                         this.unitStates.set(target, state);
@@ -616,7 +618,10 @@ export class HeadlessBattleSimulator {
 
             team.filter(u => u && u.synergies.includes('Charge')).forEach(u => {
                 const boost = minBoost + Math.floor(Math.random() * (maxBoost - minBoost + 1));
-                if (boost > 0) u.stats.attack += boost;
+                if (boost > 0) {
+                    u.stats.attack += boost;
+                    u.capStats();
+                }
             });
         }
 
@@ -706,7 +711,9 @@ export class HeadlessBattleSimulator {
                     const count = this.getSynergyCountForUnit(unit, 'Water');
                     const debuff = count >= 5 ? 10 : (count >= 3 ? 3 : (count >= 2 ? 1 : 0));
                     if (debuff > 0 && e.target.stats.attack > 1) {
-                        e.target.stats.attack = Math.max(1, e.target.stats.attack - debuff);
+                        const amountReduced = Math.min(e.target.stats.attack - 1, debuff);
+                        e.target.stats.attack -= amountReduced;
+                        e.target.capStats();
                     }
                 }
             });

@@ -29,6 +29,7 @@ function applyStatsByLevel(unit: Unit, targetLevel: number) {
         unit.stats.maxHp += bHp;
         unit.stats.attack += bAtk;
     }
+    unit.capStats();
 }
 
 function constructBossTeam(boss: any, stageId: string): Unit[] {

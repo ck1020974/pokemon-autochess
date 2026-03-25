@@ -62,6 +62,7 @@ function generateChampionTeam(): Unit[] {
         u.stats.hp += 10;
         u.stats.maxHp += 10;
         u.stats.attack += 5;
+        u.capStats();
 
         const backlineUnits = ['swampert', 'blaziken', 'sceptile', 'meganium', 'swalot', 'mankey', 'dwebble', 'sprigatito', 'fuecoco'];
         if (i === 0 && backlineUnits.includes(u.family)) {
@@ -121,6 +122,7 @@ function applyCarryBuff(team: Unit[]): { unit: Unit; type: 'HP' | 'ATK' } {
     } else {
         carry.stats.attack += bonus;
     }
+    carry.capStats();
 
     return { unit: carry, type };
 }

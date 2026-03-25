@@ -655,6 +655,7 @@ export class BattleSimulator {
                     const stealAmt = Math.min(strongest.stats.attack - 1, buff);
                     if (stealAmt > 0) {
                         strongest.stats.attack -= stealAmt;
+                        strongest.capStats();
                         const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
                         // Permanent increase for player's unit
                         this.growUnit(unit, 0, stealAmt, '小偷', original, true);
@@ -854,6 +855,7 @@ export class BattleSimulator {
                     const reducedAmt = Math.ceil(target.stats.attack * 0.33);
                     if (reducedAmt > 0) {
                         target.stats.attack -= reducedAmt;
+                        target.capStats();
                         const state = this.unitStates.get(target) || {};
                         state.isCharmed = true;
                         this.unitStates.set(target, state);
@@ -875,6 +877,7 @@ export class BattleSimulator {
                 const boost = minBoost + Math.floor(Math.random() * (maxBoost - minBoost + 1));
                 if (boost > 0) {
                     u.stats.attack += boost;
+                    u.capStats();
                     // No message as requested
                     this.playAnimation(u, 'glow-yellow', 500);
                 }
@@ -996,6 +999,7 @@ export class BattleSimulator {
                     if (debuff > 0 && e.target.stats.attack > 1) {
                         const amountReduced = Math.min(e.target.stats.attack - 1, debuff);
                         e.target.stats.attack -= amountReduced;
+                        e.target.capStats();
                         this.waterDebuffedTargets.add(e.target);
                         this.log(`${e.target.name} 被困在漩渦，降低了 ${amountReduced} 攻擊！`);
                     }

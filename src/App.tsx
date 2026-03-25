@@ -152,7 +152,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 }
 
 // Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateIds, activeFamilies, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive }: any) {
+function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateIds, activeFamilies, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive, disabled }: any) {
     const [localOpen, setLocalOpen] = useState(false);
 
     // Use side-aware ID if setActiveSynergyId is provided (mainly for summary screen)
@@ -176,6 +176,7 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateId
             onMouseEnter={onMouseEnter}
             onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
+                if (disabled) return; // Block interaction if disabled
                 if (setActiveSynergyId) {
                     setActiveSynergyId(isForcedOpen ? null : synergyKey);
                 } else {
@@ -2767,6 +2768,7 @@ function App() {
                             className=""
                             activeSynergyId={activeSynergyId}
                             setActiveSynergyId={setActiveSynergyId}
+                            disabled={!!battleResult}
                         />
                     ))}
                 </div>
@@ -2775,7 +2777,7 @@ function App() {
                 {(initialEnemyTeam.length > 0 || displayEnemyTeam) && (
                     <div className="board-synergies" style={{ left: 'auto', right: '10px', flexDirection: 'row-reverse' }}>
                         {getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || []), activeEdition).map(syn => (
-                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeTemplateIds={syn.activeTemplateIds} activeFamilies={syn.activeFamilies} isEnemy={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} />
+                            <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeTemplateIds={syn.activeTemplateIds} activeFamilies={syn.activeFamilies} isEnemy={true} activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} disabled={!!battleResult} />
                         ))}
                     </div>
                 )}

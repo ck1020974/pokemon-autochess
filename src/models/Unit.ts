@@ -39,6 +39,7 @@ export class Unit {
   public abilityPower: number = 0;
   public battlesCount: number = 0;
   public hasNewPermanentBuff: boolean = false;
+  public statCap: number = 50; // New: Flexible stat cap (default 50)
 
   constructor(template: UnitTemplate) {
     this.id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
@@ -81,13 +82,13 @@ export class Unit {
   }
 
 
-  // Max stats according to rules: 50/50
+  // Max stats according to rules: Default 50/50 but flexible
   public capStats() {
     // 1. Cap Max Values (Floor at 1)
-    if (this.stats.maxHp > 50) this.stats.maxHp = 50;
+    if (this.stats.maxHp > this.statCap) this.stats.maxHp = this.statCap;
     if (this.stats.maxHp < 1) this.stats.maxHp = 1;
 
-    if (this.stats.attack > 50) this.stats.attack = 50;
+    if (this.stats.attack > this.statCap) this.stats.attack = this.statCap;
     if (this.stats.attack < 1) this.stats.attack = 1;
 
     // 2. Cap Current HP to Max HP (Floor at 1)
@@ -97,8 +98,8 @@ export class Unit {
 
   // Helper for Permanent/Temporary Growth (MaxHP + HP + Atk)
   public addGrowth(hp: number, attack: number) {
-    const hpToMax = hp > 0 ? Math.min(hp, 50 - this.stats.maxHp) : hp;
-    const atkToAtk = attack > 0 ? Math.min(attack, 50 - this.stats.attack) : attack;
+    const hpToMax = hp > 0 ? Math.min(hp, this.statCap - this.stats.maxHp) : hp;
+    const atkToAtk = attack > 0 ? Math.min(attack, this.statCap - this.stats.attack) : attack;
 
     this.stats.maxHp += hpToMax;
     this.stats.attack += atkToAtk;
@@ -115,7 +116,7 @@ export class Unit {
 
   // Helper for Attack Buff
   public addBuff(attack: number) {
-    if (attack > 0) attack = Math.min(attack, 50 - this.stats.attack);
+    if (attack > 0) attack = Math.min(attack, this.statCap - this.stats.attack);
     this.stats.attack += attack;
     this.capStats();
   }
@@ -143,9 +144,10 @@ export class Unit {
     const secondAtk = Math.min(mpAtk, spAtk);
     const newAtk = Math.floor(highestAtk + secondAtk * 0.5);
 
-    // Feature: Cap stats at 50/50
-    const finalHp = Math.min(50, newMaxHp);
-    const finalAtk = Math.min(50, newAtk);
+    // Feature: Cap stats at 50/50 (Default) or use main unit's cap
+    const cap = main.statCap || 50;
+    const finalHp = Math.min(cap, newMaxHp);
+    const finalAtk = Math.min(cap, newAtk);
 
     return {
       hp: finalHp,
