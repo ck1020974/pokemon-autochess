@@ -15,7 +15,9 @@ class MusicManager {
     private currentGainNode: GainNode | null = null;
     private currentTrackName: string | null = null;
 
-    private musicPath: string = 'music/';
+    private musicPath: string = (import.meta.env.BASE_URL || './').endsWith('/')
+        ? (import.meta.env.BASE_URL || './') + 'music/'
+        : (import.meta.env.BASE_URL || './') + '/music/';
     private muted: boolean = false;
     private defaultVolume: number = 0.15;
 
@@ -52,6 +54,11 @@ class MusicManager {
             try {
                 await this.context.resume();
             } catch (e) { }
+        }
+
+        // If we have a track that should be playing but isn't, try to play it now
+        if (this.currentTrackName && this.bgmElement && this.bgmElement.paused) {
+            this.bgmElement.play().catch(() => { });
         }
     }
 
