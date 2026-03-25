@@ -655,7 +655,7 @@ function App() {
 
             // --- PHASE 2: 遊戲準備 (Tier 1-2 & Novice Trainers) ---
             const phase2Urls = new Set<string>();
-            const phase2Music = ['pokemonmart', 'pokemoncenter', 'gymfight', 'gymwin'];
+            const phase2Music = ['level up', 'recover'];
 
             Object.values(ALL_UNITS).forEach(t => {
                 if (t.tier <= 2 || t.id === 'sprout') {
@@ -688,7 +688,7 @@ function App() {
             // --- PHASE 3: 完整體驗 (背景載入) ---
             setTimeout(async () => {
                 const phase3Urls = new Set<string>();
-                const phase3Music = ['victoryroad', 'level up', 'recover', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin'];
+                const phase3Music: string[] = [];
 
                 Object.values(ALL_UNITS).forEach(t => {
                     if (t.tier > 2 && t.id !== 'sprout') {
