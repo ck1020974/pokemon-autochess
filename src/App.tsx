@@ -330,6 +330,7 @@ function App() {
     const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
     const [focusedVersionId, setFocusedVersionId] = useState<string | null>(null);
     const [, setLoadingStage] = useState<number>(1);
+    const [phase1Loaded, setPhase1Loaded] = useState(false);
 
     const gameRef = useRef<GameLoop | null>(null);
     if (!gameRef.current) {
@@ -571,59 +572,86 @@ function App() {
     }, [tutorialStep, game.phase, battleResult, update]); // Changed from gameRef.current.phase
 
     // Image Preloading - Split into Critical (Tier 1/2) and Background (Tier 3+)
+    // PHASE 1: Core Assets (Mount)
     useEffect(() => {
-
-        const loadAssets = async (urls: string[], isBackground: boolean = false, musicNames: string[] = []) => {
+        const loadCoreAssets = async () => {
+            console.log(`[系統] 開始階段 1：核心資源預載入...`);
+            const urls = new Set<string>();
+            urls.add(normalBall);
+            urls.add(greatBall);
+            urls.add(ultraBall);
+            urls.add(masterBall);
+            urls.add('icon-192.png');
+            urls.add('icon-002.png');
+            urls.add('icon-003.png');
+            
+            const musicNames = ['start'];
+            
             let loadedCount = 0;
-            const total = urls.length + musicNames.length;
-            if (total === 0) return;
-
+            const total = urls.size + musicNames.length;
             const updateProgress = () => {
                 loadedCount++;
-                if (!isBackground) {
-                    setLoadingProgress(Math.floor((loadedCount / total) * 100));
-                }
+                setLoadingProgress(Math.floor((loadedCount / total) * 100));
             };
 
-            const imagePromises = urls.map(url => {
+            const imagePromises = Array.from(urls).map(url => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.src = url;
-                    const handleLoad = () => {
-                        updateProgress();
-                        resolve(url);
-                    };
+                    const handleLoad = () => { updateProgress(); resolve(url); };
                     img.onload = handleLoad;
                     img.onerror = handleLoad;
                 });
             });
 
             const musicPromises = musicNames.map(name => {
-                return music.preload([name]).then(() => {
-                    updateProgress();
-                });
+                return music.preload([name]).then(() => { updateProgress(); });
             });
 
             await Promise.all([...imagePromises, ...musicPromises]);
+            setPhase1Loaded(true);
+            console.log(`[系統] 核心資源已就緒！`);
         };
+        loadCoreAssets();
+    }, []);
 
-        const preloadAllAssets = async () => {
-            console.log(`[系統] 開始三階段資源預載入...`);
+    // PHASE 2 & 3: Edition Specific Assets (Triggered after selection)
+    useEffect(() => {
+        if (!selectedVersionId) return;
 
-            // --- PHASE 1: 核心基礎 (Core Engine & UI) ---
-            const phase1Urls = new Set<string>();
-            phase1Urls.add(normalBall);
-            phase1Urls.add(greatBall);
-            phase1Urls.add(ultraBall);
-            phase1Urls.add(masterBall);
-            phase1Urls.add('icon-192.png');
-            phase1Urls.add('icon-002.png');
-            phase1Urls.add('icon-003.png');
-            
-            const phase1Music = ['start'];
-            
-            console.log(`[系統] 階段 1：載入核心資源...`);
-            await loadAssets(Array.from(phase1Urls), false, phase1Music);
+        const loadEditionAssets = async () => {
+            console.log(`[系統] 開始支援 ${activeEdition.name} 的資源載入...`);
+            setHasLoaded(false);
+            setLoadingProgress(0);
+
+            const loadAssets = async (urls: string[], isBackground: boolean = false, musicNames: string[] = []) => {
+                let loadedCount = 0;
+                const total = urls.length + musicNames.length;
+                if (total === 0) return;
+
+                const updateProgress = () => {
+                    loadedCount++;
+                    if (!isBackground) {
+                        setLoadingProgress(Math.floor((loadedCount / total) * 100));
+                    }
+                };
+
+                const imagePromises = urls.map(url => {
+                    return new Promise((resolve) => {
+                        const img = new Image();
+                        img.src = url;
+                        const handleLoad = () => { updateProgress(); resolve(url); };
+                        img.onload = handleLoad;
+                        img.onerror = handleLoad;
+                    });
+                });
+
+                const musicPromises = musicNames.map(name => {
+                    return music.preload([name]).then(() => { updateProgress(); });
+                });
+
+                await Promise.all([...imagePromises, ...musicPromises]);
+            };
 
             // --- PHASE 2: 遊戲準備 (Tier 1-2 & Novice Trainers) ---
             const phase2Urls = new Set<string>();
@@ -636,7 +664,6 @@ function App() {
                 }
             });
 
-            // Novice Trainers & their core units
             activeEdition.noviceOpponents.forEach((op: any) => {
                 if (op.url) phase2Urls.add(op.url);
                 if (op.coreUnits && Array.isArray(op.coreUnits)) {
@@ -650,19 +677,15 @@ function App() {
                 }
             });
 
-            // Common Reward item images
             REWARD_DATA.forEach(reward => {
                 if (reward.imageUrl) phase2Urls.add(reward.imageUrl);
             });
 
-            console.log(`[系統] 階段 2：載入商店與初期對手資源 (${phase2Urls.size} 個影像)...`);
             await loadAssets(Array.from(phase2Urls), false, phase2Music);
-
             setHasLoaded(true);
-            console.log(`[系統] 核心遊戲資源已就緒！`);
+            console.log(`[系統] ${activeEdition.name} 遊戲資源已就緒！`);
 
-            // --- PHASE 3: 完整體驗 (Tier 3-5 & Advanced Content - 背景載入) ---
-            // Delayed start to ensure UI is snappy
+            // --- PHASE 3: 完整體驗 (背景載入) ---
             setTimeout(async () => {
                 const phase3Urls = new Set<string>();
                 const phase3Music = ['victoryroad', 'level up', 'recover', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin'];
@@ -674,19 +697,17 @@ function App() {
                     }
                 });
 
-                // All other Trainers
                 [...activeEdition.intermOpponents, ...activeEdition.advancedOpponents, ...activeEdition.eliteOpponents, ...activeEdition.championOpponents].forEach((op: any) => {
                     if (op.url) phase3Urls.add(op.url);
                 });
 
-                console.log(`[系統] 階段 3：開始背景載入剩餘資源 (${phase3Urls.size} 個影像, ${phase3Music.length} 首音樂)...`);
                 await loadAssets(Array.from(phase3Urls), true, phase3Music);
-                console.log(`[系統] 背景資源載入完成！`);
+                console.log(`[系統] ${activeEdition.name} 背景資源載入完成！`);
             }, 1000);
         };
 
-        preloadAllAssets();
-    }, []);
+        loadEditionAssets();
+    }, [selectedVersionId, activeEdition.id]);
 
     // --- Dynamic Preloading for Current Team & Opponents ---
     useEffect(() => {
@@ -1926,7 +1947,7 @@ function App() {
                             </h1>
                         </div>
 
-                        {!hasLoaded && (
+                        {!phase1Loaded && (
                             <div className="loading-container" style={{ width: '600px', textAlign: 'center' }}>
                                 <div className="loading-bar-wrapper" style={{
                                     width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)',
@@ -1941,13 +1962,13 @@ function App() {
                                     }} />
                                 </div>
                                 <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
-                                    資源載入中... {loadingProgress}%
+                                    核心資源載入中... {loadingProgress}%
                                 </p>
                             </div>
                         )}
 
                         {/* Version Selection Options show up once Stage 1 is loaded */}
-                        {hasLoaded && (
+                        {phase1Loaded && (
                             <div className="difficulty-grid" style={{
                                 display: 'grid',
                                 gridTemplateColumns: 'repeat(3, 1fr)',
@@ -2004,7 +2025,7 @@ function App() {
                             </div>
                         )}
 
-                        {!hasLoaded && (
+                        {!phase1Loaded && (
                             <p style={{
                                 position: 'absolute',
                                 bottom: '20px',
