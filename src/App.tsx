@@ -1243,7 +1243,7 @@ function App() {
     useEffect(() => {
         if (!battleResult) return;
 
-        if (game.isGameOver()) {
+        if (game.lives <= 0 || game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER) {
             music.stop();
             return;
         }
