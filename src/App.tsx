@@ -355,6 +355,7 @@ function App() {
     }, []);
 
     const handleRestart = () => {
+        music.stop();
         // 1. Reset Core Engine
         gameRef.current = new GameLoop(activeEdition);
         setRewardChoices([]);
@@ -584,9 +585,9 @@ function App() {
             urls.add('icon-192.png');
             urls.add('icon-002.png');
             urls.add('icon-003.png');
-            
+
             const musicNames = ['start'];
-            
+
             let loadedCount = 0;
             const total = urls.size + musicNames.length;
             const updateProgress = () => {
@@ -765,10 +766,10 @@ function App() {
     useEffect(() => {
         if (game.phase === GamePhase.BATTLE && previousGamePhase.current !== GamePhase.BATTLE) {
             setInitialPlayerTeamForSynergy([...game.playerTeam]);
-            setInitialEnemyTeamForSynergy(game.opponentTeam ? [...game.opponentTeam] : []);
+            // setInitialEnemyTeamForSynergy(game.opponentTeam ? [...game.opponentTeam] : []); // Removed: Captured later when team is generated
         }
         previousGamePhase.current = game.phase;
-    }, [game.phase, game.playerTeam, game.opponentTeam]);
+    }, [game.phase, game.playerTeam]);
 
     // Orientation Detection
     useEffect(() => {
@@ -1164,6 +1165,7 @@ function App() {
 
             setInitialEnemyTeam([...enemyTeam]);
             game.opponentTeam = [...enemyTeam];
+            setInitialEnemyTeamForSynergy([...enemyTeam]); // NEW: Capture synergies after generating the new team
             game.refreshSpecialDescriptions();
 
             const activeMultiplier = (difficulty === 'MASTER' && game.turn === 1) ? 1.0 : game.difficultyMultiplier;
@@ -1700,6 +1702,7 @@ function App() {
 
     return (
         <div className="game-container" onClick={() => {
+            music.resumeContext();
             if (focusedDifficulty) setFocusedDifficulty(null);
             setActiveSynergyId(null);
         }}>
@@ -2439,6 +2442,7 @@ function App() {
                                                             side="PLAYER"
                                                             activeSynergyId={activeSynergyId}
                                                             setActiveSynergyId={setActiveSynergyId}
+                                                            disabled={true}
                                                         />
                                                     ))}
                                                 </div>
@@ -2483,6 +2487,7 @@ function App() {
                                                                     side="ENEMY"
                                                                     activeSynergyId={activeSynergyId}
                                                                     setActiveSynergyId={setActiveSynergyId}
+                                                                    disabled={true}
                                                                 />
                                                             ))}
                                                         </div>
