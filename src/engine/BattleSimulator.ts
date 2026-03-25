@@ -1267,7 +1267,7 @@ export class BattleSimulator {
         if (unit.family === 'fuecoco') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const { myTeam } = this.getTeams(unit);
-                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
+                if (unit.stats.hp <= 0 || this.processedDeaths.has(unit.id) || e.source === unit || this.unitStates.get(unit)?.isSilenced) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
                     const hpBuff = 2;
                     const targetCount = unit.level; // 1, 2, or 3
@@ -1307,7 +1307,7 @@ export class BattleSimulator {
         if (unit.family === 'quaxly') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const { myTeam } = this.getTeams(unit);
-                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
+                if (unit.stats.hp <= 0 || this.processedDeaths.has(unit.id) || e.source === unit || this.unitStates.get(unit)?.isSilenced) return;
                 if (e.context.killer && myTeam.includes(e.context.killer)) {
                     const atkBuff = 2;
                     const targetCount = unit.level; // 1, 2, or 3
@@ -1346,7 +1346,8 @@ export class BattleSimulator {
         // Psyduck Family: Kill -> Random Ally Perm HP
         if (unit.family === 'psyduck') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
-                if (this.unitStates.get(unit)?.isSilenced) return;
+                const s = this.unitStates.get(unit);
+                if (unit.stats.hp <= 0 || this.processedDeaths.has(unit.id) || e.source === unit || s?.isSilenced) return;
                 if (e.context.killer === unit) {
                     const { myTeam } = this.getTeams(unit);
                     const living = myTeam.filter(u => u && u.stats.hp > 0);
@@ -1395,7 +1396,8 @@ export class BattleSimulator {
         // Vulpix Family: Kill -> Random Ally Perm ATK
         if (unit.family === 'vulpix') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
-                if (this.unitStates.get(unit)?.isSilenced) return;
+                const s = this.unitStates.get(unit);
+                if (unit.stats.hp <= 0 || this.processedDeaths.has(unit.id) || e.source === unit || s?.isSilenced) return;
                 if (e.context.killer === unit) {
                     const { myTeam } = this.getTeams(unit);
                     const living = myTeam.filter(u => u && u.stats.hp > 0);
@@ -1624,7 +1626,7 @@ export class BattleSimulator {
         if (unit.family === 'sprigatito') {
             this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
                 const { myTeam } = this.getTeams(unit);
-                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced || !myTeam.includes(unit)) return;
+                if (unit.stats.hp <= 0 || this.processedDeaths.has(unit.id) || this.unitStates.get(unit)?.isSilenced) return;
                 if (e.source && myTeam.includes(e.source) && e.source !== unit) {
                     const buff = 1;
                     const targetCount = unit.level; // 1, 2, or 3
@@ -1760,7 +1762,7 @@ export class BattleSimulator {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const s = this.unitStates.get(unit);
                 // Ensure unit is ALIVE and it wasn't the one who died
-                if (unit.stats.hp <= 0 || s?.isSilenced || e.source === unit) return;
+                if (unit.stats.hp <= 0 || this.processedDeaths.has(unit.id) || s?.isSilenced || e.source === unit) return;
 
                 const { myTeam } = this.getTeams(unit);
                 const { killer } = e.context;

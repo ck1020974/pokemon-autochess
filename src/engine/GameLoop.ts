@@ -319,13 +319,21 @@ export class GameLoop {
 
             // Cleffa / Togepi family: Removed battle-start leftover logic as they have new abilities
 
-            // Dratini (迷你龍) family: All allies perm ATK & HP
+            // Dratini (迷你龍) family: All allies perm ATK or HP (Lv1/2) or Both (Lv3)
             if (u.family === 'dratini') {
-                const amount = [0, 2, 3, 5][u.level] || 2;
+                const amount = [0, 2, 3, 3][u.level] || 2;
                 this.playerTeam.forEach(target => {
                     if (target) {
-                        applyBuff(target, amount, 'atk', u.name);
-                        applyBuff(target, amount, 'hp', u.name);
+                        if (u.level === 3) {
+                            applyBuff(target, amount, 'atk', u.name);
+                            applyBuff(target, amount, 'hp', u.name);
+                        } else {
+                            if (Math.random() < 0.5) {
+                                applyBuff(target, amount, 'atk', u.name);
+                            } else {
+                                applyBuff(target, amount, 'hp', u.name);
+                            }
+                        }
                     }
                 });
             }
