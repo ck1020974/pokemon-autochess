@@ -608,84 +608,81 @@ function App() {
         };
 
         const preloadAllAssets = async () => {
-            // CRITICAL: Tier 1 and 2, ALL unit display images (00.webp), plus basic UI tokens
-            const criticalUrls = new Set<string>();
-            const backgroundUrls = new Set<string>();
+            console.log(`[系統] 開始三階段資源預載入...`);
+
+            // --- PHASE 1: 核心基礎 (Core Engine & UI) ---
+            const phase1Urls = new Set<string>();
+            phase1Urls.add(normalBall);
+            phase1Urls.add(greatBall);
+            phase1Urls.add(ultraBall);
+            phase1Urls.add(masterBall);
+            phase1Urls.add('icon-192.png');
+            phase1Urls.add('icon-002.png');
+            phase1Urls.add('icon-003.png');
+            
+            const phase1Music = ['start'];
+            
+            console.log(`[系統] 階段 1：載入核心資源...`);
+            await loadAssets(Array.from(phase1Urls), false, phase1Music);
+
+            // --- PHASE 2: 遊戲準備 (Tier 1-2 & Novice Trainers) ---
+            const phase2Urls = new Set<string>();
+            const phase2Music = ['pokemonmart', 'pokemoncenter', 'gymfight', 'gymwin'];
 
             Object.values(ALL_UNITS).forEach(t => {
-                const isCriticalTier = t.tier <= 3 || t.id === 'sprout';
-
-                if (t.imageUrl) {
-                    if (isCriticalTier) criticalUrls.add(t.imageUrl);
-                    else backgroundUrls.add(t.imageUrl);
-                }
-
-                if (t.battleImageUrl) {
-                    if (isCriticalTier) criticalUrls.add(t.battleImageUrl);
-                    else backgroundUrls.add(t.battleImageUrl);
+                if (t.tier <= 2 || t.id === 'sprout') {
+                    if (t.imageUrl) phase2Urls.add(t.imageUrl);
+                    if (t.battleImageUrl) phase2Urls.add(t.battleImageUrl);
                 }
             });
 
-            // Trainers: Only NOVICE are critical, others are background (but will be preloaded on encounter)
-            activeEdition.noviceOpponents.forEach((op: any) => criticalUrls.add(op.url));
-            [...activeEdition.intermOpponents, ...activeEdition.advancedOpponents, ...activeEdition.eliteOpponents, ...activeEdition.championOpponents].forEach((op: any) => backgroundUrls.add(op.url));
-
-            // Critical token/derived images (Battle versions of early game units)
-            criticalUrls.add('assets/妙蛙種子01.webp');
-            criticalUrls.add('assets/小拉達01.webp');
-            criticalUrls.add('assets/飄飄球01.webp');
-            criticalUrls.add('assets/隨風球01.webp');
-            criticalUrls.add('assets/怨影娃娃01.webp');
-            criticalUrls.add('assets/詛咒娃娃01.webp');
-
-            // Dynamic preloading for novice opponents' core units
+            // Novice Trainers & their core units
             activeEdition.noviceOpponents.forEach((op: any) => {
+                if (op.url) phase2Urls.add(op.url);
                 if (op.coreUnits && Array.isArray(op.coreUnits)) {
                     op.coreUnits.forEach((id: string) => {
                         const t = ALL_UNITS[id];
                         if (t) {
-                            if (t.imageUrl) criticalUrls.add(t.imageUrl);
-                            if (t.battleImageUrl) criticalUrls.add(t.battleImageUrl);
+                            if (t.imageUrl) phase2Urls.add(t.imageUrl);
+                            if (t.battleImageUrl) phase2Urls.add(t.battleImageUrl);
                         }
                     });
                 }
             });
 
-            // Critical difficulty icons
-            criticalUrls.add(normalBall);
-            criticalUrls.add(greatBall);
-            criticalUrls.add(ultraBall);
-            criticalUrls.add(masterBall);
-
-            // Critical Edition Icons
-            criticalUrls.add('icon-192.png');
-            criticalUrls.add('icon-002.png');
-            criticalUrls.add('icon-003.png');
-
-            // --- Move Reward item images to Critical load ---
+            // Common Reward item images
             REWARD_DATA.forEach(reward => {
-                if (reward.imageUrl) criticalUrls.add(reward.imageUrl);
+                if (reward.imageUrl) phase2Urls.add(reward.imageUrl);
             });
 
-            // Critical audio (Early game + Common)
-            const criticalMusic = ['start', 'pokemonmart', 'gymfight', 'pokemoncenter', 'gymwin'];
-
-            console.log(`[系統] 開始預載入關鍵資源 (${criticalUrls.size} 個影像, ${criticalMusic.length} 首音樂)...`);
-            await loadAssets(Array.from(criticalUrls), false, criticalMusic);
+            console.log(`[系統] 階段 2：載入商店與初期對手資源 (${phase2Urls.size} 個影像)...`);
+            await loadAssets(Array.from(phase2Urls), false, phase2Music);
 
             setHasLoaded(true);
-            console.log(`[系統] 關鍵資源載入完成！`);
+            console.log(`[系統] 核心遊戲資源已就緒！`);
 
-            // Next frame background load
+            // --- PHASE 3: 完整體驗 (Tier 3-5 & Advanced Content - 背景載入) ---
+            // Delayed start to ensure UI is snappy
             setTimeout(async () => {
-                const backgroundMusic = ['victoryroad', 'level up', 'recover', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin'];
-                console.log(`[系統] 開始背景載入剩餘資源 (${backgroundUrls.size} 個影像, ${backgroundMusic.length} 首音樂)...`);
+                const phase3Urls = new Set<string>();
+                const phase3Music = ['victoryroad', 'level up', 'recover', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin'];
 
-                // Reward items moved to Critical batch above
+                Object.values(ALL_UNITS).forEach(t => {
+                    if (t.tier > 2 && t.id !== 'sprout') {
+                        if (t.imageUrl) phase3Urls.add(t.imageUrl);
+                        if (t.battleImageUrl) phase3Urls.add(t.battleImageUrl);
+                    }
+                });
 
-                await loadAssets(Array.from(backgroundUrls), true, backgroundMusic);
+                // All other Trainers
+                [...activeEdition.intermOpponents, ...activeEdition.advancedOpponents, ...activeEdition.eliteOpponents, ...activeEdition.championOpponents].forEach((op: any) => {
+                    if (op.url) phase3Urls.add(op.url);
+                });
+
+                console.log(`[系統] 階段 3：開始背景載入剩餘資源 (${phase3Urls.size} 個影像, ${phase3Music.length} 首音樂)...`);
+                await loadAssets(Array.from(phase3Urls), true, phase3Music);
                 console.log(`[系統] 背景資源載入完成！`);
-            }, 500);
+            }, 1000);
         };
 
         preloadAllAssets();
