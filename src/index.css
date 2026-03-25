@@ -2450,6 +2450,10 @@ h3 {
   content: none !important;
 }
 
+.synergy-icon.force-visible {
+  z-index: 99999 !important;
+}
+
 .synergy-icon.force-visible .synergy-tooltip {
   visibility: visible !important;
   opacity: 1 !important;
