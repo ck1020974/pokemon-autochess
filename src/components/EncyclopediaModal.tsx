@@ -336,7 +336,14 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
                                                                     <div style={{ fontWeight: 'bold', color: syn.color, marginBottom: '4px' }}>
                                                                         {syn.icon} {syn.name}
                                                                     </div>
-                                                                    <div>{syn.description}</div>
+                                                                    <div>{(() => {
+                                                                        const game = (window as any).game;
+                                                                        let desc = syn.description;
+                                                                        if (syn.id === 'Psychic' && game) {
+                                                                            desc = desc.replace('[N]', Math.floor(game.psychicN).toString());
+                                                                        }
+                                                                        return desc;
+                                                                    })()}</div>
                                                                     {units.length > 0 && (
                                                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px', marginTop: '8px' }}>
                                                                             {units.map((u) => (
@@ -379,7 +386,12 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
                                                                 <span className="encyclopedia-stat-hp">❤️ {stats.hp}</span>
                                                             </div>
                                                             <div className="encyclopedia-stage-desc" style={{ textAlign: 'left' }}>
-                                                                {stage.description}
+                                                                {(() => {
+                                                                    const game = (window as any).game;
+                                                                    let desc = stage.description;
+                                                                    const scalingValue = (stage.family === 'charmander') ? game?.charmanderN : (stage.family === 'pichu' ? game?.pichuN : 1);
+                                                                    return desc.replace('[N]', (scalingValue || 1).toString());
+                                                                })()}
                                                             </div>
                                                         </div>
                                                     </React.Fragment>

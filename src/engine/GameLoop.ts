@@ -105,9 +105,9 @@ export class GameLoop {
 
     public refreshSpecialDescriptions() {
         // Update templates so shop shows CURRENT N value and correct frequency
-        ALL_UNITS.charmander.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每兩場戰鬥後增強)`;
-        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)`;
-        ALL_UNITS.charizard.description = `同時對後方敵方造成 ${this.charmanderN} 傷害 (每場戰鬥後增強)`;
+        ALL_UNITS.charmander.description = `同時對後方敵方造成 [N] 傷害 (每兩場戰鬥後增強)`;
+        ALL_UNITS.charmeleon.description = `同時對後方敵方造成 [N] 傷害 (每場戰鬥後增強)`;
+        ALL_UNITS.charizard.description = `同時對後方敵方造成 [N] 傷害 (每場戰鬥後增強)`;
 
         // Sync static template scaling values to current global N
         (ALL_UNITS.charmander as any).scalingValue = this.charmanderN;
@@ -115,9 +115,9 @@ export class GameLoop {
         (ALL_UNITS.charizard as any).scalingValue = this.charmanderN;
 
         // Pichu family templates
-        ALL_UNITS.pichu.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (每三場戰鬥後增強)。`;
-        ALL_UNITS.pikachu.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (每兩場戰鬥後增強)。`;
-        ALL_UNITS.raichu.description = `戰鬥開始時，對最弱的敵方造成 ${this.pichuN} 傷害 (每場戰鬥後增強)。`;
+        ALL_UNITS.pichu.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (每三場戰鬥後增強)。`;
+        ALL_UNITS.pikachu.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (每兩場戰鬥後增強)。`;
+        ALL_UNITS.raichu.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (每場戰鬥後增強)。`;
         (ALL_UNITS.pichu as any).scalingValue = this.pichuN;
         (ALL_UNITS.pikachu as any).scalingValue = this.pichuN;
         (ALL_UNITS.raichu as any).scalingValue = this.pichuN;
@@ -170,7 +170,7 @@ export class GameLoop {
         // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
         const template = '[2/3/5] 兩回合後，對隨機 2 位敵方造成 [N] 傷害 (每場戰鬥後增強)';
-        psychic.description = template.replace('[N]', Math.floor(this.psychicN).toString());
+        psychic.description = template; // Let UI (SynergyIcon) handle [N] replacement based on isEnemy
     }
 
     public startBattlePhase() {
