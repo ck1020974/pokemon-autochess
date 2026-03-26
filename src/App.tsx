@@ -270,7 +270,8 @@ function getSynergyStatus(team: (Unit | null)[], activeEdition: GameEdition) {
                 const isEeveeFamily = t.family === 'eevee';
                 const baseCondition = t.id !== 'sprout';
                 // Fix: Include evolved forms even if they are not in shop (isHiddenFromShop)
-                const isAvailable = activeEdition.availableUnitIds.includes(t.id) || (isEeveeFamily && t.id.includes('_final'));
+                const isEeveeEdition = isEeveeFamily && activeEdition.availableUnitIds.includes('eevee');
+                const isAvailable = activeEdition.availableUnitIds.includes(t.id) || isEeveeEdition;
                 if (!t.synergies?.includes(syn.id) || !(baseCondition || isEeveeFamily) || !isAvailable) return false;
 
                 // For Families (except Eevee), only show the most "basic" representative that has the synergy
