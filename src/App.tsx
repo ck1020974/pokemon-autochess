@@ -18,6 +18,7 @@ import { REWARD_DATA } from './models/RewardData';
 import type { GameEdition } from './models/Edition';
 import { ClassicEdition } from './data/editions/classic';
 import { ModernEdition } from './data/editions/modern';
+import { InfiniteEdition } from './data/editions/infinite';
 
 // Difficulty Icons
 import normalBall from './assets/普通.webp';
@@ -29,6 +30,9 @@ const getInitialEdition = (): GameEdition => {
     const params = new URLSearchParams(window.location.search);
     const v = params.get('v');
     const edition = params.get('edition');
+    if (v === '3' || edition === 'infinite') {
+        return InfiniteEdition;
+    }
     if (v === '2' || edition === 'modern') {
         return ModernEdition;
     }
@@ -355,10 +359,11 @@ function App() {
         console.log("Pokemon AutoChess v4.8.4 - Reward Phase Deploy");
     }, []);
 
-    const handleRestart = () => {
+    const handleRestart = (newEdition?: GameEdition) => {
         music.stop();
         // 1. Reset Core Engine
-        gameRef.current = new GameLoop(activeEdition);
+        const targetEdition = newEdition || activeEdition;
+        gameRef.current = new GameLoop(targetEdition);
         setRewardChoices([]);
 
         // 2. Clear Primary States
@@ -1891,7 +1896,7 @@ function App() {
             {/* Tutorial Completion Screen (Step 12) */}
             {
                 tutorialStep === 12 && (
-                    <div className="battle-result-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.98)', zIndex: 30000, display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={handleRestart}>
+                    <div className="battle-result-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.98)', zIndex: 30000, display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={() => handleRestart()}>
                         <div className="result-content" style={{ textAlign: 'center' }}>
                             <div className="result-title" style={{ fontSize: '4.5rem', color: '#ffd700', textShadow: '0 0 40px rgba(255,215,0,0.6)', marginBottom: '15px' }}>
                                 遊戲教學已結束
@@ -1999,7 +2004,7 @@ function App() {
                                 {[
                                     { id: 'classic', name: '經典版本', subtitle: '簡單上手的經典玩法', icon: 'icon-192.png', color: '#10b981', available: true },
                                     { id: 'modern', name: '帝王版本', subtitle: '進階策略的豐富玩法', icon: 'icon-002.png', color: '#3b82f6', available: true },
-                                    { id: 'infinite', name: '無限版本', subtitle: '全局角色的無限玩法', icon: 'icon-003.png', color: '#a855f7', available: false }
+                                    { id: 'infinite', name: '無限版本', subtitle: '全局角色的無限玩法', icon: 'icon-003.png', color: '#a855f7', available: true }
                                 ].map(v => (
                                     <button
                                         key={v.id}
@@ -2013,7 +2018,8 @@ function App() {
                                             if (focusedVersionId === v.id) {
                                                 music.play('start', true);
                                                 setSelectedVersionId(v.id);
-                                                setActiveEdition(v.id === 'modern' ? ModernEdition : ClassicEdition);
+                                                const nextEdition = v.id === 'modern' ? ModernEdition : (v.id === 'infinite' ? InfiniteEdition : ClassicEdition);
+                                                setActiveEdition(nextEdition);
                                                 setLoadingStage(2); // Start loading stage 2
                                             } else {
                                                 setFocusedVersionId(v.id);
@@ -2648,7 +2654,7 @@ function App() {
                                 {/* Restart Action - Cleaned up and inserted correctly */}
                                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0px' }}>
                                     <div
-                                        onClick={handleRestart}
+                                        onClick={() => handleRestart()}
                                         style={{
                                             color: '#fff',
                                             fontSize: '0.95rem',

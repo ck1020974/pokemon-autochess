@@ -19,14 +19,16 @@ export class Shop {
         return 4; // Turn 10+
     }
 
-    public roll(turn: number, availableUnitIds?: string[]) {
+    public roll(turn: number, availableUnitIds?: string[], isInfinite: boolean = false) {
         const tier = this.getTier(turn);
 
         // Dynamic Slot Count
-        let numSlots = 4;
-        if (tier === 2) numSlots = 5;
-        else if (tier === 3) numSlots = 6;
-        else if (tier === 4) numSlots = 7;
+        let numSlots = isInfinite ? 7 : 4;
+        if (!isInfinite) {
+            if (tier === 2) numSlots = 5;
+            else if (tier === 3) numSlots = 6;
+            else if (tier === 4) numSlots = 7;
+        }
 
         // Resize
         while (this.slots.length < numSlots) this.slots.push(null);
