@@ -207,7 +207,7 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateId
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '4px' }}>
                         {units.map((u: any) => {
                             const isUnitActive = (u.family === 'eevee')
-                                ? (activeTemplateIds?.has(u.id) || false)
+                                ? (activeTemplateIds?.has(u.id) || activeTemplateIds?.has(u.id + '_final') || false)
                                 : (activeFamilies?.has(u.family) || false);
                             const unitStyle: React.CSSProperties = {
                                 width: '24px', height: '24px', objectFit: 'contain',
