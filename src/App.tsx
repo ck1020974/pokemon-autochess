@@ -158,6 +158,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 // Synergy Icon Component
 function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateIds, activeFamilies, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive, disabled }: any) {
     const [localOpen, setLocalOpen] = useState(false);
+    const [isDismissed, setIsDismissed] = useState(false);
 
     // Use side-aware ID if setActiveSynergyId is provided (mainly for summary screen)
     const synergyKey = (side && synergy.id) ? `${side}-${synergy.id}` : synergy.id;
@@ -177,10 +178,14 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateId
         <div
             className={`synergy-icon ${className || ''} ${isForcedOpen ? 'force-visible' : ''}`}
             style={style}
-            onMouseEnter={onMouseEnter}
+            onMouseEnter={() => {
+                setIsDismissed(false); // Reset dismissal on mouse enter
+                onMouseEnter && onMouseEnter();
+            }}
             onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 if (disabled) return; // Block interaction if disabled
+                setIsDismissed(true); // Hide tooltip on click
                 if (setActiveSynergyId) {
                     setActiveSynergyId(isForcedOpen ? null : synergyKey);
                 } else {
@@ -201,7 +206,7 @@ function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateId
                 {synergy.icon}
             </span>
             {showCount && count !== undefined && <span style={{ position: 'absolute', bottom: -5, right: -5, fontSize: '0.7rem', background: '#000', borderRadius: '50%', padding: '0 4px', border: '1px solid #333', color: '#fff' }}>{count}</span>}
-            <div className={`synergy-tooltip ${isEnemy ? 'is-enemy' : ''}`}>
+            <div className={`synergy-tooltip ${isEnemy ? 'is-enemy' : ''} ${isDismissed ? 'is-dismissed' : ''}`} style={isDismissed ? { visibility: 'hidden', opacity: 0, pointerEvents: 'none' } : {}}>
                 <div style={{ fontWeight: 'bold', color: isActive ? synergy.color : '#aaa', marginBottom: '4px' }}>
                     {synergy.icon} {synergy.name} {count !== undefined ? `(${count})` : ''}
                 </div>

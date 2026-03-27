@@ -1111,6 +1111,12 @@ h3 {
   opacity: 1;
 }
 
+.synergy-tooltip.is-dismissed {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Detail Panel Override: Show right and slightly lower */
 .detail-panel .synergy-tooltip {
   top: auto;
@@ -2468,11 +2474,6 @@ h3 {
 
 .synergy-icon.force-visible {
   z-index: 99999 !important;
-}
-
-.synergy-icon.force-visible .synergy-tooltip {
-  visibility: visible !important;
-  opacity: 1 !important;
 }
 
 /* Force summary tooltips to the right regardless of side */
