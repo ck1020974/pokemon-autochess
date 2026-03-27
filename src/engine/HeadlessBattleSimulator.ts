@@ -611,7 +611,7 @@ export class HeadlessBattleSimulator {
             }
         }
 
-        // Charge (充電): All Charge units +random Atk (0-4 / 2-6 / 4-10 / 8-15)
+        // Charge (電光): All Charge units +random Atk (0-4 / 2-6 / 4-10 / 8-15)
         const chargeCount = mySynergies.get('Charge') || 0;
         if (chargeCount >= 2) {
             let minBoost = 0;

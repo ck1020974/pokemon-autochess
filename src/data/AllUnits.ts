@@ -913,13 +913,13 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'jolteon', name: '雷伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/雷伊布00.webp', battleImageUrl: 'assets/雷伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值；額外累積充電羈絆數量。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true, evolveId: 'jolteon_final'
+        description: '合成時額外獲得兩倍經驗值；額外累積電光羈絆數量。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true, evolveId: 'jolteon_final'
     },
     jolteon_final: {
         id: 'jolteon_final', name: '雷伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/雷伊布00.webp', battleImageUrl: 'assets/雷伊布01.webp',
-        description: '額外累積兩次充電羈絆數量。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true
+        description: '額外累積兩次電光羈絆數量。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true
     },
     espeon: {
         id: 'espeon', name: '太陽伊布', tier: 3, family: 'eevee',

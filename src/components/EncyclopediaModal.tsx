@@ -28,7 +28,7 @@ const SYNERGY_PRIORITY = [
     'Grass',        // 吸取 (4)
     'Fire',         // 燃盡 (5)
     'Water',        // 潮旋 (6)
-    'Charge',       // 充電 (7)
+    'Charge',       // 電光 (7)
     'BugBite',      // 蟲咬 (8)
     'Cave',         // 挖洞 (8)
     'Angry',        // 憤怒 (9)

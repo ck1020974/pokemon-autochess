@@ -33,7 +33,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     },
     'Trick': { id: 'Trick', name: '戲法', icon: '🪄', description: '[2] 戰鬥開始時，和隨機敵方對調生命', tiers: [2], color: '#a855f7' },
     'BugBite': { id: 'BugBite', name: '蟲咬', icon: '🪲', description: '[2] 擊殺敵方後，永久 +1 生命', tiers: [2], color: '#4ade80' },
-    'Charge': { id: 'Charge', name: '充電', icon: '⚡', description: '[2/3/5] 戰鬥開始時，隨機增加 0~15 攻擊', tiers: [2, 3, 5], color: '#fde047' },
+    'Charge': { id: 'Charge', name: '電光', icon: '⚡', description: '[2/3/5] 戰鬥開始時，隨機增加 0~15 攻擊', tiers: [2, 3, 5], color: '#fde047' },
     'Thief': { id: 'Thief', name: '小偷', icon: '👤', description: '[2/5] 戰鬥開始時，從最強的敵方偷取 2/5 點攻擊', tiers: [2, 5], color: '#64748b' },
     'Charm': { id: 'Charm', name: '撒嬌', icon: '💖', description: '[2/3/5] 戰鬥開始時，首位敵方攻擊降低 33/50/99% (最低為 1)', tiers: [2, 3, 5], color: '#f472b6' },
     'BatonPass': { id: 'BatonPass', name: '接棒', icon: '🏃', description: '[2/5] 死亡後，隨機 1 位角色繼承攻擊與生命', tiers: [2, 5], color: '#fb923c' },
