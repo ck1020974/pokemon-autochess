@@ -840,26 +840,33 @@ export class BattleSimulator {
             });
         }
 
-        // Charm (撒嬌): Random 1/2/4 enemies -33% Atk
+        // Charm (撒嬌): Target first enemy -33/50/99% Atk (min 1)
         const charmCount = mySynergies.get('Charm') || 0;
         if (charmCount >= 2) {
-            let targetCount = 1;
-            if (charmCount >= 5) targetCount = 4;
-            else if (charmCount >= 3) targetCount = 2;
+            let ratio = 0;
+            if (charmCount >= 5) ratio = 0.99;
+            else if (charmCount >= 3) ratio = 0.50;
+            else if (charmCount >= 2) ratio = 0.33;
 
-            const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
-            if (livingEnemies.length > 0) {
-                const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
-                const selected = shuffled.slice(0, targetCount);
-                for (const target of selected) {
-                    const reducedAmt = Math.ceil(target.stats.attack * 0.33);
-                    if (reducedAmt > 0) {
-                        target.stats.attack -= reducedAmt;
+            if (ratio > 0) {
+                const target = opTeam[0]; // Always target the first enemy
+                if (target && target.stats.hp > 0) {
+                    let reducedAmt = Math.floor(target.stats.attack * ratio);
+                    // Ensure at least 1 reduction if attack > 1 (unless it would hit 0, but max(1,...) handles that)
+                    if (reducedAmt === 0 && target.stats.attack > 1) {
+                        reducedAmt = 1;
+                    }
+                    const finalAtk = Math.max(1, target.stats.attack - reducedAmt);
+                    const actualReduction = target.stats.attack - finalAtk;
+
+                    if (actualReduction > 0) {
+                        target.stats.attack = finalAtk;
                         target.capStats();
                         const state = this.unitStates.get(target) || {};
                         state.isCharmed = true;
                         this.unitStates.set(target, state);
                         this.playAnimation(target, 'charm', 600);
+                        this.log(`撒嬌發動：${target.name} 的攻擊降低了 ${actualReduction} 點 (剩餘 ${target.stats.attack})。`);
                     }
                 }
             }
@@ -1368,25 +1375,29 @@ export class BattleSimulator {
             });
         }
 
-        // Bellsprout Family: Ally Summon -> Random Ally Perm Atk/HP
+        // Bellsprout Family: Ally Death -> Random Ally Perm Atk or HP
         if (unit.family === 'bellsprout') {
-            this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
-                if (unit.stats.hp <= 0 || this.unitStates.get(unit)?.isSilenced) return;
-                const { side } = this.getTeams(unit);
-                const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                if (unit.stats.hp <= 0 || this.processedDeaths.has(unit.id) || this.unitStates.get(unit)?.isSilenced) return;
+                const { myTeam } = this.getTeams(unit);
 
-                if (e.source && side === sSide && e.source !== unit) {
-                    const living = this.playerTeam.includes(unit) ? this.playerTeam.filter(u => u && u.stats.hp > 0) : this.enemyTeam.filter(u => u && u.stats.hp > 0);
+                // Trigger when an ANY ALLY died (excluding self)
+                if (e.source && myTeam.includes(e.source) && e.source !== unit) {
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
-                        const targetCount = unit.level;
-                        const buff = 1; // +1 atk, +1 hp
+                        const targetCount = unit.level; // 1, 2, or 3
                         const shuffled = [...living].sort(() => 0.5 - Math.random());
                         const targets = shuffled.slice(0, targetCount);
                         targets.forEach(target => {
-                            this.log(`${unit.name} 對 ${target.name} 發動了生長。`);
+                            const isAtk = Math.random() < 0.5;
+                            const buffAtk = isAtk ? 1 : 0;
+                            const buffHp = isAtk ? 0 : 1;
+                            const statName = isAtk ? '攻擊' : '生命';
+
+                            this.log(`${unit.name} 看到友軍倒下，對 ${target.name} 發動了生長 (+1 ${statName})。`);
                             this.playTeamAnimation([target], 'glow-pale-green', 1000);
                             const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
-                            this.growUnit(target, buff, buff, '生長', original, true);
+                            this.growUnit(target, buffHp, buffAtk, '生長', original, true);
                         });
                     }
                 }

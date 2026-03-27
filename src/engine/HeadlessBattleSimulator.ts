@@ -586,25 +586,28 @@ export class HeadlessBattleSimulator {
         }
 
         // Charm (撒嬌)
+        // Charm (撒嬌): Target first enemy -33/50/99% Atk (min 1)
         const charmCount = mySynergies.get('Charm') || 0;
         if (charmCount >= 2) {
-            let targetCount = 1;
-            if (charmCount >= 5) targetCount = 4;
-            else if (charmCount >= 3) targetCount = 2;
+            let ratio = 0;
+            if (charmCount >= 5) ratio = 0.99;
+            else if (charmCount >= 3) ratio = 0.50;
+            else if (charmCount >= 2) ratio = 0.33;
 
-            const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
-            if (livingEnemies.length > 0) {
-                const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
-                shuffled.slice(0, targetCount).forEach(target => {
-                    const reducedAmt = Math.floor(target.stats.attack * 0.33);
-                    if (reducedAmt > 0) {
-                        target.stats.attack -= reducedAmt;
-                        target.capStats();
-                        const state = this.unitStates.get(target) || {};
-                        state.isCharmed = true;
-                        this.unitStates.set(target, state);
+            if (ratio > 0) {
+                const target = opTeam[0]; // Always target the first enemy
+                if (target && target.stats.hp > 0) {
+                    let reducedAmt = Math.floor(target.stats.attack * ratio);
+                    if (reducedAmt === 0 && target.stats.attack > 1) {
+                        reducedAmt = 1;
                     }
-                });
+                    const finalAtk = Math.max(1, target.stats.attack - reducedAmt);
+                    target.stats.attack = finalAtk;
+                    target.capStats();
+                    const state = this.unitStates.get(target) || {};
+                    state.isCharmed = true;
+                    this.unitStates.set(target, state);
+                }
             }
         }
 
@@ -949,21 +952,25 @@ export class HeadlessBattleSimulator {
             });
         }
 
-        // Bellsprout Family: Ally Summon -> Random Ally Perm Atk/HP
+        // Bellsprout Family: Ally Death -> Random Ally Perm Atk or HP
         if (unit.family === 'bellsprout') {
-            this.eventBus.on('ON_FRIEND_SUMMONED', async (e) => {
-                const { side } = this.getTeams(unit);
-                const { side: sSide } = e.source ? this.getTeams(e.source) : { side: null };
-                if (e.source && side === sSide && e.source !== unit) {
-                    const living = this.playerTeam.includes(unit) ? this.playerTeam.filter(u => u && u.stats.hp > 0) : this.enemyTeam.filter(u => u && u.stats.hp > 0);
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                if (unit.stats.hp <= 0 || this.processedDeaths.has(unit.id) || this.unitStates.get(unit)?.isSilenced) return;
+                const { myTeam } = this.getTeams(unit);
+
+                // Trigger when an ANY ALLY died (excluding self)
+                if (e.source && myTeam.includes(e.source) && e.source !== unit) {
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
                     if (living.length > 0) {
-                        const targetCount = unit.level;
-                        const buff = 1; // +1 atk, +1 hp
+                        const targetCount = unit.level; // 1, 2, or 3
                         const shuffled = [...living].sort(() => 0.5 - Math.random());
                         const targets = shuffled.slice(0, targetCount);
                         targets.forEach(target => {
+                            const isAtk = Math.random() < 0.5;
+                            const buffAtk = isAtk ? 1 : 0;
+                            const buffHp = isAtk ? 0 : 1;
                             const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
-                            this.growUnit(target, buff, buff, original, true);
+                            this.growUnit(target, buffHp, buffAtk, original, true);
                         });
                     }
                 }

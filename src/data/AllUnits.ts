@@ -1007,19 +1007,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'bellsprout', name: '喇叭芽', tier: 3, family: 'bellsprout',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/喇叭芽00.webp', battleImageUrl: 'assets/喇叭芽01.webp',
-        description: '召喚友軍後，隨機 1 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], evolveId: 'weepinbell'
+        description: '友軍死亡後，隨機 1 位友軍永久 +1 攻擊或生命。', synergies: ['Grass'], evolveId: 'weepinbell'
     },
     weepinbell: {
         id: 'weepinbell', name: '口呆花', tier: 3, family: 'bellsprout',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/口呆花00.webp', battleImageUrl: 'assets/口呆花01.webp',
-        description: '召喚友軍後，隨機 2 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], evolveId: 'victreebel', isHiddenFromShop: true
+        description: '友軍死亡後，隨機 2 位友軍永久 +1 攻擊或生命。', synergies: ['Grass'], evolveId: 'victreebel', isHiddenFromShop: true
     },
     victreebel: {
         id: 'victreebel', name: '大食花', tier: 3, family: 'bellsprout',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/大食花00.webp', battleImageUrl: 'assets/大食花01.webp',
-        description: '召喚友軍後，隨機 3 位友軍永久 +1 攻擊與生命。', synergies: ['Grass'], isHiddenFromShop: true
+        description: '友軍死亡後，隨機 3 位友軍永久 +1 攻擊或生命。', synergies: ['Grass'], isHiddenFromShop: true
     },
 
     // 29. Vulpix
