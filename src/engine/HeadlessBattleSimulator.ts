@@ -488,8 +488,10 @@ export class HeadlessBattleSimulator {
                     const factor = count >= 4 ? 0.5 : 0.33;
                     const stealAmt = Math.floor(strongest.stats.attack * factor);
                     if (stealAmt > 0) {
-                        strongest.stats.attack -= stealAmt;
-                        strongest.capStats();
+                        if (strongest.family !== 'sneasel') {
+                            strongest.stats.attack -= stealAmt;
+                            strongest.capStats();
+                        }
                         this.growUnit(unit, 0, stealAmt, null, true);
                     }
                 }
@@ -601,7 +603,7 @@ export class HeadlessBattleSimulator {
                     if (reducedAmt === 0 && target.stats.attack > 1) {
                         reducedAmt = 1;
                     }
-                    const finalAtk = Math.max(1, target.stats.attack - reducedAmt);
+                    const finalAtk = target.family === 'sneasel' ? target.stats.attack : Math.max(1, target.stats.attack - reducedAmt);
                     target.stats.attack = finalAtk;
                     target.capStats();
                     const state = this.unitStates.get(target) || {};
@@ -1403,11 +1405,11 @@ export class HeadlessBattleSimulator {
             }
         }
         if (attacker.family === 'sneasel' && !s?.isSilenced) {
-            if (Math.random() < 0.5) {
+            if (Math.random() < 0.33) {
                 const { opTeam } = this.getTeams(attacker);
                 const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
                 if (liveEnemies.length > 0) {
-                    const targetCount = attacker.level >= 3 ? 2 : 1;
+                    const targetCount = 1;
                     let potentialTargets = liveEnemies.filter(u => u !== defender);
                     if (potentialTargets.length === 0) potentialTargets = [defender];
 

@@ -654,8 +654,10 @@ export class BattleSimulator {
 
                     const stealAmt = Math.min(strongest.stats.attack - 1, buff);
                     if (stealAmt > 0) {
-                        strongest.stats.attack -= stealAmt;
-                        strongest.capStats();
+                        if (strongest.family !== 'sneasel') {
+                            strongest.stats.attack -= stealAmt;
+                            strongest.capStats();
+                        }
                         const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
                         // Permanent increase for player's unit
                         this.growUnit(unit, 0, stealAmt, '小偷', original, true);
@@ -856,7 +858,7 @@ export class BattleSimulator {
                     if (reducedAmt === 0 && target.stats.attack > 1) {
                         reducedAmt = 1;
                     }
-                    const finalAtk = Math.max(1, target.stats.attack - reducedAmt);
+                    const finalAtk = target.family === 'sneasel' ? target.stats.attack : Math.max(1, target.stats.attack - reducedAmt);
                     const actualReduction = target.stats.attack - finalAtk;
 
                     if (actualReduction > 0) {
