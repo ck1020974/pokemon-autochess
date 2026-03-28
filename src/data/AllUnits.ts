@@ -731,7 +731,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'gardevoir', name: '沙奈朵', tier: 3, family: 'ralts',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/沙奈朵00.webp', battleImageUrl: 'assets/沙奈朵01.webp',
-        description: '攻擊時，同時對敵方末位造成 100% 傷害。', synergies: ['Psychic', 'Thief'], isHiddenFromShop: true
+        description: '攻擊時，同時對敵方末位造成 66% 傷害。', synergies: ['Psychic', 'Thief'], isHiddenFromShop: true
     },
     mrmime: {
         id: 'mrmime', name: '魔牆人偶', tier: 5, family: 'mrmime',
@@ -1194,7 +1194,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'tyranitar', name: '班基拉斯', tier: 5, family: 'larvitar',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/班基拉斯00.webp', battleImageUrl: 'assets/班基拉斯01.webp',
-        description: '攻擊前，對後方敵方造成 50% 攻擊力傷害。', synergies: ['Thief', 'Cave'], isHiddenFromShop: true
+        description: '攻擊時，同時對後方一位敵方造成 66% 傷害。', synergies: ['Thief', 'Cave'], isHiddenFromShop: true
     },
     // 37. Delibird
     delibird: {

@@ -1333,7 +1333,7 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
-                    const ratios = [0, 0.25, 0.33, 0.5];
+                    const ratios = [0, 0.33, 0.5, 0.66];
                     const ratio = ratios[unit.level] || 0.25;
                     const dmg = Math.ceil(unit.stats.attack * ratio);
                     const { opTeam } = this.getTeams(unit);
@@ -1429,7 +1429,7 @@ export class HeadlessBattleSimulator {
             const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (liveEnemies.length > 0) {
                 const target = liveEnemies[liveEnemies.length - 1];
-                const multiplier = attacker.level >= 3 ? 1.0 : (attacker.level === 2 ? 0.5 : 0.33);
+                const multiplier = attacker.level >= 3 ? 0.66 : (attacker.level === 2 ? 0.5 : 0.33);
                 const bonusDmg = Math.ceil(attacker.stats.attack * multiplier);
                 promises.push(this.dealDamage(attacker, target, bonusDmg, true));
             }
