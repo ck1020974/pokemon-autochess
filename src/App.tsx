@@ -281,17 +281,12 @@ function App() {
     ], [activeEdition]);
 
     const [rewardChoices, setRewardChoices] = useState<any[]>([]);
-    const [poolChoices, setPoolChoices] = useState<any[]>([]);
     const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
     const [isPoolProcessing, setIsPoolProcessing] = useState(false);
     const update = useForceUpdate();
 
     useEffect(() => {
         console.log("Pokemon AutoChess v4.8.4 - Reward Phase Deploy");
-        // Initial sync for potential start-of-game choices
-        if (game.poolChoices.length > 0) {
-            setPoolChoices([...game.poolChoices]);
-        }
     }, [game]);
 
     const handleRestart = (newEdition?: GameEdition) => {
@@ -301,7 +296,6 @@ function App() {
         const newGame = new GameLoop(targetEdition);
         gameRef.current = newGame;
         setRewardChoices([...newGame.rewardChoices]);
-        setPoolChoices([...newGame.poolChoices]);
 
         // 2. Clear Primary States
         setDifficulty(null);
@@ -753,11 +747,6 @@ function App() {
             }
 
             g.startShopPhase(); // Ensure fresh gold and shop slots on every start
-
-            // CRITICAL: Sync pool choices immediately after generation for Infinite Mode Turn 1
-            if (g.poolChoices && g.poolChoices.length > 0) {
-                setPoolChoices([...g.poolChoices]);
-            }
         }
 
         setDifficulty(lvl);
@@ -1615,10 +1604,8 @@ function App() {
             if (result === 'WIN') {
                 game.endBattle('WIN');
                 setRewardChoices([...game.rewardChoices]);
-                setPoolChoices([...game.poolChoices]);
             } else {
                 game.endBattle(result!);
-                setPoolChoices([...game.poolChoices]);
             }
 
             if (game.lives < hpBefore) {
@@ -1671,7 +1658,6 @@ function App() {
         await new Promise(resolve => setTimeout(resolve, 100));
 
         game.applyPoolChoice(choice, unselectedIds);
-        setPoolChoices([...game.poolChoices]);
         setSelectedPoolId(null);
         setIsPoolProcessing(false);
         update();
@@ -1726,9 +1712,6 @@ function App() {
                     onClose={() => {
                         setShowTutorial(false);
                         // CRITICAL: Sync Turn 1 initial pool choices if tutorial is skipped
-                        if (game.poolChoices && game.poolChoices.length > 0) {
-                            setPoolChoices([...game.poolChoices]);
-                        }
                         setHasStarted(true);
                         update();
                     }}
@@ -3215,7 +3198,7 @@ function App() {
                                             // Add current choice to highlights
                                             activeTemplateIds.add(choice.id);
                                             const unitTemplate = ALL_UNITS[choice.id];
-                                            if (unitTemplate) activeFamilies.add(unitTemplate.family);
+                                            if (unitTemplate && unitTemplate.family) activeFamilies.add(unitTemplate.family);
 
                                             return <SynergyIcon
                                                 key={s}
