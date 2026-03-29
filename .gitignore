@@ -31,3 +31,7 @@ git_status.txt
 git_status_utf8.txt
 full_git_status.txt
 git_status*.txt
+missing_urls.json
+lint_output.txt
+temp_activeSyn.txt
+ts-errors.txt

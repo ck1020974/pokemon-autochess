@@ -155,84 +155,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
     );
 }
 
-// Synergy Icon Component
-function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateIds, activeFamilies, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive, disabled }: any) {
-    const [localOpen, setLocalOpen] = useState(false);
-    const [isDismissed, setIsDismissed] = useState(false);
-
-    // Use side-aware ID if setActiveSynergyId is provided (mainly for summary screen)
-    const synergyKey = (side && synergy.id) ? `${side}-${synergy.id}` : synergy.id;
-    const isForcedOpen = setActiveSynergyId ? (activeSynergyId === synergyKey) : localOpen;
-
-    let activeDesc = synergy.description;
-    const isActive = (count !== undefined && count >= synergy.tiers[0]) || forceActive;
-    const style = { borderColor: isActive ? synergy.color : '#444' };
-
-    // Dynamic [N] replacement for Psychic synergy (Fallback, mainly handled in GameLoop now)
-    if (synergy.id === 'Psychic' && (window as any).game) {
-        const val = isEnemy ? ((window as any).game.wins + 1) : (window as any).game.psychicN;
-        activeDesc = activeDesc.replace('[N]', val.toString());
-    }
-
-    return (
-        <div
-            className={`synergy-icon ${className || ''} ${isForcedOpen ? 'force-visible' : ''}`}
-            style={style}
-            onMouseEnter={() => {
-                setIsDismissed(false); // Reset dismissal on mouse enter
-                onMouseEnter && onMouseEnter();
-            }}
-            onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                if (disabled) return; // Block interaction if disabled
-                setIsDismissed(true); // Hide tooltip on click
-                if (setActiveSynergyId) {
-                    setActiveSynergyId(isForcedOpen ? null : synergyKey);
-                } else {
-                    setLocalOpen(!isForcedOpen);
-                }
-            }}
-            onTouchStart={(e) => {
-                // Prevent ghost tooltips on mobile by stopping propagation
-                if (setActiveSynergyId) {
-                    e.stopPropagation();
-                }
-            }}
-        >
-            <span style={{
-                filter: isActive ? 'none' : 'grayscale(1)',
-                opacity: isActive ? 1 : 0.7
-            }}>
-                {synergy.icon}
-            </span>
-            {showCount && count !== undefined && <span style={{ position: 'absolute', bottom: -5, right: -5, fontSize: '0.7rem', background: '#000', borderRadius: '50%', padding: '0 4px', border: '1px solid #333', color: '#fff' }}>{count}</span>}
-            <div className={`synergy-tooltip ${isEnemy ? 'is-enemy' : ''} ${isDismissed ? 'is-dismissed' : ''}`} style={isDismissed ? { visibility: 'hidden', opacity: 0, pointerEvents: 'none' } : {}}>
-                <div style={{ fontWeight: 'bold', color: isActive ? synergy.color : '#aaa', marginBottom: '4px' }}>
-                    {synergy.icon} {synergy.name} {count !== undefined ? `(${count})` : ''}
-                </div>
-                <div style={{ marginBottom: '8px' }}>{activeDesc}</div>
-                {/* Unit thumbnails */}
-                {units && units.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '4px' }}>
-                        {units.map((u: any) => {
-                            const isUnitActive = (u.family === 'eevee')
-                                ? (activeTemplateIds?.has(u.id) || activeTemplateIds?.has(u.id + '_final') || false)
-                                : (activeFamilies?.has(u.family) || false);
-                            const unitStyle: React.CSSProperties = {
-                                width: '24px', height: '24px', objectFit: 'contain',
-                                borderRadius: '4px', background: 'rgba(0,0,0,0.3)',
-                                filter: isUnitActive ? 'none' : 'grayscale(1)',
-                                opacity: isUnitActive ? 1 : 0.7,
-                                border: 'none'
-                            };
-                            return <img key={u.id} src={u.imageUrl} alt={u.name} title={u.name} style={unitStyle} />;
-                        })}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-}
+import { SynergyIcon } from './components/SynergyIcon';
 
 // Helper to force update
 function useForceUpdate() {
@@ -358,18 +281,27 @@ function App() {
     ], [activeEdition]);
 
     const [rewardChoices, setRewardChoices] = useState<any[]>([]);
+    const [poolChoices, setPoolChoices] = useState<any[]>([]);
+    const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
+    const [isPoolProcessing, setIsPoolProcessing] = useState(false);
     const update = useForceUpdate();
 
     useEffect(() => {
         console.log("Pokemon AutoChess v4.8.4 - Reward Phase Deploy");
-    }, []);
+        // Initial sync for potential start-of-game choices
+        if (game.poolChoices.length > 0) {
+            setPoolChoices([...game.poolChoices]);
+        }
+    }, [game]);
 
     const handleRestart = (newEdition?: GameEdition) => {
         music.stop();
         // 1. Reset Core Engine
         const targetEdition = newEdition || activeEdition;
-        gameRef.current = new GameLoop(targetEdition);
-        setRewardChoices([]);
+        const newGame = new GameLoop(targetEdition);
+        gameRef.current = newGame;
+        setRewardChoices([...newGame.rewardChoices]);
+        setPoolChoices([...newGame.poolChoices]);
 
         // 2. Clear Primary States
         setDifficulty(null);
@@ -814,10 +746,22 @@ function App() {
         const g = gameRef.current;
         if (g) {
             g.setDifficulty(lvl);
+
+            // Explicitly initialize pool before starting shop phase for Infinite Mode
+            if (activeEdition.id === 'infinite') {
+                g.initInfinitePool();
+            }
+
             g.startShopPhase(); // Ensure fresh gold and shop slots on every start
+
+            // CRITICAL: Sync pool choices immediately after generation for Infinite Mode Turn 1
+            if (g.poolChoices && g.poolChoices.length > 0) {
+                setPoolChoices([...g.poolChoices]);
+            }
         }
 
         setDifficulty(lvl);
+        setHasStarted(true); // Show board behind tutorial prompt
         setShowTutorial(true); // Auto-prompt tutorial instead of going straight to the game
         update(); // Ensure shop phase logic triggers music check
     };
@@ -963,8 +907,8 @@ function App() {
 
             // 3. Strategy / Synergy Selection
             if (tutorialStep > 0 && tutorialStep < 10) {
-                // Tutorial Battle 1: Use Brock (novice_3)'s team exactly
-                const brock = activeEdition.noviceOpponents.find((n: any) => n.id === 'novice_3') || activeEdition.noviceOpponents[0];
+                // Tutorial Battle 1: Use Brock (novice_3 or in_3)'s team exactly
+                const brock = activeEdition.noviceOpponents.find((n: any) => n.id.includes('_3')) || activeEdition.noviceOpponents[0];
                 enemyTeam = brock.coreUnits.map((id: string) => {
                     const t = ALL_UNITS[id];
                     if (!t) return null;
@@ -1440,10 +1384,13 @@ function App() {
         if (tutorialStep > 0) {
             if (tutorialStep < 10) {
                 // First tutorial opponent: Brock Easter Egg (Three ways to face Brock!)
+                const brock = activeEdition.noviceOpponents.find((n: any) => n.name === '小剛') || activeEdition.noviceOpponents[0];
+                const brockId = brock.id;
+
                 setOpponentChoices([
-                    { id: 'novice_3', name: '小剛', url: 'gym/小剛01.webp', difficulty: 'EASY' },
-                    { id: 'novice_3', name: '小剛', url: 'gym/小剛02.webp', difficulty: 'NORMAL' },
-                    { id: 'novice_3', name: '小剛', url: 'gym/小剛03.webp', difficulty: 'HARD' }
+                    { id: brockId, name: '小剛', url: 'gym/小剛01.webp', difficulty: 'EASY' },
+                    { id: brockId, name: '小剛', url: 'gym/小剛02.webp', difficulty: 'NORMAL' },
+                    { id: brockId, name: '小剛', url: 'gym/小剛03.webp', difficulty: 'HARD' }
                 ]);
             } else {
                 // Second tutorial: Force Champions to ensure player defeat
@@ -1668,8 +1615,10 @@ function App() {
             if (result === 'WIN') {
                 game.endBattle('WIN');
                 setRewardChoices([...game.rewardChoices]);
+                setPoolChoices([...game.poolChoices]);
             } else {
                 game.endBattle(result!);
+                setPoolChoices([...game.poolChoices]);
             }
 
             if (game.lives < hpBefore) {
@@ -1702,6 +1651,29 @@ function App() {
             music.play('pokemonmart', true);
         }
 
+        update();
+    };
+
+    const handlePoolSelect = async (choice: any) => {
+        if (isPoolProcessing) return;
+        setIsPoolProcessing(true);
+        setSelectedPoolId(choice.id);
+
+        // Calculate unselected IDs
+        const unselectedIds = game.poolChoices
+            .filter(c => c.id !== choice.id)
+            .map(c => c.id);
+
+        // Wait for destruction animation (matches CSS 0.6s)
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        // Short pause after destruction
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        game.applyPoolChoice(choice, unselectedIds);
+        setPoolChoices([...game.poolChoices]);
+        setSelectedPoolId(null);
+        setIsPoolProcessing(false);
         update();
     };
 
@@ -1749,7 +1721,20 @@ function App() {
             )}
 
             {/* Tutorial Modal shows if difficulty selected but tutorial not started/ended */}
-            {showTutorial && tutorialStep === 0 && difficulty !== null && <TutorialModal onClose={() => setShowTutorial(false)} onStartTutorial={startTutorial} />}
+            {showTutorial && tutorialStep === 0 && difficulty !== null && (
+                <TutorialModal
+                    onClose={() => {
+                        setShowTutorial(false);
+                        // CRITICAL: Sync Turn 1 initial pool choices if tutorial is skipped
+                        if (game.poolChoices && game.poolChoices.length > 0) {
+                            setPoolChoices([...game.poolChoices]);
+                        }
+                        setHasStarted(true);
+                        update();
+                    }}
+                    onStartTutorial={startTutorial}
+                />
+            )}
 
             {/* Reward Selection Overlay (Z-Index 20000) */}
             {game.phase === 'REWARD' && (
@@ -1864,6 +1849,7 @@ function App() {
                     </div>
                 </div>
             )}
+
 
             {/* Tutorial Message Box / Mask (Steps 1-11) */}
             {
@@ -2196,7 +2182,7 @@ function App() {
             }
 
             {/* Header */}
-            <div className="header">
+            <div className="header" style={{ zIndex: 25000, position: 'relative' }}>
                 <div className="header-section">
                     {difficulty && (
                         <div className={`difficulty-badge ${difficulty}`} style={{
@@ -2242,57 +2228,57 @@ function App() {
                             <span style={{ color: game.wins >= 12 ? '#f472b6' : '#888' }}>👑 冠軍: {Math.max(0, Math.min(game.wins - 12, 1))}/1</span>
                         </>
                     )}
-                    {/* Help & Mute Toggle Buttons inside Header */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginLeft: '10px' }}>
-                        <button
-                            className={`mute-toggle-btn-header ${showTutorial ? 'is-active' : ''}`}
-                            onClick={() => {
-                                if (game.phase === GamePhase.BATTLE) return;
-                                setShowTutorial(true);
-                            }}
-                            title="遊戲指南 (Tutorial)"
-                            style={{
-                                color: showTutorial ? '#facc15' : '#aaa',
-                                border: showTutorial ? '1px solid #facc15' : '1px solid transparent',
-                                background: showTutorial ? 'rgba(250,204,21,0.1)' : 'transparent',
-                                borderRadius: '50%',
-                                opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
-                                cursor: game.phase === GamePhase.BATTLE ? 'default' : 'pointer'
-                            }}
-                        >
-                            ❓
-                        </button>
-                        <button
-                            className="mute-toggle-btn-header"
-                            onClick={() => {
-                                if (game.phase === GamePhase.BATTLE) return;
-                                setShowEncyclopedia(true);
-                            }}
-                            title="圖鑑"
-                            style={{
-                                opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
-                                cursor: (game.phase === GamePhase.BATTLE) ? 'default' : 'pointer',
-                                zIndex: 'auto',
-                                position: 'relative'
-                            }}
-                        >
-                            📖
-                        </button>
-                        <button
-                            className="mute-toggle-btn-header"
-                            onClick={toggleMute}
-                            title={isMuted ? "開啟聲音" : "靜音"}
-                        >
-                            {isMuted ? '🔇' : '🔊'}
-                        </button>
-                    </div>
+                    {/* Help & Mute Toggle Buttons inside Header - Show alongside other game info */}
+                    {difficulty && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginLeft: '10px' }}>
+                            <button
+                                className="mute-toggle-btn-header"
+                                onClick={() => {
+                                    if (game.phase === GamePhase.BATTLE) return;
+                                    setShowTutorial(true);
+                                }}
+                                title="遊戲指南 (Tutorial)"
+                                style={{
+                                    color: showTutorial ? '#facc15' : '#aaa',
+                                    borderRadius: '50%',
+                                    opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
+                                    cursor: game.phase === GamePhase.BATTLE ? 'default' : 'pointer'
+                                }}
+                            >
+                                ❓
+                            </button>
+                            <button
+                                className="mute-toggle-btn-header"
+                                onClick={() => {
+                                    if (game.phase === GamePhase.BATTLE) return;
+                                    setShowEncyclopedia(true);
+                                }}
+                                title="圖鑑"
+                                style={{
+                                    opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
+                                    cursor: (game.phase === GamePhase.BATTLE) ? 'default' : 'pointer',
+                                    zIndex: 'auto',
+                                    position: 'relative'
+                                }}
+                            >
+                                📖
+                            </button>
+                            <button
+                                className="mute-toggle-btn-header"
+                                onClick={toggleMute}
+                                title={isMuted ? "開啟聲音" : "靜音"}
+                            >
+                                {isMuted ? '🔇' : '🔊'}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Battle Result Overlay */}
             {
                 battleResult && (
-                    <div className="battle-result-overlay" onClick={handleBattleResultClick} style={{ zIndex: 10002 }}>
+                    <div className="battle-result-overlay" onClick={handleBattleResultClick} style={{ zIndex: 30000 }}>
                         <div className="result-content">
                             <div className="result-title">
                                 {battleResult === 'WIN' ? 'VICTORY ⭕' :
@@ -2338,7 +2324,7 @@ function App() {
                                     top: 0, left: 0, right: 0, bottom: 0,
                                     background: 'rgba(0,0,0,0.9)',
                                     backdropFilter: 'blur(20px)',
-                                    zIndex: 10002,
+                                    zIndex: 30000,
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'center',
@@ -2377,7 +2363,7 @@ function App() {
                                 top: 0, left: 0, right: 0, bottom: 0,
                                 background: 'rgba(0,0,0,0.92)',
                                 backdropFilter: 'blur(30px)',
-                                zIndex: 10002,
+                                zIndex: 30000,
                                 display: 'flex',
                                 flexDirection: 'column',
                                 justifyContent: 'center',
@@ -2567,7 +2553,7 @@ function App() {
                                                     card1 = { label: '寶可夢大師', opponentId: champ?.opponentId };
                                                 } else {
                                                     const lastOpp = history[history.length - 1];
-                                                    card1 = { label: '手下敗將', opponentId: lastOpp?.opponentId };
+                                                    card1 = { label: '角色敗將', opponentId: lastOpp?.opponentId };
                                                 }
 
                                                 // 2. Milestone 2 (Legendary Rival)
@@ -2805,7 +2791,14 @@ function App() {
             <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => setSelected(null)}>
                 {/* 1. Synergies (Player) */}
                 <div className={`board-synergies ${([2, 3, 4, 7, 8, 9, 10, 11].includes(tutorialStep) && game.phase !== GamePhase.BATTLE) ? 'tutorial-elevate' : ''}`}>
-                    {synergyStatus.map(syn => (
+                    {(() => {
+                        if (game.phase === GamePhase.BATTLE && simulatorRef.current) {
+                            return Array.from(simulatorRef.current.playerSynergies.entries())
+                                .map(([id, count]) => ({ ...SYNERGIES[id], count, units: [], activeTemplateIds: new Set(), activeFamilies: new Set() }))
+                                .filter(s => s.count > 0 && s.name);
+                        }
+                        return synergyStatus;
+                    })().map(syn => (
                         <SynergyIcon
                             key={syn.id}
                             synergy={syn}
@@ -2824,7 +2817,14 @@ function App() {
                 {/* 2. Synergies (Enemy) */}
                 {(initialEnemyTeam.length > 0 || displayEnemyTeam) && (
                     <div className="board-synergies" style={{ left: 'auto', right: '10px', flexDirection: 'row-reverse' }}>
-                        {getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || []), activeEdition).map(syn => (
+                        {(() => {
+                            if (game.phase === GamePhase.BATTLE && simulatorRef.current) {
+                                return Array.from(simulatorRef.current.enemySynergies.entries())
+                                    .map(([id, count]) => ({ ...SYNERGIES[id], count, units: [], activeTemplateIds: new Set(), activeFamilies: new Set() }))
+                                    .filter(s => s.count > 0 && s.name);
+                            }
+                            return getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || []), activeEdition);
+                        })().map(syn => (
                             <SynergyIcon key={syn.id} synergy={syn} count={syn.count} units={syn.units} activeTemplateIds={syn.activeTemplateIds} activeFamilies={syn.activeFamilies} isEnemy={true} side="ENEMY" activeSynergyId={activeSynergyId} setActiveSynergyId={setActiveSynergyId} disabled={!!battleResult} />
                         ))}
                     </div>
@@ -3061,10 +3061,184 @@ function App() {
                             ) : (
                                 <div>戰鬥進行中...</div>
                             )}
+                            {/* Synergy Badges */}
+                            <div style={{
+                                display: 'flex',
+                                gap: '6px',
+                                justifyContent: 'center',
+                                flexWrap: 'wrap',
+                                width: '100%'
+                            }}>
+                                {/* (Synergy Icon Logic) */}
+                            </div>
                         </div>
                     </div>
                 )
             }
+
+            {/* Pool Selection Overlay (Moved to end to ensure maximum stacking priority) */}
+            {hasStarted && game.phase === 'POOL_SELECTION' && !showTutorial && (
+                <div className="opponent-select-overlay show" style={{
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.85)',
+                    backdropFilter: 'blur(10px)',
+                    zIndex: 20000,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    animation: 'fadeIn 0.3s ease-out',
+                    overflowY: 'auto',
+                    padding: '20px'
+                }}>
+                    <div style={{
+                        maxWidth: '1200px',
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center'
+                    }}>
+                        <h2 style={{
+                            color: '#fff',
+                            fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+                            marginBottom: 'clamp(20px, 4vw, 50px)',
+                            marginTop: '20px', // Extra margin to move down a bit
+                            textShadow: '0 2px 20px rgba(0,0,0,0.8)',
+                            letterSpacing: '6px',
+                            fontWeight: '900',
+                            textAlign: 'center'
+                        }}>
+                            請選擇你的角色池
+                        </h2>
+
+                        <div className="opponent-cards-container" style={{
+                            display: 'flex',
+                            gap: '60px', // Increased gap for more breathing room
+                            justifyContent: 'center',
+                            flexWrap: 'wrap'
+                        }}>
+                            {game.poolChoices.map((choice: any, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`opponent-card ${(selectedPoolId && selectedPoolId !== choice.id) ? 'pool-card-destroy' : ''}`}
+                                    onClick={() => handlePoolSelect(choice)}
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        cursor: isPoolProcessing ? 'default' : 'pointer',
+                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
+                                        padding: 'clamp(15px, 2.5vw, 25px) clamp(10px, 1.5vw, 15px)',
+                                        borderRadius: '24px',
+                                        border: '1px solid rgba(255,255,255,0.15)',
+                                        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        width: 'clamp(120px, 22vw, 190px)',
+                                        position: 'relative',
+                                        boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                                        backdropFilter: 'blur(5px)',
+                                        opacity: (selectedPoolId && selectedPoolId === choice.id) ? 1 : undefined,
+                                        transform: (selectedPoolId && selectedPoolId === choice.id) ? 'scale(1.1)' : undefined,
+                                        zIndex: (selectedPoolId && selectedPoolId === choice.id) ? 100 : undefined
+                                    }}
+                                >
+                                    <div style={{
+                                        width: '100%',
+                                        aspectRatio: '1',
+                                        background: 'rgba(0,0,0,0.3)',
+                                        borderRadius: '16px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginBottom: '20px', // Increased margin from 15px to 20px
+                                        border: '1px solid rgba(255,255,255,0.05)',
+                                        overflow: 'hidden'
+                                    }}>
+                                        <img
+                                            src={ALL_UNITS[choice.id]?.imageUrl || choice.imageUrl}
+                                            alt={ALL_UNITS[choice.id]?.name || choice.name}
+                                            style={{
+                                                width: '85%',
+                                                height: '85%',
+                                                objectFit: 'contain',
+                                                filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))'
+                                            }}
+                                        />
+                                    </div>
+
+                                    <div style={{
+                                        color: '#fff',
+                                        fontSize: 'clamp(1.1rem, 2.2vw, 1.5rem)',
+                                        fontWeight: '800',
+                                        letterSpacing: '2px',
+                                        textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                                        textAlign: 'center',
+                                        marginBottom: '15px',
+                                        marginTop: '5px' // Added small top margin for extra breathing room
+                                    }}>
+                                        {ALL_UNITS[choice.id]?.name || choice.name}
+                                    </div>
+
+                                    {/* Synergy Badges */}
+                                    <div style={{
+                                        display: 'flex',
+                                        gap: '6px',
+                                        justifyContent: 'center',
+                                        flexWrap: 'wrap',
+                                        width: '100%'
+                                    }}>
+                                        {choice.synergies && choice.synergies.map((s: string) => {
+                                            const synergy = SYNERGIES[s];
+                                            if (!synergy) return null;
+
+                                            // Filter units for this synergy (align with getSynergyStatus logic)
+                                            const unitsForSyn = Object.values(ALL_UNITS).filter(t => {
+                                                const isEeveeFamily = t.family === 'eevee';
+                                                const isAvailable = activeEdition.availableUnitIds.includes(t.id) || (isEeveeFamily && activeEdition.availableUnitIds.includes('eevee'));
+                                                if (!t.synergies?.includes(s) || !isAvailable || t.id === 'sprout') return false;
+
+                                                if (isEeveeFamily) {
+                                                    if (t.id === 'eevee') return true;
+                                                    return !t.id.endsWith('_final');
+                                                }
+
+                                                const familyUnits = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id));
+                                                const root = familyUnits.sort((a, b) => (a.tier - b.tier))[0];
+                                                return t.id === root.id;
+                                            }).sort((a, b) => (a.tier - b.tier));
+
+                                            // Find current synergy status to highlight already owned units
+                                            const currentSynStatus = synergyStatus.find(syn => syn.id === s);
+                                            const activeTemplateIds = new Set(currentSynStatus?.activeTemplateIds || []);
+                                            const activeFamilies = new Set(currentSynStatus?.activeFamilies || []);
+
+                                            // Add current choice to highlights
+                                            activeTemplateIds.add(choice.id);
+                                            const unitTemplate = ALL_UNITS[choice.id];
+                                            if (unitTemplate) activeFamilies.add(unitTemplate.family);
+
+                                            return <SynergyIcon
+                                                key={s}
+                                                synergy={synergy}
+                                                showCount={false}
+                                                forceActive={true}
+                                                side="PLAYER"
+                                                activeSynergyId={activeSynergyId}
+                                                setActiveSynergyId={setActiveSynergyId}
+                                                units={unitsForSyn}
+                                                activeTemplateIds={activeTemplateIds}
+                                                activeFamilies={activeFamilies}
+                                                className="is-selection-pool"
+                                                tooltipLeft={idx === 2}
+                                            />;
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Detail Panel */}
             {
@@ -3179,6 +3353,7 @@ function App() {
                 showEncyclopedia && createPortal(
                     <EncyclopediaModal
                         activeEdition={activeEdition}
+                        activePoolUnitIds={game.activePoolUnitIds}
                         onClose={() => {
                             setShowEncyclopedia(false);
                             if (tutorialStep === 11) {

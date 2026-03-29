@@ -6,10 +6,12 @@ import { ALL_UNITS } from '../data/AllUnits';
 import type { GameEdition } from '../models/Edition';
 import { SYNERGIES } from '../models/Synergies';
 import type { UnitTemplate } from '../models/Unit';
+import { SynergyIcon } from './SynergyIcon';
 
 interface EncyclopediaModalProps {
     onClose: () => void;
     activeEdition: GameEdition;
+    activePoolUnitIds?: string[];
 }
 
 const TIER_NAMES = {
@@ -18,6 +20,22 @@ const TIER_NAMES = {
     3: '中級',
     4: '高級',
     5: '菁英'
+};
+
+// 計算寶可夢在進化鏈中的位置 (0 = 基礎型態, 1 = 第一階段進化...)
+const getEvolutionIndex = (u: UnitTemplate) => {
+    const familyUnits = Object.values(ALL_UNITS).filter(t => t.family === u.family);
+    const root = familyUnits.find(t => !familyUnits.some(other => other.evolveId === t.id));
+    if (!root) return 0;
+
+    let index = 0;
+    let curr: UnitTemplate | undefined = root;
+    while (curr) {
+        if (curr.id === u.id) return index;
+        curr = curr.evolveId ? ALL_UNITS[curr.evolveId] : undefined;
+        index++;
+    }
+    return 0;
 };
 
 // 顯式定義羈絆排序順序，確保排序邏輯萬無一失
@@ -41,13 +59,13 @@ const SYNERGY_PRIORITY = [
     'Hard',         // 堅硬 (17)
     'Charm',        // 撒嬌 (18)
     'BatonPass',    // 接棒 (19)
-    'Outrage',      // 逆鱗 (20)
-    'Roost',        // 羽棲 (21)
+    'Roost',        // 羽棲 (20) - Moved Up
+    'Outrage',      // 逆鱗 (21) - Moved Up
 ];
 
 const ENCYCLOPEDIA_VERSION = '2026-03-04-0105'; // 版本標記，用於協助使用者確認是否為最新版
 
-export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalProps) {
+export function EncyclopediaModal({ onClose, activeEdition, activePoolUnitIds = [] }: EncyclopediaModalProps) {
     const [activeTier, setActiveTier] = useState<number>(1);
     const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null); // Controls the detail popup
     const [viewingStageIndex, setViewingStageIndex] = useState<number>(0); // Controls which stage (0, 1, 2) is viewed in detail popup
@@ -84,6 +102,8 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
                     if (u.id === 'raikou') return 1;
                     if (u.id === 'entei') return 2;
                     if (u.id === 'suicune') return 3;
+                    if (u.id === 'darkrai') return 4;
+                    if (u.id === 'cresselia') return 5;
                     return 0;
                 };
 
@@ -100,16 +120,13 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
                     const familyUnits = Object.values(ALL_UNITS).filter(t => t.family === u.family);
                     const root = familyUnits.find(t => !familyUnits.some(other => other.evolveId === t.id));
                     if (!root) return 1;
-                    let count = 1;
-                    let curr = root;
-                    while (curr.evolveId && ALL_UNITS[curr.evolveId]) {
-                        // Count as a real stage only if it's not a technical suffix (_final, _2, _3)
-                        if (!curr.evolveId.endsWith('_final') && !curr.evolveId.endsWith('_2') && !curr.evolveId.endsWith('_3')) {
-                            count++;
-                        }
-                        curr = ALL_UNITS[curr.evolveId];
+                    const uniqueNames = new Set<string>();
+                    let curr: UnitTemplate | undefined = root;
+                    while (curr) {
+                        uniqueNames.add(curr.name);
+                        curr = curr.evolveId ? ALL_UNITS[curr.evolveId] : undefined;
                     }
-                    return count;
+                    return uniqueNames.size;
                 };
 
                 const stagesA = getEvolutionStages(a);
@@ -211,7 +228,7 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
             background: 'rgba(0,0,0,0.85)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
-            zIndex: 9999,
+            zIndex: 50000,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -252,12 +269,53 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
                                         setSelectedUnitId(unit.id);
                                         setViewingStageIndex(0);
                                     }}
+                                    style={(() => {
+                                        const isUnlocked = activeEdition.id === 'classic' || activeEdition.id === 'modern' || activePoolUnitIds.includes(unit.id) || (unit.family === 'eevee' && activePoolUnitIds.includes('eevee'));
+                                        return !isUnlocked ? {
+                                            filter: 'grayscale(100%) brightness(0.5)',
+                                            opacity: 0.7
+                                        } : {};
+                                    })()}
                                 >
-                                    <img src={unit.imageUrl} alt={unit.name} className="encyclopedia-unit-img" />
+                                    <img src={unit.imageUrl.replace('01.webp', '00.webp')} alt={unit.name} className="encyclopedia-unit-img" />
                                     <div className="encyclopedia-unit-name">{unit.name}</div>
-                                    <div className="encyclopedia-unit-stats">
-                                        <span className="encyclopedia-stat-atk">⚔️ {unit.baseStats.attack}</span>
-                                        <span className="encyclopedia-stat-hp">❤️ {unit.baseStats.hp}</span>
+                                    <div className="encyclopedia-unit-synergies" style={{
+                                        display: 'flex',
+                                        gap: '4px',
+                                        justifyContent: 'center',
+                                        marginTop: '8px',
+                                        flexWrap: 'wrap'
+                                    }}>
+                                        {unit.synergies.map((s: string) => {
+                                            const synergy = SYNERGIES[s];
+                                            if (!synergy) return null;
+
+                                            // Replicate tooltip unit filtering from App.tsx/Encyclopedia detail
+                                            const unitsForSyn = Object.values(ALL_UNITS).filter(t => {
+                                                const isAvailable = activeEdition.availableUnitIds.includes(t.id);
+                                                const isEeveeFamily = t.family === 'eevee';
+                                                const isEeveeEdition = isEeveeFamily && activeEdition.availableUnitIds.includes('eevee');
+                                                if (!(isAvailable || isEeveeEdition) || t.id === 'sprout' || !t.synergies?.includes(s)) return false;
+
+                                                if (isEeveeFamily) return !t.id.endsWith('_final') && t.id !== 'eevee';
+
+                                                const familyUnitsWithSynergy = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id) && u.synergies?.includes(s));
+                                                const firstWithSynergy = familyUnitsWithSynergy.sort((a, b) => getEvolutionIndex(a) - getEvolutionIndex(b) || a.tier - b.tier || a.id.localeCompare(b.id))[0];
+                                                return t.id === firstWithSynergy?.id;
+                                            }).sort((a, b) => a.tier - b.tier);
+
+                                            return (
+                                                <SynergyIcon
+                                                    key={s}
+                                                    synergy={synergy}
+                                                    showCount={false}
+                                                    forceActive={true}
+                                                    units={unitsForSyn}
+                                                    className="encyclopedia-grid-icon"
+                                                    showTooltip={false}
+                                                />
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ))}
@@ -287,72 +345,29 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
                                                         const syn = SYNERGIES[synId];
                                                         if (!syn) return null;
 
-                                                        // Find units belonging to this synergy
-                                                        const units = Object.values(ALL_UNITS)
-                                                            .filter(t => {
-                                                                const isAvailable = activeEdition.availableUnitIds.includes(t.id);
-                                                                if (!isAvailable || t.id === 'sprout') return false;
-                                                                if (!t.synergies?.includes(syn.id)) return false;
+                                                        // Find units belonging to this synergy (matching logic)
+                                                        const units = Object.values(ALL_UNITS).filter(t => {
+                                                            const isAvailable = activeEdition.availableUnitIds.includes(t.id);
+                                                            const isEeveeFamily = t.family === 'eevee';
+                                                            const isEeveeEdition = isEeveeFamily && activeEdition.availableUnitIds.includes('eevee');
+                                                            if (!(isAvailable || isEeveeEdition) || t.id === 'sprout' || !t.synergies?.includes(synId)) return false;
 
-                                                                // Always include Eevee family separately (all evolutions), but avoid duplicates
-                                                                if (t.family === 'eevee') return !t.id.endsWith('_final') && t.id !== 'eevee';
+                                                            if (isEeveeFamily) return !t.id.endsWith('_final') && t.id !== 'eevee';
 
-                                                                // For other families, only show the FIRST unit in the family that has the synergy
-                                                                const familyUnits = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id));
-                                                                const unitsWithSyn = familyUnits.filter(u => u.synergies?.includes(syn.id));
-
-                                                                // Helper to find evolution depth within the family
-                                                                const getStageDepth = (uId: string) => {
-                                                                    let depth = 0;
-                                                                    let currId = uId;
-                                                                    // Simple back-trace: find how many units list this one as evolveId
-                                                                    while (true) {
-                                                                        const parent = familyUnits.find(p => p.evolveId === currId);
-                                                                        if (parent) {
-                                                                            depth++;
-                                                                            currId = parent.id;
-                                                                        } else {
-                                                                            break;
-                                                                        }
-                                                                    }
-                                                                    return depth;
-                                                                };
-
-                                                                // Sort by stage depth (earliest first)
-                                                                const firstInFamily = unitsWithSyn.sort((a, b) => getStageDepth(a.id) - getStageDepth(b.id))[0];
-
-                                                                return t.id === firstInFamily?.id;
-                                                            })
-                                                            .sort((a, b) => {
-                                                                if (a.family === 'eevee' && b.family !== 'eevee') return 1;
-                                                                if (b.family === 'eevee' && a.family !== 'eevee') return -1;
-                                                                return a.tier - b.tier;
-                                                            });
+                                                            const familyUnitsWithSynergy = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id) && u.synergies?.includes(synId));
+                                                            const firstWithSynergy = familyUnitsWithSynergy.sort((a, b) => getEvolutionIndex(a) - getEvolutionIndex(b) || a.tier - b.tier || a.id.localeCompare(b.id))[0];
+                                                            return t.id === firstWithSynergy?.id;
+                                                        }).sort((a, b) => a.tier - b.tier);
 
                                                         return (
-                                                            <div key={synId} className="synergy-icon encyclopedia-syn-icon" style={{ borderColor: syn.color, position: 'relative', width: '38px', height: '38px', fontSize: '1.4rem', margin: 0 }}>
-                                                                {syn.icon}
-                                                                <div className="synergy-tooltip encyclopedia-tooltip">
-                                                                    <div style={{ fontWeight: 'bold', color: syn.color, marginBottom: '4px' }}>
-                                                                        {syn.icon} {syn.name}
-                                                                    </div>
-                                                                    <div>{(() => {
-                                                                        const game = (window as any).game;
-                                                                        let desc = syn.description;
-                                                                        if (syn.id === 'Psychic' && game) {
-                                                                            desc = desc.replace('[N]', Math.floor(game.psychicN).toString());
-                                                                        }
-                                                                        return desc;
-                                                                    })()}</div>
-                                                                    {units.length > 0 && (
-                                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px', marginTop: '8px' }}>
-                                                                            {units.map((u) => (
-                                                                                <img key={u.id} src={u.imageUrl} alt={u.name} title={u.name} style={{ width: '28px', height: '28px', objectFit: 'contain', borderRadius: '4px', background: 'rgba(0,0,0,0.3)', border: 'none' }} />
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
+                                                            <SynergyIcon
+                                                                key={synId}
+                                                                synergy={syn}
+                                                                showCount={false}
+                                                                forceActive={true}
+                                                                units={units}
+                                                                className="encyclopedia-syn-icon"
+                                                            />
                                                         );
                                                     })}
                                             </div>
@@ -388,8 +403,13 @@ export function EncyclopediaModal({ onClose, activeEdition }: EncyclopediaModalP
                                                             <div className="encyclopedia-stage-desc" style={{ textAlign: 'left' }}>
                                                                 {(() => {
                                                                     const game = (window as any).game;
-                                                                    let desc = stage.description;
-                                                                    const scalingValue = (stage.family === 'charmander') ? game?.charmanderN : (stage.family === 'pichu' ? game?.pichuN : 1);
+                                                                    let desc = stage.description || '';
+                                                                    let scalingValue = 1;
+                                                                    if (game) {
+                                                                        if (stage.family === 'charmander') scalingValue = game.charmanderN;
+                                                                        else if (stage.family === 'pichu') scalingValue = game.pichuN;
+                                                                        else if (stage.family === 'riolu') scalingValue = game.rioluN;
+                                                                    }
                                                                     return desc.replace('[N]', (scalingValue || 1).toString());
                                                                 })()}
                                                             </div>

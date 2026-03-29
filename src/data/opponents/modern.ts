@@ -94,7 +94,7 @@ export const MODERN_ELITE_OPPONENTS: OpponentDefinition[] = [
     { id: 'me_15', name: '花月', url: 'elitefour/花月.webp', coreUnits: ['murkrow', 'meowth', 'sneasel', 'larvitar', 'umbreon'], difficulty: 'HARD' },
     { id: 'me_16', name: '赤焰松', url: 'elitefour/赤焰松.webp', coreUnits: ['entei', 'charmander', 'cyndaquil', 'bonsly', 'larvitar'], difficulty: 'VERY_HARD' },
     { id: 'me_17', name: '水梧桐', url: 'elitefour/水梧桐.webp', coreUnits: ['suicune', 'totodile', 'squirtle', 'bonsly', 'larvitar'], difficulty: 'VERY_HARD' },
-    { id: 'me_18', name: '赤日', url: 'elitefour/赤日.webp', coreUnits: ['sneasel', 'murkrow', 'larvitar', 'larvitar', 'cubone'], difficulty: 'VERY_HARD' },
+    { id: 'me_18', name: '赤日', url: 'elitefour/赤日.webp', coreUnits: ['sneasel', 'murkrow', 'larvitar', 'larvitar', 'darkrai'], difficulty: 'VERY_HARD' },
     { id: 'me_19', name: '火雁', url: 'elitefour/火雁.webp', coreUnits: ['flareon', 'cyndaquil', 'vulpix', 'sneasel', 'murkrow'], difficulty: 'VERY_HARD' },
     { id: 'me_20', name: '阿泉', url: 'elitefour/阿泉.webp', coreUnits: ['vaporeon', 'totodile', 'squirtle', 'sneasel', 'murkrow'], difficulty: 'VERY_HARD' },
     { id: 'me_21', name: '牡丹', url: 'elitefour/牡丹.webp', coreUnits: ['flareon', 'jolteon', 'umbreon', 'leafeon', 'espeon'], difficulty: 'VERY_HARD' },
@@ -117,7 +117,7 @@ export const MODERN_CHAMPION_OPPONENTS: OpponentDefinition[] = [
     { id: 'mc_6', name: '迷可利', url: 'champion/米可利.webp', coreUnits: ['vaporeon', 'espeon', 'squirtle', 'psyduck', 'mrmime'], difficulty: 'VERY_HARD' },
     { id: 'mc_7', name: '竹蘭', url: 'champion/竹蘭02.webp', coreUnits: ['raikou', 'shuckle', 'sneasel', 'murkrow', 'togepi'], difficulty: 'VERY_HARD' },
     { id: 'mc_8', name: '赤紅', url: 'champion/赤紅02.webp', coreUnits: ['raikou', 'entei', 'suicune', 'pichu'], difficulty: 'VERY_HARD' },
-    { id: 'mc_9', name: '望羅', url: 'elitefour/望羅02.webp', coreUnits: ['sneasel', 'togepi', 'shuckle', 'farfetchd', 'dratini'], difficulty: 'VERY_HARD' },
+    { id: 'mc_9', name: '望羅', url: 'elitefour/望羅02.webp', coreUnits: ['sneasel', 'togepi', 'cresselia', 'farfetchd', 'dratini'], difficulty: 'VERY_HARD' },
     { id: 'mc_10', name: '剛石', url: 'elitefour/剛石.webp', coreUnits: ['leafeon', 'vaporeon', 'umbreon', 'squirtle', 'larvitar'], difficulty: 'VERY_HARD' },
     { id: 'mc_11', name: '珠貝', url: 'elitefour/珠貝.webp', coreUnits: ['flareon', 'espeon', 'glaceon', 'cyndaquil', 'mrmime'], difficulty: 'VERY_HARD' },
 ];

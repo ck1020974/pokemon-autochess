@@ -20,7 +20,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Hard': { id: 'Hard', name: '堅硬', icon: '🛡️', description: '[2] 抵擋首次死亡，保留 1 生命', tiers: [2], color: '#9ca3af' },
     'Cave': { id: 'Cave', name: '挖洞', icon: '🕳️', description: '[2] 移動後永久 +1 攻擊或生命 (每場戰鬥限3次)', tiers: [2], color: '#78350f' },
     'Angry': { id: 'Angry', name: '憤怒', icon: '💢', description: '[2/4] 受傷後，全體友軍 +2/10 攻擊', tiers: [2, 4], color: '#dc2626' },
-    'Snow': { id: 'Snow', name: '降雪', icon: '❄️', description: '[2] 戰鬥開始時，其他角色受到生命 33% 傷害', tiers: [2], color: '#bae6fd' },
+    'Snow': { id: 'Snow', name: '降雪', icon: '❄️', description: '[2/4] 戰鬥開始時，其他角色受到生命 33/50% 傷害', tiers: [2, 4], color: '#bae6fd' },
     'SwordDance': { id: 'SwordDance', name: '劍舞', icon: '⚔️', description: '[2] 移動後永久 +2 攻擊 (每場戰鬥限3次)', tiers: [2], color: '#fca5a5' },
     'Roost': { id: 'Roost', name: '羽棲', icon: '🪽', description: '[2] 移動後永久 +2 生命 (每場戰鬥限3次)', tiers: [2], color: '#bae6fd' },
     'Psychic': {
@@ -38,6 +38,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Charm': { id: 'Charm', name: '撒嬌', icon: '💖', description: '[2/3/5] 戰鬥開始時，首位敵方攻擊降低 33/50/99% (最低為 1)', tiers: [2, 3, 5], color: '#f472b6' },
     'BatonPass': { id: 'BatonPass', name: '接棒', icon: '🏃', description: '[2/5] 死亡後，隨機 1 位角色繼承攻擊與生命', tiers: [2, 5], color: '#fb923c' },
     'Outrage': { id: 'Outrage', name: '逆鱗', icon: '🐲', description: '[2] 可能額外再攻擊 1 個敵方或是無法攻擊。', tiers: [2, 3], color: '#f59e0b' },
+    'Intimidate': { id: 'Intimidate', name: '威嚇', icon: '🐺', description: '[2/4] 戰鬥開始時，敵方全體 -2/8 攻擊 (最低為 1)', tiers: [2, 4], color: '#475569' },
 };
 
 export function getSynergyCount(team: any[], synergyId: string): number {

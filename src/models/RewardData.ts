@@ -114,6 +114,8 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Charm", "item": "桃桃果", "effect": "我方全體撒嬌角色+3生命", "imageUrl": "item/桃桃果.png" },
     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "BatonPass", "item": "比巴果", "effect": "我方全體接棒角色+3攻擊", "imageUrl": "item/比巴果.png" },
     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "BatonPass", "item": "比巴果", "effect": "我方全體接棒角色+3生命", "imageUrl": "item/比巴果.png" },
+    { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Intimidate", "item": "利木果", "effect": "我方全體威嚇角色+3攻擊", "imageUrl": "item/利木果.png" },
+    { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Intimidate", "item": "利木果", "effect": "我方全體威嚇角色+3生命", "imageUrl": "item/利木果.png" },
 
     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "柿仔果", "effect": "我方全體守住角色+5攻擊", "imageUrl": "item/柿仔果.png" },
     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "謎芝果", "effect": "我方全體詛咒角色+5攻擊", "imageUrl": "item/謎芝果.png" },
@@ -157,6 +159,8 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Charm", "item": "桃桃果", "effect": "我方全體撒嬌角色+5生命", "imageUrl": "item/桃桃果.png" },
     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "BatonPass", "item": "比巴果", "effect": "我方全體接棒角色+5攻擊", "imageUrl": "item/比巴果.png" },
     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "BatonPass", "item": "比巴果", "effect": "我方全體接棒角色+5生命", "imageUrl": "item/比巴果.png" },
+    { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Intimidate", "item": "利木果", "effect": "我方全體威嚇角色+5攻擊", "imageUrl": "item/利木果.png" },
+    { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Intimidate", "item": "利木果", "effect": "我方全體威嚇角色+5生命", "imageUrl": "item/利木果.png" },
 
     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "淨空石板", "effect": "淨空的石板，雙方守住角色+5攻擊與+5生命", "imageUrl": "item/淨空石板.webp" },
     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "妖怪石板", "effect": "妖怪的石板，雙方詛咒角色+5攻擊與+5生命", "imageUrl": "item/妖怪石板.png" },
@@ -281,6 +285,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Roost", "item": "銳利鳥嘴", "effect": "強化隊伍中的羽棲角色，+2攻擊或生命", "imageUrl": "item/銳利鳥嘴.png" },
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Charm", "item": "妖精之羽", "effect": "強化隊伍中的撒嬌角色，+2攻擊或生命", "imageUrl": "item/妖精之羽.png" },
     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "BatonPass", "item": "紅牌", "effect": "強化隊伍中的接棒角色，+2攻擊或生命", "imageUrl": "item/紅牌.png" },
+    { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Intimidate", "item": "王者之證", "effect": "強化隊伍中的威嚇角色，+2攻擊或生命", "imageUrl": "item/王者之證.png" },
 
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Normal", "item": "絲綢圍巾", "effect": "強化隊伍中的守住角色，+3攻擊或生命", "imageUrl": "item/絲綢圍巾.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Ghost", "item": "詛咒之符", "effect": "強化隊伍中的詛咒角色，+3攻擊或生命", "imageUrl": "item/詛咒之符.png" },
@@ -303,6 +308,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Roost", "item": "銳利鳥嘴", "effect": "強化隊伍中的羽棲角色，+3攻擊或生命", "imageUrl": "item/銳利鳥嘴.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Charm", "item": "妖精之羽", "effect": "強化隊伍中的撒嬌角色，+3攻擊或生命", "imageUrl": "item/妖精之羽.png" },
     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "BatonPass", "item": "紅牌", "effect": "強化隊伍中的接棒角色，+3攻擊或生命", "imageUrl": "item/紅牌.png" },
+    { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Intimidate", "item": "王者之證", "effect": "強化隊伍中的威嚇角色，+3攻擊或生命", "imageUrl": "item/王者之證.png" },
 
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Normal", "item": "絲綢圍巾", "effect": "強化隊伍中的守住角色，+4攻擊或生命", "imageUrl": "item/絲綢圍巾.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Ghost", "item": "詛咒之符", "effect": "強化隊伍中的詛咒角色，+4攻擊或生命", "imageUrl": "item/詛咒之符.png" },
@@ -325,6 +331,7 @@ export const REWARD_DATA: RewardDefinition[] = [
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Roost", "item": "銳利鳥嘴", "effect": "強化隊伍中的羽棲角色，+4攻擊或生命", "imageUrl": "item/銳利鳥嘴.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Charm", "item": "妖精之羽", "effect": "強化隊伍中的撒嬌角色，+4攻擊或生命", "imageUrl": "item/妖精之羽.png" },
     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "BatonPass", "item": "紅牌", "effect": "強化隊伍中的接棒角色，+4攻擊或生命", "imageUrl": "item/紅牌.png" },
+    { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Intimidate", "item": "王者之證", "effect": "強化隊伍中的威嚇角色，+4攻擊或生命", "imageUrl": "item/王者之證.png" },
 
     // --- EXP CANDY ---
     { "difficulty": "EASY", "category": "EXP", "item": "經驗糖果ＸＳ", "effect": "讓角色成長的神奇糖果，隨機1名角色EXP+1", "imageUrl": "item/經驗糖果ＸＳ.png" },

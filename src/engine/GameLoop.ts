@@ -12,7 +12,8 @@ export const GamePhase = {
     BATTLE: 'BATTLE',
     REWARD: 'REWARD',
     GAME_OVER: 'GAME_OVER',
-    VICTORY: 'VICTORY'
+    VICTORY: 'VICTORY',
+    POOL_SELECTION: 'POOL_SELECTION'
 } as const;
 
 export type GamePhase = typeof GamePhase[keyof typeof GamePhase];
@@ -36,6 +37,7 @@ export class GameLoop {
     public charmanderCounter: number = 0;
     public pichuN: number = 1;
     public pichuCounter: number = 0;
+    public rioluN: number = 1;
     public psychicN: number = 2;
 
     public playerTeam: (Unit | null)[] = [null, null, null, null, null];
@@ -55,11 +57,37 @@ export class GameLoop {
     public freeRerolls: number = 0;
     public nextBattleBuffs: any[] = [];
 
+    // Infinite mode dynamic pool
+    public activePoolUnitIds: string[] = [];
+    public poolChoices: any[] = [];
+    public bannedPoolUnitIds: string[] = [];
+    private processedTurns: Set<number> = new Set();
+
     constructor(edition?: GameEdition) {
         this.shop = new Shop();
         if (edition) this.edition = edition;
-        this.startShopPhase();
+
         (window as any).game = this; // Expose to window for UI dynamic descriptions
+    }
+
+    public initInfinitePool() {
+        const available = this.edition.availableUnitIds;
+        const t1 = Object.values(ALL_UNITS).filter(u => u.tier === 1 && !u.isHiddenFromShop && available.includes(u.id));
+        const t2 = Object.values(ALL_UNITS).filter(u => u.tier === 2 && !u.isHiddenFromShop && available.includes(u.id));
+
+        const shuffle = (array: any[]) => {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        };
+
+        const pickedT1 = shuffle(t1).slice(0, 5).map(u => u.id);
+        const pickedT2 = shuffle(t2).slice(0, 5).map(u => u.id);
+
+        this.activePoolUnitIds = [...pickedT1, ...pickedT2];
     }
 
     public setDifficulty(level: 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER') {
@@ -100,7 +128,132 @@ export class GameLoop {
             }
         });
 
-        (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite');
+        this.updateTeamCaps();
+
+        // Infinite Pool Selection (Progressive Schedule)
+        if (this.edition.id === 'infinite') {
+            const schedule: Record<number, { tier: number, count: number }[]> = {
+                1: [{ tier: 1, count: 2 }, { tier: 2, count: 2 }],
+                2: [{ tier: 1, count: 2 }, { tier: 2, count: 2 }],
+                3: [{ tier: 3, count: 3 }],
+                4: [{ tier: 3, count: 3 }],
+                5: [{ tier: 3, count: 3 }],
+                6: [{ tier: 4, count: 3 }],
+                7: [{ tier: 4, count: 2 }],
+                8: [{ tier: 4, count: 2 }],
+                10: [{ tier: 5, count: 3 }],
+                11: [{ tier: 5, count: 1 }],
+                12: [{ tier: 5, count: 1 }]
+            };
+
+            if (schedule[this.turn] && !this.processedTurns.has(this.turn)) {
+                this.pendingPoolSelectionSteps = [...schedule[this.turn]];
+                this.processedTurns.add(this.turn);
+                this.processNextPoolStep();
+                return; // Wait for pool selection before rolling
+            }
+        }
+
+        (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
+    }
+
+    private pendingPoolSelectionSteps: { tier: number, count: number }[] = [];
+    private currentPoolStep: { tier: number, count: number } | null = null;
+
+    private processNextPoolStep() {
+        if (this.pendingPoolSelectionSteps.length > 0) {
+            this.currentPoolStep = this.pendingPoolSelectionSteps.shift()!;
+            this.generatePoolChoices(this.currentPoolStep.tier, 1);
+        } else {
+            this.currentPoolStep = null;
+            this.phase = GamePhase.SHOP;
+            // Finally roll shop after all steps done
+            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
+        }
+    }
+
+    public generatePoolChoices(tier: number, _count: number) {
+        const legendaries = ['raikou', 'entei', 'suicune', 'darkrai', 'cresselia'];
+        const available = Object.values(ALL_UNITS).filter(u =>
+            u.tier === tier &&
+            !u.isHiddenFromShop &&
+            this.edition.availableUnitIds.includes(u.id) &&
+            !this.activePoolUnitIds.includes(u.id) &&
+            !this.bannedPoolUnitIds.includes(u.id) &&
+            !legendaries.includes(u.id) // Filter out legendaries from selection pool
+        );
+
+        const shuffle = (array: any[]) => {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        };
+
+        const choices = [];
+        const candidates = shuffle(available);
+        for (let i = 0; i < 3; i++) {
+            const unit = candidates[i] || candidates[0];
+            if (!unit) break;
+            choices.push({
+                id: unit.id,
+                tier,
+                units: [unit.id],
+                synergies: unit.synergies,
+                displayUnitNames: unit.name,
+                displayImages: [unit.imageUrl],
+                name: unit.name,    // Add field for UI lookup safety
+                imageUrl: unit.imageUrl // Add field for UI lookup safety
+            });
+        }
+        this.poolChoices = choices;
+        this.phase = GamePhase.POOL_SELECTION;
+    }
+
+    public applyPoolChoice(choice: any, unselectedIds: string[] = []) {
+        this.activePoolUnitIds = [...this.activePoolUnitIds, ...choice.units];
+
+        // Ban unselected units
+        if (unselectedIds.length > 0) {
+            this.bannedPoolUnitIds = Array.from(new Set([...this.bannedPoolUnitIds, ...unselectedIds]));
+            console.log("已移除角色池候選名單：", unselectedIds.map(id => ALL_UNITS[id]?.name || id).join(', '));
+        }
+
+        this.poolChoices = [];
+
+        if (this.currentPoolStep) {
+            this.currentPoolStep.count--;
+            if (this.currentPoolStep.count > 0) {
+                this.generatePoolChoices(this.currentPoolStep.tier, 1);
+            } else {
+                this.processNextPoolStep();
+            }
+        } else {
+            this.phase = GamePhase.SHOP;
+            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
+        }
+    }
+
+    public updateTeamCaps() {
+        let globalAtkCap = 50;
+        let globalHpCap = 50;
+        this.playerTeam.forEach(u => {
+            if (u && u.family === 'darkrai') globalAtkCap = 60;
+            if (u && u.family === 'cresselia') globalHpCap = 60;
+        });
+
+        this.playerTeam.forEach(u => {
+            if (!u) return;
+            const tpl = ALL_UNITS[u.templateId];
+            const baseMaxHpCap = (tpl as any).maxHpCap || 50;
+            const baseAttackCap = (tpl as any).attackCap || 50;
+
+            u.maxHpCap = Math.max(baseMaxHpCap, globalHpCap);
+            u.attackCap = Math.max(baseAttackCap, globalAtkCap);
+            u.capStats();
+        });
     }
 
     public refreshSpecialDescriptions() {
@@ -113,6 +266,14 @@ export class GameLoop {
         (ALL_UNITS.charmander as any).scalingValue = this.charmanderN;
         (ALL_UNITS.charmeleon as any).scalingValue = this.charmanderN;
         (ALL_UNITS.charizard as any).scalingValue = this.charmanderN;
+
+        // Riolu family templates
+        ALL_UNITS.riolu.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後增強)。`;
+        ALL_UNITS.lucario.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後增強)。`;
+        ALL_UNITS.lucario_final.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後增強)。`;
+        (ALL_UNITS.riolu as any).scalingValue = this.rioluN;
+        (ALL_UNITS.lucario as any).scalingValue = this.rioluN;
+        (ALL_UNITS.lucario_final as any).scalingValue = this.rioluN;
 
         // Pichu family templates
         ALL_UNITS.pichu.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (每三場戰鬥後增強)。`;
@@ -136,6 +297,11 @@ export class GameLoop {
                 const suffix = u.level === 3 ? '每場' : `每${freq}場`;
                 u.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (${suffix}後增強)。`;
             }
+            if (u && u.family === 'riolu') {
+                u.scalingValue = this.rioluN;
+                const inc = u.level >= 2 ? 2 : 1;
+                u.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後 +${inc})`;
+            }
         });
 
         // Sync player's units on board
@@ -152,18 +318,27 @@ export class GameLoop {
                 const suffix = u.level === 3 ? '每場' : `每${freq}場`;
                 u.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (${suffix}後增強)。`;
             }
+            if (u && u.family === 'riolu') {
+                u.scalingValue = this.rioluN;
+                const inc = u.level >= 2 ? 2 : 1;
+                u.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後增強 +${inc})`;
+            }
         });
 
         // Sync opponent's units on board (Enemy uses Player wins + 1 as scaling value)
         this.opponentTeam.forEach(u => {
-            const enemyScale = this.wins + 1;
+            const enemyScale = this.wins === 0 ? 1 : this.wins;
             if (u && u.family === 'charmander') {
                 u.scalingValue = enemyScale;
-                u.description = `同時對後方敵方造成 [N] 傷害 (數值為勝場數 + 1)`;
+                u.description = `同時對後方敵方造成 [N] 傷害 (數值為勝場數 0 時為 1)`;
             }
             if (u && u.family === 'pichu') {
                 u.scalingValue = enemyScale; // Force same scaling for enemy Pichu
-                u.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (數值為勝場數 + 1)`;
+                u.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (數值為勝場數 0 時為 1)`;
+            }
+            if (u && u.family === 'riolu') {
+                u.scalingValue = enemyScale;
+                u.description = `死亡後，對首位敵方造成 [N] 傷害 (數值為勝場數 0 時為 1)`;
             }
         });
 
@@ -405,7 +580,7 @@ export class GameLoop {
 
         // Larvitar/Dratini/Charmander/Pichu scaling logic (Apply to actual persistent team)
         this.playerTeam.forEach(u => {
-            if (u && (u.family === 'larvitar' || u.family === 'dratini')) {
+            if (u && (u.family === 'larvitar' || u.family === 'dratini' || u.family === 'bagon')) {
                 if (u.level < 3) {
                     u.battlesCount++;
                     if (u.battlesCount >= 3) {
@@ -485,6 +660,19 @@ export class GameLoop {
                 this.pichuCounter = 0;
                 console.log(`皮丘家族技能增強！目前威力：${this.pichuN}`);
             }
+        }
+
+        // --- Player Riolu Scaling (Round-based) ---
+        let maxRioluLevel = 0;
+        this.playerTeam.forEach(u => {
+            if (u && u.family === 'riolu') {
+                maxRioluLevel = Math.max(maxRioluLevel, u.level);
+            }
+        });
+        if (maxRioluLevel > 0) {
+            const increment = maxRioluLevel >= 2 ? 2 : 1;
+            this.rioluN += increment;
+            console.log(`利歐路家族技能增強！目前威力：${this.rioluN} (+${increment})`);
         }
 
         // --- Player Psychic Scaling (Round-based) ---
@@ -752,11 +940,11 @@ export class GameLoop {
     public reroll() {
         if (this.freeRerolls > 0) {
             this.freeRerolls--;
-            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite');
+            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
             console.log(`使用免費刷新！剩餘次數：${this.freeRerolls}`);
         } else if (this.gold >= 1) {
             this.gold -= 1;
-            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite');
+            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
         }
     }
 
@@ -864,6 +1052,10 @@ export class GameLoop {
             }
         }
 
+        if (targetIndex !== undefined || emptySlotIndex !== -1) {
+            this.updateTeamCaps();
+        }
+
         return null;
     }
 
@@ -889,7 +1081,7 @@ export class GameLoop {
             if (!unit) return;
 
             // Special: Sell Trigger for certain families
-            const sellTriggerFamilies = ['mankey', 'dwebble', 'ekans', 'wynaut'];
+            const sellTriggerFamilies = ['mankey', 'dwebble', 'wynaut', 'stufful', 'croagunk', 'munna'];
             if (sellTriggerFamilies.includes(unit.family)) {
                 console.log(`${unit.name} (等級 ${unit.level}) 觸發了出售效果`);
                 this.triggerMergeEffect(unit);
@@ -897,6 +1089,7 @@ export class GameLoop {
 
             this.gold += 1;
             this.playerTeam[index] = null;
+            this.updateTeamCaps();
         }
     }
 
@@ -916,6 +1109,7 @@ export class GameLoop {
             this.playerTeam[fromIndex] = u2;
             this.playerTeam[toIndex] = u1;
         }
+        this.updateTeamCaps();
     }
 
     private mergeUnits(target: Unit, source: Unit) {
@@ -942,7 +1136,7 @@ export class GameLoop {
 
         // --- Added: Mankey/Dwebble/Ekans/Wynaut Combine Trigger ---
         // Trigger BEFORE exp gain to use current level for bonus calculation
-        const mergeTriggerFamilies = ['mankey', 'dwebble', 'ekans', 'wynaut'];
+        const mergeTriggerFamilies = ['mankey', 'dwebble', 'wynaut', 'stufful', 'croagunk', 'munna'];
         if (mergeTriggerFamilies.includes(target.family)) {
             // Lvl 3 only triggers on Sell, so we skip here
             if (target.level < 3) {
@@ -952,6 +1146,7 @@ export class GameLoop {
 
         const expGain = (target.family === 'eevee') ? source.exp * 2 : source.exp;
         this.handleUnitExpGain(target, expGain);
+        this.updateTeamCaps();
     }
 
     public handleUnitExpGain(unit: Unit, amount: number) {
@@ -1081,10 +1276,28 @@ export class GameLoop {
             } else {
                 const team = this.playerTeam;
                 const idx = team.indexOf(unit);
+                if (idx >= 0 && idx < team.length - 1) {
+                    const back = team[idx + 1];
+                    if (back) {
+                        const amount = unit.level === 2 ? 4 : 2;
+                        back.addBuff(amount);
+                    }
+                }
+            }
+        }
+
+        if (unit.family === 'stufful') {
+            if (unit.level === 3) {
+                this.playerTeam.filter(u => u && u !== unit).forEach(u => {
+                    u!.addBuff(10);
+                });
+            } else {
+                const team = this.playerTeam;
+                const idx = team.indexOf(unit);
                 if (idx > 0) {
                     const front = team[idx - 1];
                     if (front) {
-                        const amount = unit.level === 2 ? 4 : 2; // Fixed: Lvl 2 gives +4
+                        const amount = unit.level === 2 ? 4 : 2;
                         front.addBuff(amount);
                     }
                 }
@@ -1111,21 +1324,7 @@ export class GameLoop {
 
         // Removed caterpie logic because it was moved to battle start.
 
-        if (unit.family === 'ekans') {
-            const isLevel3 = unit.level >= 3 || unit.templateId === 'arbok_final';
-            if (isLevel3) {
-                this.playerTeam.filter(u => u && u !== unit).forEach(u => u!.addBuff(10));
-            } else {
-                const idx = this.playerTeam.indexOf(unit);
-                if (idx !== -1 && idx < this.playerTeam.length - 1) {
-                    const back = this.playerTeam[idx + 1];
-                    if (back) {
-                        const amount = (unit.templateId === 'arbok' || unit.level >= 2) ? 4 : 2;
-                        back.addBuff(amount);
-                    }
-                }
-            }
-        }
+
 
         if (unit.family === 'wynaut') {
             const isLevel3 = unit.level >= 3 || unit.templateId === 'wobbuffet_final';
@@ -1138,6 +1337,42 @@ export class GameLoop {
                     if (back) {
                         const amount = (unit.templateId === 'wobbuffet' || unit.level >= 2) ? 4 : 2;
                         back.addGrowth(amount, 0);
+                    }
+                }
+            }
+        }
+
+        if (unit.family === 'croagunk') {
+            if (unit.level === 3) {
+                this.playerTeam.filter(u => u && u !== unit).forEach(u => {
+                    u!.addGrowth(5, 5);
+                });
+            } else {
+                const team = this.playerTeam;
+                const idx = team.indexOf(unit);
+                if (idx > 0) {
+                    const front = team[idx - 1];
+                    if (front) {
+                        const amount = unit.level === 2 ? 2 : 1;
+                        front.addGrowth(amount, amount);
+                    }
+                }
+            }
+        }
+
+        if (unit.family === 'munna') {
+            if (unit.level === 3) {
+                this.playerTeam.filter(u => u && u !== unit).forEach(u => {
+                    u!.addGrowth(5, 5);
+                });
+            } else {
+                const team = this.playerTeam;
+                const idx = team.indexOf(unit);
+                if (idx >= 0 && idx < team.length - 1) {
+                    const back = team[idx + 1];
+                    if (back) {
+                        const amount = unit.level === 2 ? 2 : 1;
+                        back.addGrowth(amount, amount);
                     }
                 }
             }

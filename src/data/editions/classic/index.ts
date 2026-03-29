@@ -18,9 +18,11 @@ export const ClassicEdition: GameEdition = {
     availableUnitIds: Object.keys(ALL_UNITS).filter(id => {
         const u = ALL_UNITS[id];
         const excludedFamilies = [
-            'caterpie', 'cleffa', 'togepi', 'ekans', 'wynaut', 'geodude',
+            'caterpie', 'cleffa', 'togepi', 'ekans', 'wynaut', 'geodude', 'mankey',
             'pichu', 'eevee', 'vulpix', 'bellsprout', 'psyduck', 'mareep',
-            'cubone', 'murkrow', 'bonsly', 'happiny', 'larvitar', 'dratini', 'raikou', 'entei', 'suicune', 'delibird', 'shuckle'
+            'cubone', 'murkrow', 'bonsly', 'happiny', 'larvitar', 'dratini', 'raikou', 'entei', 'suicune', 'delibird', 'shuckle', 'riolu',
+            'cramorant', 'comfey', 'mawile', 'grubbin', 'croagunk', 'munna', 'wooper', 'pumpkaboo', 'growlithe', 'swablu', 'plusle', 'minun', 'gulpin',
+            'trapinch', 'pawmi', 'spheal', 'bagon', 'shinx', 'aron', 'darkrai', 'cresselia'
         ];
         return !u.family || !excludedFamilies.includes(u.family);
     }),

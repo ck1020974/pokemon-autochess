@@ -19,16 +19,14 @@ export class Shop {
         return 4; // Turn 10+
     }
 
-    public roll(turn: number, availableUnitIds?: string[], isInfinite: boolean = false) {
+    public roll(turn: number, availableUnitIds?: string[], isInfinite: boolean = false, activePoolUnitIds: string[] = []) {
         const tier = this.getTier(turn);
 
         // Dynamic Slot Count
-        let numSlots = isInfinite ? 7 : 4;
-        if (!isInfinite) {
-            if (tier === 2) numSlots = 5;
-            else if (tier === 3) numSlots = 6;
-            else if (tier === 4) numSlots = 7;
-        }
+        let numSlots = 4;
+        if (tier === 2) numSlots = 5;
+        else if (tier === 3) numSlots = 6;
+        else if (tier === 4) numSlots = 7;
 
         // Resize
         while (this.slots.length < numSlots) this.slots.push(null);
@@ -58,31 +56,50 @@ export class Shop {
                     }
                 }
 
-                const tierTemplates = Object.values(ALL_UNITS).filter(u => {
-                    const isCorrectTier = u.tier === targetTier;
-                    const isNotHidden = !u.isHiddenFromShop;
-                    const isAvailable = availableUnitIds ? availableUnitIds.includes(u.id) : true;
-                    return isCorrectTier && isNotHidden && isAvailable;
-                });
-
+                // Down-rolling Logic: If target tier has no units in active pool, try lower tiers.
                 let pool: any[] = [];
-                tierTemplates.forEach(u => {
-                    const isLegendary = u.id === 'raikou' || u.id === 'entei' || u.id === 'suicune';
-                    // Eevee double rate (Tier 3)
-                    const isEevee = u.id === 'eevee';
+                let currentAttemptTier = targetTier;
 
-                    let weight = isLegendary ? 1 : 3;
-                    if (isEevee) weight = 6;
+                while (currentAttemptTier >= 1 && pool.length === 0) {
+                    const tierTemplates = Object.values(ALL_UNITS).filter(u => {
+                        const isCorrectTier = u.tier === currentAttemptTier;
+                        const isNotHidden = !u.isHiddenFromShop;
+                        const isAvailable = availableUnitIds ? availableUnitIds.includes(u.id) : true;
 
-                    for (let w = 0; w < weight; w++) pool.push(u);
-                });
+                        // Dynamic Pool Filter for Infinite Mode
+                        if (isInfinite && activePoolUnitIds.length > 0) {
+                            return isCorrectTier && isNotHidden && isAvailable && activePoolUnitIds.includes(u.id);
+                        }
+
+                        return isCorrectTier && isNotHidden && isAvailable;
+                    });
+
+                    tierTemplates.forEach(u => {
+                        const isLegendary = u.id === 'raikou' || u.id === 'entei' || u.id === 'suicune' || u.id === 'darkrai' || u.id === 'cresselia';
+                        const isEevee = u.id === 'eevee';
+
+                        let weight = isLegendary ? 1 : 3;
+                        if (isEevee) weight = 6;
+
+                        for (let w = 0; w < weight; w++) pool.push(u);
+                    });
+
+                    if (pool.length === 0) {
+                        currentAttemptTier--;
+                    }
+                }
 
                 if (pool.length > 0) {
                     const randomTemp = pool[Math.floor(Math.random() * pool.length)];
                     this.slots[i] = new Unit(randomTemp);
                 } else {
-                    // Fallback if no unit of target tier exists (Shouldn't happen with proper DB)
-                    this.slots[i] = null;
+                    // Absolute fallback - pick anything from active pool if possible
+                    if (isInfinite && activePoolUnitIds.length > 0) {
+                        const fallbackId = activePoolUnitIds[Math.floor(Math.random() * activePoolUnitIds.length)];
+                        this.slots[i] = new Unit(ALL_UNITS[fallbackId]);
+                    } else {
+                        this.slots[i] = null;
+                    }
                 }
             }
         }

@@ -13,9 +13,9 @@ const INCLUDED_FAMILIES = [
     'chikorita', 'cyndaquil', 'totodile',
     'psyduck', 'bellsprout', 'vulpix',
     'eevee',
-    'doduo', 'magnemite', 'sneasel', 'diglett', 'mareep',
+    'doduo', 'magnemite', 'sneasel', 'diglett', 'mareep', 'mankey',
     'heracross', 'pinsir',
-    'caterpie', 'cleffa', 'togepi', 'pichu', 'ekans', 'wynaut', 'geodude', 'natu',
+    'caterpie', 'cleffa', 'togepi', 'pichu', 'wynaut', 'geodude', 'natu',
     'cubone', 'murkrow',
     'bonsly',
     'meowth', 'kangaskhan', 'farfetchd', 'mrmime',
@@ -25,7 +25,7 @@ const INCLUDED_FAMILIES = [
 
 export const ModernEdition: GameEdition = {
     id: 'modern',
-    name: '第二版本',
+    name: '作者：柚C老師',
     availableUnitIds: Object.keys(ALL_UNITS).filter(id => {
         const u = ALL_UNITS[id];
         if (!u || !u.family || !INCLUDED_FAMILIES.includes(u.family as any)) return false;
@@ -35,7 +35,7 @@ export const ModernEdition: GameEdition = {
         if (u.tier === 1) {
             const allowedT1Families = [
                 'bulbasaur', 'charmander', 'squirtle',
-                'caterpie', 'cleffa', 'togepi', 'ekans', 'wynaut', 'geodude', 'bonsly'
+                'caterpie', 'cleffa', 'togepi', 'wynaut', 'geodude', 'bonsly', 'mankey'
             ];
             if (!allowedT1Families.includes(u.family)) {
                 return false;

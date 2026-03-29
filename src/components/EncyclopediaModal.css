@@ -200,23 +200,52 @@
     text-align: center;
 }
 
-.encyclopedia-unit-stats {
+.encyclopedia-grid .encyclopedia-unit-stats {
+    display: none;
+    /* Hidden for the first layer (grid) as requested */
+}
+
+.encyclopedia-unit-synergies {
     display: flex;
-    gap: 6px;
-    /* Reduced from 10px to fit 10/10 better */
-    margin-top: 5px;
-    font-size: 0.85rem;
-    /* Slightly smaller for better fit */
+    gap: 4px;
     justify-content: center;
+    margin-top: 8px;
+    flex-wrap: wrap;
     width: 100%;
+    min-height: 24px;
 }
 
-.encyclopedia-stat-atk {
-    color: #60a5fa;
+.encyclopedia-grid-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+    border-radius: 0;
+    /* Remove circle */
+    background: transparent;
+    /* No background */
+    border: none;
+    /* No border */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+    z-index: 5;
 }
 
-.encyclopedia-stat-hp {
-    color: #fca5a5;
+.encyclopedia-grid-icon:hover {
+    z-index: 10000;
+    /* Ensure icon stays on top if needed, though tooltip is gone */
+}
+
+.encyclopedia-grid-icon.is-disabled:hover {
+    transform: none !important;
+    cursor: default;
+}
+
+.encyclopedia-unit-card {
+    overflow: visible !important;
+    /* Ensure tooltips can escape the card */
 }
 
 /* Detail View Overlay (Popup within Popup) */
@@ -229,8 +258,8 @@
     height: 100vh;
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(10px);
-    z-index: 10001;
-    /* Above main modal */
+    z-index: 60000;
+    /* Above main modal (50000) */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -504,8 +533,8 @@
         padding: 6px 4px;
         /* Reduced side padding slightly for mobile */
         border-radius: 6px;
-        overflow: hidden;
-        /* Prevent content overflow from being messy */
+        overflow: visible;
+        /* Allow tooltips to escape the card */
     }
 
     .encyclopedia-unit-img {

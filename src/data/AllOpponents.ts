@@ -10,7 +10,7 @@ export interface OpponentDefinition {
 export const NOVICE_OPPONENTS: OpponentDefinition[] = [
     { id: 'novice_1', name: '武藏', url: 'gym/武藏.webp', coreUnits: ['meowth'], difficulty: 'EASY' },
     { id: 'novice_2', name: '小次郎', url: 'gym/小次郎.webp', coreUnits: ['meowth'], difficulty: 'EASY' },
-    { id: 'novice_3', name: '小剛', url: 'gym/小剛01.webp', coreUnits: ['mankey', 'dwebble', 'diglett'], difficulty: 'NORMAL' },
+    { id: 'novice_3', name: '小剛', url: 'gym/小剛01.webp', coreUnits: ['geodude', 'dwebble', 'croagunk'], difficulty: 'NORMAL' },
     { id: 'novice_4', name: '小霞', url: 'gym/小霞01.webp', coreUnits: ['squirtle', 'igglybuff'], difficulty: 'EASY' },
     { id: 'novice_5', name: '葉子', url: 'gym/葉子01.webp', coreUnits: ['bulbasaur', 'igglybuff'], difficulty: 'EASY' },
     { id: 'novice_6', name: '克麗絲', url: 'gym/克麗絲01.webp', coreUnits: ['totodile'], difficulty: 'EASY' },
