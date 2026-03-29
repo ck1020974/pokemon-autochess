@@ -3067,14 +3067,14 @@ function App() {
                     position: 'fixed',
                     top: 0, left: 0, right: 0, bottom: 0,
                     background: 'rgba(0,0,0,0.85)',
-                    backdropFilter: 'blur(10px)',
+                    backdropFilter: 'blur(8px)',
                     zIndex: 20000,
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
                     animation: 'fadeIn 0.3s ease-out',
-                    overflowY: 'auto',
+                    overflow: 'hidden',
                     padding: '20px'
                 }}>
                     <div style={{
@@ -3086,12 +3086,10 @@ function App() {
                     }}>
                         <h2 style={{
                             color: '#fff',
-                            fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
-                            marginBottom: 'clamp(20px, 4vw, 50px)',
-                            marginTop: '20px', // Extra margin to move down a bit
-                            textShadow: '0 2px 20px rgba(0,0,0,0.8)',
-                            letterSpacing: '6px',
-                            fontWeight: '900',
+                            fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+                            marginBottom: 'clamp(20px, 4vw, 40px)',
+                            textShadow: '0 2px 10px rgba(0,0,0,0.8)',
+                            letterSpacing: '4px',
                             textAlign: 'center'
                         }}>
                             請選擇你的角色池
@@ -3123,7 +3121,7 @@ function App() {
                                         boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
                                         backdropFilter: 'blur(5px)',
                                         opacity: (selectedPoolId && selectedPoolId === choice.id) ? 1 : undefined,
-                                        transform: (selectedPoolId && selectedPoolId === choice.id) ? 'scale(1.1)' : undefined,
+                                        transform: (selectedPoolId && selectedPoolId === choice.id) ? 'scale(1.05)' : undefined,
                                         zIndex: (selectedPoolId && selectedPoolId === choice.id) ? 100 : undefined
                                     }}
                                 >
