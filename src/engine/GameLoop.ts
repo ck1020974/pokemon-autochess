@@ -180,7 +180,6 @@ export class GameLoop {
     }
 
     public generatePoolChoices(tier: number, _count: number) {
-        const legendaries = ['raikou', 'entei', 'suicune', 'darkrai', 'cresselia'];
         let currentTier = tier;
         let available: any[] = [];
 
@@ -191,8 +190,7 @@ export class GameLoop {
                 !u.isHiddenFromShop &&
                 this.edition.availableUnitIds.includes(u.id) &&
                 !this.activePoolUnitIds.includes(u.id) &&
-                !this.bannedPoolUnitIds.includes(u.id) &&
-                !legendaries.includes(u.id)
+                !this.bannedPoolUnitIds.includes(u.id)
             );
             if (available.length > 0) break;
             currentTier--;
