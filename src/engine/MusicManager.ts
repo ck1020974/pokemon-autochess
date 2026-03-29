@@ -87,8 +87,13 @@ class MusicManager {
 
                 this.decodedPromises.set(name, promise);
                 return promise;
+            } else {
+                // For BGM: Fetch the file to warm up browser cache, but don't decode to memory
+                try {
+                    await fetch(`${this.musicPath}${name}.OGG`);
+                } catch (e) { }
+                return Promise.resolve();
             }
-            return Promise.resolve();
         };
 
         await Promise.allSettled(names.map(name => loadTrack(name)));

@@ -593,7 +593,7 @@ function App() {
 
             // --- PHASE 2: 遊戲準備 (Tier 1-2 & Novice Trainers) ---
             const phase2Urls = new Set<string>();
-            const phase2Music = ['level up', 'recover'];
+            const phase2Music = ['level up', 'recover', 'gymfight', 'gymwin', 'pokemonmart', 'pokemoncenter'];
 
             Object.values(ALL_UNITS).forEach(t => {
                 if (t.tier <= 2 || t.id === 'sprout') {
@@ -626,7 +626,7 @@ function App() {
             // --- PHASE 3: 完整體驗 (背景載入) ---
             setTimeout(async () => {
                 const phase3Urls = new Set<string>();
-                const phase3Music: string[] = [];
+                const phase3Music: string[] = ['elitefourfight', 'elitefourwin', 'championfight', 'championwin', 'victoryroad'];
 
                 Object.values(ALL_UNITS).forEach(t => {
                     if (t.tier > 2 && t.id !== 'sprout') {
@@ -3112,11 +3112,11 @@ function App() {
                                         alignItems: 'center',
                                         cursor: isPoolProcessing ? 'default' : 'pointer',
                                         background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
-                                        padding: 'clamp(15px, 2.5vw, 25px) clamp(10px, 1.5vw, 15px)',
+                                        padding: 'clamp(10px, 2vw, 20px) clamp(8px, 1vw, 12px)',
                                         borderRadius: '24px',
-                                        border: '1px solid rgba(255,255,255,0.15)',
+                                        border: '2px solid rgba(255,255,255,0.1)',
                                         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        width: 'clamp(120px, 22vw, 190px)',
+                                        width: 'clamp(100px, 20vw, 170px)',
                                         position: 'relative',
                                         boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
                                         backdropFilter: 'blur(5px)',
@@ -3125,16 +3125,16 @@ function App() {
                                         zIndex: (selectedPoolId && selectedPoolId === choice.id) ? 100 : undefined
                                     }}
                                 >
-                                    <div style={{
+                                    <div className="pool-card-img-wrapper" style={{
                                         width: '100%',
                                         aspectRatio: '1',
-                                        background: 'rgba(0,0,0,0.3)',
+                                        background: 'transparent',
                                         borderRadius: '16px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        marginBottom: '20px', // Increased margin from 15px to 20px
-                                        border: '1px solid rgba(255,255,255,0.05)',
+                                        marginBottom: '5px',
+                                        border: 'none',
                                         overflow: 'hidden'
                                     }}>
                                         <img
@@ -3156,8 +3156,8 @@ function App() {
                                         letterSpacing: '2px',
                                         textShadow: '0 2px 4px rgba(0,0,0,0.5)',
                                         textAlign: 'center',
-                                        marginBottom: '15px',
-                                        marginTop: '5px' // Added small top margin for extra breathing room
+                                        marginBottom: '10px',
+                                        marginTop: '0px'
                                     }}>
                                         {ALL_UNITS[choice.id]?.name || choice.name}
                                     </div>

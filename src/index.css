@@ -1615,7 +1615,7 @@ h3 {
     border-radius: 16px !important;
   }
 
-  .opponent-select-overlay .opponent-card.is-selection-pool-card img {
+  .opponent-select-overlay .opponent-card.is-selection-pool-card .pool-card-img-wrapper img {
     width: 90% !important;
     height: 90% !important;
   }
@@ -1960,7 +1960,7 @@ h3 {
   .difficulty-btn {
     padding: 20px 10px !important;
     min-height: 150px !important;
-    flex: 1 1 110px !important;
+    flex: 1 1 calc(50% - 12px) !important;
     max-width: 250px !important;
     /* �𡑒刧蝝𡁜㨃�屸�摨� */
     gap: 15px !important;

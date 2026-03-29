@@ -712,7 +712,7 @@ export class BattleSimulator {
         // Darkrai: Global +10 Attack
         if (unit.family === 'darkrai') {
             for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                this.buffAttack(u, 10, true);
+                this.buffAttack(u, 5, true);
             }
         }
 
@@ -720,7 +720,7 @@ export class BattleSimulator {
         if (unit.family === 'cresselia') {
             for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
                 // Temporary HP buff in combat ONLY, no target
-                this.growUnit(u, 10, 0, undefined, null, true);
+                this.growUnit(u, 5, 0, undefined, null, true);
             }
         }
 
@@ -1264,7 +1264,7 @@ export class BattleSimulator {
                     if (triggers >= 3) return;
 
                     const count = this.getSynergyCountForUnit(unit, 'SwordDance');
-                    const buff = count >= 2 ? 2 : 0;
+                    const buff = count >= 2 ? 1 : 0;
                     if (buff > 0) {
                         state.swordDanceTriggers = triggers + 1;
                         this.unitStates.set(unit, state);
@@ -1288,7 +1288,7 @@ export class BattleSimulator {
                     if (triggers >= 3) return;
 
                     const count = this.getSynergyCountForUnit(unit, 'Roost');
-                    const buff = count >= 2 ? 2 : 0;
+                    const buff = count >= 2 ? 1 : 0;
                     if (buff > 0) {
                         state.roostTriggers = triggers + 1;
                         this.unitStates.set(unit, state);
@@ -2572,7 +2572,7 @@ export class BattleSimulator {
         // BatonPass (接棒): Random 1 ally inherits 50% (>=2) or 100% (>=5) Atk/HP
         if (unit.synergies.includes('BatonPass') && this.getSynergyCountForUnit(unit, 'BatonPass') >= 2 && !this.unitStates.get(unit)?.isSilenced) {
             const batonCount = this.getSynergyCountForUnit(unit, 'BatonPass');
-            const inheritRatio = batonCount >= 5 ? 1.0 : 0.5;
+            const inheritRatio = batonCount >= 5 ? 0.66 : 0.33;
             const livingAllies = myTeam.filter(u => u && u !== unit && u.stats.hp > 0);
             if (livingAllies.length > 0) {
                 const target = livingAllies[Math.floor(Math.random() * livingAllies.length)];

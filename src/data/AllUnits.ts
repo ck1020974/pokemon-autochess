@@ -1380,7 +1380,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'munna_3', name: '夢夢蝕', tier: 1, family: 'munna',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/夢夢蝕00.webp', battleImageUrl: 'assets/夢夢蝕01.webp',
-        description: '出售時全體友軍 +5 攻擊與生命！', synergies: ['Trick'], isHiddenFromShop: true
+        description: '出售時全體友軍 +5 攻擊與生命。', synergies: ['Trick'], isHiddenFromShop: true
     },
     // 46. Wooper Family
     wooper: {
@@ -1569,67 +1569,67 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'bagon', name: '寶貝龍', tier: 5, family: 'bagon',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/寶貝龍00.webp', battleImageUrl: 'assets/寶貝龍01.webp',
-        description: '友軍擊殺後，全體我方暫時 +1 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'bagon_2'
+        description: '友軍擊殺後，全體我方 +1 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'bagon_2'
     },
     bagon_2: {
         id: 'bagon_2', name: '甲殼龍', tier: 5, family: 'bagon',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/甲殼龍00.webp', battleImageUrl: 'assets/甲殼龍01.webp',
-        description: '友軍擊殺後，全體我方暫時 +2 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'bagon_3', isHiddenFromShop: true
+        description: '友軍擊殺後，全體我方 +2 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'bagon_3', isHiddenFromShop: true
     },
     bagon_3: {
         id: 'bagon_3', name: '暴飛龍', tier: 5, family: 'bagon',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/暴飛龍00.webp', battleImageUrl: 'assets/暴飛龍01.webp',
-        description: '友軍擊殺後，全體我方暫時 +5 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage', 'Intimidate'], isHiddenFromShop: true
+        description: '友軍擊殺後，全體我方 +5 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage', 'Intimidate'], isHiddenFromShop: true
     },
     shinx: {
         id: 'shinx', name: '小貓怪', tier: 4, family: 'shinx',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/小貓怪00.webp', battleImageUrl: 'assets/小貓怪01.webp',
-        description: '戰鬥開始時攻擊永久+1並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], evolveId: 'luxio', attackCap: 60
+        description: '戰鬥開始時攻擊永久 +1 並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], evolveId: 'luxio', attackCap: 60
     },
     luxio: {
         id: 'luxio', name: '勒克貓', tier: 4, family: 'shinx',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/勒克貓00.webp', battleImageUrl: 'assets/勒克貓01.webp',
-        description: '戰鬥開始時攻擊永久+2並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], evolveId: 'luxray', isHiddenFromShop: true, attackCap: 60
+        description: '戰鬥開始時攻擊永久 +2 並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], evolveId: 'luxray', isHiddenFromShop: true, attackCap: 60
     },
     luxray: {
         id: 'luxray', name: '倫琴貓', tier: 4, family: 'shinx',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/倫琴貓00.webp', battleImageUrl: 'assets/倫琴貓01.webp',
-        description: '戰鬥開始時攻擊永久+5並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], isHiddenFromShop: true, attackCap: 60
+        description: '戰鬥開始時攻擊永久 +5 並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], isHiddenFromShop: true, attackCap: 60
     },
     aron: {
         id: 'aron', name: '可可多拉', tier: 4, family: 'aron',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
-        imageUrl: 'assets/可可多拉00.webp', battleImageUrl: 'assets/可可多拉01.webp',
-        description: '戰鬥開始時生命永久+1並有著更高的生命上限。', synergies: ['Hard'], evolveId: 'lairon', maxHpCap: 60
+        imageUrl: 'assets/可可多拉00.webp', battleImageUrl: 'assets/可多拉01.webp',
+        description: '戰鬥開始時生命永久 +1 並有著更高的生命上限。', synergies: ['Hard'], evolveId: 'lairon', maxHpCap: 60
     },
     lairon: {
         id: 'lairon', name: '可多拉', tier: 4, family: 'aron',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/可多拉00.webp', battleImageUrl: 'assets/可多拉01.webp',
-        description: '戰鬥開始時生命永久+2並有著更高的生命上限。', synergies: ['Hard'], evolveId: 'aggron', isHiddenFromShop: true, maxHpCap: 60
+        description: '戰鬥開始時生命永久 +2 並有著更高的生命上限。', synergies: ['Hard'], evolveId: 'aggron', isHiddenFromShop: true, maxHpCap: 60
     },
     aggron: {
         id: 'aggron', name: '波士可多拉', tier: 4, family: 'aron',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/波士可多拉00.webp', battleImageUrl: 'assets/波士可多拉01.webp',
-        description: '戰鬥開始時生命永久+5並有著更高的生命上限。', synergies: ['Hard', 'Outrage'], isHiddenFromShop: true, maxHpCap: 60
+        description: '戰鬥開始時生命永久 +5 並有著更高的生命上限。', synergies: ['Hard', 'Outrage'], isHiddenFromShop: true, maxHpCap: 60
     },
     darkrai: {
         id: 'darkrai', name: '達克萊伊', tier: 5, family: 'darkrai',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/達克萊伊00.webp', battleImageUrl: 'assets/達克萊伊01.webp',
-        description: '戰鬥開始時，我方全體攻擊+10；我方全體有著更高的攻擊上限。', synergies: ['Thief']
+        description: '戰鬥開始時，我方全體攻擊 + 5 ；我方全體有著更高的攻擊上限。', synergies: ['Thief']
     },
     cresselia: {
         id: 'cresselia', name: '克雷色利亞', tier: 5, family: 'cresselia',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/克雷色利亞00.webp', battleImageUrl: 'assets/克雷色利亞01.webp',
-        description: '戰鬥開始時，我方全體生命+10；我方全體有著更高的生命上限。', synergies: ['Psychic']
+        description: '戰鬥開始時，我方全體生命 + 5 ；我方全體有著更高的生命上限。', synergies: ['Psychic']
     }
 };
 

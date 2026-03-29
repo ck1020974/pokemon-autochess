@@ -304,12 +304,12 @@ export class HeadlessBattleSimulator {
 
         // Darkrai: Global +10 Attack
         if (unit.family === 'darkrai') {
-            myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.buffAttack(u, 10, true));
+            myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.buffAttack(u, 5, true));
         }
 
         // Cresselia: Global +10 HP
         if (unit.family === 'cresselia') {
-            myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.growUnit(u, 10, 0, null, true));
+            myTeam.filter(u => u && u.stats.hp > 0).forEach(u => this.growUnit(u, 5, 0, null, true));
         }
 
         if (unit.family === 'houndour') {
@@ -923,7 +923,7 @@ export class HeadlessBattleSimulator {
                     if (triggers >= 3) return;
 
                     const count = this.getSynergyCountForUnit(unit, 'SwordDance');
-                    const buff = count >= 2 ? 2 : 0;
+                    const buff = count >= 2 ? 1 : 0;
                     if (buff > 0) {
                         state.swordDanceTriggers = triggers + 1;
                         this.unitStates.set(unit, state);
@@ -941,7 +941,7 @@ export class HeadlessBattleSimulator {
                     if (triggers >= 3) return;
 
                     const count = this.getSynergyCountForUnit(unit, 'Roost');
-                    const buff = count >= 2 ? 2 : 0;
+                    const buff = count >= 2 ? 1 : 0;
                     if (buff > 0) {
                         state.roostTriggers = triggers + 1;
                         this.unitStates.set(unit, state);
@@ -1947,7 +1947,7 @@ export class HeadlessBattleSimulator {
         // BatonPass (接棒)
         if (unit.synergies.includes('BatonPass') && this.getSynergyCountForUnit(unit, 'BatonPass') >= 2) {
             const batonCount = this.getSynergyCountForUnit(unit, 'BatonPass');
-            const inheritRatio = batonCount >= 5 ? 1.0 : 0.5;
+            const inheritRatio = batonCount >= 5 ? 0.66 : 0.33;
             const livingAllies = myTeam.filter(u => u && u !== unit && u.stats.hp > 0);
             if (livingAllies.length > 0) {
                 const target = livingAllies[Math.floor(Math.random() * livingAllies.length)];
@@ -1955,7 +1955,7 @@ export class HeadlessBattleSimulator {
                 const inheritedHp = Math.floor(unit.stats.maxHp * inheritRatio);
                 if (inheritedAtk > 0 || inheritedHp > 0) {
                     this.growUnit(target, inheritedHp, inheritedAtk, null, true);
-                    const pct = inheritRatio === 1.0 ? '100%' : '50%';
+                    const pct = inheritRatio > 0.6 ? '66%' : '33%';
                     this.log(`${unit.name} 對 ${target.name} 使用了接棒（繼承 ${pct}）。`);
                 }
             }
