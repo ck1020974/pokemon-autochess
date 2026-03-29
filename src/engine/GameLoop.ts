@@ -74,6 +74,9 @@ export class GameLoop {
         const available = this.edition.availableUnitIds;
         const t1 = Object.values(ALL_UNITS).filter(u => u.tier === 1 && !u.isHiddenFromShop && available.includes(u.id));
         const t2 = Object.values(ALL_UNITS).filter(u => u.tier === 2 && !u.isHiddenFromShop && available.includes(u.id));
+        const t3 = Object.values(ALL_UNITS).filter(u => u.tier === 3 && !u.isHiddenFromShop && available.includes(u.id));
+        const t4 = Object.values(ALL_UNITS).filter(u => u.tier === 4 && !u.isHiddenFromShop && available.includes(u.id));
+        const t5 = Object.values(ALL_UNITS).filter(u => u.tier === 5 && !u.isHiddenFromShop && available.includes(u.id));
 
         const shuffle = (array: any[]) => {
             const arr = [...array];
@@ -86,8 +89,11 @@ export class GameLoop {
 
         const pickedT1 = shuffle(t1).slice(0, 5).map(u => u.id);
         const pickedT2 = shuffle(t2).slice(0, 5).map(u => u.id);
+        const pickedT3 = shuffle(t3).slice(0, 3).map(u => u.id);
+        const pickedT4 = shuffle(t4).slice(0, 3).map(u => u.id);
+        const pickedT5 = shuffle(t5).slice(0, 2).map(u => u.id);
 
-        this.activePoolUnitIds = [...pickedT1, ...pickedT2];
+        this.activePoolUnitIds = [...pickedT1, ...pickedT2, ...pickedT3, ...pickedT4, ...pickedT5];
     }
 
     public setDifficulty(level: 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER') {
@@ -135,13 +141,14 @@ export class GameLoop {
             const schedule: Record<number, { tier: number, count: number }[]> = {
                 1: [{ tier: 1, count: 2 }, { tier: 2, count: 2 }],
                 2: [{ tier: 1, count: 2 }, { tier: 2, count: 2 }],
-                3: [{ tier: 3, count: 3 }],
-                4: [{ tier: 3, count: 3 }],
-                5: [{ tier: 3, count: 3 }],
-                6: [{ tier: 4, count: 3 }],
-                7: [{ tier: 4, count: 2 }],
-                8: [{ tier: 4, count: 2 }],
-                10: [{ tier: 5, count: 3 }],
+                3: [{ tier: 3, count: 2 }],
+                4: [{ tier: 3, count: 2 }],
+                5: [{ tier: 3, count: 2 }],
+                6: [{ tier: 4, count: 1 }],
+                7: [{ tier: 4, count: 1 }],
+                8: [{ tier: 4, count: 1 }],
+                9: [{ tier: 4, count: 1 }],
+                10: [{ tier: 5, count: 1 }],
                 11: [{ tier: 5, count: 1 }],
                 12: [{ tier: 5, count: 1 }]
             };
@@ -174,14 +181,22 @@ export class GameLoop {
 
     public generatePoolChoices(tier: number, _count: number) {
         const legendaries = ['raikou', 'entei', 'suicune', 'darkrai', 'cresselia'];
-        const available = Object.values(ALL_UNITS).filter(u =>
-            u.tier === tier &&
-            !u.isHiddenFromShop &&
-            this.edition.availableUnitIds.includes(u.id) &&
-            !this.activePoolUnitIds.includes(u.id) &&
-            !this.bannedPoolUnitIds.includes(u.id) &&
-            !legendaries.includes(u.id) // Filter out legendaries from selection pool
-        );
+        let currentTier = tier;
+        let available: any[] = [];
+
+        // Fallback Mechanism: If current tier is empty, try lower tiers
+        while (currentTier >= 1) {
+            available = Object.values(ALL_UNITS).filter(u =>
+                u.tier === currentTier &&
+                !u.isHiddenFromShop &&
+                this.edition.availableUnitIds.includes(u.id) &&
+                !this.activePoolUnitIds.includes(u.id) &&
+                !this.bannedPoolUnitIds.includes(u.id) &&
+                !legendaries.includes(u.id)
+            );
+            if (available.length > 0) break;
+            currentTier--;
+        }
 
         const shuffle = (array: any[]) => {
             const arr = [...array];
