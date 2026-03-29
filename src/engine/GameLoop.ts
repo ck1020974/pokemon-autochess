@@ -312,8 +312,7 @@ export class GameLoop {
             }
             if (u && u.family === 'riolu') {
                 u.scalingValue = this.rioluN;
-                const inc = u.level >= 2 ? 2 : 1;
-                u.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後 +${inc})`;
+                u.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後增強)`;
             }
         });
 
@@ -333,8 +332,7 @@ export class GameLoop {
             }
             if (u && u.family === 'riolu') {
                 u.scalingValue = this.rioluN;
-                const inc = u.level >= 2 ? 2 : 1;
-                u.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後增強 +${inc})`;
+                u.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後增強)`;
             }
         });
 

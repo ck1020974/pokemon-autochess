@@ -1579,7 +1579,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
     },
     bagon_3: {
         id: 'bagon_3', name: '暴飛龍', tier: 5, family: 'bagon',
-        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/暴飛龍00.webp', battleImageUrl: 'assets/暴飛龍01.webp',
         description: '友軍擊殺後，全體我方 +5 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage', 'Intimidate'], isHiddenFromShop: true
     },
