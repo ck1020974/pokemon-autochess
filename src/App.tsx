@@ -2210,7 +2210,7 @@ function App() {
                         <>
                             <span style={{ color: game.wins < 8 ? '#fff' : '#888' }}>🏅 道館: {Math.min(game.wins, 8)}/8</span>
                             <span style={{ color: (game.wins >= 8 && game.wins < 12) ? '#fbbf24' : '#888' }}>⚔️ 四天王: {Math.max(0, Math.min(game.wins - 8, 4))}/4</span>
-                            <span style={{ color: game.wins >= 12 ? '#f472b6' : '#888' }}>👑 冠軍: {Math.max(0, Math.min(game.wins - 12, 1))}/1</span>
+                            <span style={{ color: game.wins >= 12 ? '#f472b6' : '#888' }}>👑 冠軍: {game.edition.id === 'infinite' ? '∞' : `${Math.max(0, Math.min(game.wins - 12, 1))}/1`}</span>
                         </>
                     )}
                     {/* Help & Mute Toggle Buttons inside Header - Show alongside other game info */}

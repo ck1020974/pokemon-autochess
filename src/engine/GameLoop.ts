@@ -567,9 +567,23 @@ export class GameLoop {
                 this.lives++;
                 console.log("擊敗四大天王 ：+1 生命");
             }
-            if (this.wins >= 13) {
-                this.phase = GamePhase.VICTORY;
-                return;
+
+            // --- Victory Condition ---
+            const totalChampions = this.edition.championOpponents.length;
+            const defeatedChampions = new Set(this.defeatedOpponentIds.filter(id =>
+                this.edition.championOpponents.some((c: any) => c.id === id)
+            )).size;
+
+            if (this.edition.id === 'infinite') {
+                if (defeatedChampions >= totalChampions && totalChampions > 0) {
+                    this.phase = GamePhase.VICTORY;
+                    return;
+                }
+            } else {
+                if (this.wins >= 13) {
+                    this.phase = GamePhase.VICTORY;
+                    return;
+                }
             }
 
             // --- Win-based Scaling Trigger ---
