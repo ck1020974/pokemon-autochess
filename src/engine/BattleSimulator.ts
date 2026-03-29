@@ -250,6 +250,8 @@ export class BattleSimulator {
         clone.battleImageUrl = unit.battleImageUrl;
         clone.family = unit.family;
         clone.scalingValue = unit.scalingValue;
+        clone.maxHpCap = unit.maxHpCap;
+        clone.attackCap = unit.attackCap;
 
         this.unitStates.set(clone, {});
         return clone;
@@ -709,18 +711,29 @@ export class BattleSimulator {
             this.growUnit(unit, amount, 0, undefined, original, true);
         }
 
-        // Darkrai: Global +10 Attack
+        // Darkrai: Global +5 Attack and Higher Attack Cap
         if (unit.family === 'darkrai') {
-            for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                this.buffAttack(u, 5, true);
+            const living = myTeam.filter(u => u && u.stats.hp > 0);
+            if (living.length > 0) {
+                await this.notifySkill(unit, `發動了噩夢`);
+                for (const u of living) {
+                    u.attackCap = Math.max(u.attackCap, 60);
+                    this.buffAttack(u, 5, true);
+                }
             }
         }
 
-        // Cresselia: Global +10 HP
+        // Cresselia: Global +5 HP and Higher HP Cap
         if (unit.family === 'cresselia') {
-            for (const u of myTeam.filter(u => u && u.stats.hp > 0)) {
-                // Temporary HP buff in combat ONLY, no target
-                this.growUnit(u, 5, 0, undefined, null, true);
+            const living = myTeam.filter(u => u && u.stats.hp > 0);
+            if (living.length > 0) {
+                await this.notifySkill(unit, `發動了新月之光`);
+                for (const u of living) {
+                    // Provide team-wide cap increase
+                    u.maxHpCap = Math.max(u.maxHpCap, 60);
+                    // Temporary HP buff in combat ONLY, no target
+                    this.growUnit(u, 5, 0, undefined, null, true);
+                }
             }
         }
 
