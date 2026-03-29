@@ -33,7 +33,7 @@ export function SynergyIcon({ synergy, count, showCount = true, units, activeTem
                 if (!showTooltip) return; // Don't stop propagation if tooltip is off
                 e.stopPropagation();
                 if (disabled) return; // Block interaction if disabled
-                setIsDismissed(true); // Hide tooltip on click
+
                 if (setActiveSynergyId) {
                     setActiveSynergyId(isForcedOpen ? null : synergyKey);
                 } else {

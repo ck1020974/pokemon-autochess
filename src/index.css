@@ -1093,6 +1093,11 @@ h3 {
   z-index: 99999 !important;
 }
 
+.synergy-icon.force-visible .synergy-tooltip {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 .synergy-tooltip.tooltip-left {
   left: auto !important;
   right: 110% !important;
@@ -1597,8 +1602,22 @@ h3 {
     right: 0 !important;
     top: auto !important;
     bottom: 110% !important;
-    transform: none !important;
-    z-index: 99999 !important;
+  }
+
+  /* Pool Selection Overlay Mobile Optimization */
+  .opponent-select-overlay .opponent-cards-container {
+    gap: 20px !important;
+  }
+
+  .opponent-select-overlay .opponent-card.is-selection-pool-card {
+    width: clamp(100px, 28vw, 150px) !important;
+    padding: 10px !important;
+    border-radius: 16px !important;
+  }
+
+  .opponent-select-overlay .opponent-card.is-selection-pool-card img {
+    width: 90% !important;
+    height: 90% !important;
   }
 }
 

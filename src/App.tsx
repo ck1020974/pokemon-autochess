@@ -1588,6 +1588,7 @@ function App() {
         setBattleResult(null);
         setLogs([]);
         setBattleTick(0);
+        setActiveSynergyId(null);
         update();
     };
 
@@ -1625,6 +1626,7 @@ function App() {
 
         simulatorRef.current = null;
         setBattleResult(null);
+        setActiveSynergyId(null);
         update();
     };
 
@@ -2771,7 +2773,7 @@ function App() {
                 )
             }
 
-            <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => setSelected(null)}>
+            <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => { setSelected(null); setActiveSynergyId(null); }}>
                 {/* 1. Synergies (Player) */}
                 <div className={`board-synergies ${([2, 3, 4, 7, 8, 9, 10, 11].includes(tutorialStep) && game.phase !== GamePhase.BATTLE) ? 'tutorial-elevate' : ''}`}>
                     {(() => {
@@ -2894,7 +2896,7 @@ function App() {
             {/* Shop Area */}
             {
                 game.phase === GamePhase.SHOP && (
-                    <div className={`shop-container ${tutorialStep === 6 ? 'tutorial-elevate' : ''}`}>
+                    <div className={`shop-container ${tutorialStep === 6 ? 'tutorial-elevate' : ''}`} onClick={() => setActiveSynergyId(null)}>
                         {/* Left Controls: Compact & Side-by-Side */}
                         <div className="shop-controls">
                             {/* Row 1: Shop Level Text - Higher and Better Color */}
@@ -3104,7 +3106,7 @@ function App() {
                             {game.poolChoices.map((choice: any, idx) => (
                                 <div
                                     key={idx}
-                                    className={`opponent-card ${(selectedPoolId && selectedPoolId !== choice.id) ? 'pool-card-destroy' : ''}`}
+                                    className={`opponent-card is-selection-pool-card ${(selectedPoolId && selectedPoolId !== choice.id) ? 'pool-card-destroy' : ''}`}
                                     onClick={() => handlePoolSelect(choice)}
                                     style={{
                                         display: 'flex',
