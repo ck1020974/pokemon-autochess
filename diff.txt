@@ -1,0 +1,270 @@
+﻿diff --git a/public/assets/desktop.ini b/public/assets/desktop.ini
+index 6dbc3a3..97b8482 100644
+--- a/public/assets/desktop.ini
++++ b/public/assets/desktop.ini
+@@ -91,3 +91,18 @@
+ 布撥00.webp=@布撥00,0
+ 達克萊伊00.webp=@達克萊伊00,0
+ 克雷色利亞00.webp=@克雷色利亞00,0
++嗡蝠00.webp=@嗡蝠00,0
++勇士雄鷹00.webp=@勇士雄鷹00,0
++毛頭小鷹00.webp=@毛頭小鷹00,0
++艾路雷朵00.webp=@艾路雷朵00,0
++阿勃梭魯00.webp=@阿勃梭魯00,0
++請假王00.webp=@請假王00,0
++過動猿00.webp=@過動猿00,0
++懶人獺00.webp=@懶人獺00,0
++顫弦蠑螈（低調的樣子）00.webp=@顫弦蠑螈（低調的樣子）00,0
++顫弦蠑螈（高調的樣子）00.webp=@顫弦蠑螈（高調的樣子）00,0
++托戈德瑪爾00.webp=@托戈德瑪爾00,0
++蝶結萌虻00.webp=@蝶結萌虻00,0
++萌虻00.webp=@萌虻00,0
++音波龍00.webp=@音波龍00,0
++毒電嬰00.webp=@毒電嬰00,0
+diff --git a/src/components/EncyclopediaModal.tsx b/src/components/EncyclopediaModal.tsx
+index 4febc2e..ad325cd 100644
+--- a/src/components/EncyclopediaModal.tsx
++++ b/src/components/EncyclopediaModal.tsx
+@@ -44,7 +44,7 @@ const SYNERGY_PRIORITY = [
+     'Normal',       // 摰? (2)
+     'Ghost',        // 閰? (3)
+     'Grass',        // ?詨? (4)
+-    'Fire',         // ? (5)
++    'Fire',         // ?梢◢ (5)
+     'Water',        // 瞏格? (6)
+     'Charge',       // ?餃? (7)
+     'BugBite',      // ?脣 (8)
+diff --git a/src/data/AllUnits.ts b/src/data/AllUnits.ts
+index 7d71bf3..db50489 100644
+--- a/src/data/AllUnits.ts
++++ b/src/data/AllUnits.ts
+@@ -909,13 +909,13 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
+         id: 'flareon', name: '?思?撣?, tier: 3, family: 'eevee',
+         baseStats: { hp: 3, maxHp: 3, attack: 3 },
+         imageUrl: 'assets/?思?撣?0.webp', battleImageUrl: 'assets/?思?撣?1.webp',
+-        description: '????憭敺??撽潘?憿?蝝舐??蝢??賊???, synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true, evolveId: 'flareon_final'
++        description: '????憭敺??撽潘?憿?蝝舐??梢◢蝢??賊???, synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true, evolveId: 'flareon_final'
+     },
+     flareon_final: {
+         id: 'flareon_final', name: '?思?撣?, tier: 3, family: 'eevee',
+         baseStats: { hp: 3, maxHp: 3, attack: 3 },
+         imageUrl: 'assets/?思?撣?0.webp', battleImageUrl: 'assets/?思?撣?1.webp',
+-        description: '憿?蝝舐??拇活?蝢??賊???, synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true
++        description: '憿?蝝舐??拇活?梢◢蝢??賊???, synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true
+     },
+     vaporeon: {
+         id: 'vaporeon', name: '瘞港?撣?, tier: 3, family: 'eevee',
+@@ -1007,19 +1007,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
+         id: 'psyduck', name: '?舫?暾?, tier: 3, family: 'psyduck',
+         baseStats: { hp: 3, maxHp: 3, attack: 5 },
+         imageUrl: 'assets/?舫?暾?0.webp', battleImageUrl: 'assets/?舫?暾?1.webp',
+-        description: '?捏?菜敺??冽? 1 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Water', 'Psychic'], evolveId: 'golduck'
++        description: '?捏?菜敺??冽? 1 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Water'], evolveId: 'golduck'
+     },
+     golduck: {
+         id: 'golduck', name: '?仿?暾?, tier: 3, family: 'psyduck',
+         baseStats: { hp: 3, maxHp: 3, attack: 5 },
+         imageUrl: 'assets/?仿?暾?0.webp', battleImageUrl: 'assets/?仿?暾?1.webp',
+-        description: '?捏?菜敺??冽? 2 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Water', 'Psychic'], evolveId: 'golduck_final', isHiddenFromShop: true
++        description: '?捏?菜敺??冽? 2 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Water'], evolveId: 'golduck_final', isHiddenFromShop: true
+     },
+     golduck_final: {
+         id: 'golduck_final', name: '?仿?暾?, tier: 3, family: 'psyduck',
+         baseStats: { hp: 3, maxHp: 3, attack: 5 },
+         imageUrl: 'assets/?仿?暾?0.webp', battleImageUrl: 'assets/?仿?暾?1.webp',
+-        description: '?捏?菜敺??冽? 3 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Water', 'Psychic'], isHiddenFromShop: true
++        description: '?捏?菜敺??冽? 3 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Water'], isHiddenFromShop: true
+     },
+ 
+     // 28. Bellsprout
+@@ -1047,19 +1047,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
+         id: 'vulpix', name: '?剖偏', tier: 3, family: 'vulpix',
+         baseStats: { hp: 5, maxHp: 5, attack: 3 },
+         imageUrl: 'assets/?剖偏00.webp', battleImageUrl: 'assets/?剖偏01.webp',
+-        description: '?捏?菜敺??冽? 1 雿?頠偶銋?+2 ?餅???+1 ???, synergies: ['Fire', 'Charm'], evolveId: 'ninetales'
++        description: '?捏?菜敺??冽? 1 雿?頠偶銋?+2 ?餅???+1 ???, synergies: ['Fire'], evolveId: 'ninetales'
+     },
+     ninetales: {
+         id: 'ninetales', name: '銋偏', tier: 3, family: 'vulpix',
+         baseStats: { hp: 5, maxHp: 5, attack: 3 },
+         imageUrl: 'assets/銋偏00.webp', battleImageUrl: 'assets/銋偏01.webp',
+-        description: '?捏?菜敺??冽? 2 雿?頠偶銋?+2 ?餅???+1 ???, synergies: ['Fire', 'Charm'], evolveId: 'ninetales_final', isHiddenFromShop: true
++        description: '?捏?菜敺??冽? 2 雿?頠偶銋?+2 ?餅???+1 ???, synergies: ['Fire'], evolveId: 'ninetales_final', isHiddenFromShop: true
+     },
+     ninetales_final: {
+         id: 'ninetales_final', name: '銋偏', tier: 3, family: 'vulpix',
+         baseStats: { hp: 5, maxHp: 5, attack: 3 },
+         imageUrl: 'assets/銋偏00.webp', battleImageUrl: 'assets/銋偏01.webp',
+-        description: '?捏?菜敺??冽? 3 雿?頠偶銋?+2 ?餅???+1 ???, synergies: ['Fire', 'Charm'], isHiddenFromShop: true
++        description: '?捏?菜敺??冽? 3 雿?頠偶銋?+2 ?餅???+1 ???, synergies: ['Fire'], isHiddenFromShop: true
+     },
+ 
+     // 30. Mareep
+@@ -1533,37 +1533,37 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
+         id: 'pawmi', name: '撣', tier: 3, family: 'pawmi',
+         baseStats: { hp: 4, maxHp: 4, attack: 4 },
+         imageUrl: 'assets/撣00.webp', battleImageUrl: 'assets/撣01.webp',
+-        description: '?捏?菜敺??冽? 1 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Charge', 'Charm'], evolveId: 'pawmi_2'
++        description: '?捏?菜敺??冽? 1 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Charge'], evolveId: 'pawmi_2'
+     },
+     pawmi_2: {
+         id: 'pawmi_2', name: '撣???, tier: 3, family: 'pawmi',
+         baseStats: { hp: 4, maxHp: 4, attack: 4 },
+         imageUrl: 'assets/撣???0.webp', battleImageUrl: 'assets/撣???1.webp',
+-        description: '?捏?菜敺??冽? 2 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Charge', 'Charm'], evolveId: 'pawmi_3', isHiddenFromShop: true
++        description: '?捏?菜敺??冽? 2 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Charge'], evolveId: 'pawmi_3', isHiddenFromShop: true
+     },
+     pawmi_3: {
+         id: 'pawmi_3', name: '撌游??', tier: 3, family: 'pawmi',
+         baseStats: { hp: 4, maxHp: 4, attack: 4 },
+         imageUrl: 'assets/撌游??00.webp', battleImageUrl: 'assets/撌游??01.webp',
+-        description: '?捏?菜敺??冽? 3 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Charge', 'Charm'], isHiddenFromShop: true
++        description: '?捏?菜敺??冽? 3 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Charge'], isHiddenFromShop: true
+     },
+     spheal: {
+         id: 'spheal', name: '瘚瑁措??, tier: 3, family: 'spheal',
+         baseStats: { hp: 5, maxHp: 5, attack: 3 },
+         imageUrl: 'assets/瘚瑁措??0.webp', battleImageUrl: 'assets/瘚瑁措??1.webp',
+-        description: '?捏?菜敺??冽? 1 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Water', 'Snow'], evolveId: 'spheal_2'
++        description: '?捏?菜敺??冽? 1 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Snow'], evolveId: 'spheal_2'
+     },
+     spheal_2: {
+         id: 'spheal_2', name: '瘚琿???, tier: 3, family: 'spheal',
+         baseStats: { hp: 5, maxHp: 5, attack: 3 },
+         imageUrl: 'assets/瘚琿???0.webp', battleImageUrl: 'assets/瘚琿???1.webp',
+-        description: '?捏?菜敺??冽? 2 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Water', 'Snow'], evolveId: 'spheal_3', isHiddenFromShop: true
++        description: '?捏?菜敺??冽? 2 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Snow'], evolveId: 'spheal_3', isHiddenFromShop: true
+     },
+     spheal_3: {
+         id: 'spheal_3', name: '撣?瘚瑞?', tier: 3, family: 'spheal',
+         baseStats: { hp: 5, maxHp: 5, attack: 3 },
+         imageUrl: 'assets/撣?瘚瑞?00.webp', battleImageUrl: 'assets/撣?瘚瑞?01.webp',
+-        description: '?捏?菜敺??冽? 3 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Water', 'Snow'], isHiddenFromShop: true
++        description: '?捏?菜敺??冽? 3 雿?頠偶銋?+1 ?餅???+2 ???, synergies: ['Snow'], isHiddenFromShop: true
+     },
+     bagon: {
+         id: 'bagon', name: '撖嗉?樴?, tier: 5, family: 'bagon',
+diff --git a/src/engine/BattleSimulator.ts b/src/engine/BattleSimulator.ts
+index 77636fe..e533fab 100644
+--- a/src/engine/BattleSimulator.ts
++++ b/src/engine/BattleSimulator.ts
+@@ -1117,7 +1117,7 @@ export class BattleSimulator {
+                         unit.stats.hp -= 1;
+                         this.buffAttack(unit, buff, true);
+                         if (!this.fireLogged.has(unit.id)) {
+-                            this.log(`${unit.name} ??刻澈??堆?`);
++                            this.log(`${unit.name} ?梢◢?刻澈??堆?`);
+                             this.fireLogged.add(unit.id);
+                         }
+                     }
+diff --git a/src/engine/HeadlessBattleSimulator.ts b/src/engine/HeadlessBattleSimulator.ts
+index 25694fa..8b61756 100644
+--- a/src/engine/HeadlessBattleSimulator.ts
++++ b/src/engine/HeadlessBattleSimulator.ts
+@@ -800,7 +800,7 @@ export class HeadlessBattleSimulator {
+                         unit.stats.hp -= 1;
+                         this.buffAttack(unit, buff, true);
+                         if (!this.fireLogged.has(unit.id)) {
+-                            this.log(`${unit.name} ??刻澈??堆?`);
++                            this.log(`${unit.name} ?梢◢?刻澈??堆?`);
+                             this.fireLogged.add(unit.id);
+                         }
+                     }
+diff --git a/src/models/RewardData.ts b/src/models/RewardData.ts
+index 7ea1f2a..786a2bb 100644
+--- a/src/models/RewardData.ts
++++ b/src/models/RewardData.ts
+@@ -75,7 +75,7 @@ export const REWARD_DATA: RewardDefinition[] = [
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "?蹂???, "effect": "??券?摰?閫+3?餅?", "imageUrl": "item/?蹂???png" },
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "雓???, "effect": "??券?閰?閫+3?餅?", "imageUrl": "item/雓???png" },
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Grass", "item": "?寥???, "effect": "??券??詨?閫+3?餅?", "imageUrl": "item/?寥???png" },
+-    { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "????, "effect": "??券??閫+3?餅?", "imageUrl": "item/????png" },
++    { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "????, "effect": "??券??梢◢閫+3?餅?", "imageUrl": "item/????png" },
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Water", "item": "璈???, "effect": "??券?瞏格?閫+3?餅?", "imageUrl": "item/璈???png" },
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Hard", "item": "????, "effect": "??券??′閫+3?餅?", "imageUrl": "item/????png" },
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Cave", "item": "?輯??, "effect": "??券???閫+3?餅?", "imageUrl": "item/?輯??png" },
+@@ -91,7 +91,7 @@ export const REWARD_DATA: RewardDefinition[] = [
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "?蹂???, "effect": "??券?摰?閫+3?", "imageUrl": "item/?蹂???png" },
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "雓???, "effect": "??券?閰?閫+3?", "imageUrl": "item/雓???png" },
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Grass", "item": "?寥???, "effect": "??券??詨?閫+3?", "imageUrl": "item/?寥???png" },
+-    { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "????, "effect": "??券??閫+3?", "imageUrl": "item/????png" },
++    { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "????, "effect": "??券??梢◢閫+3?", "imageUrl": "item/????png" },
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Water", "item": "璈???, "effect": "??券?瞏格?閫+3?", "imageUrl": "item/璈???png" },
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Hard", "item": "????, "effect": "??券??′閫+3?", "imageUrl": "item/????png" },
+     { "difficulty": "EASY", "category": "BATTLE_SYNERGY", "synergyId": "Cave", "item": "?輯??, "effect": "??券???閫+3?", "imageUrl": "item/?輯??png" },
+@@ -120,7 +120,7 @@ export const REWARD_DATA: RewardDefinition[] = [
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "?蹂???, "effect": "??券?摰?閫+5?餅?", "imageUrl": "item/?蹂???png" },
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "雓???, "effect": "??券?閰?閫+5?餅?", "imageUrl": "item/雓???png" },
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Grass", "item": "?寥???, "effect": "??券??詨?閫+5?餅?", "imageUrl": "item/?寥???png" },
+-    { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "????, "effect": "??券??閫+5?餅?", "imageUrl": "item/????png" },
++    { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "????, "effect": "??券??梢◢閫+5?餅?", "imageUrl": "item/????png" },
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Water", "item": "璈???, "effect": "??券?瞏格?閫+5?餅?", "imageUrl": "item/璈???png" },
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Hard", "item": "????, "effect": "??券??′閫+5?餅?", "imageUrl": "item/????png" },
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Cave", "item": "?輯??, "effect": "??券???閫+5?餅?", "imageUrl": "item/?輯??png" },
+@@ -136,7 +136,7 @@ export const REWARD_DATA: RewardDefinition[] = [
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "?蹂???, "effect": "??券?摰?閫+5?", "imageUrl": "item/?蹂???png" },
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "雓???, "effect": "??券?閰?閫+5?", "imageUrl": "item/雓???png" },
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Grass", "item": "?寥???, "effect": "??券??詨?閫+5?", "imageUrl": "item/?寥???png" },
+-    { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "????, "effect": "??券??閫+5?", "imageUrl": "item/????png" },
++    { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "????, "effect": "??券??梢◢閫+5?", "imageUrl": "item/????png" },
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Water", "item": "璈???, "effect": "??券?瞏格?閫+5?", "imageUrl": "item/璈???png" },
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Hard", "item": "????, "effect": "??券??′閫+5?", "imageUrl": "item/????png" },
+     { "difficulty": "NORMAL", "category": "BATTLE_SYNERGY", "synergyId": "Cave", "item": "?輯??, "effect": "??券???閫+5?", "imageUrl": "item/?輯??png" },
+@@ -165,7 +165,7 @@ export const REWARD_DATA: RewardDefinition[] = [
+     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "瘛函征?單", "effect": "瘛函征??選??摰?閫+5?餅???5?", "imageUrl": "item/瘛函征?單.webp" },
+     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "憒芰??, "effect": "憒芰??單嚗??寡?????5?餅???5?", "imageUrl": "item/憒芰??png" },
+     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Grass", "item": "蝣抒??單", "effect": "蝣抒???選???詨?閫+5?餅???5?", "imageUrl": "item/蝣抒??單.png" },
+-    { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "?怎??單", "effect": "?怎???選???閫+5?餅???5?", "imageUrl": "item/?怎??單.png" },
++    { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "?怎??單", "effect": "?怎???選???梢◢閫+5?餅???5?", "imageUrl": "item/?怎??單.png" },
+     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Water", "item": "瘞湔輕?單", "effect": "瘞湔輕??選??瞏格?閫+5?餅???5?", "imageUrl": "item/瘞湔輕?單.png" },
+     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Hard", "item": "?潮?單", "effect": "?潮??選???′閫+5?餅???5?", "imageUrl": "item/?潮?單.png" },
+     { "difficulty": "HARD", "category": "BATTLE_SYNERGY", "synergyId": "Cave", "item": "憭批?單", "effect": "憭批??選????閫+5?餅???5?", "imageUrl": "item/憭批?單.png" },
+@@ -182,7 +182,7 @@ export const REWARD_DATA: RewardDefinition[] = [
+     { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Normal", "item": "瘛函征?單", "effect": "瘛函征??選??摰?閫+10?餅???10?", "imageUrl": "item/瘛函征?單.webp" },
+     { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Ghost", "item": "憒芰??, "effect": "憒芰??單嚗??寡?????10?餅???10?", "imageUrl": "item/憒芰??png" },
+     { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Grass", "item": "蝣抒??單", "effect": "蝣抒???選???詨?閫+10?餅???10?", "imageUrl": "item/蝣抒??單.png" },
+-    { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "?怎??單", "effect": "?怎???選???閫+10?餅???10?", "imageUrl": "item/?怎??單.png" },
++    { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Fire", "item": "?怎??單", "effect": "?怎???選???梢◢閫+10?餅???10?", "imageUrl": "item/?怎??單.png" },
+     { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Water", "item": "瘞湔輕?單", "effect": "瘞湔輕??選??瞏格?閫+10?餅???10?", "imageUrl": "item/瘞湔輕?單.png" },
+     { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Hard", "item": "?潮?單", "effect": "?潮??選???′閫+10?餅???10?", "imageUrl": "item/?潮?單.png" },
+     { "difficulty": "EXTREME", "category": "BATTLE_SYNERGY", "synergyId": "Cave", "item": "憭批?單", "effect": "憭批??選????閫+10?餅???10?", "imageUrl": "item/憭批?單.png" },
+@@ -267,7 +267,7 @@ export const REWARD_DATA: RewardDefinition[] = [
+     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Normal", "item": "蝯脩閒?溝", "effect": "撘瑕???銝剔?摰?閫嚗?2?餅?????, "imageUrl": "item/蝯脩閒?溝.png" },
+     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Ghost", "item": "閰?銋泵", "effect": "撘瑕???銝剔?閰?閫嚗?2?餅?????, "imageUrl": "item/閰?銋泵.png" },
+     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Grass", "item": "憟楚蝔桀?", "effect": "撘瑕???銝剔??詨?閫嚗?2?餅?????, "imageUrl": "item/憟楚蝔桀?.png" },
+-    { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Fire", "item": "?函", "effect": "撘瑕???銝剔??閫嚗?2?餅?????, "imageUrl": "item/?函.png" },
++    { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Fire", "item": "?函", "effect": "撘瑕???銝剔??梢◢閫嚗?2?餅?????, "imageUrl": "item/?函.png" },
+     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Water", "item": "蟡?瘞湔輕", "effect": "撘瑕???銝剔?瞏格?閫嚗?2?餅?????, "imageUrl": "item/蟡?瘞湔輕.png" },
+     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Hard", "item": "蝖祉??, "effect": "撘瑕???銝剔??′閫嚗?2?餅?????, "imageUrl": "item/蝖祉??png" },
+     { "difficulty": "NORMAL", "category": "PERM_SYNERGY", "synergyId": "Cave", "item": "??瘝?", "effect": "撘瑕???銝剔???閫嚗?2?餅?????, "imageUrl": "item/??瘝?.png" },
+@@ -290,7 +290,7 @@ export const REWARD_DATA: RewardDefinition[] = [
+     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Normal", "item": "蝯脩閒?溝", "effect": "撘瑕???銝剔?摰?閫嚗?3?餅?????, "imageUrl": "item/蝯脩閒?溝.png" },
+     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Ghost", "item": "閰?銋泵", "effect": "撘瑕???銝剔?閰?閫嚗?3?餅?????, "imageUrl": "item/閰?銋泵.png" },
+     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Grass", "item": "憟楚蝔桀?", "effect": "撘瑕???銝剔??詨?閫嚗?3?餅?????, "imageUrl": "item/憟楚蝔桀?.png" },
+-    { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Fire", "item": "?函", "effect": "撘瑕???銝剔??閫嚗?3?餅?????, "imageUrl": "item/?函.png" },
++    { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Fire", "item": "?函", "effect": "撘瑕???銝剔??梢◢閫嚗?3?餅?????, "imageUrl": "item/?函.png" },
+     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Water", "item": "蟡?瘞湔輕", "effect": "撘瑕???銝剔?瞏格?閫嚗?3?餅?????, "imageUrl": "item/蟡?瘞湔輕.png" },
+     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Hard", "item": "蝖祉??, "effect": "撘瑕???銝剔??′閫嚗?3?餅?????, "imageUrl": "item/蝖祉??png" },
+     { "difficulty": "HARD", "category": "PERM_SYNERGY", "synergyId": "Cave", "item": "??瘝?", "effect": "撘瑕???銝剔???閫嚗?3?餅?????, "imageUrl": "item/??瘝?.png" },
+@@ -313,7 +313,7 @@ export const REWARD_DATA: RewardDefinition[] = [
+     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Normal", "item": "蝯脩閒?溝", "effect": "撘瑕???銝剔?摰?閫嚗?4?餅?????, "imageUrl": "item/蝯脩閒?溝.png" },
+     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Ghost", "item": "閰?銋泵", "effect": "撘瑕???銝剔?閰?閫嚗?4?餅?????, "imageUrl": "item/閰?銋泵.png" },
+     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Grass", "item": "憟楚蝔桀?", "effect": "撘瑕???銝剔??詨?閫嚗?4?餅?????, "imageUrl": "item/憟楚蝔桀?.png" },
+-    { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Fire", "item": "?函", "effect": "撘瑕???銝剔??閫嚗?4?餅?????, "imageUrl": "item/?函.png" },
++    { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Fire", "item": "?函", "effect": "撘瑕???銝剔??梢◢閫嚗?4?餅?????, "imageUrl": "item/?函.png" },
+     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Water", "item": "蟡?瘞湔輕", "effect": "撘瑕???銝剔?瞏格?閫嚗?4?餅?????, "imageUrl": "item/蟡?瘞湔輕.png" },
+     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Hard", "item": "蝖祉??, "effect": "撘瑕???銝剔??′閫嚗?4?餅?????, "imageUrl": "item/蝖祉??png" },
+     { "difficulty": "EXTREME", "category": "PERM_SYNERGY", "synergyId": "Cave", "item": "??瘝?", "effect": "撘瑕???銝剔???閫嚗?4?餅?????, "imageUrl": "item/??瘝?.png" },
+diff --git a/src/models/Synergies.ts b/src/models/Synergies.ts
+index f710eec..4bd1531 100644
+--- a/src/models/Synergies.ts
++++ b/src/models/Synergies.ts
+@@ -14,7 +14,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
+     'Normal': { id: 'Normal', name: '摰?', icon: '??, description: '[2/3/5] 皞?蝯???????瘞訾? +2/4/10 ?', tiers: [2, 3, 5], color: '#d1d5db' },
+     'Ghost': { id: 'Ghost', name: '閰?', icon: '?', description: '[2/3/5] 皞?蝯???????瘞訾? +2/4/10 ?餅?', tiers: [2, 3, 5], color: '#a855f7' },
+     'Grass': { id: 'Grass', name: '?詨?', icon: '?', description: '[2/3/5] ?餅?敺?敺?2/5/12 ? (??鞊⊿?1甈?', tiers: [2, 3, 5], color: '#4ade80' },
+-    'Fire': { id: 'Fire', name: '?', icon: '?', description: '[2/3/5] ?餅???-1 ?(?雿 1)嚗?+2/4/10 ?餅?', tiers: [2, 3, 5], color: '#ef4444' },
++    'Fire': { id: 'Fire', name: '?梢◢', icon: '?', description: '[2/3/5] ?餅???-1 ?(?雿 1)嚗?+2/4/10 ?餅?', tiers: [2, 3, 5], color: '#ef4444' },
+     'Water': { id: 'Water', name: '瞏格?', icon: '?', description: '[2/3/5] ?餅??蝙?格? -1/3/10 ?餅? (??鞊⊿?1甈?', tiers: [2, 3, 5], color: '#60a5fa' },
+     'Triplets': { id: 'Triplets', name: '銝???, icon: '???把??, description: '[3] 甇颱滿敺偶銋?+3 ?餅?????, tiers: [3], color: '#fcd34d' },
+     'Hard': { id: 'Hard', name: '?′', icon: '?儭?, description: '[2] ?菜?擐活甇颱滿嚗???1 ?', tiers: [2], color: '#9ca3af' },

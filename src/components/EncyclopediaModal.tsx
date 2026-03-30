@@ -44,7 +44,7 @@ const SYNERGY_PRIORITY = [
     'Normal',       // 守住 (2)
     'Ghost',        // 詛咒 (3)
     'Grass',        // 吸取 (4)
-    'Fire',         // 燃盡 (5)
+    'Fire',         // 熱風 (5)
     'Water',        // 潮旋 (6)
     'Charge',       // 電光 (7)
     'BugBite',      // 蟲咬 (8)

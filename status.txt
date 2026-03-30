@@ -1,0 +1,50 @@
+﻿On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   public/assets/desktop.ini
+	modified:   src/components/EncyclopediaModal.tsx
+	modified:   src/data/AllUnits.ts
+	modified:   src/engine/BattleSimulator.ts
+	modified:   src/engine/HeadlessBattleSimulator.ts
+	modified:   src/models/RewardData.ts
+	modified:   src/models/Synergies.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	"public/assets/\345\213\207\345\243\253\351\233\204\351\267\27100.webp"
+	"public/assets/\345\213\207\345\243\253\351\233\204\351\267\27101.webp"
+	"public/assets/\345\227\241\350\235\24000.webp"
+	"public/assets/\345\227\241\350\235\24001.webp"
+	"public/assets/\346\207\266\344\272\272\347\215\27200.webp"
+	"public/assets/\346\207\266\344\272\272\347\215\27201.webp"
+	"public/assets/\346\211\230\346\210\210\345\276\267\347\221\252\347\210\27600.webp"
+	"public/assets/\346\211\230\346\210\210\345\276\267\347\221\252\347\210\27601.webp"
+	"public/assets/\346\257\222\351\233\273\345\254\26000.webp"
+	"public/assets/\346\257\222\351\233\273\345\254\26001.webp"
+	"public/assets/\346\257\233\351\240\255\345\260\217\351\267\27100.webp"
+	"public/assets/\346\257\233\351\240\255\345\260\217\351\267\27101.webp"
+	"public/assets/\350\211\276\350\267\257\351\233\267\346\234\26500.webp"
+	"public/assets/\350\211\276\350\267\257\351\233\267\346\234\26501.webp"
+	"public/assets/\350\220\214\350\231\27300.webp"
+	"public/assets/\350\220\214\350\231\27301.webp"
+	"public/assets/\350\235\266\347\265\220\350\220\214\350\231\27300.webp"
+	"public/assets/\350\235\266\347\265\220\350\220\214\350\231\27301.webp"
+	"public/assets/\350\253\213\345\201\207\347\216\21300.webp"
+	"public/assets/\350\253\213\345\201\207\347\216\21301.webp"
+	"public/assets/\351\201\216\345\213\225\347\214\27700.webp"
+	"public/assets/\351\201\216\345\213\225\347\214\27701.webp"
+	"public/assets/\351\230\277\345\213\203\346\242\255\351\255\25700.webp"
+	"public/assets/\351\230\277\345\213\203\346\242\255\351\255\25701.webp"
+	"public/assets/\351\237\263\346\263\242\351\276\21500.webp"
+	"public/assets/\351\237\263\346\263\242\351\276\21501.webp"
+	"public/assets/\351\241\253\345\274\246\350\240\221\350\236\210\357\274\210\344\275\216\350\252\277\347\232\204\346\250\243\345\255\220\357\274\21100.webp"
+	"public/assets/\351\241\253\345\274\246\350\240\221\350\236\210\357\274\210\344\275\216\350\252\277\347\232\204\346\250\243\345\255\220\357\274\21101.webp"
+	"public/assets/\351\241\253\345\274\246\350\240\221\350\236\210\357\274\210\351\253\230\350\252\277\347\232\204\346\250\243\345\255\220\357\274\21100.webp"
+	"public/assets/\351\241\253\345\274\246\350\240\221\350\236\210\357\274\210\351\253\230\350\252\277\347\232\204\346\250\243\345\255\220\357\274\21101.webp"
+	status.txt
+	temp_diff.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")

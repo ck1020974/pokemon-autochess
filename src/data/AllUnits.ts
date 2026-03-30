@@ -909,13 +909,13 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'flareon', name: '火伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火伊布00.webp', battleImageUrl: 'assets/火伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值；額外累積燃盡羈絆數量。', synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true, evolveId: 'flareon_final'
+        description: '合成時額外獲得兩倍經驗值；額外累積熱風羈絆數量。', synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true, evolveId: 'flareon_final'
     },
     flareon_final: {
         id: 'flareon_final', name: '火伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/火伊布00.webp', battleImageUrl: 'assets/火伊布01.webp',
-        description: '額外累積兩次燃盡羈絆數量。', synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true
+        description: '額外累積兩次熱風羈絆數量。', synergies: ['Fire', 'BatonPass'], isHiddenFromShop: true
     },
     vaporeon: {
         id: 'vaporeon', name: '水伊布', tier: 3, family: 'eevee',
@@ -1007,19 +1007,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'psyduck', name: '可達鴨', tier: 3, family: 'psyduck',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/可達鴨00.webp', battleImageUrl: 'assets/可達鴨01.webp',
-        description: '擊殺敵方後，隨機 1 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Psychic'], evolveId: 'golduck'
+        description: '擊殺敵方後，隨機 1 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water'], evolveId: 'golduck'
     },
     golduck: {
         id: 'golduck', name: '哥達鴨', tier: 3, family: 'psyduck',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/哥達鴨00.webp', battleImageUrl: 'assets/哥達鴨01.webp',
-        description: '擊殺敵方後，隨機 2 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Psychic'], evolveId: 'golduck_final', isHiddenFromShop: true
+        description: '擊殺敵方後，隨機 2 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water'], evolveId: 'golduck_final', isHiddenFromShop: true
     },
     golduck_final: {
         id: 'golduck_final', name: '哥達鴨', tier: 3, family: 'psyduck',
         baseStats: { hp: 3, maxHp: 3, attack: 5 },
         imageUrl: 'assets/哥達鴨00.webp', battleImageUrl: 'assets/哥達鴨01.webp',
-        description: '擊殺敵方後，隨機 3 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Psychic'], isHiddenFromShop: true
+        description: '擊殺敵方後，隨機 3 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water'], isHiddenFromShop: true
     },
 
     // 28. Bellsprout
@@ -1047,19 +1047,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'vulpix', name: '六尾', tier: 3, family: 'vulpix',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/六尾00.webp', battleImageUrl: 'assets/六尾01.webp',
-        description: '擊殺敵方後，隨機 1 位友軍永久 +2 攻擊與 +1 生命。', synergies: ['Fire', 'Charm'], evolveId: 'ninetales'
+        description: '擊殺敵方後，隨機 1 位友軍永久 +2 攻擊與 +1 生命。', synergies: ['Fire'], evolveId: 'ninetales'
     },
     ninetales: {
         id: 'ninetales', name: '九尾', tier: 3, family: 'vulpix',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/九尾00.webp', battleImageUrl: 'assets/九尾01.webp',
-        description: '擊殺敵方後，隨機 2 位友軍永久 +2 攻擊與 +1 生命。', synergies: ['Fire', 'Charm'], evolveId: 'ninetales_final', isHiddenFromShop: true
+        description: '擊殺敵方後，隨機 2 位友軍永久 +2 攻擊與 +1 生命。', synergies: ['Fire'], evolveId: 'ninetales_final', isHiddenFromShop: true
     },
     ninetales_final: {
         id: 'ninetales_final', name: '九尾', tier: 3, family: 'vulpix',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/九尾00.webp', battleImageUrl: 'assets/九尾01.webp',
-        description: '擊殺敵方後，隨機 3 位友軍永久 +2 攻擊與 +1 生命。', synergies: ['Fire', 'Charm'], isHiddenFromShop: true
+        description: '擊殺敵方後，隨機 3 位友軍永久 +2 攻擊與 +1 生命。', synergies: ['Fire'], isHiddenFromShop: true
     },
 
     // 30. Mareep
@@ -1533,37 +1533,37 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'pawmi', name: '布撥', tier: 3, family: 'pawmi',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/布撥00.webp', battleImageUrl: 'assets/布撥01.webp',
-        description: '擊殺敵方後，隨機 1 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Charge', 'Charm'], evolveId: 'pawmi_2'
+        description: '擊殺敵方後，隨機 1 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Charge'], evolveId: 'pawmi_2'
     },
     pawmi_2: {
         id: 'pawmi_2', name: '布土撥', tier: 3, family: 'pawmi',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/布土撥00.webp', battleImageUrl: 'assets/布土撥01.webp',
-        description: '擊殺敵方後，隨機 2 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Charge', 'Charm'], evolveId: 'pawmi_3', isHiddenFromShop: true
+        description: '擊殺敵方後，隨機 2 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Charge'], evolveId: 'pawmi_3', isHiddenFromShop: true
     },
     pawmi_3: {
         id: 'pawmi_3', name: '巴布土撥', tier: 3, family: 'pawmi',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/巴布土撥00.webp', battleImageUrl: 'assets/巴布土撥01.webp',
-        description: '擊殺敵方後，隨機 3 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Charge', 'Charm'], isHiddenFromShop: true
+        description: '擊殺敵方後，隨機 3 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Charge'], isHiddenFromShop: true
     },
     spheal: {
         id: 'spheal', name: '海豹球', tier: 3, family: 'spheal',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/海豹球00.webp', battleImageUrl: 'assets/海豹球01.webp',
-        description: '擊殺敵方後，隨機 1 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Snow'], evolveId: 'spheal_2'
+        description: '擊殺敵方後，隨機 1 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Snow'], evolveId: 'spheal_2'
     },
     spheal_2: {
         id: 'spheal_2', name: '海魔獅', tier: 3, family: 'spheal',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/海魔獅00.webp', battleImageUrl: 'assets/海魔獅01.webp',
-        description: '擊殺敵方後，隨機 2 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Snow'], evolveId: 'spheal_3', isHiddenFromShop: true
+        description: '擊殺敵方後，隨機 2 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Snow'], evolveId: 'spheal_3', isHiddenFromShop: true
     },
     spheal_3: {
         id: 'spheal_3', name: '帝牙海獅', tier: 3, family: 'spheal',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/帝牙海獅00.webp', battleImageUrl: 'assets/帝牙海獅01.webp',
-        description: '擊殺敵方後，隨機 3 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Snow'], isHiddenFromShop: true
+        description: '擊殺敵方後，隨機 3 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Snow'], isHiddenFromShop: true
     },
     bagon: {
         id: 'bagon', name: '寶貝龍', tier: 5, family: 'bagon',

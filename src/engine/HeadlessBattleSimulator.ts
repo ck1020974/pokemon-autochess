@@ -800,7 +800,7 @@ export class HeadlessBattleSimulator {
                         unit.stats.hp -= 1;
                         this.buffAttack(unit, buff, true);
                         if (!this.fireLogged.has(unit.id)) {
-                            this.log(`${unit.name} 燃盡全身的火焰！`);
+                            this.log(`${unit.name} 熱風全身的火焰！`);
                             this.fireLogged.add(unit.id);
                         }
                     }
