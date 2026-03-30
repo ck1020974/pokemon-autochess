@@ -1604,7 +1604,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
     aron: {
         id: 'aron', name: '可可多拉', tier: 4, family: 'aron',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
-        imageUrl: 'assets/可可多拉00.webp', battleImageUrl: 'assets/可多拉01.webp',
+        imageUrl: 'assets/可可多拉00.webp', battleImageUrl: 'assets/可可多拉01.webp',
         description: '戰鬥開始時生命永久 +1 並有著更高的生命上限。', synergies: ['Hard'], evolveId: 'lairon', maxHpCap: 60
     },
     lairon: {
