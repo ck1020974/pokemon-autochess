@@ -2212,28 +2212,31 @@ export class BattleSimulator {
             });
         }
 
-        // Spheal Family: Blizzard (Splash to backline)
+        // Spheal Family: Ice Body (Kill -> Random Allies Perm Buff)
         if (unit.family === 'spheal') {
-            this.eventBus.on('AFTER_ATTACK', async (e) => {
-                if (e.source === unit && e.target && unit.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-                    const { opTeam } = this.getTeams(unit);
-                    const targetIdx = opTeam.indexOf(e.target);
-                    if (targetIdx !== -1 && targetIdx + 1 < opTeam.length) {
-                        const backTarget = opTeam[targetIdx + 1];
-                        if (backTarget && backTarget.stats.hp > 0) {
-                            const ratio = unit.level === 3 ? 0.66 : (unit.level === 2 ? 0.50 : 0.33);
-                            const dmg = Math.ceil(unit.stats.attack * ratio);
-                            if (dmg > 0) {
-                                this.log(`${unit.name}對${backTarget.name}發動了暴風雪！`);
-                                if (typeof this.notifySkill === 'function') {
-                                    this.notifySkill(backTarget, '發動了暴風雪');
-                                }
-                                if (typeof this.playAnimation === 'function') {
-                                    this.playAnimation(backTarget, 'glow-blue', 600);
-                                }
-                                await this.dealDamage(unit, backTarget, dmg, true);
-                            }
-                        }
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (unit.stats.hp <= 0 || this.processedDeaths.has(unit.id) || e.source === unit || s?.isSilenced) return;
+                
+                if (e.context.killer === unit) {
+                    const { myTeam } = this.getTeams(unit);
+                    const living = myTeam.filter(u => u && u.stats.hp > 0);
+                    if (living.length > 0) {
+                        const targetCount = unit.level; // 1, 2, 3
+                        const hpBuff = 2;
+                        const atkBuff = 1;
+
+                        await this.notifySkill(unit, '冰凍之軀');
+
+                        const shuffled = [...living].sort(() => 0.5 - Math.random());
+                        const targets = shuffled.slice(0, targetCount);
+                        
+                        targets.forEach(target => {
+                            this.log(`${unit.name} 對 ${target.name} 發動了冰凍之軀，提高 1 攻擊與 2 生命！`);
+                            this.playTeamAnimation([target], 'glow-pale-blue', 1000);
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
+                            this.growUnit(target, hpBuff, atkBuff, '冰凍之軀', original, true);
+                        });
                     }
                 }
             });

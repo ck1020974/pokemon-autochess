@@ -1551,19 +1551,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'spheal', name: '海豹球', tier: 3, family: 'spheal',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/海豹球00.webp', battleImageUrl: 'assets/海豹球01.webp',
-        description: '攻擊時，同時對後方敵方造成 33% 傷害。', synergies: ['Water', 'Snow'], evolveId: 'spheal_2'
+        description: '擊殺敵方後，隨機 1 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Snow'], evolveId: 'spheal_2'
     },
     spheal_2: {
         id: 'spheal_2', name: '海魔獅', tier: 3, family: 'spheal',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/海魔獅00.webp', battleImageUrl: 'assets/海魔獅01.webp',
-        description: '攻擊時，同時對後方敵方造成 50% 傷害。', synergies: ['Water', 'Snow'], evolveId: 'spheal_3', isHiddenFromShop: true
+        description: '擊殺敵方後，隨機 2 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Snow'], evolveId: 'spheal_3', isHiddenFromShop: true
     },
     spheal_3: {
         id: 'spheal_3', name: '帝牙海獅', tier: 3, family: 'spheal',
         baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/帝牙海獅00.webp', battleImageUrl: 'assets/帝牙海獅01.webp',
-        description: '攻擊時，同時對後方敵方造成 66% 傷害。', synergies: ['Water', 'Snow'], isHiddenFromShop: true
+        description: '擊殺敵方後，隨機 3 位友軍永久 +1 攻擊與 +2 生命。', synergies: ['Water', 'Snow'], isHiddenFromShop: true
     },
     bagon: {
         id: 'bagon', name: '寶貝龍', tier: 5, family: 'bagon',
