@@ -1546,7 +1546,7 @@ export class BattleSimulator {
                         const targets = shuffled.slice(0, targetCount);
                         targets.forEach(target => {
                             this.log(`${unit.name} 對 ${target.name} 發動了成長。`);
-                            this.playTeamAnimation([target], 'glow-pale-blue', 500);
+                            this.playTeamAnimation([target], 'glow-pale-green', 500);
                             const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
                             const isAtk = Math.random() < 0.5;
                             this.growUnit(target, isAtk ? 0 : 2, isAtk ? 2 : 0, '成長', original, true);
