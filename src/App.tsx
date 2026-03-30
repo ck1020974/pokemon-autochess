@@ -562,38 +562,22 @@ function App() {
             setHasLoaded(false);
             setLoadingProgress(0);
 
-            const loadAssets = async (urls: string[], isBackground: boolean = false, musicNames: string[] = []) => {
-                let loadedCount = 0;
-                const total = urls.length + musicNames.length;
-                if (total === 0) return;
-
-                const updateProgress = () => {
-                    loadedCount++;
-                    if (!isBackground) {
-                        setLoadingProgress(Math.floor((loadedCount / total) * 100));
-                    }
-                };
-
+            const loadImages = async (urls: string[]) => {
                 const imagePromises = urls.map(url => {
                     return new Promise((resolve) => {
                         const img = new Image();
                         img.src = url;
-                        const handleLoad = () => { updateProgress(); resolve(url); };
+                        const handleLoad = () => resolve(url);
                         img.onload = handleLoad;
                         img.onerror = handleLoad;
                     });
                 });
-
-                const musicPromises = musicNames.map(name => {
-                    return music.preload([name]).then(() => { updateProgress(); });
-                });
-
-                await Promise.all([...imagePromises, ...musicPromises]);
+                await Promise.all(imagePromises);
             };
 
-            // --- PHASE 2: 遊戲準備 (Tier 1-2 & Novice Trainers) ---
+            // --- PHASE 2: 核心遊玩資源 (Tier 1-2, 初階對手, 獎勵, 核心音樂) ---
             const phase2Urls = new Set<string>();
-            const phase2Music = ['level up', 'recover', 'gymfight', 'gymwin', 'pokemonmart', 'pokemoncenter'];
+            const phase2Music = ['pokemonmart', 'gymfight', 'gymwin', 'pokemoncenter', 'recover', 'level up'];
 
             Object.values(ALL_UNITS).forEach(t => {
                 if (t.tier <= 2 || t.id === 'sprout') {
@@ -619,29 +603,43 @@ function App() {
                 if (reward.imageUrl) phase2Urls.add(reward.imageUrl);
             });
 
-            await loadAssets(Array.from(phase2Urls), false, phase2Music);
+            setLoadingProgress(20);
+            await loadImages(Array.from(phase2Urls));
+            setLoadingProgress(60);
+            await music.preload(phase2Music);
+
             setHasLoaded(true);
-            console.log(`[系統] ${activeEdition.name} 遊戲資源已就緒！`);
+            setLoadingProgress(100);
+            console.log(`[系統] ${activeEdition.name} 核心遊玩資源已就緒！`);
 
-            // --- PHASE 3: 完整體驗 (背景載入) ---
+            // --- PHASE 3: 背景漸進加載 (後期音樂與高階精靈) ---
+            // 延遲 2 秒開始，避免與剛開始的遊戲邏輯爭搶資源
             setTimeout(async () => {
-                const phase3Urls = new Set<string>();
-                const phase3Music: string[] = ['elitefourfight', 'elitefourwin', 'championfight', 'championwin', 'victoryroad'];
+                console.log(`[系統] 開始背景異步載入後期資源...`);
 
+                // 1. 先載入高階精靈圖片 (圖片負擔較小，先一次性處理)
+                const phase3Urls = new Set<string>();
                 Object.values(ALL_UNITS).forEach(t => {
                     if (t.tier > 2 && t.id !== 'sprout') {
                         if (t.imageUrl) phase3Urls.add(t.imageUrl);
                         if (t.battleImageUrl) phase3Urls.add(t.battleImageUrl);
                     }
                 });
-
                 [...activeEdition.intermOpponents, ...activeEdition.advancedOpponents, ...activeEdition.eliteOpponents, ...activeEdition.championOpponents].forEach((op: any) => {
                     if (op.url) phase3Urls.add(op.url);
                 });
+                await loadImages(Array.from(phase3Urls));
 
-                await loadAssets(Array.from(phase3Urls), true, phase3Music);
-                console.log(`[系統] ${activeEdition.name} 背景資源載入完成！`);
-            }, 1000);
+                // 2. 音樂文件分批次載入 (最關鍵的優化：每個間隔 1.5 秒，避免阻塞 Stream)
+                const phase3Music = ['victoryroad', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin'];
+                for (const m of phase3Music) {
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    await music.preload([m]);
+                    console.log(`[系統] 流暢解析完成: ${m}`);
+                }
+
+                console.log(`[系統] 所有資源背景載入完成。`);
+            }, 2000);
         };
 
         loadEditionAssets();
@@ -786,7 +784,18 @@ function App() {
     }, [game.phase, game]);
 
     useEffect(() => {
+        if (showOpponentSelect) {
+            music.play('victoryroad', true);
+            return;
+        }
+
         if (game.phase === GamePhase.BATTLE) {
+            setBattleElapsedSeconds(0);
+        } else if (game.phase === GamePhase.REWARD) {
+            music.play('pokemoncenter', true);
+            setBattleElapsedSeconds(0);
+        } else if (game.phase === GamePhase.POOL_SELECTION) {
+            music.play('pokemonmart', true);
             setBattleElapsedSeconds(0);
         } else if (game.phase === GamePhase.SHOP && difficulty) {
             setBattleElapsedSeconds(0);
@@ -812,7 +821,7 @@ function App() {
         } else {
             setBattleElapsedSeconds(0);
         }
-    }, [game.phase, difficulty, game]);
+    }, [game.phase, difficulty, game, showOpponentSelect]);
 
     // Timer loop for timeout (using elapsed seconds for pause sync)
     useEffect(() => {
@@ -915,7 +924,7 @@ function App() {
                         activeEdition.advancedOpponents.find((e: any) => e.id === selectedOpponent.id) ||
                         activeEdition.intermOpponents.find((g: any) => g.id === selectedOpponent.id) ||
                         activeEdition.noviceOpponents.find((n: any) => n.id === selectedOpponent.id);
-                    
+
                     if (def) {
                         // bossLevel for Core Units
                         let bossLevel = enemyBaseLevel;
@@ -1652,11 +1661,7 @@ function App() {
         game.applyReward(reward);
         setRewardChoices([]); // Clear UI state immediately
 
-        // Return to Shop music if game is continuing
-        if (game.phase !== GamePhase.VICTORY && game.phase !== GamePhase.GAME_OVER) {
-            music.play('pokemonmart', true);
-        }
-
+        // Return to Shop logic: Handled by centralized BGM effect
         update();
     };
 
