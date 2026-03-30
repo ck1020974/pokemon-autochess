@@ -62,7 +62,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'blastoise', name: '水箭龜', tier: 1, family: 'squirtle',
         baseStats: { hp: 2, maxHp: 2, attack: 2 },
         imageUrl: 'assets/水箭龜00.webp', battleImageUrl: 'assets/水箭龜01.webp',
-        description: '受到的傷害減少 3 (最低為 1)。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
+        description: '受到的傷害減少 5 (最低為 1)。', synergies: ['Starter', 'Water'], isHiddenFromShop: true
     },
 
     // 4. Gastly
@@ -448,7 +448,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'slowbro', name: '呆殼獸', tier: 3, family: 'slowpoke',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/呆殼獸00.webp', battleImageUrl: 'assets/呆殼獸01.webp',
-        description: '首次受傷後，回復 33％ 生命。', synergies: ['Water', 'Psychic'], evolveId: 'slowbro_final', isHiddenFromShop: true
+        description: '首次受傷後，回復 50％ 生命。', synergies: ['Water', 'Psychic'], evolveId: 'slowbro_final', isHiddenFromShop: true
     },
     slowbro_final: {
         id: 'slowbro_final', name: '呆殼獸', tier: 3, family: 'slowpoke',

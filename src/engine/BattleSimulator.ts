@@ -1199,7 +1199,7 @@ export class BattleSimulator {
                     (source && source.family === 'sableye' && sourceState.isAbsoluteKill);
 
                 if (e.target === unit && !s?.isSilenced && !isBypassing) {
-                    const reduction = [0, 1, 2, 3][unit.level] || 1;
+                    const reduction = [0, 1, 2, 5][unit.level] || 1;
                     const oldAmt = e.context.amount;
                     if (oldAmt > 1) {
                         const newAmt = Math.max(1, oldAmt - reduction);
@@ -1348,7 +1348,7 @@ export class BattleSimulator {
                 if (e.target === unit && !this.unitStates.get(unit)?.isSilenced) {
                     const state = this.unitStates.get(unit) || {};
                     if (!state.slowpokeHealUsed && unit.stats.hp > 0) {
-                        const percent = unit.level >= 3 ? 1.0 : 0.33;
+                        const percent = unit.level >= 3 ? 1.0 : (unit.level >= 2 ? 0.5 : 0.33);
                         const amount = Math.floor(unit.stats.maxHp * percent);
 
                         if (amount > 0) {
