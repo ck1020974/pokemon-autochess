@@ -259,12 +259,8 @@ export class GameLoop {
 
         this.playerTeam.forEach(u => {
             if (!u) return;
-            const tpl = ALL_UNITS[u.templateId];
-            const baseMaxHpCap = (tpl as any).maxHpCap || 50;
-            const baseAttackCap = (tpl as any).attackCap || 50;
-
-            u.maxHpCap = Math.max(baseMaxHpCap, globalHpCap);
-            u.attackCap = Math.max(baseAttackCap, globalAtkCap);
+            u.maxHpCap = Math.max(u.maxHpCap, globalHpCap);
+            u.attackCap = Math.max(u.attackCap, globalAtkCap);
             u.capStats();
         });
     }
@@ -1423,6 +1419,8 @@ export class GameLoop {
         clone.scalingValue = unit.scalingValue;
         clone.battlesCount = unit.battlesCount;
         clone.hasNewPermanentBuff = unit.hasNewPermanentBuff;
+        clone.maxHpCap = unit.maxHpCap;
+        clone.attackCap = unit.attackCap;
 
         return clone;
     }

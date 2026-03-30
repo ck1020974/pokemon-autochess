@@ -2779,8 +2779,19 @@ function App() {
                     {(() => {
                         if (game.phase === GamePhase.BATTLE && simulatorRef.current) {
                             return Array.from(simulatorRef.current.playerSynergies.entries())
-                                .map(([id, count]) => ({ ...SYNERGIES[id], count, units: [], activeTemplateIds: new Set(), activeFamilies: new Set() }))
-                                .filter(s => s.count > 0 && s.name);
+                                .map((entry: any) => {
+                                    const id = entry[0];
+                                    const count = entry[1];
+                                    const syn = SYNERGIES[id];
+                                    return { ...syn, count, units: [], activeTemplateIds: new Set<string>(), activeFamilies: new Set<string>(), isActive: count >= syn.tiers[0] };
+                                })
+                                .filter(s => s.count > 0 && s.name)
+                                .sort((a, b) => {
+                                    if (a.isActive && !b.isActive) return -1;
+                                    if (!a.isActive && b.isActive) return 1;
+                                    if (a.count !== b.count) return b.count - a.count;
+                                    return a.id.localeCompare(b.id);
+                                });
                         }
                         return synergyStatus;
                     })().map(syn => (
@@ -2805,8 +2816,19 @@ function App() {
                         {(() => {
                             if (game.phase === GamePhase.BATTLE && simulatorRef.current) {
                                 return Array.from(simulatorRef.current.enemySynergies.entries())
-                                    .map(([id, count]) => ({ ...SYNERGIES[id], count, units: [], activeTemplateIds: new Set(), activeFamilies: new Set() }))
-                                    .filter(s => s.count > 0 && s.name);
+                                    .map((entry: any) => {
+                                        const id = entry[0];
+                                        const count = entry[1];
+                                        const syn = SYNERGIES[id];
+                                        return { ...syn, count, units: [], activeTemplateIds: new Set<string>(), activeFamilies: new Set<string>(), isActive: count >= syn.tiers[0] };
+                                    })
+                                    .filter(s => s.count > 0 && s.name)
+                                    .sort((a, b) => {
+                                        if (a.isActive && !b.isActive) return -1;
+                                        if (!a.isActive && b.isActive) return 1;
+                                        if (a.count !== b.count) return b.count - a.count;
+                                        return a.id.localeCompare(b.id);
+                                    });
                             }
                             return getSynergyStatus(initialEnemyTeam.length > 0 ? initialEnemyTeam : (displayEnemyTeam || []), activeEdition);
                         })().map(syn => (

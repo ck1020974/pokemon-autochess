@@ -1791,17 +1791,15 @@ export class BattleSimulator {
                 if (s?.isSilenced || e.source !== unit) return;
 
                 const { opTeam } = this.getTeams(unit);
-                const dmg = unit.scalingValue || 1;
-                const living = opTeam.filter(u => u && u.stats.hp > 0);
+                // Robust targeting: Find the first enemy in opTeam that is not null and has HP > 0
+                const target = opTeam.find(u => u && u.stats.hp > 0);
 
-                if (living.length > 0) {
-                    const target = living[0]; // Always hit the first enemy
-                    if (target) {
-                        await this.notifySkill(unit, '波導彈！');
-                        this.log(`${unit.name} 對 ${target.name} 發動了波導彈！`);
-                        this.playAnimation(target, 'glow-white', 300);
-                        await this.dealDamage(unit, target, dmg, true, true);
-                    }
+                if (target) {
+                    const dmg = unit.scalingValue || 1;
+                    await this.notifySkill(unit, '波導彈！');
+                    this.log(`${unit.name} 對 ${target.name} 發動了波導彈！`);
+                    this.playAnimation(target, 'glow-white', 300);
+                    await this.dealDamage(unit, target, dmg, true, true);
                 }
             });
         }
