@@ -1632,6 +1632,78 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         imageUrl: 'assets/克雷色利亞00.webp', battleImageUrl: 'assets/克雷色利亞01.webp',
         description: '戰鬥開始時，我方全體生命 + 5 ；我方全體有著更高的生命上限。', synergies: ['Psychic'],
         providedMaxHpCap: 60
+    },
+    cetoddle: {
+        id: 'cetoddle', name: '走鯨', tier: 3, family: 'cetoddle',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/走鯨00.webp', battleImageUrl: 'assets/走鯨01.webp',
+        description: '首次受到的傷害減少 33%。', synergies: ['Snow', 'Charm'], evolveId: 'cetitan'
+    },
+    cetitan: {
+        id: 'cetitan', name: '浩大鯨', tier: 3, family: 'cetoddle',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/浩大鯨00.webp', battleImageUrl: 'assets/浩大鯨01.webp',
+        description: '首次受到的傷害減少 50%。', synergies: ['Snow', 'Angry'], evolveId: 'cetitan_final', isHiddenFromShop: true
+    },
+    cetitan_final: {
+        id: 'cetitan_final', name: '浩大鯨', tier: 3, family: 'cetoddle',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/浩大鯨00.webp', battleImageUrl: 'assets/浩大鯨01.webp',
+        description: '首次受到的傷害減少 50%。', synergies: ['Snow', 'Angry'], isHiddenFromShop: true
+    },
+    noibat: {
+        id: 'noibat', name: '嗡蝠', tier: 3, family: 'noibat',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/嗡蝠00.webp', battleImageUrl: 'assets/嗡蝠01.webp',
+        description: '首次攻擊的傷害增加 33%。', synergies: ['Roost', 'Outrage'], evolveId: 'noivern'
+    },
+    noivern: {
+        id: 'noivern', name: '音波龍', tier: 3, family: 'noibat',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/音波龍00.webp', battleImageUrl: 'assets/音波龍01.webp',
+        description: '首次攻擊的傷害增加 50%。', synergies: ['Roost', 'Outrage'], evolveId: 'noivern_final', isHiddenFromShop: true
+    },
+    noivern_final: {
+        id: 'noivern_final', name: '音波龍', tier: 3, family: 'noibat',
+        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        imageUrl: 'assets/音波龍00.webp', battleImageUrl: 'assets/音波龍01.webp',
+        description: '首次攻擊的傷害增加 50%。', synergies: ['Roost', 'Outrage'], isHiddenFromShop: true
+    },
+    cutiefly: {
+        id: 'cutiefly', name: '萌虻', tier: 2, family: 'cutiefly',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/萌虻00.webp', battleImageUrl: 'assets/萌虻01.webp',
+        description: '攻擊前使目標 -1攻擊 (最低為 1)。', synergies: ['BugBite', 'Charm'], evolveId: 'ribombee'
+    },
+    ribombee: {
+        id: 'ribombee', name: '蝶結萌虻', tier: 2, family: 'cutiefly',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/蝶結萌虻00.webp', battleImageUrl: 'assets/蝶結萌虻01.webp',
+        description: '攻擊前使目標 -2攻擊 (最低為 1)。', synergies: ['BugBite', 'Charm'], evolveId: 'ribombee_final', isHiddenFromShop: true
+    },
+    ribombee_final: {
+        id: 'ribombee_final', name: '蝶結萌虻', tier: 2, family: 'cutiefly',
+        baseStats: { hp: 3, maxHp: 3, attack: 3 },
+        imageUrl: 'assets/蝶結萌虻00.webp', battleImageUrl: 'assets/蝶結萌虻01.webp',
+        description: '攻擊前使目標 -3攻擊 (最低為 1)。', synergies: ['BugBite', 'Charm'], isHiddenFromShop: true
+    },
+    slakoth: {
+        id: 'slakoth', name: '懶人獺', tier: 5, family: 'slakoth',
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        imageUrl: 'assets/懶人獺00.webp', battleImageUrl: 'assets/懶人獺01.webp',
+        description: '友軍擊殺後，全體我方 +1 生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Normal'], evolveId: 'vigoroth'
+    },
+    vigoroth: {
+        id: 'vigoroth', name: '過動猿', tier: 5, family: 'slakoth',
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        imageUrl: 'assets/過動猿00.webp', battleImageUrl: 'assets/過動猿01.webp',
+        description: '友軍擊殺後，全體我方 +2 生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Normal', 'Angry'], evolveId: 'slaking', isHiddenFromShop: true
+    },
+    slaking: {
+        id: 'slaking', name: '請假王', tier: 5, family: 'slakoth',
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        imageUrl: 'assets/請假王00.webp', battleImageUrl: 'assets/請假王01.webp',
+        description: '友軍擊殺後，全體我方 +5 生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
     }
 };
 
@@ -1720,5 +1792,9 @@ export const PREFERRED_POSITIONS: Record<string, PreferredPosition> = {
     'shinx': 'ALL',
     'aron': 'FRONT',
     'darkrai': 'ALL',
-    'cresselia': 'ALL'
+    'cresselia': 'ALL',
+    'cetoddle': 'FRONT_MID',
+    'noibat': 'ALL',
+    'cutiefly': 'ALL',
+    'slakoth': 'ALL'
 };

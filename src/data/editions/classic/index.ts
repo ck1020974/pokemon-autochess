@@ -22,7 +22,8 @@ export const ClassicEdition: GameEdition = {
             'pichu', 'eevee', 'vulpix', 'bellsprout', 'psyduck', 'mareep',
             'cubone', 'murkrow', 'bonsly', 'happiny', 'larvitar', 'dratini', 'raikou', 'entei', 'suicune', 'delibird', 'shuckle', 'riolu',
             'cramorant', 'comfey', 'mawile', 'grubbin', 'croagunk', 'munna', 'wooper', 'pumpkaboo', 'growlithe', 'swablu', 'plusle', 'minun', 'gulpin',
-            'trapinch', 'pawmi', 'spheal', 'bagon', 'shinx', 'aron', 'darkrai', 'cresselia'
+            'trapinch', 'pawmi', 'spheal', 'bagon', 'shinx', 'aron', 'darkrai', 'cresselia',
+            'cetoddle', 'noibat', 'cutiefly', 'slakoth'
         ];
         return !u.family || !excludedFamilies.includes(u.family);
     }),

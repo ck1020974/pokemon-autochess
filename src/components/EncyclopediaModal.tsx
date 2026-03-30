@@ -48,19 +48,19 @@ const SYNERGY_PRIORITY = [
     'Water',        // 潮旋 (6)
     'Charge',       // 電光 (7)
     'BugBite',      // 蟲咬 (8)
-    'Cave',         // 挖洞 (8)
-    'Angry',        // 憤怒 (9)
-    'Triplets',     // 三胞胎 (10)
+    'Snow',         // 降雪 (9)
+    'Charm',        // 撒嬌 (10)
     'Psychic',      // 念力 (11)
-    'Snow',         // 降雪 (12)
-    'Thief',        // 小偷 (13)
-    'Trick',        // 戲法 (15)
-    'SwordDance',   // 劍舞 (16)
-    'Hard',         // 堅硬 (17)
-    'Charm',        // 撒嬌 (18)
+    'Triplets',     // 三胞胎 (12)
+    'Cave',         // 挖洞 (13)
+    'Hard',         // 堅硬 (14)
+    'Angry',        // 憤怒 (15)
+    'Thief',        // 小偷 (16)
+    'Trick',        // 戲法 (17)
+    'SwordDance',   // 劍舞 (18)
     'BatonPass',    // 接棒 (19)
-    'Roost',        // 羽棲 (20) - Moved Up
-    'Outrage',      // 逆鱗 (21) - Moved Up
+    'Roost',        // 羽棲 (20)
+    'Outrage',      // 逆鱗 (21)
 ];
 
 const ENCYCLOPEDIA_VERSION = '2026-03-04-0105'; // 版本標記，用於協助使用者確認是否為最新版

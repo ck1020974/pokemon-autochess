@@ -1693,6 +1693,82 @@ export class HeadlessBattleSimulator {
             });
         }
 
+        // Cetoddle Family: Thick Fat (First damage reduction)
+        if (unit.family === 'cetoddle') {
+            this.eventBus.on('BEFORE_HURT', async (e) => {
+                const s = this.unitStates.get(unit) || {};
+                if (e.target === unit && unit.stats.hp > 0 && !s.isSilenced) {
+                    if (!s.thickFatUsed) {
+                        s.thickFatUsed = true;
+                        this.unitStates.set(unit, s);
+                        const reduction = unit.level === 3 ? 0.5 : (unit.level === 2 ? 0.5 : 0.33);
+                        const orig = e.context.amount;
+                        e.context.amount = Math.max(1, Math.ceil(orig * (1 - reduction)));
+                        this.log(`${unit.name} 發動了厚脂肪`);
+                    }
+                }
+            });
+        }
+
+        // Noibat Family: Infiltrator (First attack damage increased)
+        if (unit.family === 'noibat') {
+            this.eventBus.on('ON_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit) || {};
+                if (e.source === unit && unit.stats.hp > 0 && !s.isSilenced) {
+                    if (!s.infiltratorUsed) {
+                        s.infiltratorUsed = true;
+
+                        const ratio = unit.level === 3 ? 0.5 : (unit.level === 2 ? 0.5 : 0.33);
+                        const bonusDmg = Math.ceil(unit.stats.attack * ratio);
+                        s.infiltratorBonus = bonusDmg;
+
+                        this.unitStates.set(unit, s);
+                        unit.stats.attack += bonusDmg;
+                        this.log(`${unit.name} 發動了穿透`);
+                    }
+                }
+            });
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (e.source === unit && s?.infiltratorBonus > 0) {
+                    unit.stats.attack = Math.max(1, unit.stats.attack - s.infiltratorBonus);
+                    s.infiltratorBonus = 0;
+                    this.unitStates.set(unit, s);
+                }
+            });
+        }
+
+        // Cutiefly Family: Fairy Wind (Before attacking, reduce target attack)
+        if (unit.family === 'cutiefly') {
+            this.eventBus.on('ON_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit) || {};
+                if (e.source === unit && e.target && unit.stats.hp > 0 && !s.isSilenced) {
+                    const reduceAmount = unit.level === 3 ? 3 : (unit.level === 2 ? 2 : 1);
+                    e.target.stats.attack = Math.max(1, e.target.stats.attack - reduceAmount);
+                    this.log(`${unit.name} 對 ${e.target.name} 使用了妖精之風`);
+                }
+            });
+        }
+
+        // Slakoth Family: Slack Off (HP up on ally kill)
+        if (unit.family === 'slakoth') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (s?.isSilenced || unit.stats.hp <= 0) return;
+
+                const { myTeam } = this.getTeams(unit);
+                if (e.context?.killer && myTeam.includes(e.context.killer)) {
+                    const buffHp = unit.level === 3 ? 5 : (unit.level === 2 ? 2 : 1);
+                    this.log(`${unit.name} 發動了偷懶！`);
+                    for (const ally of myTeam) {
+                        if (ally && ally.stats.hp > 0) {
+                            this.growUnit(ally, buffHp, 0, null, true);
+                        }
+                    }
+                }
+            });
+        }
+
         // Bagon Family: Moxie (ATK up on ally kill)
         if (unit.family === 'bagon') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
