@@ -240,7 +240,16 @@ export class BattleSimulator {
     }
 
     private cloneUnit(unit: Unit): Unit {
-        const clone = new Unit(ALL_UNITS[unit.templateId]);
+        const template = ALL_UNITS[unit.templateId];
+        if (!template) {
+            console.error(`Missing template for ID: ${unit.templateId}. Falling back to rattata.`);
+            const fallback = new Unit(ALL_UNITS.rattata);
+            fallback.id = unit.id;
+            this.unitStates.set(fallback, {});
+            return fallback;
+        }
+
+        const clone = new Unit(template);
         clone.stats = { ...unit.stats };
         clone.level = unit.level;
         clone.exp = unit.exp;
@@ -2277,7 +2286,7 @@ export class BattleSimulator {
                         s.infiltratorBonus = bonusDmg;
 
                         this.unitStates.set(unit, s);
-                        unit.stats.attack += bonusDmg;
+                        // unit.stats.attack += bonusDmg; // REFACTORED: Don't modify panel directly
                         if (typeof this.notifySkill === 'function') {
                             this.notifySkill(unit, '發動了穿透');
                         }
@@ -2287,7 +2296,7 @@ export class BattleSimulator {
             this.eventBus.on('AFTER_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
                 if (e.source === unit && s?.infiltratorBonus > 0) {
-                    unit.stats.attack = Math.max(1, unit.stats.attack - s.infiltratorBonus);
+                    // unit.stats.attack = Math.max(1, unit.stats.attack - s.infiltratorBonus);
                     s.infiltratorBonus = 0;
                     this.unitStates.set(unit, s);
                 }
@@ -2398,7 +2407,15 @@ export class BattleSimulator {
         // BEFORE_ATTACK moved to simulateStep
 
         const attackPromises: Promise<any>[] = [];
-        const dmg = attacker.stats.attack;
+        let dmg = attacker.stats.attack;
+
+        // Apply Noibat/Noivern Infiltrator bonus
+        if (state?.infiltratorBonus) {
+            dmg += state.infiltratorBonus;
+        }
+
+        // Apply Global Stat Cap (e.g. 50, or 60/999 if Darkrai present)
+        dmg = Math.min(dmg, attacker.attackCap);
 
         // Base attack
         attackPromises.push(this.dealDamage(attacker, actualDefender, dmg, false));

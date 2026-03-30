@@ -140,7 +140,12 @@ export class HeadlessBattleSimulator {
 
     private cloneUnit(unit: Unit): Unit {
         const template = ALL_UNITS[unit.templateId];
-        if (!template) return unit;
+        if (!template) {
+            const fallback = new Unit(ALL_UNITS.rattata);
+            fallback.id = unit.id;
+            this.unitStates.set(fallback, {});
+            return fallback;
+        }
 
         const clone = new Unit(template);
         clone.id = unit.id; // PRESERVE ID
@@ -157,8 +162,9 @@ export class HeadlessBattleSimulator {
         clone.scalingValue = unit.scalingValue;
         clone.battlesCount = unit.battlesCount;
         clone.hasNewPermanentBuff = unit.hasNewPermanentBuff;
+        clone.maxHpCap = unit.maxHpCap;
+        clone.attackCap = unit.attackCap;
 
-        clone.capStats();
         this.unitStates.set(clone, {});
         return clone;
     }
@@ -1750,6 +1756,58 @@ export class HeadlessBattleSimulator {
             });
         }
 
+        // Cetoddle Family: Thick Fat (First damage reduction)
+        if (unit.family === 'cetoddle') {
+            this.eventBus.on('BEFORE_HURT', async (e) => {
+                const s = this.unitStates.get(unit) || {};
+                if (e.target === unit && unit.stats.hp > 0 && !s.isSilenced) {
+                    if (!s.thickFatUsed) {
+                        s.thickFatUsed = true;
+                        this.unitStates.set(unit, s);
+                        const reduction = unit.level === 3 ? 0.5 : (unit.level === 2 ? 0.5 : 0.33);
+                        const orig = e.context.amount;
+                        e.context.amount = Math.max(1, Math.ceil(orig * (1 - reduction)));
+                    }
+                }
+            });
+        }
+
+        // Noibat Family: Infiltrator (First attack damage increased)
+        if (unit.family === 'noibat') {
+            this.eventBus.on('ON_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit) || {};
+                if (e.source === unit && unit.stats.hp > 0 && !s.isSilenced) {
+                    if (!s.infiltratorUsed) {
+                        s.infiltratorUsed = true;
+                        const ratio = unit.level === 3 ? 0.5 : (unit.level === 2 ? 0.5 : 0.33);
+                        const bonusDmg = Math.ceil(unit.stats.attack * ratio);
+                        s.infiltratorBonus = bonusDmg;
+                        this.unitStates.set(unit, s);
+                    }
+                }
+            });
+            this.eventBus.on('AFTER_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (e.source === unit && s?.infiltratorBonus > 0) {
+                    s.infiltratorBonus = 0;
+                    this.unitStates.set(unit, s);
+                }
+            });
+        }
+
+        // Cutiefly Family: Fairy Wind (Before attacking, reduce target attack)
+        if (unit.family === 'cutiefly') {
+            this.eventBus.on('ON_ATTACK', async (e) => {
+                const s = this.unitStates.get(unit) || {};
+                if (e.source === unit && e.target && unit.stats.hp > 0 && !s.isSilenced) {
+                    const reduceAmount = unit.level === 3 ? 3 : (unit.level === 2 ? 2 : 1);
+                    if (e.target.family !== 'sneasel') {
+                        e.target.stats.attack = Math.max(1, e.target.stats.attack - reduceAmount);
+                    }
+                }
+            });
+        }
+
         // Slakoth Family: Slack Off (HP up on ally kill)
         if (unit.family === 'slakoth') {
             this.eventBus.on('AFTER_DEATH', async (e) => {
@@ -1792,9 +1850,17 @@ export class HeadlessBattleSimulator {
     public async performAttack(attacker: Unit, defender: Unit) {
         if (attacker.stats.hp <= 0 || defender.stats.hp <= 0) return;
 
+        const state = this.unitStates.get(attacker);
+        if (state?.isAttackSkipped) {
+            state.isAttackSkipped = false;
+            this.unitStates.set(attacker, state); // Update state after consuming
+            this.log(`${attacker.name} 處於混亂狀態不受控制`);
+            return;
+        }
+
         // Growlithe/Arcanine: Swift Redirect
         let actualDefender = defender;
-        if (attacker.family === 'growlithe' && !this.unitStates.get(attacker)?.isSilenced) {
+        if (attacker.family === 'growlithe' && !state?.isSilenced) {
             const { opTeam } = this.getTeams(attacker);
             const liveEnemies = opTeam.filter(u => u && u.stats.hp > 0);
             if (liveEnemies.length > 0) {
@@ -1811,20 +1877,16 @@ export class HeadlessBattleSimulator {
             }
         }
 
-        // Skip attack logic (e.g., Outrage confusion)
-        const state = this.unitStates.get(attacker);
-        if (state?.isAttackSkipped) {
-            state.isAttackSkipped = false;
-            this.unitStates.set(attacker, state); // Update state after consuming
-            this.log(`${attacker.name} 處於混亂狀態不受控制`);
-            return;
+        let dmg = attacker.stats.attack;
+        if (state?.infiltratorBonus) {
+            dmg += state.infiltratorBonus;
         }
+        dmg = Math.min(dmg, attacker.attackCap || 999);
 
         // Notify that an attack is starting
         await this.eventBus.emit({ type: 'ON_ATTACK', source: attacker, target: actualDefender, context: {} });
 
         await this.eventBus.emit({ type: 'BEFORE_ATTACK', source: attacker, target: actualDefender, context: {} });
-        const dmg = attacker.stats.attack;
         const promises = [this.dealDamage(attacker, actualDefender, dmg, false)];
         const s = this.unitStates.get(attacker);
 
