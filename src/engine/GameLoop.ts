@@ -21,7 +21,7 @@ export type GamePhase = typeof GamePhase[keyof typeof GamePhase];
 export class GameLoop {
     public turn: number = 1;
     public gold: number = 10;
-    public lives: number = 5;
+    public lives: number = 6;
     public wins: number = 0;
     public phase: GamePhase = GamePhase.SHOP;
     public lastResult: 'WIN' | 'LOSS' | 'DRAW' | null = null;
@@ -71,27 +71,11 @@ export class GameLoop {
     }
 
     public initInfinitePool() {
-        const available = this.edition.availableUnitIds;
-        const t1 = Object.values(ALL_UNITS).filter(u => u.tier === 1 && !u.isHiddenFromShop && available.includes(u.id));
-        const t2 = Object.values(ALL_UNITS).filter(u => u.tier === 2 && !u.isHiddenFromShop && available.includes(u.id));
-        const t3 = Object.values(ALL_UNITS).filter(u => u.tier === 3 && !u.isHiddenFromShop && available.includes(u.id));
-        const t4 = Object.values(ALL_UNITS).filter(u => u.tier === 4 && !u.isHiddenFromShop && available.includes(u.id));
-        const t5 = Object.values(ALL_UNITS).filter(u => u.tier === 5 && !u.isHiddenFromShop && available.includes(u.id));
-
-        const shuffle = (array: any[]) => {
-            const arr = [...array];
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        };
-
-        const pickedT1 = shuffle(t1).slice(0, 5).map(u => u.id);
-        const pickedT2 = shuffle(t2).slice(0, 5).map(u => u.id);
-        const pickedT3 = shuffle(t3).slice(0, 3).map(u => u.id);
-        const pickedT4 = shuffle(t4).slice(0, 3).map(u => u.id);
-        const pickedT5 = shuffle(t5).slice(0, 2).map(u => u.id);
+        const pickedT1 = ['bulbasaur', 'charmander', 'squirtle'];
+        const pickedT2 = ['chikorita', 'cyndaquil', 'totodile'];
+        const pickedT3 = ['treecko', 'torchic', 'mudkip'];
+        const pickedT4 = ['sprigatito', 'fuecoco', 'quaxly'];
+        const pickedT5: string[] = [];
 
         this.activePoolUnitIds = [...pickedT1, ...pickedT2, ...pickedT3, ...pickedT4, ...pickedT5];
     }
@@ -103,7 +87,14 @@ export class GameLoop {
             'ULTRA': 1.1,
             'MASTER': 1.5
         };
+        const initialLives = {
+            'NORMAL': 6,
+            'GREAT': 5,
+            'ULTRA': 4,
+            'MASTER': 3
+        };
         this.difficultyMultiplier = multipliers[level];
+        this.lives = initialLives[level];
         this.difficultyName = level;
     }
 
@@ -139,18 +130,12 @@ export class GameLoop {
         // Infinite Pool Selection (Progressive Schedule)
         if (this.edition.id === 'infinite') {
             const schedule: Record<number, { tier: number, count: number }[]> = {
-                1: [{ tier: 1, count: 2 }, { tier: 2, count: 2 }],
-                2: [{ tier: 1, count: 2 }, { tier: 2, count: 2 }],
-                3: [{ tier: 3, count: 2 }],
-                4: [{ tier: 3, count: 2 }],
-                5: [{ tier: 3, count: 2 }],
-                6: [{ tier: 4, count: 1 }],
-                7: [{ tier: 4, count: 1 }],
-                8: [{ tier: 4, count: 1 }],
-                9: [{ tier: 4, count: 1 }],
-                10: [{ tier: 5, count: 1 }],
-                11: [{ tier: 5, count: 1 }],
-                12: [{ tier: 5, count: 1 }]
+                1: [{ tier: 1, count: 4 }],
+                2: [{ tier: 2, count: 4 }],
+                3: [{ tier: 3, count: 3 }],
+                4: [{ tier: 3, count: 3 }],
+                6: [{ tier: 4, count: 4 }],
+                10: [{ tier: 5, count: 5 }]
             };
 
             if (schedule[this.turn] && !this.processedTurns.has(this.turn)) {
