@@ -689,7 +689,7 @@ export class GameLoop {
             }
         });
         if (maxRioluLevel > 0) {
-            const increment = maxRioluLevel >= 2 ? 2 : 1;
+            const increment = maxRioluLevel >= 3 ? 2 : 1;
             this.rioluN += increment;
             console.log(`利歐路家族技能增強！目前威力：${this.rioluN} (+${increment})`);
         }
