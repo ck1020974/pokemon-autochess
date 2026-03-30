@@ -716,8 +716,9 @@ export class BattleSimulator {
             const living = myTeam.filter(u => u && u.stats.hp > 0);
             if (living.length > 0) {
                 await this.notifySkill(unit, `發動了噩夢`);
+                const cap = unit.providedAttackCap || 60;
                 for (const u of living) {
-                    u.attackCap = Math.max(u.attackCap, 60);
+                    u.attackCap = Math.max(u.attackCap, cap);
                     this.buffAttack(u, 5, true);
                 }
             }
@@ -728,9 +729,10 @@ export class BattleSimulator {
             const living = myTeam.filter(u => u && u.stats.hp > 0);
             if (living.length > 0) {
                 await this.notifySkill(unit, `發動了新月之光`);
+                const cap = unit.providedMaxHpCap || 60;
                 for (const u of living) {
                     // Provide team-wide cap increase
-                    u.maxHpCap = Math.max(u.maxHpCap, 60);
+                    u.maxHpCap = Math.max(u.maxHpCap, cap);
                     // Temporary HP buff in combat ONLY, no target
                     this.growUnit(u, 5, 0, undefined, null, true);
                 }
@@ -1569,8 +1571,8 @@ export class BattleSimulator {
                         if (backEnemy && backEnemy.stats.hp > 0) {
                             // Stage 1: 1, Stage 2: 2, Stage 3: 5
                             const dmg = unit.templateId === 'arbok_final' ? 5 : (unit.templateId === 'arbok' ? 2 : 1);
-                            await this.notifySkill(unit, '毒針');
                             this.log(`${unit.name} 對 ${backEnemy.name} 發動了毒針！`);
+                            await this.delay(250);
                             await this.dealDamage(unit, backEnemy, dmg, true, true);
                             this.playAnimation(backEnemy, 'glow-white', 300);
                         }
@@ -1796,8 +1798,8 @@ export class BattleSimulator {
 
                 if (target) {
                     const dmg = unit.scalingValue || 1;
-                    await this.notifySkill(unit, '波導彈！');
                     this.log(`${unit.name} 對 ${target.name} 發動了波導彈！`);
+                    await this.delay(250);
                     this.playAnimation(target, 'glow-white', 300);
                     await this.dealDamage(unit, target, dmg, true, true);
                 }
@@ -2135,7 +2137,7 @@ export class BattleSimulator {
                         }
 
                         this.log(`${unit.name} 使用了噴出，重新召喚了 ${captured.name} ！`);
-                        await this.notifySkill(unit, `使用了噴出`);
+                        await this.delay(250);
 
                         await this.spawnUnit(myTeam, deathIdx, captured.templateId, captured.level, captured.stats.hp, captured.stats.attack, true);
                     }
@@ -2151,8 +2153,8 @@ export class BattleSimulator {
                     const opSide = side === 'player' ? 'enemy' : 'player';
                     const targetSynergies = opSide === 'player' ? this.playerSynergies : this.enemySynergies;
 
-                    await this.notifySkill(unit, `對敵方使用了萬聖夜`);
-                    this.log(`${unit.name}對敵方使用了萬聖夜！`);
+                    this.log(`${unit.name} 對敵方使用了萬聖夜！`);
+                    await this.delay(250);
 
                     // Commit the target to the persistant Halloween set
                     this.halloweenTargetSides.add(opSide);
@@ -2217,7 +2219,7 @@ export class BattleSimulator {
             this.eventBus.on('AFTER_DEATH', async (e) => {
                 const s = this.unitStates.get(unit);
                 if (unit.stats.hp <= 0 || this.processedDeaths.has(unit.id) || e.source === unit || s?.isSilenced) return;
-                
+
                 if (e.context.killer === unit) {
                     const { myTeam } = this.getTeams(unit);
                     const living = myTeam.filter(u => u && u.stats.hp > 0);
@@ -2226,17 +2228,18 @@ export class BattleSimulator {
                         const hpBuff = 2;
                         const atkBuff = 1;
 
-                        await this.notifySkill(unit, '冰凍之軀');
+                        await this.delay(100);
 
                         const shuffled = [...living].sort(() => 0.5 - Math.random());
                         const targets = shuffled.slice(0, targetCount);
-                        
+
                         targets.forEach(target => {
                             this.log(`${unit.name} 對 ${target.name} 發動了冰凍之軀，提高 1 攻擊與 2 生命！`);
                             this.playTeamAnimation([target], 'glow-pale-blue', 1000);
                             const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
                             this.growUnit(target, hpBuff, atkBuff, '冰凍之軀', original, true);
                         });
+                        await this.delay(150);
                     }
                 }
             });

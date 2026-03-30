@@ -252,15 +252,28 @@ export class GameLoop {
     public updateTeamCaps() {
         let globalAtkCap = 50;
         let globalHpCap = 50;
+
         this.playerTeam.forEach(u => {
-            if (u && u.family === 'darkrai') globalAtkCap = 60;
-            if (u && u.family === 'cresselia') globalHpCap = 60;
+            if (u) {
+                if (u.providedAttackCap) {
+                    globalAtkCap = Math.max(globalAtkCap, u.providedAttackCap);
+                }
+                if (u.providedMaxHpCap) {
+                    globalHpCap = Math.max(globalHpCap, u.providedMaxHpCap);
+                }
+            }
         });
 
         this.playerTeam.forEach(u => {
             if (!u) return;
-            u.maxHpCap = Math.max(u.maxHpCap, globalHpCap);
-            u.attackCap = Math.max(u.attackCap, globalAtkCap);
+            // Apply the highest available cap
+            u.maxHpCap = Math.max(50, globalHpCap);
+            u.attackCap = Math.max(50, globalAtkCap);
+            // Units like Shinx/Aron might have their own inherent higher cap
+            const template = ALL_UNITS[u.templateId];
+            if (template && template.attackCap) u.attackCap = Math.max(u.attackCap, template.attackCap);
+            if (template && template.maxHpCap) u.maxHpCap = Math.max(u.maxHpCap, template.maxHpCap);
+
             u.capStats();
         });
     }

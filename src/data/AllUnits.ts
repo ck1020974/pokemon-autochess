@@ -1623,13 +1623,15 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'darkrai', name: '達克萊伊', tier: 5, family: 'darkrai',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/達克萊伊00.webp', battleImageUrl: 'assets/達克萊伊01.webp',
-        description: '戰鬥開始時，我方全體攻擊 + 5 ；我方全體有著更高的攻擊上限。', synergies: ['Thief']
+        description: '戰鬥開始時，我方全體攻擊 + 5 ；我方全體有著更高的攻擊上限。', synergies: ['Thief'],
+        providedAttackCap: 60
     },
     cresselia: {
         id: 'cresselia', name: '克雷色利亞', tier: 5, family: 'cresselia',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/克雷色利亞00.webp', battleImageUrl: 'assets/克雷色利亞01.webp',
-        description: '戰鬥開始時，我方全體生命 + 5 ；我方全體有著更高的生命上限。', synergies: ['Psychic']
+        description: '戰鬥開始時，我方全體生命 + 5 ；我方全體有著更高的生命上限。', synergies: ['Psychic'],
+        providedMaxHpCap: 60
     }
 };
 

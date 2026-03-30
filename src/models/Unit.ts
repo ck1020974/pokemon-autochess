@@ -22,6 +22,8 @@ export interface UnitTemplate {
   abilityPower?: number; // Optional power value for specific abilities
   maxHpCap?: number; // Optional explicit HP cap
   attackCap?: number; // Optional explicit Attack cap
+  providedMaxHpCap?: number; // New: Provide HP cap to team
+  providedAttackCap?: number; // New: Provide Attack cap to team
 }
 
 export class Unit {
@@ -43,6 +45,8 @@ export class Unit {
   public hasNewPermanentBuff: boolean = false;
   public maxHpCap: number = 50; // New: Flexible HP cap
   public attackCap: number = 50; // New: Flexible Attack cap
+  public providedMaxHpCap?: number;
+  public providedAttackCap?: number;
 
   constructor(template: UnitTemplate) {
     this.id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
@@ -60,6 +64,8 @@ export class Unit {
     this._descriptionTemplate = template.description;
     this.maxHpCap = (template as any).maxHpCap || 50;
     this.attackCap = (template as any).attackCap || 50;
+    this.providedMaxHpCap = template.providedMaxHpCap;
+    this.providedAttackCap = template.providedAttackCap;
   }
 
   private _descriptionTemplate: string;
