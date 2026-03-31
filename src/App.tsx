@@ -177,14 +177,6 @@ function getSynergyStatus(team: (Unit | null | undefined)[], activeEdition: Game
 
         let count = familySet.size;
 
-        // Mew Bonus: +2 for its session-randomized synergies
-        const game = (window as any).game;
-        if (game && game.mewSynergies && game.mewSynergies.includes(synId)) {
-            const hasMew = teamUnits.some(u => u.family === 'mew');
-            if (hasMew) {
-                count += 1;
-            }
-        }
 
         // Eevee Family Special Counting Logic
         const eeveeFamilyUnits = potentialUnits.filter(u => u.family === 'eevee');

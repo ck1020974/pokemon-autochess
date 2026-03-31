@@ -1635,19 +1635,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
     },
     cetoddle: {
         id: 'cetoddle', name: '走鯨', tier: 3, family: 'cetoddle',
-        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/走鯨00.webp', battleImageUrl: 'assets/走鯨01.webp',
         description: '首次受到的傷害減少 33%。', synergies: ['Snow', 'Charm'], evolveId: 'cetitan'
     },
     cetitan: {
         id: 'cetitan', name: '浩大鯨', tier: 3, family: 'cetoddle',
-        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/浩大鯨00.webp', battleImageUrl: 'assets/浩大鯨01.webp',
         description: '首次受到的傷害減少 50%。', synergies: ['Snow', 'Angry'], evolveId: 'cetitan_final', isHiddenFromShop: true
     },
     cetitan_final: {
         id: 'cetitan_final', name: '浩大鯨', tier: 3, family: 'cetoddle',
-        baseStats: { hp: 3, maxHp: 3, attack: 5 },
+        baseStats: { hp: 5, maxHp: 5, attack: 3 },
         imageUrl: 'assets/浩大鯨00.webp', battleImageUrl: 'assets/浩大鯨01.webp',
         description: '首次受到的傷害減少 50%。', synergies: ['Snow', 'Angry'], isHiddenFromShop: true
     },
