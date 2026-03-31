@@ -1713,7 +1713,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         synergies: [] // 動態羈絆
     },
     mew_clone: {
-        id: 'mew_clone', name: '夢幻(分身)', tier: 5, family: 'mew',
+        id: 'mew_clone', name: '幻影', tier: 5, family: 'mew',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/夢幻00.webp', battleImageUrl: 'assets/夢幻01.webp',
         description: '夢幻的分身。',
