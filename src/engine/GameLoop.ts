@@ -137,13 +137,13 @@ export class GameLoop {
         // Infinite Pool Selection (Progressive Schedule)
         if (this.edition.id === 'infinite') {
             const schedule: Record<number, { tier: number, count: number }[]> = {
-                1: [{ tier: 1, count: 4 }],
-                2: [{ tier: 2, count: 4 }],
-                3: [{ tier: 3, count: 3 }],
-                4: [{ tier: 3, count: 3 }],
+                1: [{ tier: 1, count: 5 }],
+                2: [{ tier: 2, count: 5 }],
+                3: [{ tier: 3, count: 5 }],
                 6: [{ tier: 4, count: 4 }],
                 10: [{ tier: 5, count: 5 }]
             };
+
 
             if (schedule[this.turn] && !this.processedTurns.has(this.turn)) {
                 this.pendingPoolSelectionSteps = [...schedule[this.turn]];
