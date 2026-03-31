@@ -73,30 +73,23 @@ function constructBossTeam(boss: OpponentDefinition, stageId: string): Unit[] {
 }
 
 // --- 玩家陣容生成 (基於階段進度) ---
-function generatePlayerTeamForStage(stageId: string): Unit[] {
+function generatePlayerTeamForStage(stageId: string, enemyCount: number): Unit[] {
     const allTemplates = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
     const team: Unit[] = [];
 
-    let unitCount = 3;
+    let unitCount = enemyCount; // 用戶要求數量相同
     let maxLevel = 1;
-    let focusSynergy = false;
+    let focusSynergy = false; // 用戶要求全隨機
     let applyCarryBuff = false;
 
     if (stageId === 'Novice') {
-        unitCount = 3;
-        maxLevel = 2;
+        maxLevel = 1; // 既然是全隨機，且剛才測過 4 隻 1 星全勝，這裡也維持 1 星
     } else if (stageId === 'Intermediate') {
-        unitCount = 5;
         maxLevel = 2;
-        focusSynergy = true;
     } else if (stageId === 'Advanced') {
-        unitCount = 5;
         maxLevel = 3;
-        focusSynergy = true;
     } else if (stageId === 'Elite' || stageId === 'Champion') {
-        unitCount = 5;
         maxLevel = 3;
-        focusSynergy = true;
         applyCarryBuff = true;
     }
 
@@ -210,8 +203,9 @@ async function runStageBalanceSim() {
 
             for (let i = 0; i < SIMS_PER_BOSS; i++) {
                 try {
-                    const playerTeam = generatePlayerTeamForStage(stage.id);
                     const enemyTeam = constructBossTeam(boss, stage.id);
+                    const enemyCount = enemyTeam.filter(u => u !== null).length;
+                    const playerTeam = generatePlayerTeamForStage(stage.id, enemyCount);
 
                     const simulator = new HeadlessBattleSimulator(playerTeam, enemyTeam);
                     await simulator.init();
