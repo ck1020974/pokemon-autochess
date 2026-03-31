@@ -59,9 +59,14 @@ export class Unit {
     this.evolveId = template.evolveId;
     this.synergies = template.synergies || [];
     if (this.templateId === 'mew') {
-      const g = (window as any).game;
-      if (g && g.mewSynergies) {
-        this.synergies = [...g.mewSynergies];
+      if (typeof window !== 'undefined') {
+        const g = (window as any).game;
+        if (g && g.mewSynergies) {
+          this.synergies = [...g.mewSynergies];
+        }
+      } else {
+        // Headless environment fallback (e.g. simulation)
+        this.synergies = ['Starter', 'Normal', 'Ghost']; // Default for simulation
       }
     }
     this.family = template.family || template.id;
@@ -75,6 +80,10 @@ export class Unit {
   }
 
   private _descriptionTemplate: string;
+
+  public set description(val: string) {
+    this._descriptionTemplate = val;
+  }
 
   public get description(): string {
     let desc = this._descriptionTemplate;
@@ -92,10 +101,6 @@ export class Unit {
     desc = desc.replace(/\[(.*?)\]/g, '$1');
 
     return desc;
-  }
-
-  public set description(value: string) {
-    this._descriptionTemplate = value;
   }
 
 
