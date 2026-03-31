@@ -75,7 +75,7 @@ export class Shop {
                     });
 
                     tierTemplates.forEach(u => {
-                        const isLegendary = u.id === 'raikou' || u.id === 'entei' || u.id === 'suicune' || u.id === 'darkrai' || u.id === 'cresselia';
+                        const isLegendary = u.id === 'raikou' || u.id === 'entei' || u.id === 'suicune' || u.id === 'darkrai' || u.id === 'cresselia' || u.id === 'mew';
                         const isEevee = u.id === 'eevee';
 
                         let weight = isLegendary ? 1 : 3;

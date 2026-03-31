@@ -61,11 +61,18 @@ export class GameLoop {
     public activePoolUnitIds: string[] = [];
     public poolChoices: any[] = [];
     public bannedPoolUnitIds: string[] = [];
+    public mewSynergies: string[] = [];
     private processedTurns: Set<number> = new Set();
 
     constructor(edition?: GameEdition) {
         this.shop = new Shop();
         if (edition) this.edition = edition;
+
+        // Initialize Mew's random synergies for this session
+        const allSynIds = Object.keys(SYNERGIES);
+        const shuffled = [...allSynIds].sort(() => 0.5 - Math.random());
+        this.mewSynergies = shuffled.slice(0, 3);
+        console.log("本局夢幻隨機羈絆：", this.mewSynergies);
 
         (window as any).game = this; // Expose to window for UI dynamic descriptions
     }
@@ -380,6 +387,14 @@ export class GameLoop {
     public getUniqueCount(units: Unit[], synergyId?: string): number {
         const families = new Set(units.map(u => u.family));
         let count = families.size;
+
+        // Mew Bonus: +2 for its specific session synergies
+        if (synergyId && this.mewSynergies.includes(synergyId)) {
+            const hasMew = units.some(u => u.family === 'mew');
+            if (hasMew) {
+                count += 2;
+            }
+        }
 
         if (synergyId) {
             const evolvedEeveeUnits = units.filter(u => u.family === 'eevee' && u.templateId !== 'eevee');

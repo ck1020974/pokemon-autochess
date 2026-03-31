@@ -1701,9 +1701,30 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
     },
     slaking: {
         id: 'slaking', name: '請假王', tier: 5, family: 'slakoth',
-        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/請假王00.webp', battleImageUrl: 'assets/請假王01.webp',
         description: '友軍擊殺後，全體我方 +5 生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
+    },
+    mew: {
+        id: 'mew', name: '夢幻', tier: 5, family: 'mew',
+        baseStats: { hp: 15, maxHp: 15, attack: 15 },
+        imageUrl: 'assets/夢幻00.webp', battleImageUrl: 'assets/夢幻01.webp',
+        description: '遊戲開始時隨機獲得三個羈絆，並額外累積兩次羈絆數量。',
+        synergies: [] // 動態羈絆
+    },
+    absol: {
+        id: 'absol', name: '阿勃梭魯', tier: 5, family: 'absol',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: 'assets/阿勃梭魯00.webp', battleImageUrl: 'assets/阿勃梭魯01.webp',
+        description: '死亡時，召喚 1 隻只有 1 HP 的分身。',
+        synergies: ['Thief', 'SwordDance']
+    },
+    absol_shadow: {
+        id: 'absol_shadow', name: '影子分身', tier: 5, family: 'absol',
+        baseStats: { hp: 1, maxHp: 1, attack: 10 },
+        imageUrl: 'assets/阿勃梭魯00.webp', battleImageUrl: 'assets/阿勃梭魯01.webp',
+        description: '阿勃梭魯的分身。',
+        synergies: ['Thief', 'SwordDance'], isHiddenFromShop: true
     }
 };
 
@@ -1796,5 +1817,7 @@ export const PREFERRED_POSITIONS: Record<string, PreferredPosition> = {
     'cetoddle': 'FRONT_MID',
     'noibat': 'ALL',
     'cutiefly': 'ALL',
-    'slakoth': 'ALL'
+    'slakoth': 'ALL',
+    'mew': 'ALL',
+    'absol': 'ALL'
 };

@@ -2364,6 +2364,28 @@ export class BattleSimulator {
                 }
             });
         }
+
+        // Absol: Death -> Summon Shadow
+        if (unit.family === 'absol' && unit.templateId === 'absol') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                if (this.unitStates.get(unit)?.isSilenced) return;
+                if (e.source === unit) {
+                    const { myTeam } = this.getTeams(unit);
+                    let deathIdx = e.context.deathIdx;
+                    if (deathIdx === undefined || deathIdx === -1) {
+                        deathIdx = myTeam.indexOf(unit);
+                    }
+                    if (deathIdx === -1) {
+                        deathIdx = myTeam.findIndex(u => !u || u.stats.hp <= 0);
+                        if (deathIdx === -1) deathIdx = 0;
+                    }
+
+                    await this.notifySkill(unit, '發動了影子分身');
+                    // Summon 1 HP copy with current Attack of the unit
+                    await this.spawnUnit(myTeam, deathIdx, 'absol_shadow', 1, 1, unit.stats.attack, true);
+                }
+            });
+        }
     }
 
     public async performAttack(attacker: Unit, defender: Unit) {

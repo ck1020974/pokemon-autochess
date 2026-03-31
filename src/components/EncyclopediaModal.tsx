@@ -104,6 +104,7 @@ export function EncyclopediaModal({ onClose, activeEdition, activePoolUnitIds = 
                     if (u.id === 'suicune') return 3;
                     if (u.id === 'darkrai') return 4;
                     if (u.id === 'cresselia') return 5;
+                    if (u.id === 'mew') return 6;
                     return 0;
                 };
 
@@ -286,7 +287,7 @@ export function EncyclopediaModal({ onClose, activeEdition, activePoolUnitIds = 
                                         marginTop: '8px',
                                         flexWrap: 'wrap'
                                     }}>
-                                        {unit.synergies.map((s: string) => {
+                                        {((unit.id === 'mew' && (window as any).game?.mewSynergies) ? (window as any).game.mewSynergies : unit.synergies).map((s: string) => {
                                             const synergy = SYNERGIES[s];
                                             if (!synergy) return null;
 
@@ -295,11 +296,16 @@ export function EncyclopediaModal({ onClose, activeEdition, activePoolUnitIds = 
                                                 const isAvailable = activeEdition.availableUnitIds.includes(t.id);
                                                 const isEeveeFamily = t.family === 'eevee';
                                                 const isEeveeEdition = isEeveeFamily && activeEdition.availableUnitIds.includes('eevee');
-                                                if (!(isAvailable || isEeveeEdition) || t.id === 'sprout' || !t.synergies?.includes(s)) return false;
+                                                const isMewSyn = (t.id === 'mew' && (window as any).game?.mewSynergies?.includes(s));
+                                                if (!(isAvailable || isEeveeEdition) || t.id === 'sprout' || (!t.synergies?.includes(s) && !isMewSyn)) return false;
 
                                                 if (isEeveeFamily) return !t.id.endsWith('_final') && t.id !== 'eevee';
 
-                                                const familyUnitsWithSynergy = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id) && u.synergies?.includes(s));
+                                                const familyUnitsWithSynergy = Object.values(ALL_UNITS).filter(u => {
+                                                    const unitIsAvailable = activeEdition.availableUnitIds.includes(u.id);
+                                                    const unitIsMewSyn = (u.id === 'mew' && (window as any).game?.mewSynergies?.includes(s));
+                                                    return u.family === t.family && unitIsAvailable && (u.synergies?.includes(s) || unitIsMewSyn);
+                                                });
                                                 const firstWithSynergy = familyUnitsWithSynergy.sort((a, b) => getEvolutionIndex(a) - getEvolutionIndex(b) || a.tier - b.tier || a.id.localeCompare(b.id))[0];
                                                 return t.id === firstWithSynergy?.id;
                                             }).sort((a, b) => a.tier - b.tier);
@@ -339,7 +345,7 @@ export function EncyclopediaModal({ onClose, activeEdition, activePoolUnitIds = 
                                         <div className="encyclopedia-detail-title" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                                             {viewingTemplate.name}
                                             <div className="encyclopedia-detail-synergies" style={{ marginLeft: '10px' }}>
-                                                {[...viewingTemplate.synergies]
+                                                {[...((viewingTemplate.id.startsWith('mew') && (window as any).game?.mewSynergies) ? (window as any).game.mewSynergies : viewingTemplate.synergies)]
                                                     .sort((a, b) => SYNERGY_PRIORITY.indexOf(a) - SYNERGY_PRIORITY.indexOf(b))
                                                     .map(synId => {
                                                         const syn = SYNERGIES[synId];
@@ -350,11 +356,16 @@ export function EncyclopediaModal({ onClose, activeEdition, activePoolUnitIds = 
                                                             const isAvailable = activeEdition.availableUnitIds.includes(t.id);
                                                             const isEeveeFamily = t.family === 'eevee';
                                                             const isEeveeEdition = isEeveeFamily && activeEdition.availableUnitIds.includes('eevee');
-                                                            if (!(isAvailable || isEeveeEdition) || t.id === 'sprout' || !t.synergies?.includes(synId)) return false;
+                                                            const isMewSyn = (t.id === 'mew' && (window as any).game?.mewSynergies?.includes(synId));
+                                                            if (!(isAvailable || isEeveeEdition) || t.id === 'sprout' || (!t.synergies?.includes(synId) && !isMewSyn)) return false;
 
                                                             if (isEeveeFamily) return !t.id.endsWith('_final') && t.id !== 'eevee';
 
-                                                            const familyUnitsWithSynergy = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id) && u.synergies?.includes(synId));
+                                                            const familyUnitsWithSynergy = Object.values(ALL_UNITS).filter(u => {
+                                                                const unitIsAvailable = activeEdition.availableUnitIds.includes(u.id);
+                                                                const unitIsMewSyn = (u.id === 'mew' && (window as any).game?.mewSynergies?.includes(synId));
+                                                                return u.family === t.family && unitIsAvailable && (u.synergies?.includes(synId) || unitIsMewSyn);
+                                                            });
                                                             const firstWithSynergy = familyUnitsWithSynergy.sort((a, b) => getEvolutionIndex(a) - getEvolutionIndex(b) || a.tier - b.tier || a.id.localeCompare(b.id))[0];
                                                             return t.id === firstWithSynergy?.id;
                                                         }).sort((a, b) => a.tier - b.tier);

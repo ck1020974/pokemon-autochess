@@ -58,6 +58,12 @@ export class Unit {
     this.battleImageUrl = template.battleImageUrl;
     this.evolveId = template.evolveId;
     this.synergies = template.synergies || [];
+    if (this.templateId === 'mew') {
+      const g = (window as any).game;
+      if (g && g.mewSynergies) {
+        this.synergies = [...g.mewSynergies];
+      }
+    }
     this.family = template.family || template.id;
     this.abilityPower = template.abilityPower || 0;
     this.scalingValue = (template as any).scalingValue || 1;

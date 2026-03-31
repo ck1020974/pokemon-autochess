@@ -177,6 +177,15 @@ function getSynergyStatus(team: (Unit | null | undefined)[], activeEdition: Game
 
         let count = familySet.size;
 
+        // Mew Bonus: +2 for its session-randomized synergies
+        const game = (window as any).game;
+        if (game && game.mewSynergies && game.mewSynergies.includes(synId)) {
+            const hasMew = teamUnits.some(u => u.family === 'mew');
+            if (hasMew) {
+                count += 2;
+            }
+        }
+
         // Eevee Family Special Counting Logic
         const eeveeFamilyUnits = potentialUnits.filter(u => u.family === 'eevee');
         if (eeveeFamilyUnits.length > 0) {
@@ -204,7 +213,8 @@ function getSynergyStatus(team: (Unit | null | undefined)[], activeEdition: Game
                 // Fix: Include evolved forms even if they are not in shop (isHiddenFromShop)
                 const isEeveeEdition = isEeveeFamily && activeEdition.availableUnitIds.includes('eevee');
                 const isAvailable = activeEdition.availableUnitIds.includes(t.id) || isEeveeEdition;
-                if (!t.synergies?.includes(syn.id) || !(baseCondition || isEeveeFamily) || !isAvailable) return false;
+                const isMewSyn = (t.id === 'mew' && (window as any).game?.mewSynergies?.includes(syn.id));
+                if ((!t.synergies?.includes(syn.id) && !isMewSyn) || !(baseCondition || isEeveeFamily) || !isAvailable) return false;
 
                 // For Families (except Eevee), only show the most "basic" representative that has the synergy
                 // For Eevee, show ALL unique evolved forms related to this synergy
@@ -215,7 +225,10 @@ function getSynergyStatus(team: (Unit | null | undefined)[], activeEdition: Game
                 }
 
                 const familyUnits = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id));
-                const unitsWithSyn = familyUnits.filter(u => u.synergies?.includes(syn.id));
+                const unitsWithSyn = familyUnits.filter(u => {
+                    const unitIsMewSyn = (u.id === 'mew' && (window as any).game?.mewSynergies?.includes(syn.id));
+                    return u.synergies?.includes(syn.id) || unitIsMewSyn;
+                });
 
                 const getStageDepth = (uId: string) => {
                     let depth = 0;
