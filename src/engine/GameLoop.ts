@@ -392,7 +392,7 @@ export class GameLoop {
         if (synergyId && this.mewSynergies.includes(synergyId)) {
             const hasMew = units.some(u => u.family === 'mew');
             if (hasMew) {
-                count += 2;
+                count += 1;
             }
         }
 

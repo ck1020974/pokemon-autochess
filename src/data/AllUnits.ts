@@ -1709,7 +1709,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'mew', name: '夢幻', tier: 5, family: 'mew',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/夢幻00.webp', battleImageUrl: 'assets/夢幻01.webp',
-        description: '遊戲開始時隨機獲得三個羈絆，並額外累積兩次羈絆數量。',
+        description: '遊戲開始時隨機獲得三個羈絆，並額外累積所有羈絆數量。',
         synergies: [] // 動態羈絆
     },
     absol: {

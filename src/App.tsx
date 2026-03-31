@@ -182,7 +182,7 @@ function getSynergyStatus(team: (Unit | null | undefined)[], activeEdition: Game
         if (game && game.mewSynergies && game.mewSynergies.includes(synId)) {
             const hasMew = teamUnits.some(u => u.family === 'mew');
             if (hasMew) {
-                count += 2;
+                count += 1;
             }
         }
 
