@@ -86,7 +86,7 @@ function generatePlayerTeamForStage(stageId: string): Unit[] {
         unitCount = 3;
         maxLevel = 2;
     } else if (stageId === 'Intermediate') {
-        unitCount = 4;
+        unitCount = 5;
         maxLevel = 2;
         focusSynergy = true;
     } else if (stageId === 'Advanced') {
@@ -124,14 +124,14 @@ function generatePlayerTeamForStage(stageId: string): Unit[] {
         const u = new Unit(t);
         let level = 1;
         if (maxLevel === 2) {
-            level = Math.random() < 0.4 ? 2 : 1;
+            level = Math.random() < 0.7 ? 2 : 1; // 提高二星比例
         } else if (maxLevel === 3) {
             if (stageId === 'Elite' || stageId === 'Champion') {
-                level = Math.random() < 0.8 ? 3 : 2;
+                level = Math.random() < 0.85 ? 3 : 2; // 四天王戰力維持
             } else {
                 const r = Math.random();
-                if (r < 0.3) level = 3;
-                else if (r < 0.8) level = 2;
+                if (r < 0.4) level = 3; // 提高三星比例
+                else if (r < 0.9) level = 2;
                 else level = 1;
             }
         }
