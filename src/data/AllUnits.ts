@@ -1709,8 +1709,15 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'mew', name: '夢幻', tier: 5, family: 'mew',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/夢幻00.webp', battleImageUrl: 'assets/夢幻01.webp',
-        description: '遊戲開始時隨機獲得三個羈絆，並額外累積所有羈絆數量。',
+        description: '隨機獲得三個羈絆，死亡後召喚 1 隻相同的分身。',
         synergies: [] // 動態羈絆
+    },
+    mew_clone: {
+        id: 'mew_clone', name: '夢幻(分身)', tier: 5, family: 'mew',
+        baseStats: { hp: 15, maxHp: 15, attack: 15 },
+        imageUrl: 'assets/夢幻00.webp', battleImageUrl: 'assets/夢幻01.webp',
+        description: '夢幻的分身。',
+        synergies: [], isHiddenFromShop: true
     },
     absol: {
         id: 'absol', name: '阿勃梭魯', tier: 5, family: 'absol',

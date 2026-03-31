@@ -2386,6 +2386,35 @@ export class BattleSimulator {
                 }
             });
         }
+
+        // Mew: Death -> Summon Clone
+        if (unit.family === 'mew' && unit.templateId === 'mew') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                const s = this.unitStates.get(unit);
+                if (s?.isSilenced || e.source !== unit) return;
+
+                const { myTeam } = this.getTeams(unit);
+                let deathIdx = e.context.deathIdx;
+                if (deathIdx === undefined || deathIdx === -1) {
+                    deathIdx = myTeam.indexOf(unit);
+                }
+                if (deathIdx === -1) {
+                    deathIdx = myTeam.findIndex(u => !u || u.stats.hp <= 0);
+                    if (deathIdx === -1) deathIdx = 0;
+                }
+
+                await this.notifySkill(unit, '發動了同步');
+                // Summon identical copy with same stats and level
+                const spawned = await this.spawnUnit(myTeam, deathIdx, 'mew_clone', unit.level, unit.stats.maxHp, unit.stats.attack, true);
+                if (spawned) {
+                    // Inherit synergies (important for dynamic Mew)
+                    spawned.synergies = [...unit.synergies];
+                    // Re-calculate to ensure UI and logic see the new synergies
+                    this.calculateCachedSynergies(Array.from(this.participantPlayerUnits), this.playerSynergies);
+                    this.calculateCachedSynergies(Array.from(this.participantEnemyUnits), this.enemySynergies);
+                }
+            });
+        }
     }
 
     public async performAttack(attacker: Unit, defender: Unit) {
@@ -2808,7 +2837,7 @@ export class BattleSimulator {
         target.stats.hp = Math.min(target.stats.hp + amount, target.stats.maxHp);
     }
 
-    private async spawnUnit(team: Unit[], index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false) {
+    private async spawnUnit(team: Unit[], index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false): Promise<Unit | undefined> {
         const template = ALL_UNITS[templateId];
         if (!template) return;
         const newUnit = new Unit(template);
@@ -2836,7 +2865,7 @@ export class BattleSimulator {
 
         if (livingUnits >= 5 && !isReplacingSlot) {
             this.log(`戰場已滿，無法再召喚！`);
-            return;
+            return undefined;
         }
 
         // Placement Logic: "若有空間即召喚"
@@ -2891,6 +2920,8 @@ export class BattleSimulator {
 
         // 4. Finally emit the event for others to react (e.g. Chikorita buffs)
         await this.eventBus.emit({ type: 'ON_FRIEND_SUMMONED', source: newUnit, context: {} });
+
+        return newUnit;
     }
 
     private async notifySkill(unit: Unit, message: string) {

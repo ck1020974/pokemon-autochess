@@ -388,13 +388,6 @@ export class GameLoop {
         const families = new Set(units.map(u => u.family));
         let count = families.size;
 
-        // Mew Bonus: +2 for its specific session synergies
-        if (synergyId && this.mewSynergies.includes(synergyId)) {
-            const hasMew = units.some(u => u.family === 'mew');
-            if (hasMew) {
-                count += 1;
-            }
-        }
 
         if (synergyId) {
             const evolvedEeveeUnits = units.filter(u => u.family === 'eevee' && u.templateId !== 'eevee');
