@@ -13,7 +13,7 @@ import {
 import type { OpponentDefinition } from '../data/AllOpponents';
 import { SYNERGIES } from '../models/Synergies';
 
-const SIMS_PER_BOSS = 500; // 測試次數
+const SIMS_PER_BOSS = 1000; // 測試次數
 const MAX_STEPS = 200;
 
 const STAGES = [
