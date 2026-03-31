@@ -123,6 +123,7 @@ export class BattleSimulator {
     }
 
     public async init() {
+        console.log(`[BattleSimulator] Initializing battle between ${this.playerTeam.length} player and ${this.enemyTeam.length} enemy units.`);
         this.spiritombTriggered.clear();
         this.lightScreenActivated.clear();
         this.processedDeaths.clear();
@@ -267,7 +268,8 @@ export class BattleSimulator {
     }
 
 
-    private async executeUnitStartOfBattleAbility(unit: Unit) {
+    public async executeUnitStartOfBattleAbility(unit: Unit) {
+        console.log(`[BattleSimulator] Executing start-of-battle ability for ${unit.name} (${unit.templateId}) Lv.${unit.level}`);
         if (unit.stats.hp <= 0) return;
 
         const { myTeam, opTeam, side } = this.getTeams(unit);

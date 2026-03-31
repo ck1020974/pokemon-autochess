@@ -1197,8 +1197,13 @@ function App() {
 
             let interval: ReturnType<typeof setInterval>;
             const initAndStart = async () => {
-                if (simulatorRef.current) await simulatorRef.current.init();
-                interval = setInterval(runBattleLoop, 1200 / battleSpeed);
+                try {
+                    if (simulatorRef.current) await simulatorRef.current.init();
+                    interval = setInterval(runBattleLoop, 1200 / battleSpeed);
+                } catch (err: any) {
+                    console.error("Battle Initialization Failed:", err);
+                    window.alert(`糟糕！戰鬥啟動失敗：\n${err.message}\n${err.stack}`);
+                }
             };
             initAndStart();
 
@@ -2810,6 +2815,10 @@ function App() {
                                     const id = entry[0];
                                     const count = entry[1];
                                     const syn = SYNERGIES[id];
+                                    if (!syn) {
+                                        console.warn(`Synergy ${id} not found in database!`);
+                                        return { id, name: id, icon: '❓', description: '缺失定義', tiers: [99], color: '#ccc', count, units: [], activeTemplateIds: new Set<string>(), activeFamilies: new Set<string>(), isActive: false };
+                                    }
                                     return { ...syn, count, units: [], activeTemplateIds: new Set<string>(), activeFamilies: new Set<string>(), isActive: count >= syn.tiers[0] };
                                 })
                                 .filter(s => s.count > 0 && s.name)
@@ -2847,6 +2856,10 @@ function App() {
                                         const id = entry[0];
                                         const count = entry[1];
                                         const syn = SYNERGIES[id];
+                                        if (!syn) {
+                                            console.warn(`Synergy ${id} not found in database!`);
+                                            return { id, name: id, icon: '❓', description: '缺失定義', tiers: [99], color: '#ccc', count, units: [], activeTemplateIds: new Set<string>(), activeFamilies: new Set<string>(), isActive: false };
+                                        }
                                         return { ...syn, count, units: [], activeTemplateIds: new Set<string>(), activeFamilies: new Set<string>(), isActive: count >= syn.tiers[0] };
                                     })
                                     .filter(s => s.count > 0 && s.name)

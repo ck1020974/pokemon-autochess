@@ -86,7 +86,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         imageUrl: 'assets/耿鬼00.webp',
         battleImageUrl: 'assets/耿鬼01.webp',
         description: '戰鬥開始時，我方全體永久 +3 攻擊。',
-        synergies: ['Ghost', 'Poison'],
+        synergies: ['Ghost'],
         family: 'gastly',
         isHiddenFromShop: true
     },
@@ -172,7 +172,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         imageUrl: 'assets/胖可丁00.webp',
         battleImageUrl: 'assets/胖可丁01.webp',
         description: '戰鬥開始時，我方全體永久 +3 生命。',
-        synergies: ['Normal', 'Fairy'],
+        synergies: ['Normal'],
         family: 'igglybuff',
         isHiddenFromShop: true
     },
