@@ -2243,7 +2243,7 @@ export class BattleSimulator {
                         const targets = shuffled.slice(0, targetCount);
 
                         targets.forEach(target => {
-                            this.log(`${unit.name} 對 ${target.name} 發動了冰凍之軀，提高 1 攻擊與 2 生命！`);
+                            this.log(`${target.name}發動了冰凍之軀！`);
                             this.playTeamAnimation([target], 'glow-pale-blue', 1000);
                             const original = this.originalPlayerTeam?.find(o => o && o.id === target.id);
                             this.growUnit(target, hpBuff, atkBuff, '冰凍之軀', original, true);
