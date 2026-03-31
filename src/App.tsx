@@ -2480,7 +2480,7 @@ function App() {
                                                 </div>
                                                 {game.playerTeam.map((u: any, i: number) => {
                                                     if (!u) return <div key={i} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.03)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.1)' }} />;
-                                                    const img00 = u.imageUrl.replace('01.webp', '00.webp');
+                                                    const img00 = u.imageUrl ? u.imageUrl.replace('01.webp', '00.webp') : '';
                                                     return (
                                                         <div key={i} className={`summary-unit-card ${activeSyn && u && activeSyn.activeTemplateIds?.has(u.templateId) ? 'synergy-highlight' : ''}`}>
                                                             {mvp?.id === u.id && <div className="mvp-badge"> MVP</div>}
@@ -2488,10 +2488,10 @@ function App() {
                                                                 <img
                                                                     src={img00}
                                                                     className="summary-unit-img"
-                                                                    alt={u.speciesName}
+                                                                    alt={u.name}
                                                                 />
                                                             </div>
-                                                            <div className="summary-unit-name">{u.speciesName}</div>
+                                                            <div className="summary-unit-name">{u.name}</div>
                                                             <div className="unit-stats" style={{ marginTop: '5px' }}>
                                                                 <span className="stat-atk">{u.stats.attack}</span>
                                                                 <span className="stat-hp">{u.stats.hp}</span>
@@ -2524,18 +2524,18 @@ function App() {
                                                         </div>
                                                         {game.opponentTeam.map((u: any, i: number) => {
                                                             if (!u) return <div key={`enemy-${i}`} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.01)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.05)' }} />;
-                                                            const img00 = u.imageUrl.replace('01.webp', '00.webp');
+                                                            const img00 = u.imageUrl ? u.imageUrl.replace('01.webp', '00.webp') : '';
                                                             return (
                                                                 <div key={`enemy-${i}`} className={`summary-unit-card ${activeSyn && u && activeSyn.activeTemplateIds?.has(u.templateId) ? 'synergy-highlight' : ''}`}>
                                                                     <div className="summary-unit-img-wrapper">
                                                                         <img
                                                                             src={img00}
                                                                             className="summary-unit-img"
-                                                                            alt={u.speciesName}
+                                                                            alt={u.name}
                                                                             style={{ filter: 'grayscale(0.2)' }}
                                                                         />
                                                                     </div>
-                                                                    <div className="summary-unit-name">{u.speciesName}</div>
+                                                                    <div className="summary-unit-name">{u.name}</div>
                                                                     <div className="unit-stats" style={{ marginTop: '5px' }}>
                                                                         <span className="stat-atk">{u.stats.attack}</span>
                                                                         <span className="stat-hp">{u.stats.hp}</span>

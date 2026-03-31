@@ -63,7 +63,7 @@ export const ADVANCED_OPPONENTS: OpponentDefinition[] = [
     { id: 'adv_12', name: '小銀', url: 'gym/小銀.webp', coreUnits: ['cyndaquil', 'chikorita', 'totodile', 'sneasel', 'magnemite'], difficulty: 'HARD' },
     { id: 'adv_13', name: '得撫', url: 'gym/得撫.webp', coreUnits: ['snover', 'snover', 'sneasel'], difficulty: 'HARD' },
     { id: 'adv_14', name: '琴音', url: 'gym/琴音02.webp', coreUnits: ['bulbasaur', 'chikorita', 'snover'], difficulty: 'EASY' },
-    { id: 'adv_15', name: '阿響', url: 'gym/阿響02.webp', coreUnits: ['charmander', '火球鼠', 'monkey', 'gastly'], difficulty: 'EASY' },
+    { id: 'adv_15', name: '阿響', url: 'gym/阿響02.webp', coreUnits: ['charmander', 'cyndaquil', 'mankey', 'gastly'], difficulty: 'EASY' },
     { id: 'adv_16', name: '滿充', url: 'gym/滿充02.webp', coreUnits: ['ralts', 'sprigatito'], difficulty: 'HARD' },
     { id: 'adv_17', name: '小遙', url: 'gym/小遙02.webp', coreUnits: ['torchic', 'torchic', 'mudkip', 'ralts', 'igglybuff'], difficulty: 'HARD' },
     { id: 'adv_18', name: '小悠', url: 'gym/小悠02.webp', coreUnits: ['rattata', 'rattata', 'mudkip', 'treecko', 'treecko'], difficulty: 'VERY_HARD' },
