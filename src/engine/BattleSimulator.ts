@@ -2674,7 +2674,7 @@ export class BattleSimulator {
         // Pinsir/Sableye ignore reductions - logic handled below for specific bypasses
 
         const preHp = target.stats.hp;
-        target.stats.hp -= amount;
+        target.stats.hp = Math.max(0, target.stats.hp - amount);
         if (isSkillDamage && !silent) {
             this.log(`${target.name} 受到 ${amount} 傷害！`);
         }

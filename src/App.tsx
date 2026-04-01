@@ -1145,10 +1145,11 @@ function App() {
                 simulatorRef.current = sim;
                 
                 // Sync difficulty-scaled stats back to GameLoop and UI state for accurate settlement display
-                const scaledEnemyTeam = [...sim.enemyTeam];
-                game.opponentTeam = scaledEnemyTeam;
-                setInitialEnemyTeam(scaledEnemyTeam);
-                setInitialEnemyTeamForSynergy(scaledEnemyTeam);
+                // Snapshot the team using clones to prevent modifications from the simulator affecting the summary
+                const scaledEnemyTeamSnapshot = sim.enemyTeam.map(u => u ? sim.cloneUnit(u) : null);
+                game.opponentTeam = scaledEnemyTeamSnapshot as Unit[];
+                setInitialEnemyTeam(scaledEnemyTeamSnapshot as Unit[]);
+                setInitialEnemyTeamForSynergy(scaledEnemyTeamSnapshot as Unit[]);
             } catch (err) {
                 console.error("Battle Initialisation Error:", err);
                 const fallbackUnit = new Unit(ALL_UNITS.rattata);
@@ -2500,7 +2501,7 @@ function App() {
                                                                     alt={u.name}
                                                                 />
                                                             </div>
-                                                            <div className="summary-unit-name">{u.name}</div>
+                                                            {/* <div className="summary-unit-name">{u.name}</div> */}
                                                             <div className="unit-stats" style={{ marginTop: '5px' }}>
                                                                 <span className="stat-atk">{u.stats.attack}</span>
                                                                 <span className="stat-hp">{u.stats.hp}</span>
@@ -2544,7 +2545,7 @@ function App() {
                                                                             style={{ filter: 'grayscale(0.2)' }}
                                                                         />
                                                                     </div>
-                                                                    <div className="summary-unit-name">{u.name}</div>
+                                                                    {/* <div className="summary-unit-name">{u.name}</div> */}
                                                                     <div className="unit-stats" style={{ marginTop: '5px' }}>
                                                                         <span className="stat-atk">{u.stats.attack}</span>
                                                                         <span className="stat-hp">{u.stats.hp}</span>
