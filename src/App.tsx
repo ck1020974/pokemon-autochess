@@ -1140,14 +1140,26 @@ function App() {
                 const activeBuffs = [...game.nextBattleBuffs];
                 game.nextBattleBuffs = []; // Clear buffs after consumption
                 const enemyPsychicN = game.wins + 1;
-                simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, enemyPsychicN, false, activeBuffs);
+                
+                const sim = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, enemyPsychicN, false, activeBuffs);
+                simulatorRef.current = sim;
+                
+                // Sync difficulty-scaled stats back to GameLoop and UI state for accurate settlement display
+                const scaledEnemyTeam = [...sim.enemyTeam];
+                game.opponentTeam = scaledEnemyTeam;
+                setInitialEnemyTeam(scaledEnemyTeam);
+                setInitialEnemyTeamForSynergy(scaledEnemyTeam);
             } catch (err) {
                 console.error("Battle Initialisation Error:", err);
                 const fallbackUnit = new Unit(ALL_UNITS.rattata);
                 enemyTeam = [fallbackUnit, null, null, null, null];
-                setInitialEnemyTeam([...enemyTeam]);
-                game.opponentTeam = [...enemyTeam];
-                simulatorRef.current = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, 1.0, battleSpeed, 2, 2, false, []);
+                
+                const fallbackSim = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, 1.0, battleSpeed, 2, 2, false, []);
+                simulatorRef.current = fallbackSim;
+                
+                const fallbackScaled = [...fallbackSim.enemyTeam];
+                game.opponentTeam = fallbackScaled;
+                setInitialEnemyTeam(fallbackScaled);
             }
 
             const currentSim = simulatorRef.current;
