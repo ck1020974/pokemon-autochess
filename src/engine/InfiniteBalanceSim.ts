@@ -160,26 +160,28 @@ function generatePlayerTeamForStage(stageId: string, enemyCount: number): Unit[]
     return team;
 }
 
-// 自動推導標籤
-function suggestDifficulty(winRate: number, currentDifficulty: string): string {
-    let suggested = currentDifficulty;
-    if (winRate > 85) suggested = 'EASY';
-    else if (winRate > 60) suggested = 'NORMAL';
-    else if (winRate > 35) suggested = 'HARD';
-    else suggested = 'VERY_HARD';
-    return suggested;
+// 自動推導標籤 (根據階段期望調整 - 比例制)
+function suggestDifficulty(winRate: number, currentDifficulty: string, minWin: number, maxWin: number): string {
+    const easyThreshold = Math.max(maxWin + 5, maxWin * 1.2);
+    const hardThreshold = minWin * 0.7;
+    const veryHardThreshold = minWin * 0.4;
+
+    if (winRate > easyThreshold) return 'EASY';
+    if (winRate >= minWin) return 'NORMAL';
+    if (winRate >= hardThreshold) return 'HARD';
+    return 'VERY_HARD';
 }
 
 // --- 執行主程式 ---
 async function runStageBalanceSim() {
     console.log(`開始進行無限版本 (Infinite Edition) 敵人強度考驗...`);
-    let report = `# 無限版本：敵人強度平衡測試報告\n\n`;
+    let report = `# 無限版本：敵人強度平衡測試報告 (分階段動態比例標準)\n\n`;
     report += `> 測試設定：每個 Boss 進行 \`${SIMS_PER_BOSS}\` 場 Headless 模擬，藉此評估勝率是否合乎玩家該階段該有的實力期望。\n\n`;
-    report += `> 難度自動校正規則：\n`;
-    report += `> - EASY: 玩家勝率 > 85%\n`;
-    report += `> - NORMAL: 玩家勝率 60% ~ 85%\n`;
-    report += `> - HARD: 玩家勝率 35% ~ 60%\n`;
-    report += `> - VERY_HARD: 玩家勝率 < 35%\n\n`;
+    report += `> 難度校正原則：針對不同階段的期望勝率區間 [Min, Max] 進行比例標定。\n`;
+    report += `> - **EASY**: 勝率 > Max * 1.2 (或 Max + 5%)\n`;
+    report += `> - **NORMAL**: 勝率介於 [Min, Max 門檻]\n`;
+    report += `> - **HARD**: 勝率介於 [Min * 0.7, Min)\n`;
+    report += `> - **VERY_HARD**: 勝率 < Min * 0.4\n\n`;
 
     const startTime = Date.now();
 
@@ -263,7 +265,7 @@ async function runStageBalanceSim() {
             const avgWinHp = wins > 0 ? (totalWinHpPercent / wins).toFixed(1) : '0.0';
             const avgLossHp = losses > 0 ? (totalLossHpPercent / losses).toFixed(1) : '0.0';
 
-            const suggestedTag = suggestDifficulty(winRate, boss.difficulty);
+            const suggestedTag = suggestDifficulty(winRate, boss.difficulty, stage.minWin, stage.maxWin);
 
             let diagnostic = `✅ ${boss.difficulty}`;
             if (suggestedTag !== boss.difficulty) {
