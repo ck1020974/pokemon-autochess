@@ -240,7 +240,7 @@ export class BattleSimulator {
         await this.eventBus.emit({ type: 'BATTLE_START', context: { simulator: this } });
     }
 
-    private cloneUnit(unit: Unit): Unit {
+    public cloneUnit(unit: Unit): Unit {
         const template = ALL_UNITS[unit.templateId];
         if (!template) {
             console.error(`Missing template for ID: ${unit.templateId}. Falling back to rattata.`);

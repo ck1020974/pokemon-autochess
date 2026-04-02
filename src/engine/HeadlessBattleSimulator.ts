@@ -138,7 +138,7 @@ export class HeadlessBattleSimulator {
         await this.eventBus.emit({ type: 'BATTLE_START', context: { simulator: this } });
     }
 
-    private cloneUnit(unit: Unit): Unit {
+    public cloneUnit(unit: Unit): Unit {
         const template = ALL_UNITS[unit.templateId];
         if (!template) {
             const fallback = new Unit(ALL_UNITS.rattata);

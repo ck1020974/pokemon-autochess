@@ -1406,7 +1406,7 @@ export class GameLoop {
         }
     }
 
-    private cloneUnit(unit: Unit): Unit {
+    public cloneUnit(unit: Unit): Unit {
         const template = ALL_UNITS[unit.templateId];
         if (!template) return unit;
 
