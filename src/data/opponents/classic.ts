@@ -19,7 +19,7 @@ export const NOVICE_OPPONENTS: OpponentDefinition[] = [
     { id: 'novice_9', name: '青綠', url: 'gym/青綠01.webp', coreUnits: ['charmander', 'rattata'], difficulty: 'NORMAL' },
     { id: 'novice_10', name: '松葉', url: 'gym/松葉.webp', coreUnits: ['drifloon', 'gastly'], difficulty: 'HARD' },
     { id: 'novice_11', name: '杜娟', url: 'gym/杜娟.webp', coreUnits: ['dwebble', 'dwebble', 'diglett'], difficulty: 'HARD' },
-    { id: 'novice_12', name: '藤樹', url: 'gym/藤樹.webp', coreUnits: ['bewear', 'bewear', 'bewear'], difficulty: 'EASY' },
+    { id: 'novice_12', name: '藤樹', url: 'gym/藤樹.webp', coreUnits: ['stufful', 'stufful', 'stufful'], difficulty: 'EASY' },
     { id: 'novice_13', name: '馬志士', url: 'gym/馬志士.webp', coreUnits: ['magnemite', 'magnemite', 'magnemite'], difficulty: 'EASY' },
     { id: 'novice_14', name: '菜種', url: 'gym/菜種.webp', coreUnits: ['bulbasaur', 'bulbasaur', 'bulbasaur'], difficulty: 'HARD' },
     { id: 'novice_15', name: '莉莉艾', url: 'gym/莉莉艾01.webp', coreUnits: ['igglybuff', 'igglybuff', 'squirtle'], difficulty: 'EASY' },
