@@ -11,8 +11,6 @@ import type { BattleLog } from './engine/BattleSimulator';
 import { ALL_UNITS, PREFERRED_POSITIONS } from './data/AllUnits';
 import type { PreferredPosition } from './data/AllUnits';
 import { SYNERGIES } from './models/Synergies';
-import { EncyclopediaModal } from './components/EncyclopediaModal';
-import { TutorialModal } from './components/TutorialModal';
 import { Unit } from './models/Unit';
 import { REWARD_DATA } from './models/RewardData';
 import type { GameEdition } from './models/Edition';
@@ -25,6 +23,9 @@ import normalBall from './assets/普通.webp';
 import greatBall from './assets/超級.webp';
 import ultraBall from './assets/高級.webp';
 import masterBall from './assets/大師.webp';
+
+const EncyclopediaModal = React.lazy(() => import('./components/EncyclopediaModal').then((module) => ({ default: module.EncyclopediaModal })));
+const TutorialModal = React.lazy(() => import('./components/TutorialModal').then((module) => ({ default: module.TutorialModal })));
 
 const getInitialEdition = (): GameEdition => {
     const params = new URLSearchParams(window.location.search);
@@ -291,7 +292,7 @@ function App() {
     const update = useForceUpdate();
 
     useEffect(() => {
-        console.log("Pokemon AutoChess v4.8.4 - Reward Phase Deploy");
+        console.log("Pokemon AutoChess v4.8.5 - Quality Update");
     }, [game]);
 
     const handleRestart = (newEdition?: GameEdition) => {
@@ -1755,6 +1756,7 @@ function App() {
 
             {/* Tutorial Modal shows if difficulty selected but tutorial not started/ended */}
             {showTutorial && tutorialStep === 0 && difficulty !== null && (
+                <React.Suspense fallback={null}>
                 <TutorialModal
                     onClose={() => {
                         setShowTutorial(false);
@@ -1764,6 +1766,7 @@ function App() {
                     }}
                     onStartTutorial={startTutorial}
                 />
+                </React.Suspense>
             )}
 
             {/* Reward Selection Overlay (Z-Index 20000) */}
@@ -3409,6 +3412,7 @@ function App() {
             {/* Modal should be rendered at the very end of the DOM to ensure highest physical layering context */}
             {
                 showEncyclopedia && createPortal(
+                    <React.Suspense fallback={null}>
                     <EncyclopediaModal
                         activeEdition={activeEdition}
                         activePoolUnitIds={game.activePoolUnitIds}
@@ -3417,7 +3421,8 @@ function App() {
                             if (tutorialStep === 11) {
                                 setTutorialStep(12);
                             }
-                        }} />,
+                        }} />
+                    </React.Suspense>,
                     document.getElementById('modal-root')!
                 )
             }
