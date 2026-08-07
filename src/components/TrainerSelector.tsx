@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, PointerEvent, WheelEvent } from 'react';
 import type { PlayerTrainer } from '../presentation/trainers';
 import './TrainerSelector.css';
@@ -16,7 +16,28 @@ const getDistance = (index: number, activeIndex: number, length: number) => {
 export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
     const [activeIndex, setActiveIndex] = useState(0);
     const pointerStart = useRef<number | null>(null);
+    const hoverDelayRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+    const hoverRepeatRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
     const move = (direction: -1 | 1) => setActiveIndex((index) => (index + direction + trainers.length) % trainers.length);
+
+    const stopHoverMove = () => {
+        if (hoverDelayRef.current !== null) window.clearTimeout(hoverDelayRef.current);
+        if (hoverRepeatRef.current !== null) window.clearInterval(hoverRepeatRef.current);
+        hoverDelayRef.current = null;
+        hoverRepeatRef.current = null;
+    };
+
+    const startHoverMove = (direction: -1 | 1) => {
+        if (window.matchMedia('(pointer: coarse)').matches) return;
+        stopHoverMove();
+        hoverDelayRef.current = window.setTimeout(() => {
+            hoverDelayRef.current = null;
+            move(direction);
+            hoverRepeatRef.current = window.setInterval(() => move(direction), 420) as unknown as ReturnType<typeof window.setInterval>;
+        }, 180) as unknown as ReturnType<typeof window.setTimeout>;
+    };
+
+    useEffect(() => stopHoverMove, []);
 
     const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
         if (event.key === 'ArrowLeft') {
@@ -38,6 +59,7 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
     };
 
     const onPointerDown = (event: PointerEvent<HTMLElement>) => {
+        stopHoverMove();
         pointerStart.current = event.clientX;
     };
 
@@ -59,36 +81,47 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
             <header className="trainer-selector-heading">
                 <p>YOUR ADVENTURE</p>
                 <h2>請選擇你的角色</h2>
-                <span>使用左右按鈕、方向鍵或滑鼠滾輪挑選訓練家</span>
+                <span>使用方向鍵、滑鼠滾輪或滑動挑選訓練家</span>
             </header>
             <div className="trainer-selector-carousel" onWheel={onWheel} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
-                <button className="trainer-selector-arrow trainer-selector-arrow-left" type="button" onClick={() => move(-1)} aria-label="上一位訓練家">‹</button>
-                <div className="trainer-selector-track" role="list" aria-live="polite">
+                <div
+                    className="trainer-selector-hover-zone trainer-selector-hover-zone--left"
+                    aria-hidden="true"
+                    onPointerEnter={(event) => {
+                        if (event.pointerType === 'mouse') startHoverMove(-1);
+                    }}
+                    onPointerLeave={stopHoverMove}
+                />
+                <div className="trainer-selector-track" role="list" aria-live="polite" onPointerEnter={stopHoverMove}>
                     {trainers.map((trainer, index) => {
                         const distance = getDistance(index, activeIndex, trainers.length);
-                        const visible = Math.abs(distance) <= 2;
-                        const state = distance === 0 ? 'is-active' : Math.abs(distance) === 1 ? 'is-near' : visible ? 'is-far' : 'is-hidden';
+                        const visible = Math.abs(distance) <= 1;
+                        const state = distance === 0 ? 'is-active' : visible ? 'is-near' : 'is-hidden';
                         const direction = distance < 0 ? 'is-left' : distance > 0 ? 'is-right' : '';
                         return (
                             <button
-                                className={`trainer-selector-card ${state} ${direction}`}
+                                className={`trainer-selector-figure ${state} ${direction}`}
                                 key={trainer.id}
                                 type="button"
                                 role="listitem"
                                 tabIndex={visible ? 0 : -1}
                                 onClick={() => distance === 0 ? onSelect(trainer) : setActiveIndex(index)}
                             >
-                                <span className="trainer-selector-card-glint" aria-hidden="true" />
                                 <img src={trainer.imageUrl} alt={trainer.name} />
-                                <span className="trainer-selector-name">{trainer.name}</span>
-                                <span className="trainer-selector-pick">{distance === 0 ? '點擊開始旅程' : '查看角色'}</span>
                             </button>
                         );
                     })}
                 </div>
-                <button className="trainer-selector-arrow trainer-selector-arrow-right" type="button" onClick={() => move(1)} aria-label="下一位訓練家">›</button>
+                <div
+                    className="trainer-selector-hover-zone trainer-selector-hover-zone--right"
+                    aria-hidden="true"
+                    onPointerEnter={(event) => {
+                        if (event.pointerType === 'mouse') startHoverMove(1);
+                    }}
+                    onPointerLeave={stopHoverMove}
+                />
             </div>
-            <p className="trainer-selector-footnote">角色只影響畫面演出，不會改變任何遊戲數值。</p>
+            <p className="trainer-selector-footnote">點擊角色開始旅途</p>
         </section>
     );
 }
