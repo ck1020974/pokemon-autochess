@@ -33,6 +33,7 @@ try {
   assert.match(selectorSource, /420/);
   assert.match(selectorSource, /clearTimeout/);
   assert.match(selectorSource, /clearInterval/);
+  assert.match(selectorSource, /onPointerMove/);
   assert.match(selectorSource, /點擊角色開始旅途/);
   assert.doesNotMatch(selectorSource, /trainer-selector-arrow/);
   assert.doesNotMatch(selectorSource, /trainer-selector-name/);

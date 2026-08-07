@@ -70,6 +70,14 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
         if (Math.abs(delta) >= 35) move(delta > 0 ? -1 : 1);
     };
 
+    const onPointerMove = (event: PointerEvent<HTMLElement>) => {
+        if (event.pointerType !== 'mouse') return;
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const pointerX = event.clientX - bounds.left;
+        const sideZoneWidth = Math.min(150, Math.max(56, window.innerWidth * 0.1));
+        if (pointerX > sideZoneWidth && pointerX < bounds.width - sideZoneWidth) stopHoverMove();
+    };
+
     return (
         <section className="trainer-selector-overlay" aria-label="選擇訓練家" role="dialog" aria-modal="true" onKeyDown={onKeyDown}>
             <div className="trainer-selector-atmosphere" aria-hidden="true">
@@ -83,7 +91,7 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
                 <h2>請選擇你的角色</h2>
                 <span>使用方向鍵、滑鼠滾輪或滑動挑選訓練家</span>
             </header>
-            <div className="trainer-selector-carousel" onWheel={onWheel} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+            <div className="trainer-selector-carousel" onWheel={onWheel} onPointerDown={onPointerDown} onPointerUp={onPointerUp} onPointerMove={onPointerMove}>
                 <div
                     className="trainer-selector-hover-zone trainer-selector-hover-zone--left"
                     aria-hidden="true"
