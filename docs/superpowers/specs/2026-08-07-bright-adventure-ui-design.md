@@ -4,7 +4,7 @@
 
 將主頁、版本選擇、難度選擇、教學起始視窗與角色選擇統一為明亮的「冒險道路」體驗。非戰鬥流程使用同一套天空、雲層、遠山、草地與道路景深；戰鬥流程維持依關卡變化的全景舞台。
 
-此次變更僅涵蓋呈現、互動與驗證。不得更改遊戲數值、角色數值、羈絆、敵人資料、遊戲流程規則或戰鬥規則。
+此次變更涵蓋呈現、互動、驗證，以及既有 lint 錯誤的行為保留式修正。不得更改遊戲數值、角色數值、羈絆、敵人資料、遊戲流程規則或戰鬥規則。
 
 ## 視覺系統
 
@@ -41,10 +41,11 @@
 - 主要調整檔案：`src/App.tsx`、`src/index.css`、`src/components/TutorialModal.tsx`、`src/components/TutorialModal.css`、`src/components/TrainerSelector.tsx`、`src/components/TrainerSelector.css`。
 - 如需共用非戰鬥背景，新增僅承載視覺的 UI 元件或 CSS 類別；不得耦合到 engine、models、data 或 presentation 的戰鬥判定。
 - 更新 `scripts/verify-trainer-presentation.mjs`：驗證移除箭頭、存在側邊感應區與計時邏輯、中央選取仍呼叫 `onSelect`，以及 battle engine 仍不引用 `selectedTrainer`。
+- 修正現有 ESLint 報告的 TypeScript 與程式風格問題（例如 `any`、未使用變數與區塊作用域），只做等價型別與語法整理；每一群修改後都以 smoke 與平衡驗證保護既有遊戲行為。
 
 ## 驗證
 
-1. 執行 `npm run lint`。
+1. 執行 `npm run lint`，預期零錯誤。
 2. 執行 `npm run test:smoke`、`npm run test:balance-values` 與更新後的 `npm run test:trainer-presentation`。
 3. 執行 `npm run build`。
 4. 本機瀏覽器流程檢查：載入、版本選擇、難度選擇、教學起始視窗、角色感應區的首次與連續切換、中央點擊開始、手機寬度下的滑動與側邊點擊，以及進入戰鬥後的關卡全景背景。
