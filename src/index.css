@@ -210,6 +210,45 @@ h3 {
   overflow: hidden;
 }
 
+.board-container.is-battling {
+  --battle-sky: #8dbab2;
+  --battle-horizon: #48786d;
+  --battle-floor: #285751;
+  isolation: isolate;
+  background: linear-gradient(180deg, var(--battle-sky) 0%, var(--battle-horizon) 56%, var(--battle-floor) 100%);
+  box-shadow: inset 0 0 70px rgba(5, 23, 32, .52);
+}
+
+.board-container.is-battling::before,
+.board-container.is-battling::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+
+.board-container.is-battling::before {
+  inset: 24% -8% -10%;
+  background: radial-gradient(ellipse at 50% 15%, rgba(255, 246, 182, .36), transparent 17%), repeating-linear-gradient(168deg, rgba(255,255,255,.1) 0 2px, transparent 2px 22px), linear-gradient(#5f977e, var(--battle-floor));
+  transform: perspective(380px) rotateX(46deg);
+  transform-origin: top;
+}
+
+.board-container.is-battling::after {
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, transparent 36%, rgba(5, 21, 31, .08) 68%, rgba(5, 21, 31, .48) 100%);
+}
+
+.board-container.is-battling > * { position: relative; z-index: 1; }
+.board-container.is-battling.battle-scene--garden { --battle-sky: #b9d7aa; --battle-horizon: #517e60; --battle-floor: #2d5a4d; }
+.board-container.is-battling.battle-scene--harbor { --battle-sky: #88c6cf; --battle-horizon: #3f7d8c; --battle-floor: #24546a; }
+.board-container.is-battling.battle-scene--stadium { --battle-sky: #b6bc91; --battle-horizon: #62795c; --battle-floor: #405b4c; }
+.board-container.is-battling.battle-scene--cavern { --battle-sky: #52697b; --battle-horizon: #263f52; --battle-floor: #172d40; }
+.board-container.is-battling.battle-scene--library { --battle-sky: #9f8469; --battle-horizon: #615147; --battle-floor: #3a3130; }
+.board-container.is-battling.battle-scene--waterfall { --battle-sky: #8dc2cf; --battle-horizon: #3f788a; --battle-floor: #27566b; }
+.board-container.is-battling.battle-scene--volcanic { --battle-sky: #825e54; --battle-horizon: #45383f; --battle-floor: #29262d; }
+.board-container.is-battling.battle-scene--champion-hall { --battle-sky: #5675a2; --battle-horizon: #2a4b70; --battle-floor: #18385a; }
+
 .board-teams-horizontal {
   display: flex;
   justify-content: center;

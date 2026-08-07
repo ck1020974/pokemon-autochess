@@ -17,6 +17,10 @@ import type { GameEdition } from './models/Edition';
 import { ClassicEdition } from './data/editions/classic';
 import { ModernEdition } from './data/editions/modern';
 import { InfiniteEdition } from './data/editions/infinite';
+import { TrainerSelector } from './components/TrainerSelector';
+import { BattleIntro, type BattleIntroOpponent } from './components/BattleIntro';
+import { getBattleSceneClass, getPresentationKind } from './presentation/battlePresentation';
+import { PLAYER_TRAINERS, type PlayerTrainer } from './presentation/trainers';
 
 // Difficulty Icons
 import normalBall from './assets/普通.webp';
@@ -93,6 +97,10 @@ interface ConfirmDialogState {
     description?: string;
     onConfirm: () => void;
 }
+
+type SelectedOpponent = BattleIntroOpponent & {
+    difficulty?: string;
+};
 
 // --- Helper Components ---
 
@@ -321,6 +329,9 @@ function App() {
         setShowOpponentSelect(false);
         setSelectedOpponent(null);
         setOpponentChoices([]);
+        setSelectedTrainer(null);
+        setShowTrainerSelector(false);
+        setPendingBattleOpponent(null);
         simulatorRef.current = null; // CRITICAL: Clear battle simulator
 
         // 4. Force UI Update
@@ -392,14 +403,18 @@ function App() {
     // UI States
     const [showEncyclopedia, setShowEncyclopedia] = useState<boolean>(false);
     const [showTutorial, setShowTutorial] = useState<boolean>(true); // Changed to true to auto-prompt tutorial
+    const [showTrainerSelector, setShowTrainerSelector] = useState(false);
+    const [selectedTrainer, setSelectedTrainer] = useState<PlayerTrainer | null>(null);
+    const [quickBattlePresentation, setQuickBattlePresentation] = useState(false);
     const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
     const [tutorialStep, setTutorialStep] = useState<number>(0);
     const [tutorialShake, setTutorialShake] = useState<boolean>(false);
 
     // Opponent Selection States
     const [showOpponentSelect, setShowOpponentSelect] = useState(false);
-    const [opponentChoices, setOpponentChoices] = useState<{ name: string, url: string, id: string, difficulty?: string }[]>([]);
-    const [selectedOpponent, setSelectedOpponent] = useState<{ name: string, url: string, id: string, difficulty?: string } | null>(null);
+    const [opponentChoices, setOpponentChoices] = useState<SelectedOpponent[]>([]);
+    const [selectedOpponent, setSelectedOpponent] = useState<SelectedOpponent | null>(null);
+    const [pendingBattleOpponent, setPendingBattleOpponent] = useState<SelectedOpponent | null>(null);
 
     // Animation States
     const [goldErrorAnim, setGoldErrorAnim] = useState(false);
@@ -412,6 +427,9 @@ function App() {
 
     const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
     const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
+    const battleSceneClass = selectedOpponent
+        ? getBattleSceneClass(getPresentationKind(game.wins), selectedOpponent.id)
+        : '';
 
     const tutorialUnitId = 'gastly';
     const tutorialUnitName = '鬼斯';
@@ -1624,8 +1642,19 @@ function App() {
         }
     };
 
-    const handleOpponentSelect = (opponent: { id?: string, name: string, url: string, difficulty?: string }) => {
-        setSelectedOpponent(opponent as { id: string, name: string, url: string });
+    const beginBattle = () => {
+        setPendingBattleOpponent(null);
+        music.stop();
+        game.startBattlePhase();
+        setBattleResult(null);
+        setLogs([]);
+        setBattleTick(0);
+        setActiveSynergyId(null);
+        update();
+    };
+
+    const handleOpponentSelect = (opponent: SelectedOpponent) => {
+        setSelectedOpponent(opponent);
         if (opponent.id) {
             game.currentOpponentId = opponent.id;
         }
@@ -1633,13 +1662,11 @@ function App() {
             game.currentOpponentDifficulty = opponent.difficulty;
         }
         setShowOpponentSelect(false);
-        music.stop(); // Stop prep music ONLY now
-        game.startBattlePhase();
-        setBattleResult(null);
-        setLogs([]);
-        setBattleTick(0);
-        setActiveSynergyId(null);
-        update();
+        if (!selectedTrainer) {
+            beginBattle();
+            return;
+        }
+        setPendingBattleOpponent(opponent);
     };
 
     const handleBattleResultClick = () => {
@@ -1762,11 +1789,32 @@ function App() {
                         setShowTutorial(false);
                         // CRITICAL: Sync Turn 1 initial pool choices if tutorial is skipped
                         setHasStarted(true);
+                        setShowTrainerSelector(true);
                         update();
                     }}
                     onStartTutorial={startTutorial}
                 />
                 </React.Suspense>
+            )}
+
+            {showTrainerSelector && (
+                <TrainerSelector
+                    trainers={PLAYER_TRAINERS}
+                    onSelect={(trainer) => {
+                        setSelectedTrainer(trainer);
+                        setShowTrainerSelector(false);
+                    }}
+                />
+            )}
+
+            {pendingBattleOpponent && selectedTrainer && (
+                <BattleIntro
+                    playerTrainer={selectedTrainer}
+                    opponent={pendingBattleOpponent}
+                    kind={getPresentationKind(game.wins)}
+                    quick={quickBattlePresentation}
+                    onComplete={beginBattle}
+                />
             )}
 
             {/* Reward Selection Overlay (Z-Index 20000) */}
@@ -2279,6 +2327,21 @@ function App() {
                                 }}
                             >
                                 ❓
+                            </button>
+                            <button
+                                className={`mute-toggle-btn-header ${quickBattlePresentation ? 'active' : ''}`}
+                                onClick={() => {
+                                    if (game.phase === GamePhase.BATTLE) return;
+                                    setQuickBattlePresentation((quick) => !quick);
+                                }}
+                                title={quickBattlePresentation ? '快速對戰演出：開啟' : '快速對戰演出：關閉'}
+                                style={{
+                                    color: quickBattlePresentation ? '#f9c85f' : '#aaa',
+                                    opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
+                                    cursor: game.phase === GamePhase.BATTLE ? 'default' : 'pointer'
+                                }}
+                            >
+                                ⏩
                             </button>
                             <button
                                 className="mute-toggle-btn-header"
@@ -2821,7 +2884,7 @@ function App() {
                 )
             }
 
-            <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''}`} onClick={() => { setSelected(null); setActiveSynergyId(null); }}>
+            <div className={`board-container ${game.phase === GamePhase.BATTLE ? 'is-battling' : ''} ${battleSceneClass}`} onClick={() => { setSelected(null); setActiveSynergyId(null); }}>
                 {/* 1. Synergies (Player) */}
                 <div className={`board-synergies ${([2, 3, 4, 7, 8, 9, 10, 11].includes(tutorialStep) && game.phase !== GamePhase.BATTLE) ? 'tutorial-elevate' : ''}`}>
                     {(() => {

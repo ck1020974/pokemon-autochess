@@ -31,6 +31,16 @@ try {
   assert.match(introSource, /clearTimeout/);
   assert.match(introSource, /battle-intro-scene/);
 
+  const appSource = readFileSync(resolve(root, 'src', 'App.tsx'), 'utf8');
+  assert.match(appSource, /showTrainerSelector/);
+  assert.match(appSource, /<TrainerSelector/);
+  assert.match(appSource, /quickBattlePresentation/);
+  assert.match(appSource, /<BattleIntro/);
+  const simulatorSource = readFileSync(resolve(root, 'src', 'engine', 'BattleSimulator.ts'), 'utf8');
+  const gameLoopSource = readFileSync(resolve(root, 'src', 'engine', 'GameLoop.ts'), 'utf8');
+  assert.doesNotMatch(simulatorSource, /selectedTrainer/);
+  assert.doesNotMatch(gameLoopSource, /selectedTrainer/);
+
   console.log('Trainer presentation values verified.');
 } finally {
   await server.close();
