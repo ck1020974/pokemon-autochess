@@ -25,10 +25,19 @@ try {
   assert.match(selectorSource, /aria-label="選擇訓練家"/);
   assert.match(selectorSource, /onSelect\(trainer\)/);
   assert.match(selectorSource, /trainer-selector-track/);
-  assert.match(selectorSource, /trainer-selector-arrow/);
   assert.match(selectorSource, /is-left/);
   assert.match(selectorSource, /onKeyDown/);
   assert.match(selectorSource, /setActiveIndex/);
+  assert.match(selectorSource, /trainer-selector-hover-zone/);
+  assert.match(selectorSource, /180/);
+  assert.match(selectorSource, /420/);
+  assert.match(selectorSource, /clearTimeout/);
+  assert.match(selectorSource, /clearInterval/);
+  assert.match(selectorSource, /點擊角色開始旅途/);
+  assert.doesNotMatch(selectorSource, /trainer-selector-arrow/);
+  assert.doesNotMatch(selectorSource, /trainer-selector-name/);
+  assert.doesNotMatch(selectorSource, /trainer-selector-pick/);
+  assert.doesNotMatch(selectorCss, /trainer-selector-arrow/);
   assert.doesNotMatch(selectorCss, /overflow-x:\s*auto/);
 
   const introSource = readFileSync(resolve(root, 'src', 'components', 'BattleIntro.tsx'), 'utf8');
