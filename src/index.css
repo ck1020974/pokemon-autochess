@@ -61,25 +61,30 @@ h3 {
   --stage-horizon: #5d8b77;
   --stage-ground: #2d615b;
   --stage-landmark: none;
+  min-height: 100vh;
   isolation: isolate;
+  background: var(--stage-landmark), radial-gradient(ellipse at 50% -10%, rgba(255, 245, 182, .47), transparent 28%), radial-gradient(ellipse at 50% 76%, rgba(242,255,230,.16), transparent 14%), linear-gradient(180deg, var(--stage-sky) 0%, var(--stage-horizon) 53%, var(--stage-ground) 100%);
 }
 
 .battle-stage-shell.is-battling::before {
   position: fixed;
-  z-index: -1;
+  z-index: 0;
   inset: 0;
   content: "";
   background: var(--stage-landmark), radial-gradient(ellipse at 50% -10%, rgba(255, 245, 182, .47), transparent 28%), radial-gradient(ellipse at 50% 76%, rgba(242,255,230,.16), transparent 14%), linear-gradient(180deg, var(--stage-sky) 0%, var(--stage-horizon) 53%, var(--stage-ground) 100%);
+  pointer-events: none;
 }
 
 .battle-stage-shell.is-battling::after {
   position: fixed;
-  z-index: -1;
+  z-index: 0;
   inset: 0;
   content: "";
   background: radial-gradient(ellipse at 50% 46%, transparent 32%, rgba(4, 24, 33, .08) 67%, rgba(4, 19, 30, .43) 100%);
   pointer-events: none;
 }
+
+.battle-stage-shell.is-battling > :not(.battle-intro-overlay):not(.battle-result-overlay) { position: relative; z-index: 1; }
 
 .battle-stage-shell.is-battling .header { border-bottom-color: rgba(255,255,255,.34); text-shadow: 0 2px 7px rgba(4,25,31,.58); }
 .battle-stage-shell.is-battling .board-container { background: transparent; box-shadow: none; }
@@ -3271,10 +3276,10 @@ h3 {
 .adventure-panel,
 .adventure-choice {
   color: #173f45;
-  background: rgba(255, 255, 248, .78) !important;
-  border: 1px solid rgba(255, 255, 255, .82) !important;
-  box-shadow: 0 14px 34px rgba(23, 85, 79, .16) !important;
-  backdrop-filter: blur(10px);
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none;
 }
 
 .adventure-loading {
@@ -3284,14 +3289,20 @@ h3 {
   text-align: center;
 }
 
+.adventure-startup-overlay .loading-container {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
 .adventure-startup-overlay .loading-bar-wrapper {
   width: 100%;
-  height: 8px;
+  height: 6px;
   margin-bottom: 14px;
   overflow: hidden;
-  border: 1px solid rgba(86, 124, 112, .28);
+  border: 0 !important;
   border-radius: 999px;
-  background: rgba(53, 112, 103, .13);
+  background: rgba(53, 112, 103, .3) !important;
 }
 
 .adventure-startup-overlay .loading-bar-fill {
@@ -3337,13 +3348,12 @@ h3 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
+  min-height: 184px;
   max-width: 300px;
   gap: 14px;
   padding: 24px 15px;
-  border-radius: 24px;
   cursor: pointer;
-  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+  transition: transform .25s ease, filter .25s ease;
 }
 
 .adventure-choice.is-unavailable {
@@ -3355,8 +3365,10 @@ h3 {
 .adventure-choice:hover:not(:disabled),
 .adventure-choice.is-focused {
   transform: translateY(-6px);
-  border-color: var(--adventure-gold) !important;
-  box-shadow: 0 0 0 4px rgba(244, 206, 104, .34), 0 18px 34px rgba(23, 85, 79, .2) !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 12px 12px rgba(23, 85, 79, .16));
 }
 
 .adventure-choice:active:not(:disabled) {
@@ -3374,7 +3386,7 @@ h3 {
 }
 
 .adventure-choice.is-focused .adventure-choice-icon {
-  filter: drop-shadow(0 8px 8px rgba(216, 169, 58, .42));
+  filter: drop-shadow(0 0 13px rgba(216, 169, 58, .72)) drop-shadow(0 8px 8px rgba(216, 169, 58, .42));
 }
 
 .adventure-choice-icon--edition {
@@ -3403,6 +3415,7 @@ h3 {
 
 .adventure-choice.is-focused .adventure-choice-name {
   color: #d8a93a;
+  text-shadow: 0 2px 0 rgba(255, 255, 248, .72);
 }
 
 .adventure-choice-subtitle {

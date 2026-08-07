@@ -29,6 +29,7 @@ try {
   assert.match(selectorSource, /onKeyDown/);
   assert.match(selectorSource, /setActiveIndex/);
   assert.match(selectorSource, /trainer-selector-hover-zone/);
+  assert.match(selectorSource, /is-far/);
   assert.match(selectorSource, /180/);
   assert.match(selectorSource, /420/);
   assert.match(selectorSource, /clearTimeout/);
@@ -60,6 +61,15 @@ try {
   assert.match(appCss, /--stage-landmark/);
   assert.match(presentationSource, /landmark/);
   assert.match(introCss, /max-height:\s*30vh/);
+  assert.match(introCss, /flex-direction:\s*column/);
+  assert.match(introCss, /bottom:\s*clamp\(58px,\s*8vw,\s*96px\)/);
+  assert.match(appCss, /\.battle-stage-shell\.is-battling::before\s*\{[^}]*z-index:\s*0;/s);
+  assert.match(appCss, /\.battle-stage-shell\.is-battling\s*>\s*:not\(\.battle-intro-overlay\):not\(\.battle-result-overlay\)\s*\{[^}]*z-index:\s*1;/s);
+  assert.match(appCss, /\.battle-stage-shell\.is-battling\s*\{[^}]*min-height:\s*100vh;[^}]*background:\s*var\(--stage-landmark\)/s);
+  assert.match(selectorCss, /\.trainer-selector-figure\.is-far\.is-left/);
+  assert.match(appCss, /\.adventure-panel,\s*\.adventure-choice\s*\{[^}]*background:\s*transparent\s*!important;/s);
+  assert.match(appCss, /\.adventure-startup-overlay\s+\.loading-container\s*\{[^}]*box-shadow:\s*none\s*!important;/s);
+  assert.match(appCss, /\.adventure-startup-overlay\s+\.loading-bar-wrapper\s*\{[^}]*border:\s*0\s*!important;/s);
   const simulatorSource = readFileSync(resolve(root, 'src', 'engine', 'BattleSimulator.ts'), 'utf8');
   const gameLoopSource = readFileSync(resolve(root, 'src', 'engine', 'GameLoop.ts'), 'utf8');
   assert.doesNotMatch(simulatorSource, /selectedTrainer/);

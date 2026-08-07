@@ -87,9 +87,8 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
                 <span className="trainer-selector-hill hill-two" />
             </div>
             <header className="trainer-selector-heading">
-                <p>YOUR ADVENTURE</p>
+                <p>使用方向鍵、滑鼠滾輪或滑動挑選訓練家</p>
                 <h2>請選擇你的角色</h2>
-                <span>使用方向鍵、滑鼠滾輪或滑動挑選訓練家</span>
             </header>
             <div className="trainer-selector-carousel" onWheel={onWheel} onPointerDown={onPointerDown} onPointerUp={onPointerUp} onPointerMove={onPointerMove}>
                 <div
@@ -103,8 +102,8 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
                 <div className="trainer-selector-track" role="list" aria-live="polite" onPointerEnter={stopHoverMove}>
                     {trainers.map((trainer, index) => {
                         const distance = getDistance(index, activeIndex, trainers.length);
-                        const visible = Math.abs(distance) <= 1;
-                        const state = distance === 0 ? 'is-active' : visible ? 'is-near' : 'is-hidden';
+                        const visible = Math.abs(distance) <= 2;
+                        const state = distance === 0 ? 'is-active' : Math.abs(distance) === 1 ? 'is-near' : visible ? 'is-far' : 'is-hidden';
                         const direction = distance < 0 ? 'is-left' : distance > 0 ? 'is-right' : '';
                         return (
                             <button
