@@ -2049,43 +2049,26 @@ function App() {
             {/* Loading & Start Screen (Stage 1) */}
             {
                 !hasStarted && !selectedVersionId && (
-                    <div className="startup-overlay"
-                        style={{
-                            position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
-                            background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
-                            zIndex: 10000, display: 'flex', flexDirection: 'column',
-                            justifyContent: 'center', alignItems: 'center', gap: '30px'
-                        }}>
-                        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                            <h1 style={{
-                                fontSize: '5rem',
-                                margin: '0',
-                                letterSpacing: '12px',
-                                background: 'linear-gradient(to bottom, #fff, #94a3b8)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
-                                fontWeight: 900
-                            }}>
+                    <div className="startup-overlay adventure-startup-overlay">
+                        <div className="adventure-scene" aria-hidden="true">
+                            <span className="adventure-cloud adventure-cloud--one" />
+                            <span className="adventure-cloud adventure-cloud--two" />
+                            <span className="adventure-hill adventure-hill--one" />
+                            <span className="adventure-hill adventure-hill--two" />
+                            <span className="adventure-road" />
+                        </div>
+                        <div className="adventure-brand">
+                            <h1 className="adventure-title">
                                 POKEMON<br />AUTOCHESS
                             </h1>
                         </div>
 
                         {!phase1Loaded && (
-                            <div className="loading-container" style={{ width: '600px', textAlign: 'center' }}>
-                                <div className="loading-bar-wrapper" style={{
-                                    width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)',
-                                    borderRadius: '3px', overflow: 'hidden', marginBottom: '20px',
-                                    border: '1px solid rgba(255,255,255,0.05)'
-                                }}>
-                                    <div className="loading-bar-fill" style={{
-                                        width: `${loadingProgress}%`, height: '100%',
-                                        background: 'linear-gradient(90deg, #60a5fa, #3b82f6)',
-                                        transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)'
-                                    }} />
+                            <div className="loading-container adventure-panel adventure-loading">
+                                <div className="loading-bar-wrapper">
+                                    <div className="loading-bar-fill" style={{ width: `${loadingProgress}%` }} />
                                 </div>
-                                <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
+                                <p className="adventure-loading-copy">
                                     核心資源載入中... {loadingProgress}%
                                 </p>
                             </div>
@@ -2093,14 +2076,7 @@ function App() {
 
                         {/* Version Selection Options show up once Stage 1 is loaded */}
                         {phase1Loaded && (
-                            <div className="difficulty-grid" style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(3, 1fr)',
-                                gap: '30px',
-                                maxWidth: '950px',
-                                width: '94%',
-                                margin: '20px auto 0'
-                            }}>
+                            <div className="difficulty-grid adventure-choice-grid">
                                 {[
                                     { id: 'classic', name: '經典版本', subtitle: '簡單上手的經典玩法', icon: 'icon-192.png', color: '#10b981', available: true },
                                     { id: 'modern', name: '帝王版本', subtitle: '進階策略的豐富玩法', icon: 'icon-002.png', color: '#3b82f6', available: true },
@@ -2108,7 +2084,7 @@ function App() {
                                 ].map(v => (
                                     <button
                                         key={v.id}
-                                        className={`difficulty-btn ${focusedVersionId === v.id ? 'is-focused' : ''}`}
+                                        className={`difficulty-btn adventure-choice ${focusedVersionId === v.id ? 'is-focused' : ''} ${v.available ? '' : 'is-unavailable'}`}
                                         disabled={!v.available}
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -2125,24 +2101,11 @@ function App() {
                                                 setFocusedVersionId(v.id);
                                             }
                                         }}
-                                        style={{
-                                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '15px',
-                                            padding: '25px 15px', background: 'rgba(0,0,0,0.4)', border: 'none',
-                                            borderRadius: '24px', cursor: v.available ? 'pointer' : 'not-allowed',
-                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                            flex: '1 1 200px',
-                                            maxWidth: '300px',
-                                            minHeight: '220px',
-                                            backdropFilter: 'blur(10px)',
-                                            boxShadow: `0 10px 30px rgba(0,0,0,0.5)`,
-                                            opacity: v.available ? 1 : 0.5,
-                                            filter: v.available ? 'none' : 'grayscale(100%)'
-                                        }}
                                     >
-                                        <img src={v.icon} alt={v.name} style={{ width: '120px', height: '120px', borderRadius: '16px', filter: `drop-shadow(0 0 15px ${v.color}55)` }} />
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                            <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: v.color, letterSpacing: '2px' }}>{v.name}</span>
-                                            <span style={{ fontSize: '0.85rem', color: '#94a3b8', letterSpacing: '1px' }}>{v.subtitle}</span>
+                                        <img src={v.icon} alt={v.name} className="adventure-choice-icon adventure-choice-icon--edition" />
+                                        <div className="adventure-choice-copy">
+                                            <span className="adventure-choice-name">{v.name}</span>
+                                            <span className="adventure-choice-subtitle">{v.subtitle}</span>
                                             {/* {!v.available && <span style={{ fontSize: '0.75rem', color: '#ef4444', letterSpacing: '1px', marginTop: '5px' }}>(尚未開放)</span>} */}
                                         </div>
                                     </button>
@@ -2151,13 +2114,7 @@ function App() {
                         )}
 
                         {!phase1Loaded && (
-                            <p style={{
-                                position: 'absolute',
-                                bottom: '20px',
-                                color: 'rgba(148, 163, 184, 0.3)',
-                                fontSize: '0.7rem',
-                                letterSpacing: '2px'
-                            }}>v4.8.6 - {activeEdition.name}</p>
+                            <p className="adventure-version">v4.8.6 - {activeEdition.name}</p>
                         )}
                     </div>
                 )
@@ -2165,42 +2122,25 @@ function App() {
 
             {
                 !hasStarted && selectedVersionId && !hasLoaded && (
-                    <div className="startup-overlay"
-                        style={{
-                            position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
-                            background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
-                            zIndex: 10000, display: 'flex', flexDirection: 'column',
-                            justifyContent: 'center', alignItems: 'center', gap: '30px'
-                        }}>
-                        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                            <h1 style={{
-                                fontSize: '5rem',
-                                margin: '0',
-                                letterSpacing: '12px',
-                                background: 'linear-gradient(to bottom, #fff, #94a3b8)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
-                                fontWeight: 900
-                            }}>
+                    <div className="startup-overlay adventure-startup-overlay">
+                        <div className="adventure-scene" aria-hidden="true">
+                            <span className="adventure-cloud adventure-cloud--one" />
+                            <span className="adventure-cloud adventure-cloud--two" />
+                            <span className="adventure-hill adventure-hill--one" />
+                            <span className="adventure-hill adventure-hill--two" />
+                            <span className="adventure-road" />
+                        </div>
+                        <div className="adventure-brand">
+                            <h1 className="adventure-title">
                                 POKEMON<br />AUTOCHESS
                             </h1>
                         </div>
 
-                        <div className="loading-container" style={{ width: '600px', textAlign: 'center' }}>
-                            <div className="loading-bar-wrapper" style={{
-                                width: '100%', height: '6px', background: 'rgba(255,255,255,0.05)',
-                                borderRadius: '3px', overflow: 'hidden', marginBottom: '20px',
-                                border: '1px solid rgba(255,255,255,0.05)'
-                            }}>
-                                <div className="loading-bar-fill" style={{
-                                    width: `${loadingProgress}%`, height: '100%',
-                                    background: 'linear-gradient(90deg, #60a5fa, #3b82f6)',
-                                    transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)'
-                                }} />
+                        <div className="loading-container adventure-panel adventure-loading">
+                            <div className="loading-bar-wrapper">
+                                <div className="loading-bar-fill" style={{ width: `${loadingProgress}%` }} />
                             </div>
-                            <p style={{ color: '#94a3b8', fontSize: '1rem', letterSpacing: '4px', margin: 0, opacity: 0.7 }}>
+                            <p className="adventure-loading-copy">
                                 版本資源載入中... {loadingProgress}%
                             </p>
                         </div>
@@ -2211,37 +2151,21 @@ function App() {
             {/* Difficulty Selection Screen (After Version Selection & Stage 2 Load) */}
             {
                 (!hasStarted && selectedVersionId && hasLoaded && difficulty === null) && (
-                    <div className="startup-overlay"
-                        style={{
-                            position: 'fixed', top: 0, left: 0, bottom: 0, right: 0,
-                            background: 'radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%)',
-                            zIndex: 10000, display: 'flex', flexDirection: 'column',
-                            justifyContent: 'center', alignItems: 'center', gap: '40px'
-                        }}>
-                        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                            <h1 style={{
-                                fontSize: '4.5rem',
-                                margin: '0',
-                                letterSpacing: '10px',
-                                background: 'linear-gradient(to bottom, #fff, #94a3b8)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.1))',
-                                fontWeight: 900
-                            }}>
+                    <div className="startup-overlay adventure-startup-overlay">
+                        <div className="adventure-scene" aria-hidden="true">
+                            <span className="adventure-cloud adventure-cloud--one" />
+                            <span className="adventure-cloud adventure-cloud--two" />
+                            <span className="adventure-hill adventure-hill--one" />
+                            <span className="adventure-hill adventure-hill--two" />
+                            <span className="adventure-road" />
+                        </div>
+                        <div className="adventure-brand">
+                            <h1 className="adventure-title">
                                 POKEMON<br />AUTOCHESS
                             </h1>
                         </div>
 
-                        <div className="difficulty-grid" style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            justifyContent: 'center',
-                            gap: '20px',
-                            maxWidth: '1100px',
-                            width: '94%',
-                            margin: '0 auto'
-                        }}>
+                        <div className="difficulty-grid adventure-choice-grid adventure-choice-grid--difficulty">
                             {[
                                 { id: 'NORMAL', name: '普通', icon: normalBall, color: '#ef4444' },
                                 { id: 'GREAT', name: '超級', icon: greatBall, color: '#3b82f6' },
@@ -2250,7 +2174,7 @@ function App() {
                             ].map(d => (
                                 <button
                                     key={d.id}
-                                    className={`difficulty-btn ${focusedDifficulty === d.id ? 'is-focused' : ''}`}
+                                    className={`difficulty-btn adventure-choice ${focusedDifficulty === d.id ? 'is-focused' : ''}`}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         if (focusedDifficulty === d.id) {
@@ -2259,32 +2183,15 @@ function App() {
                                             setFocusedDifficulty(d.id as 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER');
                                         }
                                     }}
-                                    style={{
-                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px',
-                                        padding: '30px 15px', background: 'rgba(0,0,0,0.4)', border: `1px solid ${d.color}33`,
-                                        borderRadius: '24px', cursor: 'pointer',
-                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        flex: '1 1 210px',
-                                        maxWidth: '280px',
-                                        minHeight: '200px',
-                                        backdropFilter: 'blur(10px)',
-                                        boxShadow: `0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px ${d.color}11`
-                                    }}
                                 >
-                                    <img src={d.icon} alt={d.name} style={{ width: '96px', height: '96px', filter: `drop-shadow(0 0 20px ${d.color}66)` }} />
-                                    <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: d.color, letterSpacing: '2px' }}>{d.name}</span>
+                                    <img src={d.icon} alt={d.name} className="adventure-choice-icon adventure-choice-icon--difficulty" />
+                                    <span className="adventure-choice-name">{d.name}</span>
                                 </button>
                             ))}
                         </div>
 
-                        <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '5vh' }} className="startup-footer-box">
-                            <p style={{
-                                color: '#94a3b8',
-                                fontSize: '1.1rem',
-                                letterSpacing: '4px',
-                                opacity: 0.8,
-                                padding: '0 20px'
-                            }}>選擇本次挑戰難度</p>
+                        <div className="startup-footer-box adventure-footer">
+                            <p className="adventure-footer-copy">選擇本次挑戰難度</p>
                         </div>
                     </div>
                 )
