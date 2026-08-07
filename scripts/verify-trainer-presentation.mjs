@@ -25,6 +25,12 @@ try {
   assert.match(selectorSource, /onSelect\(trainer\)/);
   assert.match(selectorSource, /trainer-selector-track/);
 
+  const introSource = readFileSync(resolve(root, 'src', 'components', 'BattleIntro.tsx'), 'utf8');
+  assert.match(introSource, /onClick=\{complete\}/);
+  assert.match(introSource, /useRef\(false\)/);
+  assert.match(introSource, /clearTimeout/);
+  assert.match(introSource, /battle-intro-scene/);
+
   console.log('Trainer presentation values verified.');
 } finally {
   await server.close();
