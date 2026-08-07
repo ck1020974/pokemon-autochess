@@ -7,31 +7,18 @@ interface TutorialModalProps {
 
 export function TutorialModal({ onClose, onStartTutorial }: TutorialModalProps) {
     return (
-        <div className="tutorial-overlay" style={{ zIndex: 100000 }}>
-            <div className="tutorial-modal" style={{ width: '500px', height: 'auto', textAlign: 'center', padding: '40px', justifyContent: 'center' }} onClick={(e) => e.stopPropagation()}>
-                <h2 className="tutorial-title" style={{ marginBottom: '20px', fontSize: '2.2rem' }}>新手教學模式</h2>
-                <div style={{ color: '#cbd5e1', fontSize: '1.2rem', marginBottom: '35px', lineHeight: '1.8' }}>
+        <div className="tutorial-overlay tutorial-entry-overlay">
+            <div className="tutorial-modal tutorial-entry-modal" onClick={(e) => e.stopPropagation()}>
+                <h2 className="tutorial-title tutorial-entry-title">新手教學模式</h2>
+                <div className="tutorial-entry-copy">
                     學習如何遊玩寶可夢自走棋<br />
                     遊戲進度將被清除，並重新開始！
                 </div>
-                <div style={{ display: 'flex', gap: '30px', justifyContent: 'center' }}>
-                    <button className="btn-premium" style={{
-                        background: 'linear-gradient(to bottom, #3b82f6, #2563eb)',
-                        borderColor: '#60a5fa',
-                        color: '#fff',
-                        fontSize: '1.2rem',
-                        padding: '15px 35px',
-                        boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)'
-                    }} onClick={onStartTutorial}>
+                <div className="tutorial-entry-actions">
+                    <button className="btn-premium tutorial-entry-action tutorial-entry-primary" onClick={onStartTutorial}>
                         開始
                     </button>
-                    <button className="btn-premium" style={{
-                        background: 'transparent',
-                        borderColor: 'rgba(255,255,255,0.2)',
-                        color: '#aaa',
-                        fontSize: '1.2rem',
-                        padding: '15px 35px'
-                    }} onClick={onClose}>
+                    <button className="btn-premium tutorial-entry-action tutorial-entry-secondary" onClick={onClose}>
                         跳過
                     </button>
                 </div>

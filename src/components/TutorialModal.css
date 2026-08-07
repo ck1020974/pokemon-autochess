@@ -173,6 +173,100 @@
     font-weight: bold;
 }
 
+/* Tutorial entry point: a bright, welcoming invitation before the guided flow. */
+.tutorial-entry-overlay {
+    z-index: 100000;
+    padding: 24px;
+    background:
+        radial-gradient(circle at 18% 16%, rgba(255, 250, 220, 0.78), transparent 32%),
+        radial-gradient(circle at 82% 84%, rgba(119, 214, 202, 0.34), transparent 38%),
+        rgba(219, 247, 241, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.tutorial-entry-modal {
+    width: min(500px, 100%);
+    max-width: 500px;
+    height: auto;
+    max-height: min(90vh, 620px);
+    padding: 40px;
+    justify-content: center;
+    text-align: center;
+    overflow-y: auto;
+    background: linear-gradient(145deg, rgba(255, 254, 247, 0.96), rgba(242, 255, 250, 0.9));
+    border: 1px solid rgba(22, 104, 98, 0.22);
+    border-radius: 28px;
+    box-shadow: 0 24px 60px rgba(19, 89, 84, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.tutorial-entry-title {
+    margin-bottom: 20px;
+    color: #124f4c;
+    font-size: 2.2rem;
+    letter-spacing: 0.08em;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+}
+
+.tutorial-entry-copy {
+    margin-bottom: 35px;
+    color: #235e59;
+    font-size: 1.2rem;
+    line-height: 1.8;
+}
+
+.tutorial-entry-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+}
+
+.tutorial-entry-action.tutorial-entry-action {
+    min-width: 144px;
+    padding: 15px 30px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.tutorial-entry-action.tutorial-entry-action:hover {
+    transform: translateY(-2px);
+}
+
+.tutorial-entry-action.tutorial-entry-action:focus-visible {
+    outline: 3px solid #0b7770;
+    outline-offset: 3px;
+}
+
+.tutorial-entry-action.tutorial-entry-primary {
+    color: #173a35;
+    background: linear-gradient(180deg, #f8d980, #e9b94f);
+    border-color: #c89025;
+    box-shadow: 0 8px 18px rgba(170, 116, 22, 0.24);
+}
+
+.tutorial-entry-action.tutorial-entry-primary:hover {
+    background: linear-gradient(180deg, #ffe9a7, #f2c55c);
+    box-shadow: 0 11px 22px rgba(170, 116, 22, 0.3);
+}
+
+.tutorial-entry-action.tutorial-entry-secondary {
+    color: #155d58;
+    background: rgba(255, 255, 255, 0.62);
+    border-color: rgba(21, 93, 88, 0.45);
+    box-shadow: 0 5px 12px rgba(19, 89, 84, 0.1);
+}
+
+.tutorial-entry-action.tutorial-entry-secondary:hover {
+    background: rgba(234, 255, 249, 0.94);
+    box-shadow: 0 8px 16px rgba(19, 89, 84, 0.16);
+}
+
 @media (max-width: 800px),
 (max-height: 600px) {
     .tutorial-modal {
@@ -211,5 +305,30 @@
     .tutorial-step-icon {
         margin-right: 0;
         margin-bottom: 10px;
+    }
+
+    .tutorial-entry-overlay {
+        padding: 16px;
+    }
+
+    .tutorial-entry-modal {
+        padding: 30px 24px;
+    }
+
+    .tutorial-entry-title {
+        font-size: clamp(1.7rem, 8vw, 2.2rem);
+    }
+
+    .tutorial-entry-copy {
+        font-size: 1.05rem;
+        margin-bottom: 28px;
+    }
+
+    .tutorial-entry-actions {
+        gap: 12px;
+    }
+
+    .tutorial-entry-action {
+        width: 100%;
     }
 }
