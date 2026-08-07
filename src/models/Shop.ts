@@ -1,5 +1,5 @@
 
-import { Unit } from './Unit';
+import { Unit, type UnitTemplate } from './Unit';
 // Removed unused UnitTemplate import
 import { ALL_UNITS } from '../data/AllUnits';
 
@@ -57,7 +57,7 @@ export class Shop {
                 }
 
                 // Down-rolling Logic: If target tier has no units in active pool, try lower tiers.
-                let pool: any[] = [];
+                const pool: UnitTemplate[] = [];
                 let currentAttemptTier = targetTier;
 
                 while (currentAttemptTier >= 1 && pool.length === 0) {

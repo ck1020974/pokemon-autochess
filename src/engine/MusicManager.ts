@@ -43,7 +43,9 @@ class MusicManager {
 
     private initContext() {
         if (!this.context) {
-            this.context = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const AudioContextConstructor = window.AudioContext ?? (window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+            if (!AudioContextConstructor) throw new Error('Web Audio API is unavailable');
+            this.context = new AudioContextConstructor();
         }
         this.resumeContext();
         return this.context;
@@ -53,7 +55,7 @@ class MusicManager {
         if (this.context && this.context.state === 'suspended') {
             try {
                 await this.context.resume();
-            } catch (e) { }
+            } catch { /* browser blocked audio context resume */ }
         }
 
         // If we have a track that should be playing but isn't, try to play it now
@@ -63,7 +65,7 @@ class MusicManager {
     }
 
     public async preload(names: string[]): Promise<void> {
-        const loadTrack = async (name: string): Promise<any> => {
+        const loadTrack = async (name: string): Promise<AudioBuffer | null | void> => {
             if (this.sfxTracks.includes(name)) {
                 if (this.bufferCache.has(name)) return this.bufferCache.get(name)!;
                 if (this.decodedPromises.has(name)) return this.decodedPromises.get(name)!;
@@ -91,7 +93,7 @@ class MusicManager {
                 // For BGM: Fetch the file to warm up browser cache, but don't decode to memory
                 try {
                     await fetch(`${this.musicPath}${name}.OGG`);
-                } catch (e) { }
+                } catch { /* cache warm-up is optional */ }
                 return Promise.resolve();
             }
         };
@@ -202,7 +204,7 @@ class MusicManager {
             try {
                 this.currentSource.stop();
                 this.currentSource.disconnect();
-            } catch (e) { }
+            } catch { /* source may already be stopped */ }
             this.currentSource = null;
         }
 
@@ -211,21 +213,21 @@ class MusicManager {
             try {
                 this.bgmElement.pause();
                 this.bgmElement.currentTime = 0;
-            } catch (e) { }
+            } catch { /* media element may already be stopped */ }
         }
 
         // Cleanup Gain Nodes
         if (this.currentGainNode) {
             try {
                 this.currentGainNode.disconnect();
-            } catch (e) { }
+            } catch { /* gain node may already be disconnected */ }
             this.currentGainNode = null;
         }
 
         if (this.bgmMediaSource) {
             try {
                 this.bgmMediaSource.disconnect();
-            } catch (e) { }
+            } catch { /* media source may already be disconnected */ }
         }
     }
 

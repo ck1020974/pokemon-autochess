@@ -1,8 +1,8 @@
-import { Unit } from '../models/Unit';
+import { Unit, type UnitTemplate } from '../models/Unit';
 import { Shop } from '../models/Shop';
 import { ALL_UNITS } from '../data/AllUnits';
 import { SYNERGIES } from '../models/Synergies';
-import { REWARD_DATA } from '../models/RewardData';
+import { REWARD_DATA, type RewardDefinition, type RewardDifficulty } from '../models/RewardData';
 
 import type { GameEdition } from '../models/Edition';
 import { ClassicEdition } from '../data/editions/classic';
@@ -17,6 +17,17 @@ export const GamePhase = {
 } as const;
 
 export type GamePhase = typeof GamePhase[keyof typeof GamePhase];
+
+export interface PoolChoice {
+    id: string;
+    tier: number;
+    units: string[];
+    synergies: string[];
+    displayUnitNames: string;
+    displayImages: string[];
+    name: string;
+    imageUrl: string;
+}
 
 export class GameLoop {
     public turn: number = 1;
@@ -51,15 +62,15 @@ export class GameLoop {
     public currentOpponentId: string | null = null;
     public currentOpponentDifficulty: string = 'NORMAL';
 
-    public rewardChoices: any[] = [];
+    public rewardChoices: RewardDefinition[] = [];
     public pendingGoldBonus: number = 0;
     public pendingFreeRerolls: number = 0;
     public freeRerolls: number = 0;
-    public nextBattleBuffs: any[] = [];
+    public nextBattleBuffs: RewardDefinition[] = [];
 
     // Infinite mode dynamic pool
     public activePoolUnitIds: string[] = [];
-    public poolChoices: any[] = [];
+    public poolChoices: PoolChoice[] = [];
     public bannedPoolUnitIds: string[] = [];
     public mewSynergies: string[] = [];
     private processedTurns: Set<number> = new Set();
@@ -74,7 +85,7 @@ export class GameLoop {
         this.mewSynergies = shuffled.slice(0, 3);
         console.log("本局夢幻隨機羈絆：", this.mewSynergies);
 
-        (window as any).game = this; // Expose to window for UI dynamic descriptions
+        (window as Window & typeof globalThis & { game?: GameLoop }).game = this; // Expose to window for UI dynamic descriptions
     }
 
     public initInfinitePool() {
@@ -153,7 +164,7 @@ export class GameLoop {
             }
         }
 
-        (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
+        this.shop.roll(this.turn, this.edition.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
     }
 
     private pendingPoolSelectionSteps: { tier: number, count: number }[] = [];
@@ -162,18 +173,18 @@ export class GameLoop {
     private processNextPoolStep() {
         if (this.pendingPoolSelectionSteps.length > 0) {
             this.currentPoolStep = this.pendingPoolSelectionSteps.shift()!;
-            this.generatePoolChoices(this.currentPoolStep.tier, 1);
+                this.generatePoolChoices(this.currentPoolStep.tier);
         } else {
             this.currentPoolStep = null;
             this.phase = GamePhase.SHOP;
             // Finally roll shop after all steps done
-            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
+            this.shop.roll(this.turn, this.edition.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
         }
     }
 
-    public generatePoolChoices(tier: number, _count: number) {
+    public generatePoolChoices(tier: number) {
         let currentTier = tier;
-        let available: any[] = [];
+        let available: UnitTemplate[] = [];
 
         // Fallback Mechanism: If current tier is empty, try lower tiers
         while (currentTier >= 1) {
@@ -188,7 +199,7 @@ export class GameLoop {
             currentTier--;
         }
 
-        const shuffle = (array: any[]) => {
+        const shuffle = (array: UnitTemplate[]) => {
             const arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -197,7 +208,7 @@ export class GameLoop {
             return arr;
         };
 
-        const choices = [];
+        const choices: PoolChoice[] = [];
         const candidates = shuffle(available);
         for (let i = 0; i < 3; i++) {
             const unit = candidates[i] || candidates[0];
@@ -217,7 +228,7 @@ export class GameLoop {
         this.phase = GamePhase.POOL_SELECTION;
     }
 
-    public applyPoolChoice(choice: any, unselectedIds: string[] = []) {
+    public applyPoolChoice(choice: PoolChoice, unselectedIds: string[] = []) {
         this.activePoolUnitIds = [...this.activePoolUnitIds, ...choice.units];
 
         // Ban unselected units
@@ -231,13 +242,13 @@ export class GameLoop {
         if (this.currentPoolStep) {
             this.currentPoolStep.count--;
             if (this.currentPoolStep.count > 0) {
-                this.generatePoolChoices(this.currentPoolStep.tier, 1);
+                this.generatePoolChoices(this.currentPoolStep.tier);
             } else {
                 this.processNextPoolStep();
             }
         } else {
             this.phase = GamePhase.SHOP;
-            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
+            this.shop.roll(this.turn, this.edition.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
         }
     }
 
@@ -277,25 +288,25 @@ export class GameLoop {
         ALL_UNITS.charizard.description = `同時對後方敵方造成 [N] 傷害 (每場戰鬥後增強)`;
 
         // Sync static template scaling values to current global N
-        (ALL_UNITS.charmander as any).scalingValue = this.charmanderN;
-        (ALL_UNITS.charmeleon as any).scalingValue = this.charmanderN;
-        (ALL_UNITS.charizard as any).scalingValue = this.charmanderN;
+        ALL_UNITS.charmander.scalingValue = this.charmanderN;
+        ALL_UNITS.charmeleon.scalingValue = this.charmanderN;
+        ALL_UNITS.charizard.scalingValue = this.charmanderN;
 
         // Riolu family templates
         ALL_UNITS.riolu.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後增強)。`;
         ALL_UNITS.lucario.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後增強)。`;
         ALL_UNITS.lucario_final.description = `死亡後，對首位敵方造成 [N] 傷害 (每場戰鬥後增強)。`;
-        (ALL_UNITS.riolu as any).scalingValue = this.rioluN;
-        (ALL_UNITS.lucario as any).scalingValue = this.rioluN;
-        (ALL_UNITS.lucario_final as any).scalingValue = this.rioluN;
+        ALL_UNITS.riolu.scalingValue = this.rioluN;
+        ALL_UNITS.lucario.scalingValue = this.rioluN;
+        ALL_UNITS.lucario_final.scalingValue = this.rioluN;
 
         // Pichu family templates
         ALL_UNITS.pichu.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (每三場戰鬥後增強)。`;
         ALL_UNITS.pikachu.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (每兩場戰鬥後增強)。`;
         ALL_UNITS.raichu.description = `戰鬥開始時，對最弱的敵方造成 [N] 傷害 (每場戰鬥後增強)。`;
-        (ALL_UNITS.pichu as any).scalingValue = this.pichuN;
-        (ALL_UNITS.pikachu as any).scalingValue = this.pichuN;
-        (ALL_UNITS.raichu as any).scalingValue = this.pichuN;
+        ALL_UNITS.pichu.scalingValue = this.pichuN;
+        ALL_UNITS.pikachu.scalingValue = this.pichuN;
+        ALL_UNITS.raichu.scalingValue = this.pichuN;
 
         // Sync units in shop (including frozen ones)
         this.shop.slots.forEach(u => {
@@ -571,7 +582,7 @@ export class GameLoop {
             // --- Victory Condition ---
             const totalChampions = this.edition.championOpponents.length;
             const defeatedChampions = new Set(this.defeatedOpponentIds.filter(id =>
-                this.edition.championOpponents.some((c: any) => c.id === id)
+                this.edition.championOpponents.some(c => c.id === id)
             )).size;
 
             if (this.edition.id === 'infinite') {
@@ -636,7 +647,7 @@ export class GameLoop {
                 'VERY_HARD': 'EXTREME'
             };
             const rewardDiffRaw = difficultyMap[this.currentOpponentDifficulty] || 'NORMAL';
-            this.rewardChoices = this.generateRewardOptions(rewardDiffRaw as any);
+            this.rewardChoices = this.generateRewardOptions(rewardDiffRaw as RewardDifficulty);
         } else {
             this.concludeTurn(result);
         }
@@ -721,7 +732,7 @@ export class GameLoop {
         }
     }
 
-    public generateRewardOptions(difficulty: any): any[] {
+    public generateRewardOptions(difficulty: RewardDifficulty): RewardDefinition[] {
         // 1. Get player synergies
         const playerSynergies = new Set<string>();
         this.playerTeam.forEach(u => {
@@ -729,25 +740,25 @@ export class GameLoop {
         });
 
         // 2. Filter REWARD_DATA by difficulty
-        const diffData = REWARD_DATA.filter((r: any) => r.difficulty === difficulty);
+        const diffData = REWARD_DATA.filter(r => r.difficulty === difficulty);
 
         // 3. Define Pools
         // Pool 1: 資源類 (GOLD, EXP, LIVES)
         const pool1Categories = ['GOLD', 'EXP', 'LIVES'];
-        const pool1 = diffData.filter((r: any) =>
+        const pool1 = diffData.filter(r =>
             pool1Categories.includes(r.category)
         );
 
         // Pool 2: 通用強化類 (BATTLE_NONE, Mints, and Evolutionary Items)
         const pool2Items = ['幸運蛋', '不變之石', '進化奇石'];
-        const pool2 = diffData.filter((r: any) =>
+        const pool2 = diffData.filter(r =>
             r.category === 'BATTLE_NONE' ||
             (r.category === 'PERM_NONE' && r.item.includes('薄荷')) ||
             pool2Items.includes(r.item)
         );
 
         // Pool 3: 羈絆強化類 (PERM_SYNERGY, BATTLE_SYNERGY)
-        let pool3 = diffData.filter((r: any) =>
+        let pool3 = diffData.filter(r =>
             (r.category === 'PERM_SYNERGY' || r.category === 'BATTLE_SYNERGY')
         );
 
@@ -763,8 +774,8 @@ export class GameLoop {
         pool3 = pool3.filter(r => !r.synergyId || availableSynergies.has(r.synergyId));
 
         // 4. Selection Logic: Strict One from Each Pool
-        const results: any[] = [];
-        const shuffle = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
+        const results: RewardDefinition[] = [];
+        const shuffle = (array: RewardDefinition[]) => [...array].sort(() => Math.random() - 0.5);
 
         // Pick from Pool 1
         const shuffledP1 = shuffle(pool1);
@@ -795,13 +806,13 @@ export class GameLoop {
         return shuffle(results).slice(0, 3);
     }
 
-    public applyReward(reward: any) {
+    public applyReward(reward: RewardDefinition) {
         console.log(`正在應用獎勵：${reward.item}`);
 
         const targetUnits = this.playerTeam.filter(u => u !== null) as Unit[];
 
         switch (reward.category) {
-            case 'GOLD':
+            case 'GOLD': {
                 const goldMatch = reward.effect.match(/\+(\d+)/);
                 if (goldMatch) {
                     this.pendingGoldBonus += parseInt(goldMatch[1]);
@@ -810,7 +821,8 @@ export class GameLoop {
                     if (diceMatch) this.pendingFreeRerolls += parseInt(diceMatch[1]);
                 }
                 break;
-            case 'EXP':
+            }
+            case 'EXP': {
                 const expMatch = reward.effect.match(/\+(\d+)/);
                 const expAmount = expMatch ? parseInt(expMatch[1]) : 1;
 
@@ -834,21 +846,25 @@ export class GameLoop {
                     shuffled.slice(0, count).forEach(u => this.applyExpToUnit(u, expAmount));
                 }
                 break;
+            }
             case 'PERM_NONE':
-            case 'PERM_SYNERGY':
+            case 'PERM_SYNERGY': {
                 this.applyPermanentReward(reward, targetUnits);
                 break;
+            }
             case 'BATTLE_NONE':
-            case 'BATTLE_SYNERGY':
+            case 'BATTLE_SYNERGY': {
                 this.nextBattleBuffs.push(reward);
                 break;
-            case 'LIVES':
+            }
+            case 'LIVES': {
                 const livesMatch = reward.effect.match(/\+(\d+)/);
                 if (livesMatch) {
                     this.lives += parseInt(livesMatch[1]);
                     console.log(`玩家生命增加：${livesMatch[1]}`);
                 }
                 break;
+            }
         }
 
         this.rewardChoices = []; // Clear choices in engine
@@ -879,7 +895,7 @@ export class GameLoop {
         }
     }
 
-    private applyPermanentReward(reward: any, units: Unit[]) {
+    private applyPermanentReward(reward: RewardDefinition, units: Unit[]) {
         const atkMatch = reward.effect.match(/\+(\d+)\s*(?:攻擊|攻)/);
         const hpMatch = reward.effect.match(/\+(\d+)\s*(?:生命|HP)/);
         const atkMinus = reward.effect.match(/-(\d+)\s*(?:攻擊|攻)/);
@@ -915,7 +931,7 @@ export class GameLoop {
                 return !nextTemplate || nextTemplate.name === u.name;
             });
         } else if (reward.synergyId) {
-            targets = units.filter(u => u.synergies.includes(reward.synergyId));
+            targets = units.filter(u => u.synergies.includes(reward.synergyId!));
         }
 
         targets.forEach(u => {
@@ -967,11 +983,11 @@ export class GameLoop {
     public reroll() {
         if (this.freeRerolls > 0) {
             this.freeRerolls--;
-            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
+            this.shop.roll(this.turn, this.edition.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
             console.log(`使用免費刷新！剩餘次數：${this.freeRerolls}`);
         } else if (this.gold >= 1) {
             this.gold -= 1;
-            (this.shop as any).roll(this.turn, this.edition?.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
+            this.shop.roll(this.turn, this.edition.availableUnitIds, this.edition.id === 'infinite', this.activePoolUnitIds);
         }
     }
 

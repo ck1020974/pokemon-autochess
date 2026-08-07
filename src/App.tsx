@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 // Last updated: 2026-03-06 - Balance Fix Deploy
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
-import { GameLoop, GamePhase } from './engine/GameLoop';
+import { GameLoop, GamePhase, type PoolChoice } from './engine/GameLoop';
 import { music } from './engine/MusicManager';
 
 import { BattleSimulator } from './engine/BattleSimulator';
@@ -11,8 +11,9 @@ import type { BattleLog } from './engine/BattleSimulator';
 import { ALL_UNITS, PREFERRED_POSITIONS } from './data/AllUnits';
 import type { PreferredPosition } from './data/AllUnits';
 import { SYNERGIES } from './models/Synergies';
-import { Unit } from './models/Unit';
+import { Unit, type UnitTemplate } from './models/Unit';
 import { REWARD_DATA } from './models/RewardData';
+import type { RewardDefinition } from './models/RewardData';
 import type { GameEdition } from './models/Edition';
 import { ClassicEdition } from './data/editions/classic';
 import { ModernEdition } from './data/editions/modern';
@@ -21,6 +22,8 @@ import { TrainerSelector } from './components/TrainerSelector';
 import { BattleIntro, type BattleIntroOpponent } from './components/BattleIntro';
 import { getBattleSceneClass, getPresentationKind } from './presentation/battlePresentation';
 import { PLAYER_TRAINERS, type PlayerTrainer } from './presentation/trainers';
+
+const gameWindow = window as Window & typeof globalThis & { game?: GameLoop };
 
 // Difficulty Icons
 import normalBall from './assets/普通.webp';
@@ -45,15 +48,15 @@ const getInitialEdition = (): GameEdition => {
 };
 
 // --- Error Boundary ---
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
-    constructor(props: any) {
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: unknown }> {
+    constructor(props: { children: React.ReactNode }) {
         super(props);
         this.state = { hasError: false, error: null };
     }
-    static getDerivedStateFromError(error: any) {
+    static getDerivedStateFromError(error: unknown) {
         return { hasError: true, error };
     }
-    componentDidCatch(error: any, errorInfo: any) {
+    componentDidCatch(error: unknown, errorInfo: React.ErrorInfo) {
         console.error("React Error Boundary caught an error:", error, errorInfo);
     }
     render() {
@@ -102,10 +105,30 @@ type SelectedOpponent = BattleIntroOpponent & {
     difficulty?: string;
 };
 
+interface UnitCardProps {
+    unit: Unit | null;
+    onClick: () => void;
+    frozen?: boolean;
+    draggable?: boolean;
+    onDragStart?: (event: React.DragEvent) => void;
+    flipped?: boolean;
+    isInteractive?: boolean;
+    onToggleFreeze?: () => void;
+    silenced?: boolean;
+    gastroAcid?: boolean;
+    hpSwapped?: boolean;
+    isSelected?: boolean;
+    isEvolving?: boolean;
+    showMergeGlow?: boolean;
+    isCharmed?: boolean;
+    tutorialHighlightLock?: boolean;
+    synergyHighlight?: boolean;
+}
+
 // --- Helper Components ---
 
 // UnitCard with Direct Lock & Silence Support
-function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock, synergyHighlight }: any) {
+function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock, synergyHighlight }: UnitCardProps) {
     // Robust Check: Ensure unit and its stats exist
     if (!unit || !unit.stats || unit.stats.hp <= 0) {
         return (
@@ -214,7 +237,7 @@ function getSynergyStatus(team: (Unit | null | undefined)[], activeEdition: Game
                 // Fix: Include evolved forms even if they are not in shop (isHiddenFromShop)
                 const isEeveeEdition = isEeveeFamily && activeEdition.availableUnitIds.includes('eevee');
                 const isAvailable = activeEdition.availableUnitIds.includes(t.id) || isEeveeEdition;
-                const isMewSyn = (t.id === 'mew' && (window as any).game?.mewSynergies?.includes(syn.id));
+                const isMewSyn = t.id === 'mew' && gameWindow.game?.mewSynergies?.includes(syn.id);
                 if ((!t.synergies?.includes(syn.id) && !isMewSyn) || !(baseCondition || isEeveeFamily) || !isAvailable) return false;
 
                 // For Families (except Eevee), only show the most "basic" representative that has the synergy
@@ -227,7 +250,7 @@ function getSynergyStatus(team: (Unit | null | undefined)[], activeEdition: Game
 
                 const familyUnits = Object.values(ALL_UNITS).filter(u => u.family === t.family && activeEdition.availableUnitIds.includes(u.id));
                 const unitsWithSyn = familyUnits.filter(u => {
-                    const unitIsMewSyn = (u.id === 'mew' && (window as any).game?.mewSynergies?.includes(syn.id));
+                    const unitIsMewSyn = u.id === 'mew' && gameWindow.game?.mewSynergies?.includes(syn.id);
                     return u.synergies?.includes(syn.id) || unitIsMewSyn;
                 });
 
@@ -282,7 +305,7 @@ function App() {
     const gameRef = useRef<GameLoop | null>(null);
     if (!gameRef.current) {
         gameRef.current = new GameLoop(activeEdition);
-        (window as any).game = gameRef.current;
+        gameWindow.game = gameRef.current;
     }
     const game = gameRef.current;
 
@@ -294,7 +317,7 @@ function App() {
         ...activeEdition.championOpponents
     ], [activeEdition]);
 
-    const [rewardChoices, setRewardChoices] = useState<any[]>([]);
+    const [rewardChoices, setRewardChoices] = useState<RewardDefinition[]>([]);
     const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
     const [isPoolProcessing, setIsPoolProcessing] = useState(false);
     const update = useForceUpdate();
@@ -370,6 +393,8 @@ function App() {
 
     // Battle Speed State
     const [battleSpeed, setBattleSpeed] = useState(1);
+    const battleSpeedRef = useRef(battleSpeed);
+    battleSpeedRef.current = battleSpeed;
     useEffect(() => {
         document.documentElement.style.setProperty('--anim-speed', battleSpeed.toString());
     }, [battleSpeed]);
@@ -484,14 +509,14 @@ function App() {
         if (tutorialStep === 0) return;
 
         if (tutorialStep === 2) {
-            if (game.playerTeam.filter((u: any) => u !== null).length >= 3) {
+            if (game.playerTeam.filter(u => u !== null).length >= 3) {
                 setTutorialStep(3);
                 setSelected(null);
             }
         } else if (tutorialStep === 4) {
-            const tutorialUnitIdx = game.playerTeam.findIndex((u: any) => u?.family === tutorialUnitId);
+            const tutorialUnitIdx = game.playerTeam.findIndex(u => u?.family === tutorialUnitId);
             // If Tutorial Unit is in index 1-4, it's behind someone if there is another unit in index 0 to (tutorialUnitIdx-1)
-            const isBehindSomeone = tutorialUnitIdx > 0 && game.playerTeam.slice(0, tutorialUnitIdx).some((u: any) => u !== null);
+            const isBehindSomeone = tutorialUnitIdx > 0 && game.playerTeam.slice(0, tutorialUnitIdx).some(u => u !== null);
             if (isBehindSomeone) {
                 setTutorialStep(5);
                 setSelected(null);
@@ -515,7 +540,7 @@ function App() {
             }
         } else if (tutorialStep === 8) {
             if (game.phase === GamePhase.SHOP && battleResult === null) {
-                const hasLevel2Charmander = game.playerTeam.some((u: any) => u?.family === 'charmander' && u.level >= 2);
+                const hasLevel2Charmander = game.playerTeam.some(u => u?.family === 'charmander' && u.level >= 2);
                 if (hasLevel2Charmander) {
                     setTutorialStep(9);
                 } else {
@@ -531,7 +556,7 @@ function App() {
                 }
             }
         }
-    }, [tutorialStep, game.phase, battleResult, update]); // Changed from gameRef.current.phase
+    }, [tutorialStep, game.phase, battleResult, update, game.playerTeam, game.gold, game.shop]); // Changed from gameRef.current.phase
 
     // Image Preloading - Split into Critical (Tier 1/2) and Background (Tier 3+)
     // PHASE 1: Core Assets (Mount)
@@ -610,7 +635,7 @@ function App() {
                 }
             });
 
-            activeEdition.noviceOpponents.forEach((op: any) => {
+            activeEdition.noviceOpponents.forEach(op => {
                 if (op.url) phase2Urls.add(op.url);
                 if (op.coreUnits && Array.isArray(op.coreUnits)) {
                     op.coreUnits.forEach((id: string) => {
@@ -649,7 +674,7 @@ function App() {
                         if (t.battleImageUrl) phase3Urls.add(t.battleImageUrl);
                     }
                 });
-                [...activeEdition.intermOpponents, ...activeEdition.advancedOpponents, ...activeEdition.eliteOpponents, ...activeEdition.championOpponents].forEach((op: any) => {
+                [...activeEdition.intermOpponents, ...activeEdition.advancedOpponents, ...activeEdition.eliteOpponents, ...activeEdition.championOpponents].forEach(op => {
                     if (op.url) phase3Urls.add(op.url);
                 });
                 await loadImages(Array.from(phase3Urls));
@@ -667,7 +692,7 @@ function App() {
         };
 
         loadEditionAssets();
-    }, [selectedVersionId, activeEdition.id]);
+    }, [selectedVersionId, activeEdition]);
 
     // --- Dynamic Preloading for Current Team & Opponents ---
     useEffect(() => {
@@ -681,7 +706,7 @@ function App() {
 
         // Current Opponent Preload
         if (game.currentOpponentId) {
-            const op = allEditionOpponents.find((o: any) => o.id === game.currentOpponentId);
+            const op = allEditionOpponents.find(o => o.id === game.currentOpponentId);
             if (op) {
                 if (op.url) teamUrls.push(op.url);
                 if (op.coreUnits && Array.isArray(op.coreUnits)) {
@@ -712,7 +737,7 @@ function App() {
                 img.src = url;
             });
         }
-    }, [game.playerTeam, game.currentOpponentId, game.turn]);
+    }, [game.playerTeam, game.currentOpponentId, game.turn, allEditionOpponents]);
 
     // --- BGM Initial Logic ---
     useEffect(() => {
@@ -744,10 +769,11 @@ function App() {
 
         // Attempt to lock landscape if supported
         try {
-            if (screen.orientation && (screen.orientation as any).lock) {
-                (screen.orientation as any).lock('landscape').catch(() => { });
+            const orientation = screen.orientation as ScreenOrientation & { lock?: (orientation: string) => Promise<void> };
+            if (orientation.lock) {
+                orientation.lock('landscape').catch(() => { /* unsupported orientation lock */ });
             }
-        } catch (e) { }
+        } catch { /* unsupported orientation lock */ }
 
         return () => {
             window.removeEventListener('resize', checkOrientation);
@@ -783,7 +809,7 @@ function App() {
     };
 
     const toggleBattleSpeed = () => {
-        setBattleSpeed((prev: any) => {
+        setBattleSpeed(prev => {
             if (prev === 1) return 2;
             if (prev === 2) return 3;
             return 1;
@@ -849,7 +875,7 @@ function App() {
 
     // Timer loop for timeout (using elapsed seconds for pause sync)
     useEffect(() => {
-        let timer: any;
+        let timer: ReturnType<typeof setInterval> | undefined;
         if (game.phase === GamePhase.BATTLE && !battleResult && !isPaused) {
             timer = setInterval(() => {
                 if (!document.hidden) {
@@ -861,6 +887,7 @@ function App() {
     }, [game.phase, battleResult, isPaused]);
 
     useEffect(() => {
+        const battleSpeedAtStart = battleSpeedRef.current;
         if (game.phase === GamePhase.BATTLE && !simulatorRef.current) {
             // Init Battle
             // Enemy Count Logic based on User Request
@@ -872,7 +899,7 @@ function App() {
             let enemyTeam: (Unit | null)[] = [];
 
             // Helper to bias enemy generation towards higher tiers in mid/late game
-            const getRandomEnemyTemplate = (templates: any[]) => {
+            const getRandomEnemyTemplate = (templates: UnitTemplate[]) => {
                 if (game.turn >= 8 && Math.random() < 0.6) {
                     const maxTier = Math.max(...templates.map(t => t.tier));
                     const highTierPool = templates.filter(t => t.tier >= maxTier - 1);
@@ -930,7 +957,7 @@ function App() {
                 // 3. Strategy / Synergy Selection
                 if (tutorialStep > 0 && tutorialStep < 10) {
                     // Tutorial Battle 1: Use Brock (novice_3 or in_3)'s team exactly
-                    const brock = activeEdition.noviceOpponents.find((n: any) => n.id.includes('_3')) || activeEdition.noviceOpponents[0];
+                    const brock = activeEdition.noviceOpponents.find(n => n.id.includes('_3')) || activeEdition.noviceOpponents[0];
                     enemyTeam = (brock?.coreUnits || []).map((id: string) => {
                         const t = ALL_UNITS[id];
                         if (!t) {
@@ -943,11 +970,11 @@ function App() {
                     }).concat(Array(5).fill(null)).slice(0, 5) as Unit[];
                 } else if (selectedOpponent && selectedOpponent.id) {
                     // Real gameplay OR Tutorial Battle 2: Use chosen opponent's team
-                    let def = activeEdition.championOpponents.find((c: any) => c.id === selectedOpponent.id) ||
-                        activeEdition.eliteOpponents.find((c: any) => c.id === selectedOpponent.id) ||
-                        activeEdition.advancedOpponents.find((e: any) => e.id === selectedOpponent.id) ||
-                        activeEdition.intermOpponents.find((g: any) => g.id === selectedOpponent.id) ||
-                        activeEdition.noviceOpponents.find((n: any) => n.id === selectedOpponent.id);
+                    const def = activeEdition.championOpponents.find(c => c.id === selectedOpponent.id) ||
+                        activeEdition.eliteOpponents.find(c => c.id === selectedOpponent.id) ||
+                        activeEdition.advancedOpponents.find(e => e.id === selectedOpponent.id) ||
+                        activeEdition.intermOpponents.find(g => g.id === selectedOpponent.id) ||
+                        activeEdition.noviceOpponents.find(n => n.id === selectedOpponent.id);
 
                     if (def) {
                         // bossLevel for Core Units
@@ -963,7 +990,7 @@ function App() {
                         }
 
                         // Helper to dynamically evolve core units
-                        const getEvolvedTemplate = (t: any, targetLevel: number) => {
+                        const getEvolvedTemplate = (t: UnitTemplate, targetLevel: number) => {
                             let current = t;
                             if (!current) return null;
                             for (let i = 1; i < targetLevel; i++) {
@@ -1055,7 +1082,7 @@ function App() {
                     }
                 } else {
                     // This block executes if there's NO selected opponent (e.g., debugging or not opening the modal)
-                    let fallbackPool = game.wins >= 12 ? activeEdition.championOpponents : (game.wins >= 8 ? activeEdition.eliteOpponents : (game.wins >= 5 ? activeEdition.advancedOpponents : (game.wins >= 3 ? activeEdition.intermOpponents : activeEdition.noviceOpponents)));
+                    const fallbackPool = game.wins >= 12 ? activeEdition.championOpponents : (game.wins >= 8 ? activeEdition.eliteOpponents : (game.wins >= 5 ? activeEdition.advancedOpponents : (game.wins >= 3 ? activeEdition.intermOpponents : activeEdition.noviceOpponents)));
                     const def = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
                     const fbCandidateUnits: Unit[] = [];
                     for (const coreId of def.coreUnits) {
@@ -1084,7 +1111,7 @@ function App() {
                 }
 
                 // A. Apply forced stars (upgrades)
-                let threeStarCount = enemyTeam.filter(u => u && u.level >= 3).length;
+                const threeStarCount = enemyTeam.filter(u => u && u.level >= 3).length;
                 if (isBossMatch && threeStarCount < forcedStarCount) {
                     let needed = forcedStarCount - threeStarCount;
                     for (const u of enemyTeam) {
@@ -1113,8 +1140,8 @@ function App() {
                     const baseStats = ALL_UNITS[u.templateId]?.baseStats || u.stats;
                     u.stats = { ...baseStats };
                     for (let lv = 2; lv <= u.level; lv++) {
-                        let bHp = Math.floor(baseStats.hp * 0.5);
-                        let bAtk = Math.floor(baseStats.attack * 0.5);
+                        const bHp = Math.floor(baseStats.hp * 0.5);
+                        const bAtk = Math.floor(baseStats.attack * 0.5);
                         u.stats.hp += bHp; u.stats.maxHp += bHp; u.stats.attack += bAtk;
                     }
 
@@ -1160,7 +1187,7 @@ function App() {
                 game.nextBattleBuffs = []; // Clear buffs after consumption
                 const enemyPsychicN = game.wins + 1;
                 
-                const sim = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeed, game.psychicN, enemyPsychicN, false, activeBuffs);
+                const sim = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeedAtStart, game.psychicN, enemyPsychicN, false, activeBuffs);
                 simulatorRef.current = sim;
                 
                 // Sync difficulty-scaled stats back to GameLoop and UI state for accurate settlement display
@@ -1174,7 +1201,7 @@ function App() {
                 const fallbackUnit = new Unit(ALL_UNITS.rattata);
                 enemyTeam = [fallbackUnit, null, null, null, null];
                 
-                const fallbackSim = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, 1.0, battleSpeed, 2, 2, false, []);
+                const fallbackSim = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, 1.0, battleSpeedAtStart, 2, 2, false, []);
                 simulatorRef.current = fallbackSim;
                 
                 const fallbackScaled = [...fallbackSim.enemyTeam];
@@ -1194,8 +1221,8 @@ function App() {
 
             const runBattleLoop = async () => {
                 if (!simulatorRef.current || isPausedRef.current) return;
-                if ((simulatorRef.current as any).isProcessing) return;
-                (simulatorRef.current as any).isProcessing = true;
+                if (simulatorRef.current.isProcessing) return;
+                simulatorRef.current.isProcessing = true;
 
                 try {
                     const keepGoing = await simulatorRef.current.simulateStep();
@@ -1219,11 +1246,11 @@ function App() {
                                 setSelected(null);
                                 setBattleResult(result);
                             }
-                        }, 300 / battleSpeed);
+                        }, 300 / battleSpeedAtStart);
                         return;
                     }
                 } finally {
-                    if (simulatorRef.current) (simulatorRef.current as any).isProcessing = false;
+                    if (simulatorRef.current) simulatorRef.current.isProcessing = false;
                 }
             };
 
@@ -1231,10 +1258,11 @@ function App() {
             const initAndStart = async () => {
                 try {
                     if (simulatorRef.current) await simulatorRef.current.init();
-                    interval = setInterval(runBattleLoop, 1200 / battleSpeed);
-                } catch (err: any) {
+                    interval = setInterval(runBattleLoop, 1200 / battleSpeedAtStart);
+                } catch (err: unknown) {
                     console.error("Battle Initialization Failed:", err);
-                    window.alert(`糟糕！戰鬥啟動失敗：\n${err.message}\n${err.stack}`);
+                    const details = err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : '發生不明錯誤。';
+                    window.alert(`糟糕！戰鬥啟動失敗：\n${details}`);
                 }
             };
             initAndStart();
@@ -1251,7 +1279,7 @@ function App() {
             }, 50);
             setInitialEnemyTeam([]);
         }
-    }, [game.phase]);
+    }, [game.phase, activeEdition, difficulty, game, selectedOpponent, tutorialStep]);
 
     // Handle Battle Result Music
     useEffect(() => {
@@ -1283,7 +1311,7 @@ function App() {
         } else if (battleResult === 'DRAW') {
             music.playRecoverSequence('pokemoncenter');
         }
-    }, [battleResult]);
+    }, [battleResult, game.lives, game.phase, game.wins]);
 
     // Handle Timeout DRAW
     useEffect(() => {
@@ -1298,13 +1326,13 @@ function App() {
     }, [battleElapsedSeconds, game.phase, battleResult]);
 
     // Actions
-    const isTutorialActionAllowed = (actionType: string, payload?: any) => {
+    const isTutorialActionAllowed = (actionType: string, payload?: string | number) => {
         if (tutorialStep === 0) return true;
 
         if (tutorialStep === 1) return false;
         if (tutorialStep === 2) {
             if (actionType !== 'BUY' && actionType !== 'SELECT_SHOP') return false;
-            const unit = game.shop.slots[payload];
+            const unit = typeof payload === 'number' ? game.shop.slots[payload] : undefined;
             const hasTutorialUnit = game.playerTeam.some(u => u?.family === tutorialUnitId);
             if (!hasTutorialUnit) {
                 return unit?.family === tutorialUnitId;
@@ -1323,8 +1351,8 @@ function App() {
             return false;
         }
         if (tutorialStep === 7) return actionType === 'START_BATTLE';
-        if (tutorialStep === 8) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'charmander') || actionType === 'MOVE_BOARD' || (actionType === 'SELECT_BOARD' && payload === 'charmander');
-        if (tutorialStep === 9) return (actionType === 'BUY' && game.shop.slots[payload]?.family === 'cyndaquil') || actionType === 'MOVE_BOARD' || actionType === 'SELECT_BOARD';
+        if (tutorialStep === 8) return (actionType === 'BUY' && typeof payload === 'number' && game.shop.slots[payload]?.family === 'charmander') || actionType === 'MOVE_BOARD' || (actionType === 'SELECT_BOARD' && payload === 'charmander');
+        if (tutorialStep === 9) return (actionType === 'BUY' && typeof payload === 'number' && game.shop.slots[payload]?.family === 'cyndaquil') || actionType === 'MOVE_BOARD' || actionType === 'SELECT_BOARD';
         if (tutorialStep === 10) return actionType === 'START_BATTLE' || actionType === 'SELECT_BOARD' || actionType === 'MOVE_BOARD';
         if (tutorialStep === 11) return false;
         if (tutorialStep === 12) return false;
@@ -1441,7 +1469,7 @@ function App() {
         if (tutorialStep > 0) {
             if (tutorialStep < 10) {
                 // First tutorial opponent: Brock Easter Egg (Three ways to face Brock!)
-                const brock = activeEdition.noviceOpponents.find((n: any) => n.name === '小剛') || activeEdition.noviceOpponents[0];
+                const brock = activeEdition.noviceOpponents.find(n => n.name === '小剛') || activeEdition.noviceOpponents[0];
                 const brockId = brock.id;
 
                 setOpponentChoices([
@@ -1459,7 +1487,7 @@ function App() {
         }
 
         // Determine which opponent pool to use based on game.wins
-        let npcPool: any[] = [];
+        let npcPool: SelectedOpponent[] = [];
         if (game.wins >= 12) {
             npcPool = activeEdition.championOpponents;
         } else if (game.wins >= 8) {
@@ -1707,7 +1735,7 @@ function App() {
         update();
     };
 
-    const handleRewardSelect = (reward: any) => {
+    const handleRewardSelect = (reward: RewardDefinition) => {
         // Only stop if we are transition back to shop, which is handled below.
         game.applyReward(reward);
         setRewardChoices([]); // Clear UI state immediately
@@ -1716,7 +1744,7 @@ function App() {
         update();
     };
 
-    const handlePoolSelect = async (choice: any) => {
+    const handlePoolSelect = async (choice: PoolChoice) => {
         if (isPoolProcessing) return;
         setIsPoolProcessing(true);
         setSelectedPoolId(choice.id);
@@ -1746,16 +1774,16 @@ function App() {
     const activeSynId = activeSynergyId?.includes('-') ? activeSynergyId.split('-').pop() : activeSynergyId;
     const isEnemySynergy = activeSynergyId && activeSynergyId.startsWith('ENEMY-');
 
-    let activeSyn = null;
+    let activeSyn: ReturnType<typeof getSynergyStatus>[number] | undefined;
     if (activeSynId) {
         if (isEnemySynergy) {
             const enemyStatus = getSynergyStatus(initialEnemyTeamForSynergy.length > 0 ? initialEnemyTeamForSynergy : (game.opponentTeam || []), activeEdition);
-            activeSyn = enemyStatus.find((s: any) => s.id === activeSynId);
+            activeSyn = enemyStatus.find(s => s.id === activeSynId);
         } else {
             activeSyn = synergyStatus.find(s => s.id === activeSynId);
         }
         if (!activeSyn) {
-            activeSyn = (SYNERGIES as any)[activeSynId];
+            activeSyn = SYNERGIES[activeSynId] as unknown as ReturnType<typeof getSynergyStatus>[number];
         }
     }
 
@@ -1847,7 +1875,7 @@ function App() {
                         justifyContent: 'center',
                         flexWrap: 'wrap'
                     }}>
-                        {rewardChoices.map((reward: any, idx) => (
+                        {rewardChoices.map((reward, idx) => (
                             <div
                                 key={idx}
                                 className="opponent-card"
@@ -2226,9 +2254,9 @@ function App() {
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         if (focusedDifficulty === d.id) {
-                                            handleDifficultySelect(d.id as any);
+                                            handleDifficultySelect(d.id as 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER');
                                         } else {
-                                            setFocusedDifficulty(d.id as any);
+                                            setFocusedDifficulty(d.id as 'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER');
                                         }
                                     }}
                                     style={{
@@ -2392,7 +2420,7 @@ function App() {
             {/* Game Over / Victory Overlay */}
             {
                 (game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER) && (() => {
-                    const mvp = [...game.playerTeam].filter(u => u).reduce((max: any, current: any) => {
+                    const mvp = [...game.playerTeam].filter((u): u is Unit => u !== null).reduce<Unit | null>((max, current) => {
                         if (!max) return current;
                         const currentScore = (current.level * 5) + (current.tier * 2) + current.stats.attack + current.stats.maxHp;
                         const maxScore = (max.level * 5) + (max.tier * 2) + max.stats.attack + max.stats.maxHp;
@@ -2554,7 +2582,7 @@ function App() {
                                                         />
                                                     ))}
                                                 </div>
-                                                {game.playerTeam.map((u: any, i: number) => {
+                                                {game.playerTeam.map((u, i) => {
                                                     if (!u) return <div key={i} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.03)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.1)' }} />;
                                                     const img00 = u.imageUrl ? u.imageUrl.replace('01.webp', '00.webp') : '';
                                                     return (
@@ -2582,7 +2610,7 @@ function App() {
                                                 <div style={{ marginTop: '20px' }}>
                                                     <div className="summary-units-grid">
                                                         <div className="summary-synergies-row">
-                                                            {getSynergyStatus(initialEnemyTeamForSynergy.length > 0 ? initialEnemyTeamForSynergy : game.opponentTeam, activeEdition).map((syn: any) => (
+                                                            {getSynergyStatus(initialEnemyTeamForSynergy.length > 0 ? initialEnemyTeamForSynergy : game.opponentTeam, activeEdition).map(syn => (
                                                                 <SynergyIcon
                                                                     key={syn.id}
                                                                     synergy={syn}
@@ -2598,7 +2626,7 @@ function App() {
                                                                 />
                                                             ))}
                                                         </div>
-                                                        {game.opponentTeam.map((u: any, i: number) => {
+                                                        {game.opponentTeam.map((u, i) => {
                                                             if (!u) return <div key={`enemy-${i}`} className="summary-unit-card" style={{ width: '105px', height: '115px', background: 'rgba(255,255,255,0.01)', borderRadius: '15px', border: '1px dashed rgba(255,255,255,0.05)' }} />;
                                                             const img00 = u.imageUrl ? u.imageUrl.replace('01.webp', '00.webp') : '';
                                                             return (
@@ -2643,7 +2671,7 @@ function App() {
                                                 };
 
                                                 // 1. Milestone 1
-                                                let card1: any = null;
+                                                let card1: { label: string; opponentId?: string } | null = null;
                                                 if (game.phase === GamePhase.VICTORY) {
                                                     const champ = history[history.length - 1];
                                                     card1 = { label: '寶可夢大師', opponentId: champ?.opponentId };
@@ -2704,7 +2732,7 @@ function App() {
                                                         <div className="history-hero-grid">
                                                             {heroes.map((hero, idx) => {
                                                                 if (!hero) return <div key={idx} className="hero-card is-empty"><div className="hero-label">尚未達成</div></div>;
-                                                                const info = getConsolidatedInfo(hero.opponentId);
+                                                                const info = getConsolidatedInfo(hero.opponentId ?? '');
                                                                 return (
                                                                     <div key={idx} className="hero-card">
                                                                         <div className="hero-label">{hero.label}</div>
@@ -2812,7 +2840,7 @@ function App() {
                             justifyContent: 'center',
                             flexWrap: 'wrap'
                         }}>
-                            {opponentChoices.map((npc: any, idx) => (
+                            {opponentChoices.map((npc, idx) => (
                                 <div
                                     key={idx}
                                     className="opponent-card"
@@ -2890,7 +2918,7 @@ function App() {
                     {(() => {
                         if (game.phase === GamePhase.BATTLE && simulatorRef.current) {
                             return Array.from(simulatorRef.current.playerSynergies.entries())
-                                .map((entry: any) => {
+                                .map(entry => {
                                     const id = entry[0];
                                     const count = entry[1];
                                     const syn = SYNERGIES[id];
@@ -2931,7 +2959,7 @@ function App() {
                         {(() => {
                             if (game.phase === GamePhase.BATTLE && simulatorRef.current) {
                                 return Array.from(simulatorRef.current.enemySynergies.entries())
-                                    .map((entry: any) => {
+                                    .map(entry => {
                                         const id = entry[0];
                                         const count = entry[1];
                                         const syn = SYNERGIES[id];
@@ -2995,13 +3023,13 @@ function App() {
                                         draggable={isInteractive && !!unit}
                                         onDragStart={(e: React.DragEvent) => onDragStart(e, i, 'BOARD')}
                                         isInteractive={isInteractive}
-                                        isSelected={selected?.unit === unit && selected?.source === 'BOARD'}
-                                        silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
-                                        gastroAcid={unit ? simulatorRef.current?.unitStates.get(unit)?.isGastroAcid : false}
-                                        hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
-                                        isCharmed={unit ? simulatorRef.current?.unitStates.get(unit)?.isCharmed : false}
-                                        isEvolving={unit && evolvingUnitId === unit.id}
-                                        synergyHighlight={activeSyn && unit && unit.synergies.includes(activeSyn.id)}
+                                        isSelected={!!(selected?.unit === unit && selected?.source === 'BOARD')}
+                                        silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced ?? false : false}
+                                        gastroAcid={unit ? simulatorRef.current?.unitStates.get(unit)?.isGastroAcid ?? false : false}
+                                        hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped ?? false : false}
+                                        isCharmed={unit ? simulatorRef.current?.unitStates.get(unit)?.isCharmed ?? false : false}
+                                        isEvolving={!!unit && evolvingUnitId === unit.id}
+                                        synergyHighlight={!!(activeSyn && unit && unit.synergies.includes(activeSyn.id))}
                                     />
                                 </div>
                             );
@@ -3020,12 +3048,12 @@ function App() {
                                         unit={unit}
                                         onClick={() => handleSelect(unit, i, 'ENEMY')}
                                         flipped={true}
-                                        silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced : false}
-                                        gastroAcid={unit ? simulatorRef.current?.unitStates.get(unit)?.isGastroAcid : false}
-                                        hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped : false}
-                                        isCharmed={unit ? simulatorRef.current?.unitStates.get(unit)?.isCharmed : false}
-                                        isEvolving={unit && evolvingUnitId === unit.id}
-                                        synergyHighlight={activeSyn && unit && unit.synergies.includes(activeSyn.id)}
+                                        silenced={unit ? simulatorRef.current?.unitStates.get(unit)?.isSilenced ?? false : false}
+                                        gastroAcid={unit ? simulatorRef.current?.unitStates.get(unit)?.isGastroAcid ?? false : false}
+                                        hpSwapped={unit ? simulatorRef.current?.unitStates.get(unit)?.hpSwapped ?? false : false}
+                                        isCharmed={unit ? simulatorRef.current?.unitStates.get(unit)?.isCharmed ?? false : false}
+                                        isEvolving={!!unit && evolvingUnitId === unit.id}
+                                        synergyHighlight={!!(activeSyn && unit && unit.synergies.includes(activeSyn.id))}
                                     />
                                 </div>
                             );
@@ -3085,10 +3113,10 @@ function App() {
                                 {/* Render Active Slots */}
                                 {game.shop.slots.map((unit: Unit | null, i: number) => {
                                     if (unit) {
-                                        (unit as any).isMergeable = game.playerTeam.some((u: any) => u && u.family === unit.family && u.level === unit.level);
+                                        unit.isMergeable = game.playerTeam.some(u => u && u.family === unit.family && u.level === unit.level);
                                     }
 
-                                    const hasGastly = game.playerTeam.some((u: any) => u?.family === 'gastly');
+                                    const hasGastly = game.playerTeam.some(u => u?.family === 'gastly');
                                     const isHighlighted = (tutorialStep === 2 && ((!hasGastly && unit?.family === 'gastly') || (hasGastly && (unit?.family === 'charmander' || unit?.family === 'squirtle')))) ||
                                         (tutorialStep === 6 && unit?.family === 'charmander') ||
                                         (tutorialStep === 8 && unit?.family === 'charmander') ||
@@ -3107,10 +3135,10 @@ function App() {
                                                 draggable={!!unit && game.gold >= 3}
                                                 onDragStart={(e: React.DragEvent) => onDragStart(e, i, 'SHOP')}
                                                 onToggleFreeze={() => handleFreezeToggle(i)}
-                                                showMergeGlow={unit && (unit as any).isMergeable}
-                                                isEvolving={unit && evolvingUnitId === unit.id}
+                                                showMergeGlow={!!unit && unit.isMergeable}
+                                                isEvolving={!!unit && evolvingUnitId === unit.id}
                                                 tutorialHighlightLock={false}
-                                                synergyHighlight={activeSyn && unit && activeSyn.activeTemplateIds?.has(unit.templateId)}
+                                                synergyHighlight={!!(activeSyn && unit && activeSyn.activeTemplateIds?.has(unit.templateId))}
                                             />
                                         </div>
                                     );
@@ -3179,7 +3207,7 @@ function App() {
                         {/* 2. Battle Log (Bottom) */}
                         <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5, minHeight: '4.5em', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             {logs.length > 0 ? (
-                                logs.slice(-3).map((log: any, i: number) => (
+                                logs.slice(-3).map((log, i) => (
                                     <div key={i} style={{ opacity: i === 2 ? 1 : (i === 1 ? 0.6 : 0.3) }}>
                                         {log.message}
                                     </div>
@@ -3242,7 +3270,7 @@ function App() {
                             justifyContent: 'center',
                             flexWrap: 'wrap'
                         }}>
-                            {game.poolChoices.map((choice: any, idx) => (
+                            {game.poolChoices.map((choice, idx) => (
                                 <div
                                     key={idx}
                                     className={`opponent-card is-selection-pool-card ${(selectedPoolId && selectedPoolId !== choice.id) ? 'pool-card-destroy' : ''}`}

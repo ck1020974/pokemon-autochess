@@ -20,6 +20,7 @@ export interface UnitTemplate {
   isHiddenFromShop?: boolean; // If true, this unit cannot appear in the shop
   family?: string; // Family ID for synergy grouping
   abilityPower?: number; // Optional power value for specific abilities
+  scalingValue?: number; // Optional dynamic description scaling value
   maxHpCap?: number; // Optional explicit HP cap
   attackCap?: number; // Optional explicit Attack cap
   providedMaxHpCap?: number; // New: Provide HP cap to team
@@ -43,6 +44,7 @@ export class Unit {
   public abilityPower: number = 0;
   public battlesCount: number = 0;
   public hasNewPermanentBuff: boolean = false;
+  public isMergeable?: boolean;
   public maxHpCap: number = 50; // New: Flexible HP cap
   public attackCap: number = 50; // New: Flexible Attack cap
   public providedMaxHpCap?: number;
@@ -60,7 +62,7 @@ export class Unit {
     this.synergies = template.synergies || [];
     if (this.templateId === 'mew') {
       if (typeof window !== 'undefined') {
-        const g = (window as any).game;
+        const g = (window as Window & typeof globalThis & { game?: { mewSynergies?: string[] } }).game;
         if (g && g.mewSynergies) {
           this.synergies = [...g.mewSynergies];
         }
@@ -71,10 +73,10 @@ export class Unit {
     }
     this.family = template.family || template.id;
     this.abilityPower = template.abilityPower || 0;
-    this.scalingValue = (template as any).scalingValue || 1;
+    this.scalingValue = template.scalingValue || 1;
     this._descriptionTemplate = template.description;
-    this.maxHpCap = (template as any).maxHpCap || 50;
-    this.attackCap = (template as any).attackCap || 50;
+    this.maxHpCap = template.maxHpCap || 50;
+    this.attackCap = template.attackCap || 50;
     this.providedMaxHpCap = template.providedMaxHpCap;
     this.providedAttackCap = template.providedAttackCap;
   }
@@ -143,7 +145,7 @@ export class Unit {
     this.capStats();
   }
 
-  public addExp(_amount: number): boolean {
+  public addExp(): boolean {
     // Level logic handled by GameLoop merge
     return false;
   }

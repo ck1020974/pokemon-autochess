@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { Unit } from '../models/Unit';
 import { ALL_UNITS } from '../data/AllUnits';
 import { HeadlessBattleSimulator } from './HeadlessBattleSimulator';
 import { writeFileSync } from 'fs';
-import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS, CHAMPION_OPPONENTS } from '../data/opponents/classic';
+import { NOVICE_OPPONENTS, INTERM_OPPONENTS, ADVANCED_OPPONENTS, ELITE_OPPONENTS, CHAMPION_OPPONENTS, type OpponentDefinition } from '../data/opponents/classic';
 import { SYNERGIES } from '../models/Synergies';
 
 const TOTAL_BATTLES = 5000;
@@ -23,8 +22,8 @@ function applyStatsByLevel(unit: Unit, targetLevel: number) {
     const baseStats = ALL_UNITS[unit.templateId]?.baseStats || unit.stats;
     unit.stats = { ...baseStats };
     for (let lv = 2; lv <= unit.level; lv++) {
-        let bHp = Math.floor(baseStats.hp * 0.5);
-        let bAtk = Math.floor(baseStats.attack * 0.5);
+        const bHp = Math.floor(baseStats.hp * 0.5);
+        const bAtk = Math.floor(baseStats.attack * 0.5);
         unit.stats.hp += bHp;
         unit.stats.maxHp += bHp;
         unit.stats.attack += bAtk;
@@ -32,7 +31,7 @@ function applyStatsByLevel(unit: Unit, targetLevel: number) {
     unit.capStats();
 }
 
-function constructBossTeam(boss: any, stageId: string): Unit[] {
+function constructBossTeam(boss: OpponentDefinition, stageId: string): Unit[] {
     const team: Unit[] = [];
     let baseLevel = 1;
     if (stageId === 'Intermediate') baseLevel = 2;
@@ -168,7 +167,7 @@ async function runUnitBalanceSim() {
     for (const [key, stat] of sortedStats) {
         if (stat.total < 20) continue; // 樣本數過低不計入
         const winRate = (stat.wins / stat.total) * 100;
-        const [_, level] = key.split('_');
+        const [, level] = key.split('_');
 
         let diagnostic = '✅ 正常';
         if (winRate > 70) diagnostic = '🔥 強力 (Overperforming)';

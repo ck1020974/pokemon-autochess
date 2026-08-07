@@ -41,6 +41,6 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Intimidate': { id: 'Intimidate', name: '威嚇', icon: '🐺', description: '[2/4] 戰鬥開始時，敵方全體 -2/8 攻擊 (最低為 1)', tiers: [2, 4], color: '#475569' },
 };
 
-export function getSynergyCount(team: any[], synergyId: string): number {
+export function getSynergyCount(team: Array<{ synergies: string[] } | null | undefined>, synergyId: string): number {
     return team.filter(u => u && u.synergies.includes(synergyId)).length;
 }

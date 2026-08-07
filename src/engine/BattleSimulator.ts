@@ -1,7 +1,10 @@
 
 import { Unit } from '../models/Unit';
-import { EventBus } from './EventBus';
+import { EventBus, type BattleUnitState } from './EventBus';
 import { ALL_UNITS } from '../data/AllUnits';
+import type { RewardDefinition } from '../models/RewardData';
+
+type BattleTeam = Omit<Unit[], number> & { [index: number]: Unit | null };
 
 export interface BattleLog {
     message: string;
@@ -9,15 +12,15 @@ export interface BattleLog {
 }
 
 export class BattleSimulator {
-    public playerTeam: Unit[];
-    public enemyTeam: Unit[];
+    public playerTeam: BattleTeam;
+    public enemyTeam: BattleTeam;
     public logs: BattleLog[] = [];
     public eventBus: EventBus;
     public turnCount: number = 0;
     public onUpdate?: () => void; // Hook for UI refresh during async steps
 
     // Track battle-specific state for units (e.g. "hasBlockedDeath")
-    public unitStates: Map<Unit, any> = new Map();
+    public unitStates: Map<Unit | BattleSimulator, BattleUnitState> = new Map();
     private lightScreenActivated: Set<string> = new Set();
     private initialPlayerSet: Set<Unit> = new Set();
     private spiritombTriggered: Set<string> = new Set();
@@ -41,11 +44,12 @@ export class BattleSimulator {
 
     private speed: number = 1;
     public isSim: boolean = false;
-    public battleBuffs: any[] = [];
+    public isProcessing: boolean = false;
+    public battleBuffs: RewardDefinition[] = [];
     private waterDebuffedTargets = new Set<Unit>();
     private grassHealedTargets = new Set<Unit>();
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 2, enemyPsychicN: number = 2, isSim: boolean = false, battleBuffs: any[] = []) {
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], difficultyMultiplier: number = 1.0, speed: number = 1, psychicN: number = 2, enemyPsychicN: number = 2, isSim: boolean = false, battleBuffs: RewardDefinition[] = []) {
         this.speed = speed;
         this.isSim = isSim;
         this.battleBuffs = battleBuffs;
@@ -54,9 +58,8 @@ export class BattleSimulator {
         this.psychicN = psychicN;
         this.enemyPsychicN = enemyPsychicN;
         // Preserve 5-slot architecture to match UI indices exactly
-        this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
-        this.enemyTeam = enemyTeam.map(u => {
-            if (!u) return null;
+        this.playerTeam = this.cloneTeam(playerTeam, u => this.cloneUnit(u));
+        this.enemyTeam = this.cloneTeam(enemyTeam, u => {
             const clone = this.cloneUnit(u);
             // Apply Difficulty Scaling to Enemy (Ensure it doesn't drop below current values)
             clone.stats.hp = Math.max(clone.stats.hp, Math.floor(clone.stats.hp * difficultyMultiplier));
@@ -65,7 +68,7 @@ export class BattleSimulator {
             // Feature: Global Stat Cap 50/50
             clone.capStats();
             return clone;
-        }) as Unit[];
+        });
         this.eventBus = new EventBus();
 
         // Apply Battle Rewards (Must be done after teams are initialized)
@@ -81,6 +84,14 @@ export class BattleSimulator {
         // 1. Register Passive Abilities & Hooks
         this.playerTeam.forEach(u => { if (u) this.registerUnitAbilities(u); });
         this.enemyTeam.forEach(u => { if (u) this.registerUnitAbilities(u); });
+    }
+
+    private cloneTeam(source: (Unit | null)[], clone: (unit: Unit) => Unit): BattleTeam {
+        const team: BattleTeam = [];
+        source.forEach((unit, index) => {
+            team[index] = unit ? clone(unit) : null;
+        });
+        return team;
     }
 
     private applyBattleRewards() {
@@ -106,11 +117,11 @@ export class BattleSimulator {
             } else if (reward.effect.includes('雙方')) {
                 const synergyId = reward.synergyId;
                 targets = [...playerUnits, ...(this.enemyTeam.filter(u => u !== null) as Unit[])]
-                    .filter(u => u.synergies.includes(synergyId));
+                    .filter(u => u.synergies.includes(synergyId ?? ''));
             } else if (reward.effect.includes('我方')) {
                 targets = playerUnits;
             } else if (reward.synergyId) {
-                targets = playerUnits.filter(u => u.synergies.includes(reward.synergyId));
+                targets = playerUnits.filter(u => u.synergies.includes(reward.synergyId!));
             }
 
             targets.forEach(u => {
@@ -196,7 +207,7 @@ export class BattleSimulator {
         if (snowCount >= 2) {
             this.log("四周開始降下冰雹，冰雹襲擊了雙方隊伍！");
             await this.delay(500);
-            const alive = [...this.playerTeam, ...this.enemyTeam].filter((u: Unit) => u !== null && u.stats.hp > 0);
+            const alive = [...this.playerTeam, ...this.enemyTeam].filter((u): u is Unit => u !== null && u.stats.hp > 0);
             const ratio = snowCount >= 4 ? 0.50 : 0.33;
 
             for (const target of alive) {
@@ -680,7 +691,8 @@ export class BattleSimulator {
             await this.playTeamAnimation(myTeam, 'light-screen-anim', 1000);
             this.lightScreenActivated.add(side);
 
-            const lsMap = (this as any).lightScreenCharges = (this as any).lightScreenCharges || new Map<string, number>();
+            const simulator = this as BattleSimulator & { lightScreenCharges?: Map<string, number> };
+            const lsMap = simulator.lightScreenCharges ?? (simulator.lightScreenCharges = new Map<string, number>());
             lsMap.set(side, 5);
 
             this.eventBus.on('BEFORE_HURT', (e) => {
@@ -693,7 +705,7 @@ export class BattleSimulator {
                     const charges = lsMap.get(victimSide) || 0;
                     if (charges > 0) {
                         if (!isBypassing) {
-                            e.context.amount = Math.ceil(e.context.amount / 2);
+                    e.context.amount = Math.ceil(e.context.amount! / 2);
                         } else if (e.context.source?.family === 'pinsir') {
                             this.log(`${e.context.source.name} 發動了破格，無視了光牆！`);
                         }
@@ -1211,7 +1223,7 @@ export class BattleSimulator {
 
                 if (e.target === unit && !s?.isSilenced && !isBypassing) {
                     const reduction = [0, 1, 2, 5][unit.level] || 1;
-                    const oldAmt = e.context.amount;
+                    const oldAmt = e.context.amount!;
                     if (oldAmt > 1) {
                         const newAmt = Math.max(1, oldAmt - reduction);
                         if (newAmt < oldAmt) {
@@ -1232,7 +1244,7 @@ export class BattleSimulator {
                     await this.notifySkill(unit, '使用了噴火！');
                     await this.playAnimation(unit, 'jump', 200);
 
-                    const allUnits = [...this.playerTeam, ...this.enemyTeam].filter(u => u && u !== unit && u.stats.hp > 0);
+                    const allUnits = [...this.playerTeam, ...this.enemyTeam].filter((u): u is Unit => u !== null && u !== unit && u.stats.hp > 0);
                     for (const target of allUnits) {
                         await this.dealDamage(unit, target, dmg, true, true);
                     }
@@ -1399,8 +1411,8 @@ export class BattleSimulator {
             // Reflect 200% of incoming BASIC damage
             this.eventBus.on('ON_HURT', async (e) => {
                 if (e.target === unit && e.context.source && e.context.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-                    if (!e.context.isSkillDamage && e.context.amount > 0) {
-                        const reflectDmg = Math.ceil(e.context.amount * 0.5); // Nerfed to 50%
+                    if (!e.context.isSkillDamage && e.context.amount! > 0) {
+                        const reflectDmg = Math.ceil(e.context.amount! * 0.5); // Nerfed to 50%
                         this.log(`${unit.name} 對${e.context.source.name}使用了捨身衝撞！`);
                         this.playAnimation(unit, 'jump', 200);
                         await this.dealDamage(unit, e.context.source, reflectDmg, true, true);
@@ -1451,8 +1463,8 @@ export class BattleSimulator {
                     const state = this.unitStates.get(unit) || {};
                     const lastGlow = state.lastGlobalGlowTime || 0;
 
-                    if (now - lastGlow > 500 && !(e.context as any).fuecocoAnimTriggered) {
-                        (e.context as any).fuecocoAnimTriggered = true;
+                    if (now - lastGlow > 500 && !e.context.fuecocoAnimTriggered) {
+                        e.context.fuecocoAnimTriggered = true;
                         myTeam.filter(u => u?.family === 'fuecoco').forEach(u => {
                             if (u) {
                                 const us = this.unitStates.get(u) || {};
@@ -1491,8 +1503,8 @@ export class BattleSimulator {
                     const state = this.unitStates.get(unit) || {};
                     const lastGlow = state.lastGlobalGlowTime || 0;
 
-                    if (now - lastGlow > 500 && !(e.context as any).quaxlyAnimTriggered) {
-                        (e.context as any).quaxlyAnimTriggered = true;
+                    if (now - lastGlow > 500 && !e.context.quaxlyAnimTriggered) {
+                        e.context.quaxlyAnimTriggered = true;
                         myTeam.filter(u => u?.family === 'quaxly').forEach(u => {
                             if (u) {
                                 const us = this.unitStates.get(u) || {};
@@ -1853,8 +1865,8 @@ export class BattleSimulator {
                     const state = this.unitStates.get(unit) || {};
                     const lastGlow = state.lastGlobalGlowTime || 0;
 
-                    if (now - lastGlow > 500 && !(e.context as any).sprigatitoAnimTriggered) {
-                        (e.context as any).sprigatitoAnimTriggered = true;
+                    if (now - lastGlow > 500 && !e.context.sprigatitoAnimTriggered) {
+                        e.context.sprigatitoAnimTriggered = true;
                         myTeam.filter(u => u?.family === 'sprigatito').forEach(u => {
                             if (u) {
                                 const us = this.unitStates.get(u) || {};
@@ -2078,7 +2090,7 @@ export class BattleSimulator {
                     const pos = e.context.deathIdx;
                     const pikachuHp = Math.floor(unit.stats.maxHp * 0.33);
                     const pikachuAtk = Math.floor(unit.stats.attack * 0.33);
-                    await this.spawnUnit(myTeam, pos, 'pikachu', 1, pikachuHp, pikachuAtk, true);
+                    await this.spawnUnit(myTeam, pos ?? 0, 'pikachu', 1, pikachuHp, pikachuAtk, true);
                     this.log(`${unit.name}使用了一口飛彈，吐出了皮卡丘`);
                 }
             });
@@ -2183,7 +2195,7 @@ export class BattleSimulator {
             this.eventBus.on('AFTER_ATTACK', async (e) => {
                 if (e.source === unit && unit.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     const dmg = unit.level === 3 ? 5 : (unit.level === 2 ? 2 : 1);
-                    const allOthers = [...this.playerTeam, ...this.enemyTeam].filter(u => u && u !== unit && u.stats.hp > 0);
+                    const allOthers = [...this.playerTeam, ...this.enemyTeam].filter((u): u is Unit => u !== null && u !== unit && u.stats.hp > 0);
                     if (allOthers.length > 0) {
                         this.log(`${unit.name}對全體使用了地震！`);
                         for (const target of allOthers) {
@@ -2265,7 +2277,7 @@ export class BattleSimulator {
                         s.thickFatUsed = true;
                         this.unitStates.set(unit, s);
                         const reduction = unit.level === 3 ? 0.5 : (unit.level === 2 ? 0.5 : 0.33);
-                        const orig = e.context.amount;
+                        const orig = e.context.amount!;
                         e.context.amount = Math.max(1, Math.ceil(orig * (1 - reduction)));
                         if (typeof this.notifySkill === 'function') {
                             this.notifySkill(unit, '發動了厚脂肪');
@@ -2297,8 +2309,8 @@ export class BattleSimulator {
             });
             this.eventBus.on('AFTER_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
-                if (e.source === unit && s?.infiltratorBonus > 0) {
-                    // unit.stats.attack = Math.max(1, unit.stats.attack - s.infiltratorBonus);
+                if (e.source === unit && s && (s.infiltratorBonus ?? 0) > 0) {
+                    // unit.stats.attack = Math.max(1, unit.stats.attack - (s.infiltratorBonus ?? 0));
                     s.infiltratorBonus = 0;
                     this.unitStates.set(unit, s);
                 }
@@ -2459,7 +2471,7 @@ export class BattleSimulator {
 
         // BEFORE_ATTACK moved to simulateStep
 
-        const attackPromises: Promise<any>[] = [];
+        const attackPromises: Promise<void>[] = [];
         let dmg = attacker.stats.attack;
 
         // Apply Noibat/Noivern Infiltrator bonus
@@ -2593,11 +2605,11 @@ export class BattleSimulator {
             if (count >= 2) {
                 // "兩回合後" means exactly start of Turn 3, and only once.
                 if (this.turnCount === 3) {
-                    const lastTurn = this.unitStates.get(this as any)?.[`psychicLastTurn_${side}`];
+                    const lastTurn = this.unitStates.get(this)?.[`psychicLastTurn_${side}`];
                     if (lastTurn !== this.turnCount) {
-                        const state = this.unitStates.get(this as any) || {};
+                        const state = this.unitStates.get(this) || {};
                         state[`psychicLastTurn_${side}`] = this.turnCount;
-                        this.unitStates.set(this as any, state);
+                        this.unitStates.set(this, state);
 
                         this.log(isPlayer ? "敵方受到了預知未來的攻擊！" : "我方受到了預知未來的攻擊！");
                         const targets = isPlayer ? this.enemyTeam : this.playerTeam;
@@ -2764,12 +2776,12 @@ export class BattleSimulator {
         if (this.playerTeam.includes(unit)) {
             const idx = this.playerTeam.indexOf(unit);
             if (this.playerTeam[idx] === unit) {
-                this.playerTeam[idx] = null as any;
+                this.playerTeam[idx] = null;
             }
         } else if (this.enemyTeam.includes(unit)) {
             const idx = this.enemyTeam.indexOf(unit);
             if (this.enemyTeam[idx] === unit) {
-                this.enemyTeam[idx] = null as any;
+                this.enemyTeam[idx] = null;
             }
         }
 
@@ -2825,9 +2837,11 @@ export class BattleSimulator {
         await this.delay(100); // 0.1s delay after movement
     }
 
-    private compactTeam(team: Unit[]): Unit[] {
+    private compactTeam(team: BattleTeam): BattleTeam {
         const survivors = team.filter(u => u !== null && u.stats.hp > 0);
-        const result = new Array(5).fill(null);
+        const result: BattleTeam = [];
+        result.length = 5;
+        for (let i = 0; i < result.length; i++) result[i] = null;
         for (let i = 0; i < survivors.length; i++) {
             result[i] = survivors[i];
         }
@@ -2839,7 +2853,7 @@ export class BattleSimulator {
         target.stats.hp = Math.min(target.stats.hp + amount, target.stats.maxHp);
     }
 
-    private async spawnUnit(team: Unit[], index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false): Promise<Unit | undefined> {
+    private async spawnUnit(team: BattleTeam, index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false): Promise<Unit | undefined> {
         const template = ALL_UNITS[templateId];
         if (!template) return;
         const newUnit = new Unit(template);

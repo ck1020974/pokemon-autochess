@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Unit } from '../models/Unit';
 import { ALL_UNITS } from '../data/AllUnits';
 import { HeadlessBattleSimulator } from './HeadlessBattleSimulator';
@@ -30,8 +29,8 @@ function applyStatsByLevel(unit: Unit, targetLevel: number) {
     const baseStats = ALL_UNITS[unit.templateId]?.baseStats || unit.stats;
     unit.stats = { ...baseStats };
     for (let lv = 2; lv <= unit.level; lv++) {
-        let bHp = Math.floor(baseStats.hp * 0.5);
-        let bAtk = Math.floor(baseStats.attack * 0.5);
+        const bHp = Math.floor(baseStats.hp * 0.5);
+        const bAtk = Math.floor(baseStats.attack * 0.5);
         unit.stats.hp += bHp;
         unit.stats.maxHp += bHp;
         unit.stats.attack += bAtk;
@@ -53,14 +52,10 @@ function constructBossTeam(boss: OpponentDefinition, stageId: string): Unit[] {
         if (team.length >= 5) break;
         const t = ALL_UNITS[coreId];
         if (t) {
-            try {
-                const u = new Unit(t);
-                applyStatsByLevel(u, baseLevel);
-                if (stageId === 'Advanced' && team.length < 2) applyStatsByLevel(u, 3);
-                team.push(u);
-            } catch (err) {
-                throw err;
-            }
+            const u = new Unit(t);
+            applyStatsByLevel(u, baseLevel);
+            if (stageId === 'Advanced' && team.length < 2) applyStatsByLevel(u, 3);
+            team.push(u);
         } else {
             console.warn(`找不到單位模板: ${coreId}`);
         }
@@ -77,9 +72,9 @@ function generatePlayerTeamForStage(stageId: string, enemyCount: number): Unit[]
     const allTemplates = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop);
     const team: Unit[] = [];
 
-    let unitCount = enemyCount; // 用戶要求數量相同
+    const unitCount = enemyCount; // 用戶要求數量相同
     let maxLevel = 1;
-    let focusSynergy = false; // 用戶要求全隨機
+    const focusSynergy = false; // 用戶要求全隨機
     let applyCarryBuff = false;
 
     if (stageId === 'Novice') {
@@ -161,10 +156,9 @@ function generatePlayerTeamForStage(stageId: string, enemyCount: number): Unit[]
 }
 
 // 自動推導標籤 (根據階段期望調整 - 比例制)
-function suggestDifficulty(winRate: number, currentDifficulty: string, minWin: number, maxWin: number): string {
+function suggestDifficulty(winRate: number, minWin: number, maxWin: number): string {
     const easyThreshold = Math.max(maxWin + 5, maxWin * 1.2);
     const hardThreshold = minWin * 0.7;
-    const veryHardThreshold = minWin * 0.4;
 
     if (winRate > easyThreshold) return 'EASY';
     if (winRate >= minWin) return 'NORMAL';
@@ -194,11 +188,9 @@ async function runStageBalanceSim() {
         for (const boss of stage.data) {
             let wins = 0;
             let losses = 0;
-            let draws = 0;
             let totalTurns = 0;
             let totalWinHpPercent = 0;
             let totalLossHpPercent = 0;
-            let totalDrawHpPercent = 0;
 
             const previewTeam = constructBossTeam(boss, stage.id);
             const teamNames = previewTeam.filter(u => u !== null).map(u => u.name).join(', ');
@@ -215,12 +207,12 @@ async function runStageBalanceSim() {
                     let active = true;
                     let steps = 0;
                     while (active && steps < MAX_STEPS) {
-                        active = await (simulator as any).simulateStep();
+                        active = await simulator.simulateStep();
                         steps++;
                     }
                     totalTurns += simulator.turnCount;
 
-                    const result = (simulator as any).getResult();
+                    const result = simulator.getResult();
 
                     let playerMaxHp = 0;
                     let playerHp = 0;
@@ -248,9 +240,6 @@ async function runStageBalanceSim() {
                     } else if (result === 'LOSS') {
                         losses++;
                         totalLossHpPercent += enemyHpPercent;
-                    } else {
-                        draws++;
-                        totalDrawHpPercent += ((playerHpPercent + enemyHpPercent) / 2);
                     }
                 } catch (err) {
                     console.error(`模擬發生錯誤! 對手: ${boss.name} (${boss.id}), 第 ${i} 次模擬`);
@@ -265,7 +254,7 @@ async function runStageBalanceSim() {
             const avgWinHp = wins > 0 ? (totalWinHpPercent / wins).toFixed(1) : '0.0';
             const avgLossHp = losses > 0 ? (totalLossHpPercent / losses).toFixed(1) : '0.0';
 
-            const suggestedTag = suggestDifficulty(winRate, boss.difficulty, stage.minWin, stage.maxWin);
+            const suggestedTag = suggestDifficulty(winRate, stage.minWin, stage.maxWin);
 
             let diagnostic = `✅ ${boss.difficulty}`;
             if (suggestedTag !== boss.difficulty) {

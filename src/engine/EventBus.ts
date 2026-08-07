@@ -21,7 +21,48 @@ export interface GameEvent {
     source?: Unit;
     target?: Unit;
     value?: number; // Damage amount or heal amount
-    context: any; // Battle state or Shop state
+    context: GameEventContext; // Battle state or Shop state
+}
+
+export interface GameEventContext {
+    simulator?: object;
+    source?: Unit | null;
+    amount?: number;
+    isSkillDamage?: boolean;
+    isPassiveMove?: boolean;
+    killer?: Unit;
+    deathIdx?: number;
+    fuecocoAnimTriggered?: boolean;
+    quaxlyAnimTriggered?: boolean;
+    sprigatitoAnimTriggered?: boolean;
+}
+
+export interface BattleUnitState {
+    [key: string]: boolean | number | Unit | undefined;
+    hpSwapped?: boolean;
+    isSilenced?: boolean;
+    isGastroAcid?: boolean;
+    isAbsoluteKill?: boolean;
+    isLethalStrike?: boolean;
+    lethalStrikeUsed?: boolean;
+    isAttackSkipped?: boolean;
+    isExtraAttack?: boolean;
+    isCharmed?: boolean;
+    swallowedUnit?: Unit;
+    infiltratorBonus?: number;
+    lastGlobalGlowTime?: number;
+    caveTriggers?: number;
+    dragonDanceTriggers?: number;
+    swordDanceTriggers?: number;
+    roostTriggers?: number;
+    mimikyuGuardsUsed?: number;
+    slowpokeHealUsed?: boolean;
+    thickFatUsed?: boolean;
+    infiltratorUsed?: boolean;
+    hardUsed?: boolean;
+    heracrossEnraged?: boolean;
+    heracrossTriggered?: boolean;
+    farfetchdUsed?: boolean;
 }
 
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Unit } from '../models/Unit';
 import { ALL_UNITS } from '../data/AllUnits';
 import { HeadlessBattleSimulator } from './HeadlessBattleSimulator';
@@ -25,8 +24,8 @@ function applyStatsByLevel(unit: Unit, targetLevel: number) {
     const baseStats = ALL_UNITS[unit.templateId]?.baseStats || unit.stats;
     unit.stats = { ...baseStats };
     for (let lv = 2; lv <= unit.level; lv++) {
-        let bHp = Math.floor(baseStats.hp * 0.5);
-        let bAtk = Math.floor(baseStats.attack * 0.5);
+        const bHp = Math.floor(baseStats.hp * 0.5);
+        const bAtk = Math.floor(baseStats.attack * 0.5);
         unit.stats.hp += bHp;
         unit.stats.maxHp += bHp;
         unit.stats.attack += bAtk;
@@ -183,11 +182,8 @@ async function runStageBalanceSim() {
 
         for (const boss of stage.data) {
             let wins = 0;
-            let losses = 0;
             let draws = 0;
-            let totalSurvivingUnits = 0;
             let totalTurns = 0;
-            let totalWinHpPercent = 0;
             let totalDrawPlayerHpPercent = 0;
             let totalDrawEnemyHpPercent = 0;
 
@@ -235,13 +231,8 @@ async function runStageBalanceSim() {
 
                 if (result === 'WIN') {
                     wins++;
-                    totalSurvivingUnits += playerTeam.filter(u => u && u.stats.hp > 0).length;
-                    totalWinHpPercent += playerHpPercent;
                 }
-                else if (result === 'LOSS') {
-                    losses++;
-                }
-                else {
+                else if (result !== 'LOSS') {
                     draws++;
                     totalDrawPlayerHpPercent += playerHpPercent;
                     totalDrawEnemyHpPercent += enemyHpPercent;
@@ -250,7 +241,6 @@ async function runStageBalanceSim() {
 
             const winRate = (wins / SIMS_PER_BOSS) * 100;
             const drawRate = (draws / SIMS_PER_BOSS) * 100;
-            const avgSurviving = wins > 0 ? (totalSurvivingUnits / wins).toFixed(1) : '0.0';
             const avgTurns = (totalTurns / SIMS_PER_BOSS).toFixed(1);
 
             const avgDrawPlayerHp = draws > 0 ? (totalDrawPlayerHpPercent / draws).toFixed(1) : '0.0';

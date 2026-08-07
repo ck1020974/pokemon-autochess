@@ -1,15 +1,17 @@
 
 import { Unit } from '../models/Unit';
-import { EventBus } from './EventBus';
+import { EventBus, type BattleUnitState } from './EventBus';
 import { ALL_UNITS } from '../data/AllUnits';
 
+type BattleTeam = Omit<Unit[], number> & { [index: number]: Unit | null };
+
 export class HeadlessBattleSimulator {
-    public playerTeam: Unit[];
-    public enemyTeam: Unit[];
+    public playerTeam: BattleTeam;
+    public enemyTeam: BattleTeam;
     public logs: string[] = [];
     public eventBus: EventBus;
     public turnCount: number = 0;
-    public unitStates: Map<Unit, any> = new Map();
+    public unitStates: Map<Unit, BattleUnitState> = new Map();
     private lightScreenActivated: Set<string> = new Set();
     private initialPlayerSet: Set<Unit> = new Set();
     private spiritombTriggered: Set<string> = new Set();
@@ -33,16 +35,15 @@ export class HeadlessBattleSimulator {
     constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], _playerWins: number = 0) {
         this.playerWins = _playerWins;
         this.originalPlayerTeam = originalPlayerTeam || null;
-        this.playerTeam = playerTeam.map(u => u ? this.cloneUnit(u) : null) as Unit[];
-        this.enemyTeam = enemyTeam.map(u => {
-            if (!u) return null;
+        this.playerTeam = this.cloneTeam(playerTeam, u => this.cloneUnit(u));
+        this.enemyTeam = this.cloneTeam(enemyTeam, u => {
             // Apply Difficulty Scaling to Enemy (Ensure it doesn't drop below current values if multiplier < 1)
             // Note: Multiplier is passed through App.tsx -> Simulator. 
             // Here we don't have the multiplier arg but we have the result of it? 
             // Wait, Headless usually clones what is ALREADY scaled if it's enemy? 
             // Actually Headless takes the same args. Let's check Headless constructor.
             return this.cloneUnit(u);
-        }) as Unit[];
+        });
         this.eventBus = new EventBus();
 
         this.playerTeam.forEach(u => { if (u) this.initialPlayerSet.add(u); });
@@ -53,6 +54,14 @@ export class HeadlessBattleSimulator {
 
         this.enemyTeam.forEach(u => { if (u) this.registerUnitAbilities(u); });
         this.playerTeam.forEach(u => { if (u) this.registerUnitAbilities(u); });
+    }
+
+    private cloneTeam(source: (Unit | null)[], clone: (unit: Unit) => Unit): BattleTeam {
+        const team: BattleTeam = [];
+        source.forEach((unit, index) => {
+            team[index] = unit ? clone(unit) : null;
+        });
+        return team;
     }
 
     public async init() {
@@ -112,7 +121,7 @@ export class HeadlessBattleSimulator {
         const snowCount = Math.max(pSnow, eSnow);
 
         if (snowCount >= 2) {
-            const alive = [...this.playerTeam, ...this.enemyTeam].filter((u: Unit) => u !== null && u.stats.hp > 0);
+            const alive = [...this.playerTeam, ...this.enemyTeam].filter((u): u is Unit => u !== null && u.stats.hp > 0);
             const ratio = snowCount >= 4 ? 0.50 : 0.33;
 
             for (const target of alive) {
@@ -272,7 +281,8 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'mrmime' && !this.lightScreenActivated.has(side)) {
             this.lightScreenActivated.add(side);
 
-            const lsMap = (this as any).lightScreenCharges = (this as any).lightScreenCharges || new Map<string, number>();
+            const simulator = this as HeadlessBattleSimulator & { lightScreenCharges?: Map<string, number> };
+            const lsMap = simulator.lightScreenCharges ?? (simulator.lightScreenCharges = new Map<string, number>());
             lsMap.set(side, 5);
 
             // Add the damage reduction listener
@@ -286,7 +296,7 @@ export class HeadlessBattleSimulator {
                     const charges = lsMap.get(victimSide) || 0;
                     if (charges > 0) {
                         if (!isBypassing) {
-                            e.context.amount = Math.ceil(e.context.amount / 2);
+                    e.context.amount = Math.ceil(e.context.amount! / 2);
                         }
                         lsMap.set(victimSide, charges - 1);
                     }
@@ -479,7 +489,7 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'kangaskhan') {
             const hpBuff = Math.floor(unit.stats.attack * 0.33);
             if (hpBuff > 0) {
-                const original = this.playerTeam.includes(unit) ? (this.originalPlayerTeam as any)?.find((o: Unit | null) => o && o.id === unit.id) : null;
+                const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
                 this.growUnit(unit, hpBuff, 0, original, true);
                 this.log(`${unit.name}發動了親子愛！`);
             }
@@ -768,6 +778,7 @@ export class HeadlessBattleSimulator {
     }
 
     private growUnit(unit: Unit, hp: number, atk: number, permanentTarget?: Unit | null, _silent: boolean = false) {
+        void _silent;
         if (unit.family === 'sneasel' && atk < 0) atk = 0;
         const hpToMax = hp > 0 ? Math.min(hp, unit.maxHpCap - unit.stats.maxHp) : hp;
         const atkToAtk = atk > 0 ? Math.min(atk, unit.attackCap - unit.stats.attack) : atk;
@@ -778,6 +789,7 @@ export class HeadlessBattleSimulator {
     }
 
     private buffAttack(unit: Unit, amount: number, _silent: boolean = false) {
+        void _silent;
         if (unit.family === 'sneasel' && amount < 0) return; // Protection
         unit.addBuff(amount);
     }
@@ -879,7 +891,7 @@ export class HeadlessBattleSimulator {
                 if (s?.isSilenced) return;
                 if (e.source === unit) {
                     const dmg = [0, 1, 2, 5][unit.level] || 1;
-                    const allUnits = [...this.playerTeam, ...this.enemyTeam].filter(u => u && u !== unit && u.stats.hp > 0);
+                    const allUnits = [...this.playerTeam, ...this.enemyTeam].filter((u): u is Unit => u !== null && u !== unit && u.stats.hp > 0);
                     for (const target of allUnits) {
                         await this.dealDamage(unit, target, dmg, true, true); // Silent
                     }
@@ -1009,8 +1021,8 @@ export class HeadlessBattleSimulator {
             });
             this.eventBus.on('ON_HURT', async (e) => {
                 if (e.target === unit && e.context.source && e.context.source.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
-                    if (!e.context.isSkillDamage && e.context.amount > 0) {
-                        const reflectDmg = Math.ceil(e.context.amount * 1.0); // 100% reflect
+                    if (!e.context.isSkillDamage && e.context.amount! > 0) {
+                        const reflectDmg = Math.ceil(e.context.amount! * 1.0); // 100% reflect
                         await this.dealDamage(unit, e.context.source, reflectDmg, true);
                     }
                 }
@@ -1444,7 +1456,7 @@ export class HeadlessBattleSimulator {
                         const targets = shuffled.slice(0, targetCount);
                         this.log(`${unit.name} 使用了充電光束！`);
                         for (const target of targets) {
-                            const original = this.playerTeam.includes(target) ? (this.originalPlayerTeam as any)?.find((o: Unit | null) => o && o.id === target.id) : null;
+                        const original = this.playerTeam.includes(target) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === target.id) : null;
                             this.growUnit(target, 1, 1, original, true);
                         }
                     }
@@ -1460,7 +1472,7 @@ export class HeadlessBattleSimulator {
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
                     const selfGrowths = [0, 1, 2, 5];
                     const selfGrow = selfGrowths[unit.level] || 1;
-                    const original = this.playerTeam.includes(unit) ? (this.originalPlayerTeam as any)?.find((o: Unit | null) => o && o.id === unit.id) : null;
+                    const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
                     this.growUnit(unit, selfGrow, 0, original || null, true);
 
                     const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
@@ -1638,7 +1650,7 @@ export class HeadlessBattleSimulator {
             this.eventBus.on('AFTER_ATTACK', async (e) => {
                 if (e.source === unit && unit.stats.hp > 0 && !this.unitStates.get(unit)?.isSilenced) {
                     const dmg = unit.level === 3 ? 5 : (unit.level === 2 ? 2 : 1);
-                    const allOthers = [...this.playerTeam, ...this.enemyTeam].filter(u => u && u !== unit && u.stats.hp > 0);
+                    const allOthers = [...this.playerTeam, ...this.enemyTeam].filter((u): u is Unit => u !== null && u !== unit && u.stats.hp > 0);
                     if (allOthers.length > 0) {
                         this.log(`${unit.name}對全體使用了地震！`);
                         for (const target of allOthers) {
@@ -1708,7 +1720,7 @@ export class HeadlessBattleSimulator {
                         s.thickFatUsed = true;
                         this.unitStates.set(unit, s);
                         const reduction = unit.level === 3 ? 0.5 : (unit.level === 2 ? 0.5 : 0.33);
-                        const orig = e.context.amount;
+                        const orig = e.context.amount!;
                         e.context.amount = Math.max(1, Math.ceil(orig * (1 - reduction)));
                         this.log(`${unit.name} 發動了厚脂肪`);
                     }
@@ -1736,8 +1748,8 @@ export class HeadlessBattleSimulator {
             });
             this.eventBus.on('AFTER_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
-                if (e.source === unit && s?.infiltratorBonus > 0) {
-                    unit.stats.attack = Math.max(1, unit.stats.attack - s.infiltratorBonus);
+                if (e.source === unit && s && (s.infiltratorBonus ?? 0) > 0) {
+                    unit.stats.attack = Math.max(1, unit.stats.attack - (s.infiltratorBonus ?? 0));
                     s.infiltratorBonus = 0;
                     this.unitStates.set(unit, s);
                 }
@@ -1765,7 +1777,7 @@ export class HeadlessBattleSimulator {
                         s.thickFatUsed = true;
                         this.unitStates.set(unit, s);
                         const reduction = unit.level === 3 ? 0.5 : (unit.level === 2 ? 0.5 : 0.33);
-                        const orig = e.context.amount;
+                        const orig = e.context.amount!;
                         e.context.amount = Math.max(1, Math.ceil(orig * (1 - reduction)));
                     }
                 }
@@ -1788,7 +1800,7 @@ export class HeadlessBattleSimulator {
             });
             this.eventBus.on('AFTER_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
-                if (e.source === unit && s?.infiltratorBonus > 0) {
+                if (e.source === unit && s && (s.infiltratorBonus ?? 0) > 0) {
                     s.infiltratorBonus = 0;
                     this.unitStates.set(unit, s);
                 }
@@ -2013,6 +2025,7 @@ export class HeadlessBattleSimulator {
     }
 
     public async dealDamage(source: Unit | null, target: Unit, amount: number, isSkillDamage: boolean = false, _silent: boolean = false) {
+        void _silent;
         const targetState = this.unitStates.get(target) || {};
         const sourceState = source ? this.unitStates.get(source) || {} : {};
         const isBypassing = (source && source.family === 'pinsir' && !sourceState.isSilenced) ||
@@ -2100,10 +2113,10 @@ export class HeadlessBattleSimulator {
         }
         if (this.playerTeam.includes(unit)) {
             const idx = this.playerTeam.indexOf(unit);
-            if (this.playerTeam[idx] === unit || (this.playerTeam[idx] && this.playerTeam[idx].stats.hp <= 0)) this.playerTeam[idx] = null as any;
+            if (this.playerTeam[idx] === unit || (this.playerTeam[idx] && this.playerTeam[idx].stats.hp <= 0)) this.playerTeam[idx] = null;
         } else if (this.enemyTeam.includes(unit)) {
             const idx = this.enemyTeam.indexOf(unit);
-            if (this.enemyTeam[idx] === unit || (this.enemyTeam[idx] && this.enemyTeam[idx].stats.hp <= 0)) this.enemyTeam[idx] = null as any;
+            if (this.enemyTeam[idx] === unit || (this.enemyTeam[idx] && this.enemyTeam[idx].stats.hp <= 0)) this.enemyTeam[idx] = null;
         }
         if (killer && killer.stats.hp > 0) {
             const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id) || null;
@@ -2138,9 +2151,11 @@ export class HeadlessBattleSimulator {
         }
     }
 
-    private compactTeam(team: Unit[]): Unit[] {
+    private compactTeam(team: BattleTeam): BattleTeam {
         const survivors = team.filter(u => u !== null && u.stats.hp > 0);
-        const result = new Array(5).fill(null);
+        const result: BattleTeam = [];
+        result.length = 5;
+        for (let i = 0; i < result.length; i++) result[i] = null;
         for (let i = 0; i < survivors.length; i++) result[i] = survivors[i];
         return result;
     }
@@ -2149,7 +2164,7 @@ export class HeadlessBattleSimulator {
         if (target.stats.hp > 0) target.stats.hp = Math.min(target.stats.hp + amount, target.stats.maxHp);
     }
 
-    private async spawnUnit(team: Unit[], index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false) {
+    private async spawnUnit(team: BattleTeam, index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false) {
         const template = ALL_UNITS[templateId];
         if (!template) return;
 
@@ -2175,7 +2190,13 @@ export class HeadlessBattleSimulator {
                 } else team.splice(index, 0, newUnit);
             }
         } else {
-            const nullIdx = team.indexOf(null as any);
+            let nullIdx = -1;
+            for (let i = 0; i < team.length; i++) {
+                if (team[i] === null) {
+                    nullIdx = i;
+                    break;
+                }
+            }
             if (nullIdx !== -1) team[nullIdx] = newUnit;
             else team.push(newUnit);
         }
@@ -2187,9 +2208,9 @@ export class HeadlessBattleSimulator {
         this.logs.push(message);
     }
 
-    public async delay(_ms: number) { }
-    public async playAnimation(_unit: Unit | Unit[], _anim: string, _duration?: number) { }
-    public playTeamAnimation(_units: Unit[], _anim: string, _duration?: number) { }
+    public async delay(_ms: number) { void _ms; }
+    public async playAnimation(_unit: Unit | Unit[], _anim: string, _duration?: number) { void _unit; void _anim; void _duration; }
+    public playTeamAnimation(_units: Unit[], _anim: string, _duration?: number) { void _units; void _anim; void _duration; }
     public async notifySkill(unit: Unit, msg: string) {
         this.log(`${unit.name} ${msg}`);
     }

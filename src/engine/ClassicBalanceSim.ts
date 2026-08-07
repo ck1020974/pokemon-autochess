@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Unit } from '../models/Unit';
 import { ALL_UNITS } from '../data/AllUnits';
 import { HeadlessBattleSimulator } from './HeadlessBattleSimulator';
@@ -31,8 +30,8 @@ function applyStatsByLevel(unit: Unit, targetLevel: number) {
     const baseStats = ALL_UNITS[unit.templateId]?.baseStats || unit.stats;
     unit.stats = { ...baseStats };
     for (let lv = 2; lv <= unit.level; lv++) {
-        let bHp = Math.floor(baseStats.hp * 0.5);
-        let bAtk = Math.floor(baseStats.attack * 0.5);
+        const bHp = Math.floor(baseStats.hp * 0.5);
+        const bAtk = Math.floor(baseStats.attack * 0.5);
         unit.stats.hp += bHp;
         unit.stats.maxHp += bHp;
         unit.stats.attack += bAtk;
@@ -195,11 +194,9 @@ async function runStageBalanceSim() {
         for (const boss of stage.data) {
             let wins = 0;
             let losses = 0;
-            let draws = 0;
             let totalTurns = 0;
             let totalWinHpPercent = 0;
             let totalLossHpPercent = 0;
-            let totalDrawHpPercent = 0;
 
             const previewTeam = constructBossTeam(boss, stage.id);
             const teamNames = previewTeam.filter(u => u !== null).map(u => u.name).join(', ');
@@ -249,14 +246,9 @@ async function runStageBalanceSim() {
                     losses++;
                     totalLossHpPercent += enemyHpPercent;
                 }
-                else {
-                    draws++;
-                    totalDrawHpPercent += ((playerHpPercent + enemyHpPercent) / 2);
-                }
             }
 
             const winRate = (wins / SIMS_PER_BOSS) * 100;
-            const drawRate = (draws / SIMS_PER_BOSS) * 100;
             const avgTurns = (totalTurns / SIMS_PER_BOSS).toFixed(1);
 
             const avgWinHp = wins > 0 ? (totalWinHpPercent / wins).toFixed(1) : '0.0';

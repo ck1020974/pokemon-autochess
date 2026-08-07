@@ -1,8 +1,32 @@
 import * as React from 'react';
 import { useState } from 'react';
+import type { SynergyConfig } from '../models/Synergies';
+import type { UnitTemplate } from '../models/Unit';
+import type { GameLoop } from '../engine/GameLoop';
+
+interface SynergyIconProps {
+    synergy: SynergyConfig;
+    count?: number;
+    showCount?: boolean;
+    units?: UnitTemplate[];
+    activeTemplateIds?: Set<string>;
+    activeFamilies?: Set<string>;
+    isEnemy?: boolean;
+    side?: string;
+    onMouseEnter?: () => void;
+    className?: string;
+    activeSynergyId?: string | null;
+    setActiveSynergyId?: (id: string | null) => void;
+    forceActive?: boolean;
+    disabled?: boolean;
+    tooltipLeft?: boolean;
+    showTooltip?: boolean;
+}
+
+const gameWindow = window as Window & typeof globalThis & { game?: GameLoop };
 
 // Synergy Icon Component
-export function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateIds, activeFamilies, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive, disabled, tooltipLeft, showTooltip = true }: any) {
+export function SynergyIcon({ synergy, count, showCount = true, units, activeTemplateIds, activeFamilies, isEnemy, side, onMouseEnter, className, activeSynergyId, setActiveSynergyId, forceActive, disabled, tooltipLeft, showTooltip = true }: SynergyIconProps) {
     const [localOpen, setLocalOpen] = useState(false);
     const [isDismissed, setIsDismissed] = useState(false);
 
@@ -15,8 +39,8 @@ export function SynergyIcon({ synergy, count, showCount = true, units, activeTem
     const style = { borderColor: isActive ? synergy.color : '#444' };
 
     // Dynamic [N] replacement for Psychic synergy (Fallback, mainly handled in GameLoop now)
-    if (synergy.id === 'Psychic' && (window as any).game) {
-        const val = isEnemy ? ((window as any).game.wins + 1) : (window as any).game.psychicN;
+    if (synergy.id === 'Psychic' && gameWindow.game) {
+        const val = isEnemy ? (gameWindow.game.wins + 1) : gameWindow.game.psychicN;
         activeDesc = activeDesc.replace('[N]', val.toString());
     }
 
@@ -27,7 +51,7 @@ export function SynergyIcon({ synergy, count, showCount = true, units, activeTem
             onMouseEnter={() => {
                 if (!showTooltip) return;
                 setIsDismissed(false); // Reset dismissal on mouse enter
-                onMouseEnter && onMouseEnter();
+                if (onMouseEnter) onMouseEnter();
             }}
             onClick={(e: React.MouseEvent) => {
                 if (!showTooltip) return; // Don't stop propagation if tooltip is off
@@ -63,10 +87,10 @@ export function SynergyIcon({ synergy, count, showCount = true, units, activeTem
                     {/* Unit thumbnails */}
                     {units && units.length > 0 && (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '4px' }}>
-                            {units.map((u: any) => {
+                            {units.map((u) => {
                                 const isUnitActive = (u.family === 'eevee')
                                     ? (activeTemplateIds?.has(u.id) || activeTemplateIds?.has(u.id + '_final') || false)
-                                    : (activeFamilies?.has(u.family) || false);
+                                    : (u.family ? activeFamilies?.has(u.family) || false : false);
                                 const unitStyle: React.CSSProperties = {
                                     width: '24px', height: '24px', objectFit: 'contain',
                                     borderRadius: '4px', background: 'rgba(0,0,0,0.3)',

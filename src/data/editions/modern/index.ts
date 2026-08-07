@@ -28,7 +28,7 @@ export const ModernEdition: GameEdition = {
     name: '作者：柚C老師',
     availableUnitIds: Object.keys(ALL_UNITS).filter(id => {
         const u = ALL_UNITS[id];
-        if (!u || !u.family || !INCLUDED_FAMILIES.includes(u.family as any)) return false;
+        if (!u || !u.family || !INCLUDED_FAMILIES.includes(u.family)) return false;
 
         // --- 根據需求調整：第二版本 (Modern Edition) 限縮 T1 商店角色池 ---
         // 除御三家外，移除所有其他 T1 角色 (含寶寶丁、小拉達、猴怪等)

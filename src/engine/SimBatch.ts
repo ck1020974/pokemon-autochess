@@ -23,7 +23,7 @@ let totalWins = 0;
 let totalDraws = 0;
 let totalLosses = 0;
 let totalLoops = 0;
-const loopCases: any[] = [];
+const loopCases: unknown[] = [];
 
 // Initialize trackers
 Object.keys(ALL_UNITS).forEach(id => {
@@ -288,7 +288,7 @@ function generateReport(duration: number) {
     try {
         writeFileSync('./balance_report.md', report);
         console.log('Final Report generated: balance_report.md');
-    } catch (err) {
+    } catch {
         console.log('Failed to write report');
     }
 }
