@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import type { CSSProperties, KeyboardEvent, PointerEvent, WheelEvent } from 'react';
+import type { KeyboardEvent, PointerEvent, WheelEvent } from 'react';
 import type { PlayerTrainer } from '../presentation/trainers';
 import './TrainerSelector.css';
 
@@ -68,14 +68,13 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
                         const distance = getDistance(index, activeIndex, trainers.length);
                         const visible = Math.abs(distance) <= 2;
                         const state = distance === 0 ? 'is-active' : Math.abs(distance) === 1 ? 'is-near' : visible ? 'is-far' : 'is-hidden';
-                        const style = { '--trainer-offset': distance } as CSSProperties;
+                        const direction = distance < 0 ? 'is-left' : distance > 0 ? 'is-right' : '';
                         return (
                             <button
-                                className={`trainer-selector-card ${state}`}
+                                className={`trainer-selector-card ${state} ${direction}`}
                                 key={trainer.id}
                                 type="button"
                                 role="listitem"
-                                style={style}
                                 tabIndex={visible ? 0 : -1}
                                 onClick={() => distance === 0 ? onSelect(trainer) : setActiveIndex(index)}
                             >

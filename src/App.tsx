@@ -1760,7 +1760,7 @@ function App() {
     }
 
     return (
-        <div className="game-container" onClick={() => {
+        <div className={`game-container battle-stage-shell ${game.phase === GamePhase.BATTLE ? `is-battling ${battleSceneClass}` : ''}`} onClick={() => {
             music.resumeContext();
             if (focusedDifficulty) setFocusedDifficulty(null);
             setActiveSynergyId(null);

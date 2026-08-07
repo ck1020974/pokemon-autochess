@@ -26,6 +26,7 @@ try {
   assert.match(selectorSource, /onSelect\(trainer\)/);
   assert.match(selectorSource, /trainer-selector-track/);
   assert.match(selectorSource, /trainer-selector-arrow/);
+  assert.match(selectorSource, /is-left/);
   assert.match(selectorSource, /onKeyDown/);
   assert.match(selectorSource, /setActiveIndex/);
   assert.doesNotMatch(selectorCss, /overflow-x:\s*auto/);
@@ -46,6 +47,7 @@ try {
   assert.match(appSource, /<BattleIntro/);
   assert.match(appSource, /battle-stage-shell/);
   assert.match(appCss, /\.battle-stage-shell\.is-battling/);
+  assert.match(appCss, /--stage-landmark/);
   assert.match(presentationSource, /landmark/);
   assert.match(introCss, /max-height:\s*30vh/);
   const simulatorSource = readFileSync(resolve(root, 'src', 'engine', 'BattleSimulator.ts'), 'utf8');
