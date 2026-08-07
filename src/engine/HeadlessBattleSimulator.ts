@@ -687,7 +687,7 @@ export class HeadlessBattleSimulator {
         }
         if (this.getSynergyCountForUnit(team[0], 'Starter') >= 3) {
             const count = this.getSynergyCountForUnit(team[0], 'Starter');
-            const buff = count >= 5 ? 3 : 1;
+            const buff = count >= 5 ? 2 : 1;
             team.filter(u => u && u.synergies.includes('Starter')).forEach(u => {
                 const original = this.originalPlayerTeam?.find(o => o && o.id === u.id);
                 this.growUnit(u, buff, buff, original, true);
@@ -737,12 +737,12 @@ export class HeadlessBattleSimulator {
             }
         }
 
-        // Charge (電光): All Charge units +random Atk (0-4 / 2-6 / 4-10 / 8-15)
+        // Charge (電光): All Charge units +random Atk (0-3 / 2-6 / 6-12)
         const chargeCount = mySynergies.get('Charge') || 0;
         if (chargeCount >= 2) {
             let minBoost = 0;
-            let maxBoost = 4;
-            if (chargeCount >= 5) { minBoost = 8; maxBoost = 15; }
+            let maxBoost = 3;
+            if (chargeCount >= 5) { minBoost = 6; maxBoost = 12; }
             else if (chargeCount >= 3) { minBoost = 2; maxBoost = 6; }
 
             team.filter(u => u && u.synergies.includes('Charge')).forEach(u => {
