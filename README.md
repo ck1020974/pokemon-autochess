@@ -70,4 +70,22 @@ npm run build
 
 ---
 
+## 本機執行與驗證
+
+第一次執行請先安裝依賴：
+
+```powershell
+npm install
+npm run dev
+```
+
+開啟 Vite 顯示的網址，通常是 `http://localhost:5173/`。自動驗證可依序執行：
+
+```powershell
+npm run test:trainer-presentation
+npm run test:balance-values
+npm run test:smoke
+npm run build
+```
+
 Made with ❤️ by 李祐馨
