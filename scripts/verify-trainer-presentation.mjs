@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
@@ -19,6 +19,11 @@ try {
   assert.equal(presentation.getBattleIntroDuration('elite', false, false), 2000);
   assert.equal(presentation.getBattleIntroDuration('champion', true, false), 600);
   assert.equal(presentation.getBattleIntroDuration('regular', false, true), 0);
+
+  const selectorSource = readFileSync(resolve(root, 'src', 'components', 'TrainerSelector.tsx'), 'utf8');
+  assert.match(selectorSource, /aria-label="選擇訓練家"/);
+  assert.match(selectorSource, /onSelect\(trainer\)/);
+  assert.match(selectorSource, /trainer-selector-track/);
 
   console.log('Trainer presentation values verified.');
 } finally {
