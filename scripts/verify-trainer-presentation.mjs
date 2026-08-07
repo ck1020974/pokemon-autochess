@@ -21,21 +21,33 @@ try {
   assert.equal(presentation.getBattleIntroDuration('regular', false, true), 0);
 
   const selectorSource = readFileSync(resolve(root, 'src', 'components', 'TrainerSelector.tsx'), 'utf8');
+  const selectorCss = readFileSync(resolve(root, 'src', 'components', 'TrainerSelector.css'), 'utf8');
   assert.match(selectorSource, /aria-label="選擇訓練家"/);
   assert.match(selectorSource, /onSelect\(trainer\)/);
   assert.match(selectorSource, /trainer-selector-track/);
+  assert.match(selectorSource, /trainer-selector-arrow/);
+  assert.match(selectorSource, /onKeyDown/);
+  assert.match(selectorSource, /setActiveIndex/);
+  assert.doesNotMatch(selectorCss, /overflow-x:\s*auto/);
 
   const introSource = readFileSync(resolve(root, 'src', 'components', 'BattleIntro.tsx'), 'utf8');
+  const introCss = readFileSync(resolve(root, 'src', 'components', 'BattleIntro.css'), 'utf8');
   assert.match(introSource, /onClick=\{complete\}/);
   assert.match(introSource, /useRef\(false\)/);
   assert.match(introSource, /clearTimeout/);
   assert.match(introSource, /battle-intro-scene/);
 
   const appSource = readFileSync(resolve(root, 'src', 'App.tsx'), 'utf8');
+  const appCss = readFileSync(resolve(root, 'src', 'index.css'), 'utf8');
+  const presentationSource = readFileSync(resolve(root, 'src', 'presentation', 'battlePresentation.ts'), 'utf8');
   assert.match(appSource, /showTrainerSelector/);
   assert.match(appSource, /<TrainerSelector/);
   assert.match(appSource, /quickBattlePresentation/);
   assert.match(appSource, /<BattleIntro/);
+  assert.match(appSource, /battle-stage-shell/);
+  assert.match(appCss, /\.battle-stage-shell\.is-battling/);
+  assert.match(presentationSource, /landmark/);
+  assert.match(introCss, /max-height:\s*30vh/);
   const simulatorSource = readFileSync(resolve(root, 'src', 'engine', 'BattleSimulator.ts'), 'utf8');
   const gameLoopSource = readFileSync(resolve(root, 'src', 'engine', 'GameLoop.ts'), 'utf8');
   assert.doesNotMatch(simulatorSource, /selectedTrainer/);

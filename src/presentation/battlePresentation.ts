@@ -16,10 +16,25 @@ export const getBattleIntroDuration = (
     return kind === 'regular' ? 1400 : 2000;
 };
 
-const sceneVariants: Record<BattlePresentationKind, readonly string[]> = {
-    regular: ['route', 'garden', 'harbor', 'stadium'],
-    elite: ['cavern', 'library', 'waterfall', 'volcanic'],
-    champion: ['champion-hall'],
+interface BattleSceneDescriptor {
+    scene: string;
+    landmark: string;
+}
+
+const sceneVariants: Record<BattlePresentationKind, readonly BattleSceneDescriptor[]> = {
+    regular: [
+        { scene: 'route', landmark: 'wooden-fence' },
+        { scene: 'garden', landmark: 'glasshouse' },
+        { scene: 'harbor', landmark: 'pier' },
+        { scene: 'stadium', landmark: 'scoreboard' },
+    ],
+    elite: [
+        { scene: 'cavern', landmark: 'crystal-arch' },
+        { scene: 'library', landmark: 'book-towers' },
+        { scene: 'waterfall', landmark: 'cascade' },
+        { scene: 'volcanic', landmark: 'lava-ridge' },
+    ],
+    champion: [{ scene: 'champion-hall', landmark: 'league-columns' }],
 };
 
 const stableIndex = (value: string, length: number) => {
@@ -28,6 +43,10 @@ const stableIndex = (value: string, length: number) => {
 };
 
 export const getBattleSceneClass = (kind: BattlePresentationKind, opponentId: string): string => {
+    return `battle-scene--${getBattleSceneDescriptor(kind, opponentId).scene}`;
+};
+
+export const getBattleSceneDescriptor = (kind: BattlePresentationKind, opponentId: string): BattleSceneDescriptor => {
     const variants = sceneVariants[kind];
-    return `battle-scene--${variants[stableIndex(opponentId, variants.length)]}`;
+    return variants[stableIndex(opponentId, variants.length)];
 };
