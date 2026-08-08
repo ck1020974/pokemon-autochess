@@ -155,7 +155,6 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
             {silenced && !gastroAcid && (
                 <>
                     <div className="silence-lock-badge" title="招式已被封印"> 🈲 </div>
-                    <div className="silence-overlay" />
                 </>
             )}
 

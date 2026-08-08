@@ -71,7 +71,6 @@ export function BattleIntro({ playerTrainer, opponent, kind, quick, onComplete }
                         <img src={playerTrainer.imageUrl} alt={playerTrainer.name} />
                         <span>{playerTrainer.name}</span>
                     </div>
-                    <div className="battle-intro-versus" aria-hidden="true">VS</div>
                     <div className="battle-intro-trainer battle-intro-opponent">
                         <img src={opponent.url} alt={opponent.name} />
                         <span>{opponent.name}</span>

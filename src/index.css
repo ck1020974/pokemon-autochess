@@ -57,13 +57,14 @@ h3 {
 }
 
 .battle-stage-shell.is-battling {
-  --stage-sky: #9ccac1;
-  --stage-horizon: #5d8b77;
-  --stage-ground: #2d615b;
-  --stage-landmark: none;
+  --stage-sky: #a9d9dc;
+  --stage-horizon: #6aa184;
+  --stage-ground: #295b59;
+  --stage-glow: rgba(255, 242, 181, .46);
+  --stage-ridge: rgba(221, 246, 210, .19);
   min-height: 100vh;
   isolation: isolate;
-  background: var(--stage-landmark), radial-gradient(ellipse at 50% -10%, rgba(255, 245, 182, .47), transparent 28%), radial-gradient(ellipse at 50% 76%, rgba(242,255,230,.16), transparent 14%), linear-gradient(180deg, var(--stage-sky) 0%, var(--stage-horizon) 53%, var(--stage-ground) 100%);
+  background: radial-gradient(ellipse at 50% 8%, var(--stage-glow), transparent 30%), linear-gradient(180deg, var(--stage-sky) 0%, var(--stage-horizon) 54%, var(--stage-ground) 100%);
 }
 
 .battle-stage-shell.is-battling::before {
@@ -71,7 +72,7 @@ h3 {
   z-index: 0;
   inset: 0;
   content: "";
-  background: var(--stage-landmark), radial-gradient(ellipse at 50% -10%, rgba(255, 245, 182, .47), transparent 28%), radial-gradient(ellipse at 50% 76%, rgba(242,255,230,.16), transparent 14%), linear-gradient(180deg, var(--stage-sky) 0%, var(--stage-horizon) 53%, var(--stage-ground) 100%);
+  background: radial-gradient(ellipse 56% 20% at 50% 48%, var(--stage-ridge), transparent 70%), radial-gradient(ellipse 42% 12% at 50% 72%, rgba(255, 255, 235, .12), transparent 72%), linear-gradient(180deg, transparent 0 52%, rgba(16, 66, 60, .18) 72%, rgba(8, 42, 47, .28) 100%);
   pointer-events: none;
 }
 
@@ -80,7 +81,7 @@ h3 {
   z-index: 0;
   inset: 0;
   content: "";
-  background: radial-gradient(ellipse at 50% 46%, transparent 32%, rgba(4, 24, 33, .08) 67%, rgba(4, 19, 30, .43) 100%);
+  background: linear-gradient(164deg, transparent 0 46%, rgba(255, 255, 240, .06) 47% 48%, transparent 49%), radial-gradient(ellipse at 50% 46%, transparent 32%, rgba(4, 24, 33, .08) 67%, rgba(4, 19, 30, .38) 100%);
   pointer-events: none;
 }
 
@@ -91,17 +92,7 @@ h3 {
 .battle-stage-shell.is-battling .board-container.is-battling { background: transparent; box-shadow: none; }
 .battle-stage-shell.is-battling .board-container.is-battling::before { opacity: .72; }
 .battle-stage-shell.is-battling .board-container.is-battling::after { opacity: .45; }
-.battle-stage-shell.is-battling.battle-scene--garden { --stage-sky: #c3ddb0; --stage-horizon: #5d865f; --stage-ground: #315f4d; }.battle-stage-shell.is-battling.battle-scene--harbor { --stage-sky: #94cdd3; --stage-horizon: #4c8593; --stage-ground: #28586b; }.battle-stage-shell.is-battling.battle-scene--stadium { --stage-sky: #c5c392; --stage-horizon: #6a7c5e; --stage-ground: #405d4d; }.battle-stage-shell.is-battling.battle-scene--cavern { --stage-sky: #586d7d; --stage-horizon: #2a4354; --stage-ground: #172f41; }.battle-stage-shell.is-battling.battle-scene--library { --stage-sky: #a7886c; --stage-horizon: #675348; --stage-ground: #3b3030; }.battle-stage-shell.is-battling.battle-scene--waterfall { --stage-sky: #9acbd4; --stage-horizon: #447d8d; --stage-ground: #25596d; }.battle-stage-shell.is-battling.battle-scene--volcanic { --stage-sky: #8a6258; --stage-horizon: #47393f; --stage-ground: #29262d; }.battle-stage-shell.is-battling.battle-scene--champion-hall { --stage-sky: #5e7cad; --stage-horizon: #2d4e73; --stage-ground: #18395b; }
-
-.battle-stage-shell.is-battling.battle-scene--route { --stage-landmark: repeating-linear-gradient(90deg, transparent 0 26px, rgba(97, 68, 42, .8) 27px 33px, transparent 34px 55px) right 71% / 48% 16% no-repeat, linear-gradient(rgba(137, 94, 52, .76), rgba(85, 58, 39, .9)) right 70% / 48% 10% no-repeat; }
-.battle-stage-shell.is-battling.battle-scene--garden { --stage-landmark: repeating-linear-gradient(90deg, rgba(246, 255, 236, .66) 0 2px, transparent 2px 38px) 52% 51% / 220px 160px no-repeat, repeating-linear-gradient(0deg, rgba(246, 255, 236, .62) 0 2px, transparent 2px 36px) 52% 51% / 220px 160px no-repeat; }
-.battle-stage-shell.is-battling.battle-scene--harbor { --stage-landmark: repeating-linear-gradient(90deg, rgba(79, 56, 39, .9) 0 18px, transparent 19px 42px) 13% 64% / 52% 13% no-repeat, linear-gradient(172deg, transparent 0 44%, rgba(194, 165, 123, .78) 45% 49%, transparent 50%) 13% 61% / 54% 21% no-repeat; }
-.battle-stage-shell.is-battling.battle-scene--stadium { --stage-landmark: radial-gradient(ellipse at 50% 100%, transparent 0 49%, rgba(238, 236, 196, .53) 50% 54%, transparent 55%) 50% 60% / 260px 138px no-repeat, linear-gradient(rgba(61, 92, 74, .7), rgba(61, 92, 74, .7)) 50% 62% / 360px 12px no-repeat; }
-.battle-stage-shell.is-battling.battle-scene--cavern { --stage-landmark: linear-gradient(130deg, transparent 0 43%, rgba(163, 221, 232, .56) 44% 49%, transparent 50%) 26% 54% / 115px 210px no-repeat, linear-gradient(230deg, transparent 0 43%, rgba(133, 194, 215, .52) 44% 50%, transparent 51%) 74% 54% / 115px 210px no-repeat; }
-.battle-stage-shell.is-battling.battle-scene--library { --stage-landmark: repeating-linear-gradient(90deg, rgba(76, 46, 36, .93) 0 17px, rgba(194, 140, 80, .8) 18px 25px, rgba(74, 43, 35, .91) 26px 36px) 50% 52% / min(76vw, 780px) 38% no-repeat; }
-.battle-stage-shell.is-battling.battle-scene--waterfall { --stage-landmark: repeating-linear-gradient(90deg, rgba(218, 247, 244, .56) 0 14px, rgba(98, 183, 200, .32) 15px 28px) 50% 23% / 260px 57% no-repeat; }
-.battle-stage-shell.is-battling.battle-scene--volcanic { --stage-landmark: linear-gradient(152deg, transparent 0 42%, rgba(36, 31, 34, .86) 43% 63%, transparent 64%) 22% 47% / 360px 240px no-repeat, linear-gradient(28deg, transparent 0 42%, rgba(54, 37, 37, .86) 43% 63%, transparent 64%) 78% 48% / 360px 240px no-repeat; }
-.battle-stage-shell.is-battling.battle-scene--champion-hall { --stage-landmark: repeating-linear-gradient(90deg, rgba(236, 241, 231, .55) 0 34px, transparent 35px 90px) 50% 16% / min(84vw, 940px) 63% no-repeat, linear-gradient(rgba(227, 235, 224, .54), rgba(134, 169, 189, .3)) 50% 66% / min(86vw, 960px) 10% no-repeat; }
+.battle-stage-shell.is-battling.battle-scene--garden { --stage-sky: #cce4b5; --stage-horizon: #5d8d67; --stage-ground: #315f4d; --stage-glow: rgba(255, 247, 186, .46); --stage-ridge: rgba(227, 249, 205, .24); }.battle-stage-shell.is-battling.battle-scene--harbor { --stage-sky: #9fd7dc; --stage-horizon: #4d8998; --stage-ground: #285b6d; --stage-glow: rgba(245, 252, 232, .38); --stage-ridge: rgba(213, 248, 249, .2); }.battle-stage-shell.is-battling.battle-scene--stadium { --stage-sky: #d0cea0; --stage-horizon: #708461; --stage-ground: #405e4f; --stage-glow: rgba(255, 238, 170, .42); --stage-ridge: rgba(242, 242, 198, .19); }.battle-stage-shell.is-battling.battle-scene--cavern { --stage-sky: #5b7080; --stage-horizon: #2b4658; --stage-ground: #172f41; --stage-glow: rgba(159, 216, 231, .22); --stage-ridge: rgba(131, 190, 211, .16); }.battle-stage-shell.is-battling.battle-scene--library { --stage-sky: #a98a70; --stage-horizon: #675348; --stage-ground: #3b3030; --stage-glow: rgba(251, 211, 151, .27); --stage-ridge: rgba(229, 179, 119, .14); }.battle-stage-shell.is-battling.battle-scene--waterfall { --stage-sky: #a4d8df; --stage-horizon: #4b8495; --stage-ground: #25596d; --stage-glow: rgba(231, 255, 252, .42); --stage-ridge: rgba(194, 240, 243, .22); }.battle-stage-shell.is-battling.battle-scene--volcanic { --stage-sky: #91675e; --stage-horizon: #4a3d43; --stage-ground: #29262d; --stage-glow: rgba(255, 167, 104, .23); --stage-ridge: rgba(231, 103, 68, .14); }.battle-stage-shell.is-battling.battle-scene--champion-hall { --stage-sky: #6685b6; --stage-horizon: #31547a; --stage-ground: #18395b; --stage-glow: rgba(236, 238, 189, .31); --stage-ridge: rgba(196, 219, 244, .2); }
 
 .mute-toggle-btn-header {
   background: transparent;
@@ -1785,15 +1776,6 @@ h3 {
   pointer-events: none;
   opacity: 0.9;
   filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
-}
-
-.silence-overlay {
-  position: absolute;
-  inset: 4px;
-  border-radius: 12px;
-  z-index: 14;
-  pointer-events: none;
-  backdrop-filter: grayscale(0.4) brightness(0.9);
 }
 
 .is-gastro-acid .unit-image {

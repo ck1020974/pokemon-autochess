@@ -49,6 +49,10 @@ try {
   assert.match(introSource, /useRef\(false\)/);
   assert.match(introSource, /clearTimeout/);
   assert.match(introSource, /battle-intro-scene/);
+  assert.doesNotMatch(introSource, /battle-intro-versus/);
+  assert.doesNotMatch(introCss, /battle-intro-versus/);
+  assert.doesNotMatch(introCss, /border-radius:\s*50%/);
+  assert.match(introCss, /--scene-glow/);
 
   const appSource = readFileSync(resolve(root, 'src', 'App.tsx'), 'utf8');
   const appCss = readFileSync(resolve(root, 'src', 'index.css'), 'utf8');
@@ -58,15 +62,18 @@ try {
   assert.match(appSource, /quickBattlePresentation/);
   assert.match(appSource, /<BattleIntro/);
   assert.match(appSource, /battle-stage-shell/);
+  assert.doesNotMatch(appSource, /<div className="silence-overlay"\s*\/>/);
   assert.match(appCss, /\.battle-stage-shell\.is-battling/);
-  assert.match(appCss, /--stage-landmark/);
+  assert.match(appCss, /--stage-glow/);
+  assert.doesNotMatch(appCss, /--stage-landmark/);
+  assert.doesNotMatch(appCss, /\.silence-overlay/);
   assert.match(presentationSource, /landmark/);
   assert.match(introCss, /max-height:\s*30vh/);
   assert.match(introCss, /flex-direction:\s*column/);
   assert.match(introCss, /bottom:\s*clamp\(58px,\s*8vw,\s*96px\)/);
   assert.match(appCss, /\.battle-stage-shell\.is-battling::before\s*\{[^}]*z-index:\s*0;/s);
   assert.match(appCss, /\.battle-stage-shell\.is-battling\s*>\s*:not\(\.battle-intro-overlay\):not\(\.battle-result-overlay\)\s*\{[^}]*z-index:\s*1;/s);
-  assert.match(appCss, /\.battle-stage-shell\.is-battling\s*\{[^}]*min-height:\s*100vh;[^}]*background:\s*var\(--stage-landmark\)/s);
+  assert.match(appCss, /\.battle-stage-shell\.is-battling\s*\{[^}]*min-height:\s*100vh;[^}]*background:\s*radial-gradient/s);
   assert.match(selectorCss, /\.trainer-selector-figure\.is-far\.is-left/);
   assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*transform:\s*translateY\(-clamp\(28px,\s*4vh,\s*56px\)\)/s);
   assert.match(appCss, /\.adventure-panel,\s*\.adventure-choice\s*\{[^}]*background:\s*transparent\s*!important;/s);
