@@ -185,11 +185,11 @@
 }
 
 .tutorial-entry-modal {
-    width: min(500px, 100%);
-    max-width: 500px;
+    width: min(440px, 100%);
+    max-width: 440px;
     height: auto;
-    max-height: min(90vh, 620px);
-    padding: 40px;
+    max-height: min(86vh, 540px);
+    padding: 30px;
     justify-content: center;
     text-align: center;
     overflow-y: auto;
@@ -217,14 +217,15 @@
 
 .tutorial-entry-actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
     gap: 16px;
 }
 
 .tutorial-entry-action.tutorial-entry-action {
-    min-width: 144px;
-    padding: 15px 30px;
+    min-width: 0;
+    flex: 1 1 0;
+    padding: 15px 20px;
     border: 1px solid transparent;
     border-radius: 14px;
     font-size: 1.2rem;
@@ -328,7 +329,9 @@
         gap: 12px;
     }
 
-    .tutorial-entry-action {
-        width: 100%;
+    .tutorial-entry-action.tutorial-entry-action {
+        width: auto;
+        min-width: 0;
+        padding-inline: 12px;
     }
 }

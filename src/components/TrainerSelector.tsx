@@ -87,7 +87,6 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
                 <span className="trainer-selector-hill hill-two" />
             </div>
             <header className="trainer-selector-heading">
-                <p>使用方向鍵、滑鼠滾輪或滑動挑選訓練家</p>
                 <h2>請選擇你的角色</h2>
             </header>
             <div className="trainer-selector-carousel" onWheel={onWheel} onPointerDown={onPointerDown} onPointerUp={onPointerUp} onPointerMove={onPointerMove}>
