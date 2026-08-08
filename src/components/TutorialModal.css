@@ -270,7 +270,7 @@
 
 @media (max-width: 800px),
 (max-height: 600px) {
-    .tutorial-modal {
+    .tutorial-modal:not(.tutorial-entry-modal) {
         width: 90vw;
         height: 88vh;
     }

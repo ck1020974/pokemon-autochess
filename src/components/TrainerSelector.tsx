@@ -114,6 +114,7 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
                                 onClick={() => distance === 0 ? onSelect(trainer) : setActiveIndex(index)}
                             >
                                 <img src={trainer.imageUrl} alt={trainer.name} />
+                                <span className="trainer-selector-name">{trainer.name}</span>
                             </button>
                         );
                     })}

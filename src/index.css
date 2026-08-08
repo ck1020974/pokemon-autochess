@@ -3295,7 +3295,7 @@ h3 {
 }
 
 .adventure-brand + .adventure-loading {
-  margin-top: clamp(12px, 2vh, 28px);
+  margin-top: clamp(32px, 5vh, 72px);
 }
 
 .adventure-startup-overlay .loading-container {
@@ -3348,13 +3348,13 @@ h3 {
   display: flex !important;
   flex-wrap: wrap;
   justify-content: center;
-  gap: clamp(8px, 1.2vw, 16px) !important;
-  width: min(760px, 92vw) !important;
+  gap: clamp(20px, 3vw, 36px) !important;
+  width: min(920px, 92vw) !important;
 }
 
 .adventure-choice-grid--difficulty .adventure-choice {
-  flex: 0 1 164px;
-  max-width: 176px;
+  flex: 0 1 170px;
+  max-width: 184px;
 }
 
 .adventure-choice {

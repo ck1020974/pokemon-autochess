@@ -36,12 +36,13 @@ try {
   assert.match(selectorSource, /clearInterval/);
   assert.match(selectorSource, /onPointerMove/);
   assert.doesNotMatch(selectorSource, /<header className="trainer-selector-heading">\s*<p>/s);
+  assert.match(selectorSource, /trainer-selector-name/);
   assert.match(selectorSource, /點擊角色開始旅途/);
   assert.doesNotMatch(selectorSource, /trainer-selector-arrow/);
-  assert.doesNotMatch(selectorSource, /trainer-selector-name/);
   assert.doesNotMatch(selectorSource, /trainer-selector-pick/);
   assert.doesNotMatch(selectorCss, /trainer-selector-arrow/);
   assert.doesNotMatch(selectorCss, /overflow-x:\s*auto/);
+  assert.doesNotMatch(selectorCss, /trainer-selector-figure::after/);
 
   const introSource = readFileSync(resolve(root, 'src', 'components', 'BattleIntro.tsx'), 'utf8');
   const introCss = readFileSync(resolve(root, 'src', 'components', 'BattleIntro.css'), 'utf8');
@@ -75,17 +76,18 @@ try {
   assert.match(appCss, /\.battle-stage-shell\.is-battling\s*>\s*:not\(\.battle-intro-overlay\):not\(\.battle-result-overlay\)\s*\{[^}]*z-index:\s*1;/s);
   assert.match(appCss, /\.battle-stage-shell\.is-battling\s*\{[^}]*min-height:\s*100vh;[^}]*background:\s*radial-gradient/s);
   assert.match(selectorCss, /\.trainer-selector-figure\.is-far\.is-left/);
-  assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*transform:\s*translateY\(-clamp\(28px,\s*4vh,\s*56px\)\)/s);
+  assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*transform:\s*translateY\(clamp\(8px,\s*2vh,\s*24px\)\)/s);
   assert.match(appCss, /\.adventure-panel,\s*\.adventure-choice\s*\{[^}]*background:\s*transparent\s*!important;/s);
   assert.match(appCss, /\.adventure-startup-overlay\s+\.loading-container\s*\{[^}]*box-shadow:\s*none\s*!important;/s);
   assert.match(appCss, /\.adventure-startup-overlay\s+\.loading-bar-wrapper\s*\{[^}]*border:\s*0\s*!important;/s);
   assert.match(appCss, /\.adventure-scene::before\s*\{/);
-  assert.match(appCss, /\.adventure-brand\s*\+\s*\.adventure-loading\s*\{[^}]*margin-top:/s);
-  assert.match(appCss, /\.adventure-choice-grid--difficulty\s*\{[^}]*width:\s*min\(760px,\s*92vw\)/s);
+  assert.match(appCss, /\.adventure-brand\s*\+\s*\.adventure-loading\s*\{[^}]*margin-top:\s*clamp\(32px,\s*5vh,\s*72px\)/s);
+  assert.match(appCss, /\.adventure-choice-grid--difficulty\s*\{[^}]*width:\s*min\(920px,\s*92vw\)/s);
   assert.doesNotMatch(appCss, /\.adventure-road\s*\{[^}]*clip-path:/s);
   const tutorialCss = readFileSync(resolve(root, 'src', 'components', 'TutorialModal.css'), 'utf8');
   assert.match(tutorialCss, /\.tutorial-entry-modal\s*\{[^}]*max-width:\s*440px/s);
   assert.match(tutorialCss, /\.tutorial-entry-actions\s*\{[^}]*flex-wrap:\s*nowrap/s);
+  assert.match(tutorialCss, /\.tutorial-modal:not\(\.tutorial-entry-modal\)\s*\{[^}]*height:\s*88vh/s);
   const simulatorSource = readFileSync(resolve(root, 'src', 'engine', 'BattleSimulator.ts'), 'utf8');
   const gameLoopSource = readFileSync(resolve(root, 'src', 'engine', 'GameLoop.ts'), 'utf8');
   assert.doesNotMatch(simulatorSource, /selectedTrainer/);
