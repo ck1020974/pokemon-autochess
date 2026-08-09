@@ -23,7 +23,7 @@
 .trainer-selector-heading { padding: 0 clamp(22px, 7vw, 100px); text-align: center; text-shadow: 0 1px 0 rgba(255,255,255,.35); }
 .trainer-selector-heading h2 { margin: 0; font-family: Georgia, "Noto Serif TC", serif; font-size: clamp(31px, 5vw, 54px); letter-spacing: .035em; line-height: 1.2; }
 
-.trainer-selector-carousel { position: relative; display: grid; place-items: center; min-height: 330px; touch-action: pan-y; transform: translateY(clamp(8px, 2vh, 24px)); }
+.trainer-selector-carousel { position: relative; display: grid; place-items: center; min-height: 330px; padding-bottom: clamp(28px, 4vh, 42px); box-sizing: border-box; touch-action: pan-y; transform: translateY(clamp(8px, 2vh, 24px)); }
 .trainer-selector-track { position: relative; width: min(1040px, calc(100vw - 48px)); height: clamp(248px, 31vw, 360px); }
 .trainer-selector-hover-zone { position: absolute; z-index: 7; inset-block: 0; width: clamp(56px, 10vw, 150px); background: transparent; pointer-events: none; }
 .trainer-selector-hover-zone--left { left: 0; }
@@ -70,7 +70,7 @@
 
 @media(max-width:640px) {
     .trainer-selector-overlay { padding-top: 30px; }
-    .trainer-selector-carousel { min-height: 260px; transform: translateY(8px); }
+    .trainer-selector-carousel { min-height: 260px; padding-bottom: 28px; transform: translateY(8px); }
     .trainer-selector-name { top: calc(100% + 1px); font-size: 14px; }
     .trainer-selector-track { width: calc(100vw - 32px); height: 230px; }
     .trainer-selector-figure { width: 164px; transform: translateX(-50%) scale(.6); }

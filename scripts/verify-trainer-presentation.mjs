@@ -44,6 +44,7 @@ try {
   assert.doesNotMatch(selectorCss, /overflow-x:\s*auto/);
   assert.doesNotMatch(selectorCss, /trainer-selector-figure::after/);
   assert.match(selectorCss, /\.trainer-selector-figure\.is-active\s+\.trainer-selector-name/);
+  assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*padding-bottom:\s*clamp\(28px, 4vh, 42px\)/s);
 
   const introSource = readFileSync(resolve(root, 'src', 'components', 'BattleIntro.tsx'), 'utf8');
   const introCss = readFileSync(resolve(root, 'src', 'components', 'BattleIntro.css'), 'utf8');
@@ -68,7 +69,9 @@ try {
   assert.match(appCss, /\.battle-stage-shell\.is-battling/);
   assert.match(appCss, /\.game-container:not\(\.is-battling\)\s*\{[^}]*background:\s*linear-gradient/s);
   assert.match(appCss, /body\s*\{[^}]*background:\s*radial-gradient\(circle at 50% 5%, #e7f8f2/s);
-  assert.match(appCss, /\.board-container:not\(\.is-battling\)\s*\{[^}]*background:\s*rgba\(255, 255, 250, \.78\)/s);
+  assert.match(appCss, /\.board-container:not\(\.is-battling\)\s*\{[^}]*background:\s*linear-gradient\(180deg, #7eaaa0/s);
+  assert.match(appCss, /\.board-vs\s*\{[^}]*display:\s*none/s);
+  assert.match(appSource, /className="tier-text"\s+style=\{\{\s*color:\s*'#175b5c'/s);
   assert.match(appCss, /\.opponent-select-overlay\s*\{[^}]*background:\s*radial-gradient[^}]*linear-gradient[^}]*!important/s);
   assert.match(appCss, /--stage-glow/);
   assert.doesNotMatch(appCss, /--stage-landmark/);

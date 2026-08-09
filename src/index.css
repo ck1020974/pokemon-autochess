@@ -269,9 +269,9 @@ h3 {
 }
 
 .board-container:not(.is-battling) {
-  background: rgba(255, 255, 250, .78);
-  border: 1px solid rgba(22, 104, 98, .14);
-  box-shadow: 0 12px 30px rgba(25, 99, 88, .1);
+  background: linear-gradient(180deg, #7eaaa0 0%, #598b7f 54%, #356b60 100%);
+  border: 1px solid rgba(224, 250, 236, .28);
+  box-shadow: inset 0 0 46px rgba(10, 47, 49, .26), 0 12px 30px rgba(25, 99, 88, .14);
 }
 
 .board-container.is-battling {
@@ -351,6 +351,7 @@ h3 {
 
 /* VS Badge */
 .board-vs {
+  display: none;
   font-size: 2.5rem;
   font-weight: 900;
   color: rgba(255, 255, 255, 0.1);
