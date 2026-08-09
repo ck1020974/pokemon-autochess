@@ -429,7 +429,6 @@ function App() {
     const [showTutorial, setShowTutorial] = useState<boolean>(true); // Changed to true to auto-prompt tutorial
     const [showTrainerSelector, setShowTrainerSelector] = useState(false);
     const [selectedTrainer, setSelectedTrainer] = useState<PlayerTrainer | null>(null);
-    const [quickBattlePresentation, setQuickBattlePresentation] = useState(false);
     const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
     const [tutorialStep, setTutorialStep] = useState<number>(0);
     const [tutorialShake, setTutorialShake] = useState<boolean>(false);
@@ -1839,7 +1838,7 @@ function App() {
                     playerTrainer={selectedTrainer}
                     opponent={pendingBattleOpponent}
                     kind={getPresentationKind(game.wins)}
-                    quick={quickBattlePresentation}
+                    quick={false}
                     onComplete={beginBattle}
                 />
             )}
@@ -2261,21 +2260,6 @@ function App() {
                                 }}
                             >
                                 ❓
-                            </button>
-                            <button
-                                className={`mute-toggle-btn-header ${quickBattlePresentation ? 'active' : ''}`}
-                                onClick={() => {
-                                    if (game.phase === GamePhase.BATTLE) return;
-                                    setQuickBattlePresentation((quick) => !quick);
-                                }}
-                                title={quickBattlePresentation ? '快速對戰演出：開啟' : '快速對戰演出：關閉'}
-                                style={{
-                                    color: quickBattlePresentation ? '#f9c85f' : '#aaa',
-                                    opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
-                                    cursor: game.phase === GamePhase.BATTLE ? 'default' : 'pointer'
-                                }}
-                            >
-                                ⏩
                             </button>
                             <button
                                 className="mute-toggle-btn-header"
