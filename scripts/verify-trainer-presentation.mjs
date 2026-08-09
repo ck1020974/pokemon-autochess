@@ -19,6 +19,8 @@ try {
   assert.equal(presentation.getBattleIntroDuration('elite', false, false), 2000);
   assert.equal(presentation.getBattleIntroDuration('champion', true, false), 600);
   assert.equal(presentation.getBattleIntroDuration('regular', false, true), 0);
+  const firstRegularScene = presentation.getBattleSceneClass('regular', 'repeat-opponent');
+  assert.notEqual(presentation.getBattleSceneClass('regular', 'repeat-opponent', [firstRegularScene]), firstRegularScene);
 
   const selectorSource = readFileSync(resolve(root, 'src', 'components', 'TrainerSelector.tsx'), 'utf8');
   const selectorCss = readFileSync(resolve(root, 'src', 'components', 'TrainerSelector.css'), 'utf8');
@@ -68,16 +70,22 @@ try {
   assert.match(appSource, /<BattleIntro/);
   assert.match(appSource, /battle-stage-shell/);
   assert.match(appSource, /preparationSceneClass/);
+  assert.match(appSource, /recentBattleSceneClasses/);
+  assert.match(appSource, /battle-result--\$\{battleResult\.toLowerCase\(\)\}/);
+  assert.match(appSource, /game-result-overlay/);
   assert.doesNotMatch(appSource, /<div className="silence-overlay"\s*\/>/);
   assert.match(appCss, /\.battle-stage-shell\.is-battling/);
   assert.doesNotMatch(appCss, /\.battle-stage-shell\.is-battling::before/);
   assert.match(appCss, /\.game-container\.prep-scene--mart\s*\{[^}]*#b9d9e9/s);
-  assert.match(appCss, /\.game-container\.prep-scene--center\s*\{[^}]*#e5b9c6/s);
+  assert.match(appCss, /\.game-container\.prep-scene--center\s*\{[^}]*#f1dce1/s);
   assert.match(appCss, /\.game-container\.prep-scene--road\s*\{[^}]*#b8c996/s);
   assert.match(appCss, /\.game-container:not\(\.is-battling\)\s*\{[^}]*background:\s*linear-gradient/s);
   assert.match(appCss, /body\s*\{[^}]*background:\s*radial-gradient\(circle at 50% 5%, #e7f8f2/s);
   assert.match(appCss, /\.board-container:not\(\.is-battling\)\s*\{[^}]*background:\s*linear-gradient\(180deg, #7eaaa0/s);
   assert.match(appCss, /\.board-vs\s*\{[^}]*display:\s*none/s);
+  assert.doesNotMatch(appCss, /\.board-container\.is-battling::before\s*\{/);
+  assert.match(appCss, /\.battle-result-overlay\.battle-result--win\s*\{[^}]*#d9eef0/s);
+  assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*#d9e9c0/s);
   assert.match(appSource, /className="tier-text"\s+style=\{\{\s*color:\s*'#175b5c'/s);
   assert.match(appCss, /\.opponent-select-overlay\s*\{[^}]*background:\s*radial-gradient[^}]*linear-gradient[^}]*!important/s);
   assert.match(appCss, /--stage-glow/);
@@ -86,7 +94,8 @@ try {
   assert.match(presentationSource, /landmark/);
   assert.match(introCss, /max-height:\s*30vh/);
   assert.match(introCss, /flex-direction:\s*column/);
-  assert.match(introCss, /bottom:\s*clamp\(58px,\s*8vw,\s*96px\)/);
+  assert.match(introCss, /bottom:\s*clamp\(88px,\s*11vw,\s*138px\)/);
+  assert.match(introCss, /gap:\s*clamp\(12px,\s*1\.6vw,\s*18px\)/);
   assert.match(appCss, /\.battle-stage-shell\.is-battling\s*>\s*:not\(\.battle-intro-overlay\):not\(\.battle-result-overlay\)\s*\{[^}]*z-index:\s*1;/s);
   assert.match(appCss, /\.battle-stage-shell\.is-battling\s*\{[^}]*min-height:\s*100vh;[^}]*background:\s*radial-gradient/s);
   assert.match(selectorCss, /\.trainer-selector-figure\.is-far\.is-left/);

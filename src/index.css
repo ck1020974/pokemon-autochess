@@ -77,11 +77,11 @@ h3 {
 .game-container:not(.is-battling) .header-section { gap: clamp(10px, 1.8vw, 22px); }
 
 .game-container.prep-scene--mart { background: linear-gradient(180deg, #b9d9e9 0%, #d9eef0 48%, #b6d8d0 100%); }
-.game-container.prep-scene--center { background: linear-gradient(180deg, #e5b9c6 0%, #f5dfe4 48%, #d9c6cd 100%); }
+.game-container.prep-scene--center { background: linear-gradient(180deg, #f1dce1 0%, #f9edf0 48%, #e8d8dd 100%); }
 .game-container.prep-scene--road { background: linear-gradient(180deg, #b8c996 0%, #e7edcb 48%, #c6d7ac 100%); }
 
 .game-container.prep-scene--mart .board-container:not(.is-battling) { background: linear-gradient(180deg, #a4d0d9 0%, #619caa 54%, #457d8d 100%); }
-.game-container.prep-scene--center .board-container:not(.is-battling) { background: linear-gradient(180deg, #efcbd3 0%, #d99aae 54%, #b6778e 100%); }
+.game-container.prep-scene--center .board-container:not(.is-battling) { background: linear-gradient(180deg, #f3dce1 0%, #dfb7c2 54%, #cda1af 100%); }
 .game-container.prep-scene--road .board-container:not(.is-battling) { background: linear-gradient(180deg, #d2deb5 0%, #9db67d 54%, #758f62 100%); }
 
 .battle-stage-shell.is-battling {
@@ -100,7 +100,7 @@ h3 {
   z-index: 0;
   inset: 0;
   content: "";
-  background: linear-gradient(164deg, transparent 0 46%, rgba(255, 255, 240, .06) 47% 48%, transparent 49%), radial-gradient(ellipse at 50% 46%, transparent 32%, rgba(4, 24, 33, .08) 67%, rgba(4, 19, 30, .38) 100%);
+  background: radial-gradient(ellipse at 50% 46%, transparent 32%, rgba(4, 24, 33, .08) 67%, rgba(4, 19, 30, .38) 100%);
   pointer-events: none;
 }
 
@@ -109,7 +109,6 @@ h3 {
 .battle-stage-shell.is-battling .header { border-bottom-color: rgba(255,255,255,.34); text-shadow: 0 2px 7px rgba(4,25,31,.58); }
 .battle-stage-shell.is-battling .board-container { background: transparent; box-shadow: none; }
 .battle-stage-shell.is-battling .board-container.is-battling { background: transparent; box-shadow: none; }
-.battle-stage-shell.is-battling .board-container.is-battling::before { opacity: .72; }
 .battle-stage-shell.is-battling .board-container.is-battling::after { opacity: .45; }
 .battle-stage-shell.is-battling.battle-scene--garden { --stage-sky: #cce4b5; --stage-horizon: #5d8d67; --stage-ground: #315f4d; --stage-glow: rgba(255, 247, 186, .46); --stage-ridge: rgba(227, 249, 205, .24); }.battle-stage-shell.is-battling.battle-scene--harbor { --stage-sky: #9fd7dc; --stage-horizon: #4d8998; --stage-ground: #285b6d; --stage-glow: rgba(245, 252, 232, .38); --stage-ridge: rgba(213, 248, 249, .2); }.battle-stage-shell.is-battling.battle-scene--stadium { --stage-sky: #d0cea0; --stage-horizon: #708461; --stage-ground: #405e4f; --stage-glow: rgba(255, 238, 170, .42); --stage-ridge: rgba(242, 242, 198, .19); }.battle-stage-shell.is-battling.battle-scene--cavern { --stage-sky: #5b7080; --stage-horizon: #2b4658; --stage-ground: #172f41; --stage-glow: rgba(159, 216, 231, .22); --stage-ridge: rgba(131, 190, 211, .16); }.battle-stage-shell.is-battling.battle-scene--library { --stage-sky: #a98a70; --stage-horizon: #675348; --stage-ground: #3b3030; --stage-glow: rgba(251, 211, 151, .27); --stage-ridge: rgba(229, 179, 119, .14); }.battle-stage-shell.is-battling.battle-scene--waterfall { --stage-sky: #a4d8df; --stage-horizon: #4b8495; --stage-ground: #25596d; --stage-glow: rgba(231, 255, 252, .42); --stage-ridge: rgba(194, 240, 243, .22); }.battle-stage-shell.is-battling.battle-scene--volcanic { --stage-sky: #91675e; --stage-horizon: #4a3d43; --stage-ground: #29262d; --stage-glow: rgba(255, 167, 104, .23); --stage-ridge: rgba(231, 103, 68, .14); }.battle-stage-shell.is-battling.battle-scene--champion-hall { --stage-sky: #6685b6; --stage-horizon: #31547a; --stage-ground: #18395b; --stage-glow: rgba(236, 238, 189, .31); --stage-ridge: rgba(196, 219, 244, .2); }
 
@@ -282,19 +281,11 @@ h3 {
   box-shadow: inset 0 0 70px rgba(5, 23, 32, .52);
 }
 
-.board-container.is-battling::before,
 .board-container.is-battling::after {
   position: absolute;
   z-index: -1;
   content: "";
   pointer-events: none;
-}
-
-.board-container.is-battling::before {
-  inset: 24% -8% -10%;
-  background: radial-gradient(ellipse at 50% 15%, rgba(255, 246, 182, .36), transparent 17%), repeating-linear-gradient(168deg, rgba(255,255,255,.1) 0 2px, transparent 2px 22px), linear-gradient(#5f977e, var(--battle-floor));
-  transform: perspective(380px) rotateX(46deg);
-  transform-origin: top;
 }
 
 .board-container.is-battling::after {
@@ -2630,6 +2621,23 @@ h3 {
 .opponent-card:hover .opponent-name {
   color: #ffd700 !important;
 }
+
+.battle-result-overlay.battle-result--win { background: radial-gradient(circle at 50% 20%, #fffdf0 0%, #d9eef0 46%, #94c8bd 100%) !important; }
+.battle-result-overlay.battle-result--loss { background: radial-gradient(circle at 50% 20%, #fff7f5 0%, #f2d8df 46%, #d9a7b8 100%) !important; }
+.battle-result-overlay.battle-result--draw { background: radial-gradient(circle at 50% 20%, #fffceb 0%, #e8e3c5 46%, #b6c59c 100%) !important; }
+.battle-result-overlay.battle-result--win .result-content,
+.battle-result-overlay.battle-result--loss .result-content,
+.battle-result-overlay.battle-result--draw .result-content { color: #173f45; text-shadow: none; }
+.battle-result-overlay.battle-result--win .result-title { color: #21726f; text-shadow: 0 2px 0 rgba(255,255,255,.7); }
+.battle-result-overlay.battle-result--loss .result-title { color: #a64a67; text-shadow: 0 2px 0 rgba(255,255,255,.7); }
+.battle-result-overlay.battle-result--draw .result-title { color: #6d7b4f; text-shadow: 0 2px 0 rgba(255,255,255,.7); }
+.battle-result-overlay.battle-result--win .result-subtitle,
+.battle-result-overlay.battle-result--loss .result-subtitle,
+.battle-result-overlay.battle-result--draw .result-subtitle { color: #245356 !important; }
+.game-result-overlay.result-screen--champion { background: radial-gradient(circle at 50% 18%, #fffce7 0%, #d9e9c0 45%, #84ad88 100%) !important; backdrop-filter: none !important; }
+.game-result-overlay.result-screen--game-over { background: radial-gradient(circle at 50% 18%, #fff8f6 0%, #ead7df 45%, #bf8195 100%) !important; backdrop-filter: none !important; }
+.game-result-overlay .result-content { color: #173f45; }
+.game-result-overlay .result-subtitle { color: #28575a; }
 
 /* Bright adventure treatment for opponent, reward, and pool choices. */
 .opponent-select-overlay {

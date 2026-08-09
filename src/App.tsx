@@ -350,6 +350,8 @@ function App() {
         setActiveSynergyId(null);
         setShowOpponentSelect(false);
         setSelectedOpponent(null);
+        setSelectedBattleSceneClass('');
+        setRecentBattleSceneClasses([]);
         setOpponentChoices([]);
         setSelectedTrainer(null);
         setShowTrainerSelector(false);
@@ -438,6 +440,8 @@ function App() {
     const [opponentChoices, setOpponentChoices] = useState<SelectedOpponent[]>([]);
     const [selectedOpponent, setSelectedOpponent] = useState<SelectedOpponent | null>(null);
     const [pendingBattleOpponent, setPendingBattleOpponent] = useState<SelectedOpponent | null>(null);
+    const [selectedBattleSceneClass, setSelectedBattleSceneClass] = useState('');
+    const [recentBattleSceneClasses, setRecentBattleSceneClasses] = useState<string[]>([]);
 
     // Animation States
     const [goldErrorAnim, setGoldErrorAnim] = useState(false);
@@ -450,9 +454,9 @@ function App() {
 
     const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
     const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
-    const battleSceneClass = selectedOpponent
-        ? getBattleSceneClass(getPresentationKind(game.wins), selectedOpponent.id)
-        : '';
+    const battleSceneClass = selectedBattleSceneClass || (selectedOpponent
+        ? getBattleSceneClass(getPresentationKind(game.wins), selectedOpponent.id, recentBattleSceneClasses)
+        : '');
     const preparationSceneClass = (() => {
         if (showOpponentSelect) return 'prep-scene--road';
         if (game.phase === GamePhase.REWARD || game.lastResult === 'LOSS' || game.lastResult === 'DRAW') return 'prep-scene--center';
@@ -1691,7 +1695,10 @@ function App() {
     };
 
     const handleOpponentSelect = (opponent: SelectedOpponent) => {
+        const nextSceneClass = getBattleSceneClass(getPresentationKind(game.wins), opponent.id, recentBattleSceneClasses);
         setSelectedOpponent(opponent);
+        setSelectedBattleSceneClass(nextSceneClass);
+        setRecentBattleSceneClasses((recent) => [...recent, nextSceneClass].slice(-2));
         if (opponent.id) {
             game.currentOpponentId = opponent.id;
         }
@@ -2303,7 +2310,7 @@ function App() {
             {/* Battle Result Overlay */}
             {
                 battleResult && (
-                    <div className="battle-result-overlay" onClick={handleBattleResultClick} style={{ zIndex: 30000 }}>
+                    <div className={`battle-result-overlay battle-result--${battleResult.toLowerCase()}`} onClick={handleBattleResultClick} style={{ zIndex: 30000 }}>
                         <div className="result-content">
                             <div className="result-title">
                                 {battleResult === 'WIN' ? 'VICTORY ⭕' :
@@ -2343,7 +2350,7 @@ function App() {
                     if (summaryStage === 1) {
                         return (
                             <div
-                                className="battle-result-overlay"
+                                className={`battle-result-overlay game-result-overlay ${game.phase === GamePhase.VICTORY ? 'result-screen--champion' : 'result-screen--game-over'}`}
                                 style={{
                                     position: 'fixed',
                                     top: 0, left: 0, right: 0, bottom: 0,
@@ -2382,7 +2389,7 @@ function App() {
 
                     return (
                         <div
-                            className="battle-result-overlay"
+                            className={`battle-result-overlay game-result-overlay ${game.phase === GamePhase.VICTORY ? 'result-screen--champion' : 'result-screen--game-over'}`}
                             style={{
                                 position: 'fixed',
                                 top: 0, left: 0, right: 0, bottom: 0,

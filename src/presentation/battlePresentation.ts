@@ -42,8 +42,24 @@ const stableIndex = (value: string, length: number) => {
     return sum % length;
 };
 
-export const getBattleSceneClass = (kind: BattlePresentationKind, opponentId: string): string => {
-    return `battle-scene--${getBattleSceneDescriptor(kind, opponentId).scene}`;
+export const getBattleSceneClass = (
+    kind: BattlePresentationKind,
+    opponentId: string,
+    recentSceneClasses: readonly string[] = [],
+): string => {
+    const variants = sceneVariants[kind];
+    const startIndex = stableIndex(opponentId, variants.length);
+    let descriptor = variants[startIndex];
+
+    for (let offset = 0; offset < variants.length; offset += 1) {
+        const candidate = variants[(startIndex + offset) % variants.length];
+        if (!recentSceneClasses.includes(`battle-scene--${candidate.scene}`)) {
+            descriptor = candidate;
+            break;
+        }
+    }
+
+    return `battle-scene--${descriptor.scene}`;
 };
 
 export const getBattleSceneDescriptor = (kind: BattlePresentationKind, opponentId: string): BattleSceneDescriptor => {
