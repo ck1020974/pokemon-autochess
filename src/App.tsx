@@ -453,6 +453,17 @@ function App() {
     const battleSceneClass = selectedOpponent
         ? getBattleSceneClass(getPresentationKind(game.wins), selectedOpponent.id)
         : '';
+    const preparationSceneClass = (() => {
+        if (showOpponentSelect) return 'prep-scene--road';
+        if (game.phase === GamePhase.REWARD || game.lastResult === 'LOSS' || game.lastResult === 'DRAW') return 'prep-scene--center';
+        if (game.phase === GamePhase.POOL_SELECTION) return 'prep-scene--mart';
+        if (game.phase === GamePhase.SHOP) {
+            return game.lastResult === 'WIN' && game.wins >= 8 && game.wins < 12
+                ? 'prep-scene--road'
+                : 'prep-scene--mart';
+        }
+        return '';
+    })();
 
     const tutorialUnitId = 'gastly';
     const tutorialUnitName = '鬼斯';
@@ -1786,7 +1797,7 @@ function App() {
     }
 
     return (
-        <div className={`game-container battle-stage-shell ${game.phase === GamePhase.BATTLE ? `is-battling ${battleSceneClass}` : ''}`} onClick={() => {
+        <div className={`game-container battle-stage-shell ${preparationSceneClass} ${game.phase === GamePhase.BATTLE ? `is-battling ${battleSceneClass}` : ''}`} onClick={() => {
             music.resumeContext();
             if (focusedDifficulty) setFocusedDifficulty(null);
             setActiveSynergyId(null);

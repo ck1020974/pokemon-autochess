@@ -76,6 +76,14 @@ h3 {
 .game-container:not(.is-battling) .header span { color: #1d5353 !important; }
 .game-container:not(.is-battling) .header-section { gap: clamp(10px, 1.8vw, 22px); }
 
+.game-container.prep-scene--mart { background: linear-gradient(180deg, #b9d9e9 0%, #d9eef0 48%, #b6d8d0 100%); }
+.game-container.prep-scene--center { background: linear-gradient(180deg, #e5b9c6 0%, #f5dfe4 48%, #d9c6cd 100%); }
+.game-container.prep-scene--road { background: linear-gradient(180deg, #b8c996 0%, #e7edcb 48%, #c6d7ac 100%); }
+
+.game-container.prep-scene--mart .board-container:not(.is-battling) { background: linear-gradient(180deg, #a4d0d9 0%, #619caa 54%, #457d8d 100%); }
+.game-container.prep-scene--center .board-container:not(.is-battling) { background: linear-gradient(180deg, #efcbd3 0%, #d99aae 54%, #b6778e 100%); }
+.game-container.prep-scene--road .board-container:not(.is-battling) { background: linear-gradient(180deg, #d2deb5 0%, #9db67d 54%, #758f62 100%); }
+
 .battle-stage-shell.is-battling {
   --stage-sky: #a9d9dc;
   --stage-horizon: #6aa184;
@@ -85,15 +93,6 @@ h3 {
   min-height: 100vh;
   isolation: isolate;
   background: radial-gradient(ellipse at 50% 8%, var(--stage-glow), transparent 30%), linear-gradient(180deg, var(--stage-sky) 0%, var(--stage-horizon) 54%, var(--stage-ground) 100%);
-}
-
-.battle-stage-shell.is-battling::before {
-  position: fixed;
-  z-index: 0;
-  inset: 0;
-  content: "";
-  background: radial-gradient(ellipse 56% 20% at 50% 48%, var(--stage-ridge), transparent 70%), radial-gradient(ellipse 42% 12% at 50% 72%, rgba(255, 255, 235, .12), transparent 72%), linear-gradient(180deg, transparent 0 52%, rgba(16, 66, 60, .18) 72%, rgba(8, 42, 47, .28) 100%);
-  pointer-events: none;
 }
 
 .battle-stage-shell.is-battling::after {
