@@ -13,4 +13,3 @@ At `max-width: 600px`, `.summary-identity` was explicitly `flex-wrap: nowrap`, l
 ## Change
 
 The 600px media query now wraps `.summary-identity`, places `.summary-identity-stats` on a full-width three-column row, and places `.summary-actions` on a full-width row. DOM order and desktop layout remain unchanged.
-

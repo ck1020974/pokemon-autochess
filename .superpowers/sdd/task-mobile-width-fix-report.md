@@ -16,4 +16,3 @@
 - `npm run test:smoke` passed (`Smoke test passed: 266 units, 60 shop flows, 100 battles, 3 opponent data files.`); Vite reported an existing WebSocket port-in-use warning while the test still passed.
 - `npm run test:balance-values` passed (`Balance values verified.`)
 - `npm run build` passed (`vite ... built`); Vite emitted only the existing large-chunk advisory.
-
