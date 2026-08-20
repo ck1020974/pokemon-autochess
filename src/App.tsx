@@ -1844,6 +1844,7 @@ function App() {
             {showTrainerSelector && (
                 <TrainerSelector
                     trainers={PLAYER_TRAINERS}
+                    requireConfirmation={activeEdition.id === 'infinite'}
                     onSelect={(trainer) => {
                         setSelectedTrainer(trainer);
                         setShowTrainerSelector(false);
@@ -2596,35 +2597,21 @@ function App() {
                                                     card1 = { label: '角色敗將', opponentId: lastOpp?.opponentId };
                                                 }
 
-                                                // 2. Milestone 2 (Legendary Rival)
-                                                // Group encounters by NAME
-                                                const nameEncounters: Record<string, number> = {};
-                                                const lastSeenIdByName: Record<string, string> = {};
                                                 const lastEncounterIndexByName: Record<string, number> = {};
 
                                                 history.forEach((e, idx) => {
                                                     const info = getConsolidatedInfo(e.opponentId);
-                                                    nameEncounters[info.name] = (nameEncounters[info.name] || 0) + 1;
-                                                    lastSeenIdByName[info.name] = e.opponentId;
                                                     lastEncounterIndexByName[info.name] = idx;
                                                 });
 
-                                                let maxE = 0;
-                                                let rivalName = '';
-                                                Object.entries(nameEncounters).forEach(([name, count]) => {
-                                                    if (count > maxE || (count === maxE && lastEncounterIndexByName[name] > (lastEncounterIndexByName[rivalName] || 0))) {
-                                                        maxE = count;
-                                                        rivalName = name;
-                                                    }
-                                                });
-                                                const card2: HistoryHero | null = rivalName ? { label: '對戰勁敵', opponentId: lastSeenIdByName[rivalName] } : null;
-
-                                                // 3. Milestone 3 (Lifelong Enemy: Draws + Losses)
+                                                // 2. Milestone 2 (Lifelong Enemy: Draws + Losses)
                                                 const nameNuisance: Record<string, number> = {};
+                                                const lastSeenIdByName: Record<string, string> = {};
                                                 history.forEach((e) => {
                                                     if (e.result === 'LOSS' || e.result === 'DRAW') {
                                                         const info = getConsolidatedInfo(e.opponentId);
                                                         nameNuisance[info.name] = (nameNuisance[info.name] || 0) + 1;
+                                                        lastSeenIdByName[info.name] = e.opponentId;
                                                     }
                                                 });
                                                 let maxN = 0;
@@ -2637,7 +2624,11 @@ function App() {
                                                 });
                                                 const card3: HistoryHero | null = enemyName ? { label: '好討厭的感覺', opponentId: lastSeenIdByName[enemyName] } : null;
 
-                                                const heroes = [playerCard, card1, card2, card3];
+                                                // 3. Milestone 3 (First Battle)
+                                                const firstBattle = history[0];
+                                                const card4: HistoryHero | null = firstBattle ? { label: '冒險的起點', opponentId: firstBattle.opponentId } : null;
+
+                                                const heroes = [playerCard, card1, card4, card3];
 
                                                 return (
                                                     <>
