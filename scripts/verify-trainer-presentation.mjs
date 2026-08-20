@@ -13,6 +13,8 @@ try {
 
   assert.deepEqual(PLAYER_TRAINERS.map(({ name }) => name), ['小青', '小春', '小悠', '小智', '小遙', '克麗絲', '阿響', '琴音', '葉子', '赤紅']);
   assert.equal(new Set(PLAYER_TRAINERS.map(({ id }) => id)).size, 10);
+  PLAYER_TRAINERS.forEach(({ description }) => assert.equal(typeof description, 'string'));
+  PLAYER_TRAINERS.forEach(({ description }) => assert.ok(description.trim().length > 0, 'Trainer descriptions must be non-empty'));
   PLAYER_TRAINERS.forEach(({ imageUrl }) => assert.ok(existsSync(resolve(root, 'public', imageUrl)), `Missing player trainer asset: ${imageUrl}`));
 
   assert.equal(presentation.getBattleIntroDuration('regular', false, false), 1400);
@@ -39,6 +41,8 @@ try {
   assert.match(selectorSource, /onPointerMove/);
   assert.doesNotMatch(selectorSource, /<header className="trainer-selector-heading">\s*<p>/s);
   assert.match(selectorSource, /trainer-selector-name/);
+  assert.match(selectorSource, /trainer\.description/);
+  assert.match(selectorSource, /trainer-selector-description/);
   assert.doesNotMatch(selectorSource, /requireConfirmation/);
   assert.doesNotMatch(selectorSource, /previewedTrainerId/);
   assert.match(selectorSource, /點擊角色開始旅途/);
