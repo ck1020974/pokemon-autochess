@@ -48,9 +48,9 @@ try {
   assert.doesNotMatch(selectorCss, /overflow-x:\s*auto/);
   assert.doesNotMatch(selectorCss, /trainer-selector-figure::after/);
   assert.match(selectorCss, /\.trainer-selector-figure\.is-active\s+\.trainer-selector-name/);
-  assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*padding-bottom:\s*clamp\(38px, 5vh, 54px\)/s);
-  assert.match(selectorCss, /\.trainer-selector-name\s*\{[^}]*font-size:\s*clamp\(18px, 2\.1vw, 24px\)/s);
-  assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*translateY\(clamp\(-34px, -3vh, -18px\)\)/s);
+  assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*padding-bottom:\s*clamp\(46px, 6vh, 62px\)/s);
+  assert.match(selectorCss, /\.trainer-selector-name\s*\{[^}]*font-size:\s*clamp\(17px, 1\.9vw, 22px\)/s);
+  assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*translateY\(clamp\(-46px, -4vh, -26px\)\)/s);
   assert.match(selectorCss, /\.trainer-selector-footnote\s*\{[^}]*font-size:\s*clamp\(13px, 1\.45vw, 16px\)/s);
 
   const introSource = readFileSync(resolve(root, 'src', 'components', 'BattleIntro.tsx'), 'utf8');
@@ -84,7 +84,7 @@ try {
   assert.match(appSource, /pool-choice-card__details/);
   assert.match(appSource, /onClick=\{\(\) => void handlePoolSelect\(choice\)\}/);
   assert.match(appSource, /冒險失敗/);
-  assert.match(appSource, /整裝待發後再重新踏上旅程/);
+  assert.match(appSource, /你的眼前一片漆黑/);
   assert.match(appSource, /summary-identity-stats/);
   assert.doesNotMatch(appSource, /<div className="silence-overlay"\s*\/>/);
   assert.match(appCss, /\.battle-stage-shell\.is-battling/);
@@ -101,7 +101,8 @@ try {
   assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*#112c55/s);
   assert.match(appCss, /\.hero-card\.hero-card--player\s*\{[^}]*border:\s*2px solid #d7a837/s);
   assert.match(appSource, /className="tier-text"\s+style=\{\{\s*color:\s*'#175b5c'/s);
-  assert.match(appCss, /\.opponent-select-overlay\s*\{[^}]*background:\s*radial-gradient[^}]*linear-gradient[^}]*!important/s);
+  assert.match(appCss, /\.pool-selection-overlay\s*\{[^}]*background:\s*radial-gradient[^}]*linear-gradient[^}]*!important/s);
+  assert.doesNotMatch(appCss, /\.opponent-select-overlay \.opponent-card\s*\{/);
   assert.match(appCss, /--stage-glow/);
   assert.doesNotMatch(appCss, /--stage-landmark/);
   assert.doesNotMatch(appCss, /\.silence-overlay/);
@@ -113,7 +114,7 @@ try {
   assert.match(appCss, /\.battle-stage-shell\.is-battling\s*>\s*:not\(\.battle-intro-overlay\):not\(\.battle-result-overlay\)\s*\{[^}]*z-index:\s*1;/s);
   assert.match(appCss, /\.battle-stage-shell\.is-battling\s*\{[^}]*min-height:\s*100vh;[^}]*background:\s*radial-gradient/s);
   assert.match(selectorCss, /\.trainer-selector-figure\.is-far\.is-left/);
-  assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*transform:\s*translateY\(clamp\(-34px,\s*-3vh,\s*-18px\)\)/s);
+  assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*transform:\s*translateY\(clamp\(-46px,\s*-4vh,\s*-26px\)\)/s);
   assert.match(appCss, /\.adventure-panel,\s*\.adventure-choice\s*\{[^}]*background:\s*transparent\s*!important;/s);
   assert.match(appCss, /\.adventure-startup-overlay\s+\.loading-container\s*\{[^}]*box-shadow:\s*none\s*!important;/s);
   assert.match(appCss, /\.adventure-startup-overlay\s+\.loading-bar-wrapper\s*\{[^}]*border:\s*0\s*!important;/s);
@@ -128,10 +129,14 @@ try {
   assert.match(appSource, /summary-identity/);
   assert.match(appSource, /summary-identity-stats/);
   assert.match(appSource, /className="summary-restart-action"/);
+  assert.match(appSource, />隊伍<\/button>/);
+  assert.match(appSource, />對戰<\/button>/);
+  assert.match(appSource, /history\.slice\(-48\)/);
   assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*#112c55/s);
   assert.match(appCss, /\.game-result-overlay\.result-screen--game-over\s*\{[^}]*#020407/s);
   assert.match(appCss, /\.game-result-overlay\.result-screen--champion \.result-title/);
   assert.match(appCss, /\.result-screen--champion \.summary-history-display \.hero-label/);
+  assert.match(appCss, /\.summary-history-grid\s*\{[^}]*grid-template-columns:\s*repeat\(12, 1fr\)/s);
   assert.match(appCss, /\.pool-choice-card\s*\{[^}]*flex-direction:\s*column/s);
   assert.match(appCss, /\.pool-choice-card\s*\{\s*flex-direction:\s*row\s*!important/s);
   assert.doesNotMatch(appCss, /\.summary-identity-stats\s*\{[^}]*width:\s*100%/s);

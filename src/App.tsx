@@ -1861,7 +1861,7 @@ function App() {
 
             {/* Reward Selection Overlay (Z-Index 20000) */}
             {game.phase === 'REWARD' && (
-                <div className="opponent-select-overlay show" style={{
+                <div className="opponent-select-overlay pool-selection-overlay show" style={{
                     position: 'fixed',
                     top: 0, left: 0, right: 0, bottom: 0,
                     background: 'rgba(0,0,0,0.85)',
@@ -2368,7 +2368,7 @@ function App() {
                                         {game.phase === GamePhase.VICTORY ? '聯盟冠軍' : '冒險失敗'}
                                     </div>
                                     <div className="result-subtitle">
-                                        {game.phase === GamePhase.VICTORY ? '你的夥伴與你，一同留名殿堂' : '整裝待發後再重新踏上旅程'}
+                                        {game.phase === GamePhase.VICTORY ? '你的夥伴與你，一同留名殿堂' : '你的眼前一片漆黑...'}
                                     </div>
                                     <div className="result-continue">點擊畫面查看冒險紀錄</div>
                                 </div>
@@ -2401,16 +2401,16 @@ function App() {
                                         <strong>{selectedTrainer?.name ?? '訓練家'}</strong>
                                         <small>{game.phase === GamePhase.VICTORY ? '聯盟冠軍' : '冒險失敗'}</small>
                                     </div>
-                                    <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="難度" />
                                     <div className="summary-identity-stats">
                                         <div className="stat-box"><div className="stat-box-label">場數</div><div className="stat-box-value">{totalGames}</div></div>
                                         <div className="stat-box"><div className="stat-box-label">勝／平／敗</div><div className="stat-box-value">{game.wins}／{game.drawCount || 0}／{game.lossCount || 0}</div></div>
                                         <div className="stat-box"><div className="stat-box-label">勝率</div><div className="stat-box-value">{winRate}%</div></div>
                                     </div>
-                                </div>
-                                <div className="summary-tabs">
-                                    <button className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('team'); }}>最終隊伍</button>
-                                    <button className={`summary-tab-btn-compact ${summaryTab === 'history' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('history'); }}>冒險歷程</button>
+                                    <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="難度" />
+                                    <div className="summary-tabs">
+                                        <button className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('team'); }}>隊伍</button>
+                                        <button className={`summary-tab-btn-compact ${summaryTab === 'history' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('history'); }}>對戰</button>
+                                    </div>
                                 </div>
 
                                 {/* Content Area */}
@@ -2593,7 +2593,7 @@ function App() {
                                                         </div>
 
                                                         <div className="summary-history-grid" style={{ marginTop: '5px' }}>
-                                                            {history.slice(-39).map((entry, idx) => {
+                                                            {history.slice(-48).map((entry, idx) => {
                                                                 const info = getConsolidatedInfo(entry.opponentId);
                                                                 const origOp = allEditionOpponents.find(o => o.id === entry.opponentId);
                                                                 const displayUrl = origOp ? origOp.url : info.url;
@@ -3091,7 +3091,7 @@ function App() {
                             gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
                             gap: 'clamp(14px, 2.2vw, 28px)',
                             justifyContent: 'center',
-                            width: 'min(940px, 94vw)'
+                            width: 'min(760px, 90vw)'
                         }}>
                             {game.poolChoices.map((choice, idx) => (
                                 <div
@@ -3104,7 +3104,7 @@ function App() {
                                         alignItems: 'center',
                                         cursor: isPoolProcessing ? 'default' : 'pointer',
                                         background: 'rgba(255,255,250,.92)',
-                                        padding: 'clamp(12px, 1.8vw, 18px)',
+                                        padding: 'clamp(8px, 1.2vw, 12px)',
                                         borderRadius: '18px',
                                         border: '1px solid rgba(26,92,88,.22)',
                                         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -3119,7 +3119,7 @@ function App() {
                                 >
                                     <div className="pool-card-img-wrapper" style={{
                                         width: '100%',
-                                        aspectRatio: '1',
+                                        aspectRatio: '1.2',
                                         background: 'transparent',
                                         borderRadius: '16px',
                                         display: 'flex',
@@ -3142,7 +3142,7 @@ function App() {
                                     </div>
 
                                     <div className="pool-choice-card__details">
-                                        <div className="pool-choice-card__title">{ALL_UNITS[choice.id]?.name || choice.name} <span>★{ALL_UNITS[choice.id]?.tier ?? ''}</span></div>
+                                        <div className="pool-choice-card__title">{ALL_UNITS[choice.id]?.name || choice.name}</div>
                                         <p>{ALL_UNITS[choice.id]?.description ?? '選擇此角色加入本次冒險。'}</p>
                                     </div>
 
