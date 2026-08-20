@@ -151,7 +151,9 @@ try {
   assert.match(appCss, /\.pool-choice-card\s*\{\s*flex-direction:\s*row\s*!important/s);
   assert.doesNotMatch(appCss, /\.summary-identity-stats\s*\{[^}]*width:\s*100%/s);
   assert.match(appCss, /\.pool-choice-card__synergies\s*\{[^}]*gap:\s*8px/s);
+  assert.match(appCss, /\.pool-choice-card__heading\s*\{[^}]*justify-content:\s*center/s);
   assert.match(appCss, /\.opponent-card--choice\s*\{[^}]*flex-direction:\s*column/s);
+  assert.match(appCss, /\.opponent-card--choice\s*\{[^}]*min-height:\s*220px/s);
   assert.doesNotMatch(encyclopediaSource, /ENCYCLOPEDIA_VERSION/);
   assert.doesNotMatch(encyclopediaSource, /encyclopedia-unit-synergies/);
   assert.match(encyclopediaSource, /className="encyclopedia-unit-name"/);
