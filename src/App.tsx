@@ -2399,17 +2399,19 @@ function App() {
                                     <div className="summary-identity-copy">
                                         <span>冒險主角</span>
                                         <strong>{selectedTrainer?.name ?? '訓練家'}</strong>
-                                        <small>{game.phase === GamePhase.VICTORY ? '聯盟冠軍' : '冒險失敗'}</small>
                                     </div>
+                                    <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="難度" />
                                     <div className="summary-identity-stats">
                                         <div className="stat-box"><div className="stat-box-label">場數</div><div className="stat-box-value">{totalGames}</div></div>
                                         <div className="stat-box"><div className="stat-box-label">勝／平／敗</div><div className="stat-box-value">{game.wins}／{game.drawCount || 0}／{game.lossCount || 0}</div></div>
                                         <div className="stat-box"><div className="stat-box-label">勝率</div><div className="stat-box-value">{winRate}%</div></div>
                                     </div>
-                                    <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="難度" />
-                                    <div className="summary-tabs">
+                                    <div className="summary-actions">
                                         <button className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('team'); }}>隊伍</button>
                                         <button className={`summary-tab-btn-compact ${summaryTab === 'history' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('history'); }}>對戰</button>
+                                        <button type="button" className="summary-restart-action" onClick={() => handleRestart()}>
+                                            重新開始
+                                        </button>
                                     </div>
                                 </div>
 
@@ -2586,7 +2588,6 @@ function App() {
                                                                     <div key={idx} className={`hero-card ${hero.isPlayer ? 'hero-card--player' : ''}`}>
                                                                         <div className="hero-label">{hero.label}</div>
                                                                         {info.url && <img src={info.url} className="hero-img" alt={info.name} />}
-                                                                        {hero.isPlayer && <div className="hero-name">{info.name}</div>}
                                                                     </div>
                                                                 );
                                                             })}
@@ -2616,11 +2617,6 @@ function App() {
                                     )}
                                 </div>
 
-                                <div className="summary-restart-row">
-                                    <button type="button" className="summary-restart-action" onClick={() => handleRestart()}>
-                                        重新開始
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     );

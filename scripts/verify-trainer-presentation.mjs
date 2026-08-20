@@ -134,6 +134,11 @@ try {
   assert.match(appSource, /冒險失敗/);
   assert.match(appSource, /summary-identity/);
   assert.match(appSource, /summary-identity-stats/);
+  assert.doesNotMatch(appSource, /<div className="summary-identity-copy">[\s\S]*?<small>\{game\.phase === GamePhase\.(?:VICTORY|GAME_OVER)[\s\S]*?<\/small>/);
+  assert.doesNotMatch(appSource, /hero\.isPlayer && <div className="hero-name">/);
+  assert.match(appSource, /className="summary-actions"/);
+  assert.match(appSource, /summary-identity-copy[\s\S]*difficulty-icon-img[\s\S]*summary-identity-stats[\s\S]*summary-actions/s);
+  assert.match(appCss, /\.summary-actions\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*34px\)\s+minmax\(/s);
   assert.match(appSource, /className="summary-restart-action"/);
   assert.match(appSource, />隊伍<\/button>/);
   assert.match(appSource, />對戰<\/button>/);
