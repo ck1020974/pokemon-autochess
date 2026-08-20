@@ -66,8 +66,6 @@ const SYNERGY_PRIORITY = [
     'Outrage',      // 逆鱗 (21)
 ];
 
-const ENCYCLOPEDIA_VERSION = '2026-03-04-0105'; // 版本標記，用於協助使用者確認是否為最新版
-
 export function EncyclopediaModal({ onClose, activeEdition, activePoolUnitIds = [] }: EncyclopediaModalProps) {
     const [activeTier, setActiveTier] = useState<number>(1);
     const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null); // Controls the detail popup
@@ -242,7 +240,7 @@ export function EncyclopediaModal({ onClose, activeEdition, activePoolUnitIds = 
             <div className="encyclopedia-modal" onClick={e => e.stopPropagation()}>
                 {/* Header */}
                 <div className="encyclopedia-header">
-                    <h2 className="encyclopedia-title">📖 寶可夢圖鑑 <span style={{ fontSize: '0.8rem', opacity: 0.5, letterSpacing: 'normal' }}>v{ENCYCLOPEDIA_VERSION}</span></h2>
+                    <h2 className="encyclopedia-title">📖 寶可夢圖鑑</h2>
                     <button className="encyclopedia-close-btn" onClick={onClose}>×</button>
                 </div>
 
@@ -283,49 +281,6 @@ export function EncyclopediaModal({ onClose, activeEdition, activePoolUnitIds = 
                                 >
                                     <img src={unit.imageUrl.replace('01.webp', '00.webp')} alt={unit.name} className="encyclopedia-unit-img" />
                                     <div className="encyclopedia-unit-name">{unit.name}</div>
-                                    <div className="encyclopedia-unit-synergies" style={{
-                                        display: 'flex',
-                                        gap: '4px',
-                                        justifyContent: 'center',
-                                        marginTop: '8px',
-                                        flexWrap: 'wrap'
-                                    }}>
-                                        {((unit.id === 'mew' && gameWindow.game?.mewSynergies) ? gameWindow.game.mewSynergies : unit.synergies).map((s: string) => {
-                                            const synergy = SYNERGIES[s];
-                                            if (!synergy) return null;
-
-                                            // Replicate tooltip unit filtering from App.tsx/Encyclopedia detail
-                                            const unitsForSyn = Object.values(ALL_UNITS).filter(t => {
-                                                const isAvailable = activeEdition.availableUnitIds.includes(t.id);
-                                                const isEeveeFamily = t.family === 'eevee';
-                                                const isEeveeEdition = isEeveeFamily && activeEdition.availableUnitIds.includes('eevee');
-                                                const isMewSyn = t.id === 'mew' && gameWindow.game?.mewSynergies?.includes(s);
-                                                if (!(isAvailable || isEeveeEdition) || t.id === 'sprout' || (!t.synergies?.includes(s) && !isMewSyn)) return false;
-
-                                                if (isEeveeFamily) return !t.id.endsWith('_final') && t.id !== 'eevee';
-
-                                                const familyUnitsWithSynergy = Object.values(ALL_UNITS).filter(u => {
-                                                    const unitIsAvailable = activeEdition.availableUnitIds.includes(u.id);
-                                                    const unitIsMewSyn = u.id === 'mew' && gameWindow.game?.mewSynergies?.includes(s);
-                                                    return u.family === t.family && unitIsAvailable && (u.synergies?.includes(s) || unitIsMewSyn);
-                                                });
-                                                const firstWithSynergy = familyUnitsWithSynergy.sort((a, b) => getEvolutionIndex(a) - getEvolutionIndex(b) || a.tier - b.tier || a.id.localeCompare(b.id))[0];
-                                                return t.id === firstWithSynergy?.id;
-                                            }).sort((a, b) => a.tier - b.tier);
-
-                                            return (
-                                                <SynergyIcon
-                                                    key={s}
-                                                    synergy={synergy}
-                                                    showCount={false}
-                                                    forceActive={true}
-                                                    units={unitsForSyn}
-                                                    className="encyclopedia-grid-icon"
-                                                    showTooltip={false}
-                                                />
-                                            );
-                                        })}
-                                    </div>
                                 </div>
                             ))}
                         </div>

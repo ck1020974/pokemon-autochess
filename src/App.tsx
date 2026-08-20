@@ -2538,7 +2538,7 @@ function App() {
                                                     card1 = { label: '寶可夢大師', opponentId: champ?.opponentId };
                                                 } else {
                                                     const lastOpp = history[history.length - 1];
-                                                    card1 = { label: '角色敗將', opponentId: lastOpp?.opponentId };
+                                                    card1 = { label: '手下敗將', opponentId: lastOpp?.opponentId };
                                                 }
 
                                                 const lastEncounterIndexByName: Record<string, number> = {};
@@ -2666,10 +2666,11 @@ function App() {
                             {opponentChoices.map((npc, idx) => (
                                 <div
                                     key={idx}
-                                    className="opponent-card"
+                                    className="opponent-card opponent-card--choice"
                                     onClick={() => handleOpponentSelect(npc)}
                                     style={{
                                         display: 'flex',
+                                        flexDirection: 'column',
                                         alignItems: 'center',
                                         cursor: 'pointer',
                                         background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
@@ -2709,6 +2710,7 @@ function App() {
                                     <img
                                         src={npc.url}
                                         alt={npc.name}
+                                        className="opponent-card__portrait"
                                         style={{
                                             width: 'clamp(100px, 20vw, 150px)',
                                             height: 'clamp(100px, 20vw, 150px)',
@@ -2717,7 +2719,7 @@ function App() {
                                             filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
                                         }}
                                     />
-                                    <div className="opponent-name" style={{
+                                    <div className="opponent-name opponent-card__name" style={{
                                         color: '#fff',
                                         fontSize: 'clamp(1.2rem, 2.5vw, 1.8rem)',
                                         fontWeight: 'bold',
@@ -3089,7 +3091,7 @@ function App() {
                         <div className="opponent-cards-container" style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                            gap: 'clamp(14px, 2.2vw, 28px)',
+                            gap: 'clamp(24px, 3vw, 40px)',
                             justifyContent: 'center',
                             width: 'min(760px, 90vw)'
                         }}>
@@ -3142,18 +3144,9 @@ function App() {
                                     </div>
 
                                     <div className="pool-choice-card__details">
-                                        <div className="pool-choice-card__title">{ALL_UNITS[choice.id]?.name || choice.name}</div>
-                                        <p>{ALL_UNITS[choice.id]?.description ?? '選擇此角色加入本次冒險。'}</p>
-                                    </div>
-
-                                    {/* Synergy Badges */}
-                                    <div style={{
-                                        display: 'flex',
-                                        gap: '6px',
-                                        justifyContent: 'center',
-                                        flexWrap: 'wrap',
-                                        width: '100%'
-                                    }}>
+                                        <div className="pool-choice-card__heading">
+                                            <div className="pool-choice-card__title">{ALL_UNITS[choice.id]?.name || choice.name}</div>
+                                            <div className="pool-choice-card__synergies">
                                         {choice.synergies && choice.synergies.map((s: string) => {
                                             const synergy = SYNERGIES[s];
                                             if (!synergy) return null;
@@ -3199,6 +3192,9 @@ function App() {
                                                 tooltipLeft={idx === 2}
                                             />;
                                         })}
+                                            </div>
+                                        </div>
+                                        <p>{ALL_UNITS[choice.id]?.description ?? '選擇此角色加入本次冒險。'}</p>
                                     </div>
                                 </div>
                             ))}

@@ -66,6 +66,7 @@ try {
 
   const appSource = readFileSync(resolve(root, 'src', 'App.tsx'), 'utf8');
   const appCss = readFileSync(resolve(root, 'src', 'index.css'), 'utf8');
+  const encyclopediaSource = readFileSync(resolve(root, 'src', 'components', 'EncyclopediaModal.tsx'), 'utf8');
   const presentationSource = readFileSync(resolve(root, 'src', 'presentation', 'battlePresentation.ts'), 'utf8');
   assert.match(appSource, /showTrainerSelector/);
   assert.match(appSource, /<TrainerSelector/);
@@ -82,6 +83,7 @@ try {
   assert.doesNotMatch(appSource, /selectedPoolPreviewId/);
   assert.doesNotMatch(appSource, /handlePoolCardClick/);
   assert.match(appSource, /pool-choice-card__details/);
+  assert.match(appSource, /pool-choice-card__synergies/);
   assert.match(appSource, /onClick=\{\(\) => void handlePoolSelect\(choice\)\}/);
   assert.match(appSource, /冒險失敗/);
   assert.match(appSource, /你的眼前一片漆黑/);
@@ -132,6 +134,10 @@ try {
   assert.match(appSource, />隊伍<\/button>/);
   assert.match(appSource, />對戰<\/button>/);
   assert.match(appSource, /history\.slice\(-48\)/);
+  assert.match(appSource, /label: '手下敗將'/);
+  assert.doesNotMatch(appSource, /label: '角色敗將'/);
+  assert.match(appSource, /opponent-card__portrait/);
+  assert.match(appSource, /opponent-card__name/);
   assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*#112c55/s);
   assert.match(appCss, /\.game-result-overlay\.result-screen--game-over\s*\{[^}]*#020407/s);
   assert.match(appCss, /\.game-result-overlay\.result-screen--champion \.result-title/);
@@ -140,6 +146,11 @@ try {
   assert.match(appCss, /\.pool-choice-card\s*\{[^}]*flex-direction:\s*column/s);
   assert.match(appCss, /\.pool-choice-card\s*\{\s*flex-direction:\s*row\s*!important/s);
   assert.doesNotMatch(appCss, /\.summary-identity-stats\s*\{[^}]*width:\s*100%/s);
+  assert.match(appCss, /\.pool-choice-card__synergies\s*\{[^}]*gap:\s*8px/s);
+  assert.match(appCss, /\.opponent-card--choice\s*\{[^}]*flex-direction:\s*column/s);
+  assert.doesNotMatch(encyclopediaSource, /ENCYCLOPEDIA_VERSION/);
+  assert.doesNotMatch(encyclopediaSource, /encyclopedia-unit-synergies/);
+  assert.match(encyclopediaSource, /className="encyclopedia-unit-name"/);
   const tutorialCss = readFileSync(resolve(root, 'src', 'components', 'TutorialModal.css'), 'utf8');
   assert.match(tutorialCss, /\.tutorial-entry-modal\s*\{[^}]*max-width:\s*440px/s);
   assert.match(tutorialCss, /\.tutorial-entry-actions\s*\{[^}]*flex-wrap:\s*nowrap/s);

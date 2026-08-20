@@ -3646,7 +3646,9 @@ h3 {
 .is-selection-pool-card.pool-choice-card:hover { background: #fffef8 !important; border-color: #d6a43c !important; box-shadow: 0 14px 28px rgba(31, 98, 91, .2) !important; transform: translateY(-5px); }
 .pool-choice-card .pool-card-img-wrapper { width: 100% !important; aspect-ratio: 1.15 !important; margin-bottom: 2px !important; }
 .pool-choice-card__details { width: 100%; text-align: left; padding: 0 4px 8px; }
+.pool-choice-card__heading { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .pool-choice-card__title { color: #164b4c; font-family: Georgia, "Noto Serif TC", serif; font-size: clamp(1.05rem, 2vw, 1.38rem); font-weight: 800; letter-spacing: .04em; }
+.pool-choice-card__synergies { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-left: auto; }
 .pool-choice-card__title span { color: #ad741b; font-family: inherit; font-size: .82em; white-space: nowrap; }
 .pool-choice-card__details p { min-height: 3em; margin: 5px 0 0; color: #32676a; font-size: clamp(.76rem, 1.15vw, .9rem); line-height: 1.45; }
 .pool-choice-card .synergy-icon { filter: none; }
@@ -3655,6 +3657,10 @@ h3 {
 .pool-selection-overlay .pool-choice-card__details { padding-bottom: 4px; }
 .pool-selection-overlay .pool-choice-card__details p { min-height: 2.7em; font-size: clamp(.7rem, 1vw, .8rem); }
 .pool-selection-overlay .pool-choice-card__title { font-size: clamp(.95rem, 1.5vw, 1.12rem); }
+
+.opponent-card--choice { flex-direction: column; justify-content: flex-end; min-height: 260px; }
+.opponent-card--choice .opponent-card__portrait { display: block; margin: 0 auto 10px !important; }
+.opponent-card--choice .opponent-card__name { width: 100%; }
 
 .summary-identity .summary-tabs { display: grid; flex: 0 0 112px; grid-template-columns: 1fr; gap: 3px; padding: 0; background: transparent; }
 .summary-identity .summary-tab-btn-compact { padding: 5px 8px; font-size: .72rem; }
