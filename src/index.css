@@ -3634,8 +3634,9 @@ h3 {
 
 @media (max-width: 600px) {
   .game-result-overlay .summary-container { width: min(94vw, 520px); padding: 15px; }
-  .summary-identity { flex-wrap: nowrap; gap: 7px; }
-  .summary-identity-stats { grid-template-columns: repeat(3, auto); gap: 7px; margin-left: 0; }
+  .summary-identity { flex-wrap: wrap; gap: 7px; }
+  .summary-identity-stats { width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-left: 0; }
+  .summary-actions { width: 100%; grid-template-columns: repeat(2, 30px) minmax(0, 1fr); margin-left: 0; }
   .game-result-overlay .stat-box-label { font-size: .58rem; }
   .game-result-overlay .stat-box-value { font-size: .82rem; }
   .game-result-overlay .summary-tab-content { min-height: 300px; max-height: 48vh; padding: 10px; }

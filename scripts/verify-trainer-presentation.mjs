@@ -154,7 +154,9 @@ try {
   assert.match(appCss, /\.summary-history-grid\s*\{[^}]*grid-template-columns:\s*repeat\(12, 1fr\)/s);
   assert.match(appCss, /\.pool-choice-card\s*\{[^}]*flex-direction:\s*column/s);
   assert.match(appCss, /\.pool-choice-card\s*\{\s*flex-direction:\s*row\s*!important/s);
-  assert.doesNotMatch(appCss, /\.summary-identity-stats\s*\{[^}]*width:\s*100%/s);
+  assert.match(appCss, /@media\s*\(max-width:\s*600px\)\s*\{[\s\S]*?\.summary-identity\s*\{[^}]*flex-wrap:\s*wrap/s);
+  assert.match(appCss, /@media\s*\(max-width:\s*600px\)\s*\{[\s\S]*?\.summary-identity-stats\s*\{[^}]*width:\s*100%[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/s);
+  assert.match(appCss, /@media\s*\(max-width:\s*600px\)\s*\{[\s\S]*?\.summary-actions\s*\{[^}]*width:\s*100%/s);
   assert.match(appCss, /\.pool-choice-card__synergies\s*\{[^}]*gap:\s*8px/s);
   assert.match(appCss, /\.pool-choice-card__heading\s*\{[^}]*justify-content:\s*center/s);
   assert.match(appCss, /\.opponent-card--choice\s*\{[^}]*flex-direction:\s*column/s);
