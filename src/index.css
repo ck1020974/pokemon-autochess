@@ -3234,6 +3234,26 @@ h3 {
   }
 }
 
+.hero-card.hero-card--player {
+  background: linear-gradient(145deg, rgba(255, 252, 224, .95), rgba(234, 247, 234, .92));
+  border: 2px solid #d7a837;
+  box-shadow: 0 10px 24px rgba(144, 107, 22, .24), inset 0 0 0 3px rgba(255,255,255,.58);
+  transform: translateY(-8px);
+}
+
+.hero-card.hero-card--player::before {
+  position: absolute;
+  inset: 7px;
+  content: '';
+  border: 1px solid rgba(48, 111, 89, .25);
+  border-radius: 13px;
+  pointer-events: none;
+}
+
+.hero-card.hero-card--player .hero-label { color: #8c6515; text-shadow: none; }
+.hero-card.hero-card--player .hero-name { color: #20584d; font-size: 1rem; letter-spacing: .08em; text-shadow: none; }
+.hero-card.hero-card--player .hero-img { filter: drop-shadow(0 8px 12px rgba(37, 84, 67, .26)); }
+
 /* --- Bright adventure startup screens --- */
 .adventure-startup-overlay {
   --adventure-teal: #153f45;

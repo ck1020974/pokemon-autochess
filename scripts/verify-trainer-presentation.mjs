@@ -73,6 +73,8 @@ try {
   assert.match(appSource, /recentBattleSceneClasses/);
   assert.match(appSource, /battle-result--\$\{battleResult\.toLowerCase\(\)\}/);
   assert.match(appSource, /game-result-overlay/);
+  assert.match(appSource, /label:\s*'我方主角'/);
+  assert.doesNotMatch(appSource, /label:\s*'冒險的起點'/);
   assert.doesNotMatch(appSource, /<div className="silence-overlay"\s*\/>/);
   assert.match(appCss, /\.battle-stage-shell\.is-battling/);
   assert.doesNotMatch(appCss, /\.battle-stage-shell\.is-battling::before/);
@@ -86,6 +88,7 @@ try {
   assert.doesNotMatch(appCss, /\.board-container\.is-battling::before\s*\{/);
   assert.match(appCss, /\.battle-result-overlay\.battle-result--win\s*\{[^}]*#d9eef0/s);
   assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*#d9e9c0/s);
+  assert.match(appCss, /\.hero-card\.hero-card--player\s*\{[^}]*border:\s*2px solid #d7a837/s);
   assert.match(appSource, /className="tier-text"\s+style=\{\{\s*color:\s*'#175b5c'/s);
   assert.match(appCss, /\.opponent-select-overlay\s*\{[^}]*background:\s*radial-gradient[^}]*linear-gradient[^}]*!important/s);
   assert.match(appCss, /--stage-glow/);

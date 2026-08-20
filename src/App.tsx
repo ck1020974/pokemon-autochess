@@ -2578,8 +2578,16 @@ function App() {
                                                     };
                                                 };
 
-                                                // 1. Milestone 1
-                                                let card1: { label: string; opponentId?: string } | null = null;
+                                                type HistoryHero = { label: string; opponentId?: string; imageUrl?: string; name?: string; isPlayer?: boolean };
+                                                const playerCard: HistoryHero = {
+                                                    label: '我方主角',
+                                                    name: selectedTrainer?.name ?? '訓練家',
+                                                    imageUrl: selectedTrainer?.imageUrl,
+                                                    isPlayer: true,
+                                                };
+
+                                                // 1. Final opponent milestone
+                                                let card1: HistoryHero | null = null;
                                                 if (game.phase === GamePhase.VICTORY) {
                                                     const champ = history[history.length - 1];
                                                     card1 = { label: '寶可夢大師', opponentId: champ?.opponentId };
@@ -2609,7 +2617,7 @@ function App() {
                                                         rivalName = name;
                                                     }
                                                 });
-                                                const card2 = rivalName ? { label: '對戰勁敵', opponentId: lastSeenIdByName[rivalName] } : null;
+                                                const card2: HistoryHero | null = rivalName ? { label: '對戰勁敵', opponentId: lastSeenIdByName[rivalName] } : null;
 
                                                 // 3. Milestone 3 (Lifelong Enemy: Draws + Losses)
                                                 const nameNuisance: Record<string, number> = {};
@@ -2627,24 +2635,23 @@ function App() {
                                                         enemyName = name;
                                                     }
                                                 });
-                                                const card3 = enemyName ? { label: '好討厭的感覺', opponentId: lastSeenIdByName[enemyName] } : null;
+                                                const card3: HistoryHero | null = enemyName ? { label: '好討厭的感覺', opponentId: lastSeenIdByName[enemyName] } : null;
 
-                                                // 4. Milestone 4 (First Victory)
-                                                const firstBattle = history[0];
-                                                const card4 = firstBattle ? { label: '冒險的起點', opponentId: firstBattle.opponentId } : null;
-
-                                                const heroes = [card1, card4, card2, card3];
+                                                const heroes = [playerCard, card1, card2, card3];
 
                                                 return (
                                                     <>
                                                         <div className="history-hero-grid">
                                                             {heroes.map((hero, idx) => {
                                                                 if (!hero) return <div key={idx} className="hero-card is-empty"><div className="hero-label">尚未達成</div></div>;
-                                                                const info = getConsolidatedInfo(hero.opponentId ?? '');
+                                                                const info = hero.isPlayer
+                                                                    ? { name: hero.name ?? '訓練家', url: hero.imageUrl ?? '' }
+                                                                    : getConsolidatedInfo(hero.opponentId ?? '');
                                                                 return (
-                                                                    <div key={idx} className="hero-card">
+                                                                    <div key={idx} className={`hero-card ${hero.isPlayer ? 'hero-card--player' : ''}`}>
                                                                         <div className="hero-label">{hero.label}</div>
-                                                                        <img src={info.url} className="hero-img" alt="hero" />
+                                                                        {info.url && <img src={info.url} className="hero-img" alt={info.name} />}
+                                                                        {hero.isPlayer && <div className="hero-name">{info.name}</div>}
                                                                     </div>
                                                                 );
                                                             })}
