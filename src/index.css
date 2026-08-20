@@ -3600,7 +3600,7 @@ h3 {
   box-shadow: 0 18px 54px rgba(0, 0, 0, .72);
 }
 
-.summary-identity { display: flex; align-items: center; gap: 12px; min-width: 0; padding-bottom: 13px; border-bottom: 1px solid rgba(25, 68, 76, .18); }
+.summary-identity { display: flex; align-items: center; gap: 12px; min-width: 0; padding-bottom: 10px; border-bottom: 1px solid rgba(25, 68, 76, .18); }
 .result-screen--game-over .summary-identity { border-color: rgba(227, 231, 232, .14); }
 .summary-trainer-image, .summary-trainer-fallback { width: 50px; height: 50px; flex: 0 0 50px; object-fit: contain; border-radius: 50%; background: #e8c96d; color: #143743; display: grid; place-items: center; font-size: 24px; }
 .result-screen--game-over .summary-trainer-image, .result-screen--game-over .summary-trainer-fallback { background: #52616b; color: #f0f2f2; filter: grayscale(.6); }
@@ -3609,8 +3609,8 @@ h3 {
 .summary-identity-copy strong { display: block; margin: 2px 0; font-size: clamp(1.1rem, 2.5vw, 1.45rem); }
 .summary-identity .difficulty-icon-img { width: 44px; height: 44px; filter: drop-shadow(0 3px 5px rgba(18, 52, 59, .2)); }
 
-.summary-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 4px 0; }
-.summary-metrics .stat-box { min-width: 0; padding: 5px 2px; text-align: center; }
+.summary-identity-stats { display: grid; grid-template-columns: repeat(3, auto); gap: clamp(8px, 1.6vw, 18px); margin-left: auto; }
+.summary-identity-stats .stat-box { min-width: 0; padding: 3px 0; text-align: center; }
 .game-result-overlay .stat-box-label { color: inherit; font-size: .68rem; opacity: .6; }
 .game-result-overlay .stat-box-value { color: inherit; font-size: clamp(1rem, 2.4vw, 1.3rem); white-space: nowrap; }
 
@@ -3634,8 +3634,26 @@ h3 {
 
 @media (max-width: 600px) {
   .game-result-overlay .summary-container { width: min(94vw, 520px); padding: 15px; }
-  .summary-metrics { gap: 2px; }
-  .game-result-overlay .stat-box-value { font-size: .95rem; }
-  .summary-identity { gap: 10px; }
+  .summary-identity { flex-wrap: nowrap; gap: 7px; }
+  .summary-identity-stats { grid-template-columns: repeat(3, auto); gap: 7px; margin-left: auto; }
+  .game-result-overlay .stat-box-label { font-size: .58rem; }
+  .game-result-overlay .stat-box-value { font-size: .82rem; }
   .game-result-overlay .summary-tab-content { min-height: 300px; max-height: 48vh; padding: 10px; }
+}
+
+/* Infinite pool: details live on every choice, so selection is immediate. */
+.is-selection-pool-card.pool-choice-card { min-width: 0; color: #173f45; flex-direction: column; }
+.is-selection-pool-card.pool-choice-card:hover { background: #fffef8 !important; border-color: #d6a43c !important; box-shadow: 0 14px 28px rgba(31, 98, 91, .2) !important; transform: translateY(-5px); }
+.pool-choice-card .pool-card-img-wrapper { width: 100% !important; aspect-ratio: 1.15 !important; margin-bottom: 2px !important; }
+.pool-choice-card__details { width: 100%; text-align: left; padding: 0 4px 8px; }
+.pool-choice-card__title { color: #164b4c; font-family: Georgia, "Noto Serif TC", serif; font-size: clamp(1.05rem, 2vw, 1.38rem); font-weight: 800; letter-spacing: .04em; }
+.pool-choice-card__title span { color: #ad741b; font-family: inherit; font-size: .82em; white-space: nowrap; }
+.pool-choice-card__details p { min-height: 3em; margin: 5px 0 0; color: #32676a; font-size: clamp(.76rem, 1.15vw, .9rem); line-height: 1.45; }
+.pool-choice-card .synergy-icon { filter: none; }
+@media (max-width: 700px) {
+  .opponent-cards-container { grid-template-columns: 1fr !important; width: min(420px, 92vw) !important; }
+  .pool-choice-card { flex-direction: row !important; align-items: center !important; gap: 10px; }
+  .pool-choice-card .pool-card-img-wrapper { width: 98px !important; flex: 0 0 98px; }
+  .pool-choice-card .pool-choice-card__details { flex: 1; }
+  .pool-choice-card .synergy-icon { transform: scale(.88); transform-origin: left center; }
 }

@@ -318,7 +318,6 @@ function App() {
 
     const [rewardChoices, setRewardChoices] = useState<RewardDefinition[]>([]);
     const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
-    const [selectedPoolPreviewId, setSelectedPoolPreviewId] = useState<string | null>(null);
     const [isPoolProcessing, setIsPoolProcessing] = useState(false);
     const update = useForceUpdate();
 
@@ -351,7 +350,6 @@ function App() {
         setActiveSynergyId(null);
         setShowOpponentSelect(false);
         setSelectedOpponent(null);
-        setSelectedPoolPreviewId(null);
         setSelectedBattleSceneClass('');
         setRecentBattleSceneClasses([]);
         setOpponentChoices([]);
@@ -1778,18 +1776,8 @@ function App() {
 
         game.applyPoolChoice(choice, unselectedIds);
         setSelectedPoolId(null);
-        setSelectedPoolPreviewId(null);
         setIsPoolProcessing(false);
         update();
-    };
-
-    const handlePoolCardClick = (choice: PoolChoice) => {
-        if (isPoolProcessing) return;
-        if (selectedPoolPreviewId === choice.id) {
-            void handlePoolSelect(choice);
-            return;
-        }
-        setSelectedPoolPreviewId(choice.id);
     };
 
     // Calculate Synergies (All)
@@ -2377,10 +2365,10 @@ function App() {
                                 <div className="result-content" style={{ textAlign: 'center' }}>
                                     <div className="result-kicker">POKÉMON AUTOCHESS · {game.phase === GamePhase.VICTORY ? 'HALL OF FAME' : 'JOURNEY PAUSED'}</div>
                                     <div className="result-title">
-                                        {game.phase === GamePhase.VICTORY ? '聯盟冠軍' : '冒險暫止'}
+                                        {game.phase === GamePhase.VICTORY ? '聯盟冠軍' : '冒險失敗'}
                                     </div>
                                     <div className="result-subtitle">
-                                        {game.phase === GamePhase.VICTORY ? '你的夥伴與你，一同留名殿堂' : '生命值歸零，但旅途還能重新啟程。'}
+                                        {game.phase === GamePhase.VICTORY ? '你的夥伴與你，一同留名殿堂' : '整裝待發後再重新踏上旅程'}
                                     </div>
                                     <div className="result-continue">點擊畫面查看冒險紀錄</div>
                                 </div>
@@ -2411,14 +2399,14 @@ function App() {
                                     <div className="summary-identity-copy">
                                         <span>冒險主角</span>
                                         <strong>{selectedTrainer?.name ?? '訓練家'}</strong>
-                                        <small>{game.phase === GamePhase.VICTORY ? '聯盟冠軍' : '冒險暫止'}</small>
+                                        <small>{game.phase === GamePhase.VICTORY ? '聯盟冠軍' : '冒險失敗'}</small>
                                     </div>
                                     <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="難度" />
-                                </div>
-                                <div className="summary-metrics">
-                                    <div className="stat-box"><div className="stat-box-label">總場數</div><div className="stat-box-value">{totalGames}</div></div>
-                                    <div className="stat-box"><div className="stat-box-label">勝／平／敗</div><div className="stat-box-value">{game.wins}／{game.drawCount || 0}／{game.lossCount || 0}</div></div>
-                                    <div className="stat-box"><div className="stat-box-label">勝率</div><div className="stat-box-value">{winRate}%</div></div>
+                                    <div className="summary-identity-stats">
+                                        <div className="stat-box"><div className="stat-box-label">場數</div><div className="stat-box-value">{totalGames}</div></div>
+                                        <div className="stat-box"><div className="stat-box-label">勝／平／敗</div><div className="stat-box-value">{game.wins}／{game.drawCount || 0}／{game.lossCount || 0}</div></div>
+                                        <div className="stat-box"><div className="stat-box-label">勝率</div><div className="stat-box-value">{winRate}%</div></div>
+                                    </div>
                                 </div>
                                 <div className="summary-tabs">
                                     <button className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('team'); }}>最終隊伍</button>
@@ -2682,7 +2670,6 @@ function App() {
                                     onClick={() => handleOpponentSelect(npc)}
                                     style={{
                                         display: 'flex',
-                                        flexDirection: 'column',
                                         alignItems: 'center',
                                         cursor: 'pointer',
                                         background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
@@ -3099,48 +3086,32 @@ function App() {
                             請選擇你的角色池
                         </h2>
 
-                        {selectedPoolPreviewId && (() => {
-                            const choice = game.poolChoices.find((item) => item.id === selectedPoolPreviewId);
-                            const unit = choice ? ALL_UNITS[choice.id] : undefined;
-                            if (!choice || !unit) return null;
-                            return (
-                                <div className="pool-choice-info" aria-live="polite">
-                                    <img src={unit.imageUrl} alt={unit.name} />
-                                    <div>
-                                        <span>角色資訊</span>
-                                        <strong>{unit.name} · ★{unit.tier}</strong>
-                                        <p>{unit.description}</p>
-                                        <small>{unit.synergies.map((id) => SYNERGIES[id]?.name ?? id).join(' · ')} 再點一次此卡片確認選擇</small>
-                                    </div>
-                                </div>
-                            );
-                        })()}
-
                         <div className="opponent-cards-container" style={{
-                            display: 'flex',
-                            gap: '60px', // Increased gap for more breathing room
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                            gap: 'clamp(14px, 2.2vw, 28px)',
                             justifyContent: 'center',
-                            flexWrap: 'wrap'
+                            width: 'min(940px, 94vw)'
                         }}>
                             {game.poolChoices.map((choice, idx) => (
                                 <div
                                     key={idx}
-                                    className={`opponent-card is-selection-pool-card ${selectedPoolPreviewId === choice.id ? 'is-previewed' : ''} ${(selectedPoolId && selectedPoolId !== choice.id) ? 'pool-card-destroy' : ''}`}
-                                    onClick={() => handlePoolCardClick(choice)}
+                                    className={`opponent-card is-selection-pool-card pool-choice-card ${(selectedPoolId && selectedPoolId !== choice.id) ? 'pool-card-destroy' : ''}`}
+                                    onClick={() => void handlePoolSelect(choice)}
                                     style={{
                                         display: 'flex',
                                         flexDirection: 'column',
                                         alignItems: 'center',
                                         cursor: isPoolProcessing ? 'default' : 'pointer',
-                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
-                                        padding: 'clamp(10px, 2vw, 20px) clamp(8px, 1vw, 12px)',
-                                        borderRadius: '24px',
-                                        border: '2px solid rgba(255,255,255,0.1)',
+                                        background: 'rgba(255,255,250,.92)',
+                                        padding: 'clamp(12px, 1.8vw, 18px)',
+                                        borderRadius: '18px',
+                                        border: '1px solid rgba(26,92,88,.22)',
                                         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        width: 'clamp(100px, 20vw, 170px)',
+                                        width: '100%',
                                         position: 'relative',
-                                        boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                                        backdropFilter: 'blur(5px)',
+                                        boxShadow: '0 10px 24px rgba(27,92,86,.14)',
+                                        backdropFilter: 'none',
                                         opacity: (selectedPoolId && selectedPoolId === choice.id) ? 1 : undefined,
                                         transform: (selectedPoolId && selectedPoolId === choice.id) ? 'scale(1.05)' : undefined,
                                         zIndex: (selectedPoolId && selectedPoolId === choice.id) ? 100 : undefined
@@ -3170,17 +3141,9 @@ function App() {
                                         />
                                     </div>
 
-                                    <div style={{
-                                        color: '#fff',
-                                        fontSize: 'clamp(1.1rem, 2.2vw, 1.5rem)',
-                                        fontWeight: '800',
-                                        letterSpacing: '2px',
-                                        textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                                        textAlign: 'center',
-                                        marginBottom: '10px',
-                                        marginTop: '0px'
-                                    }}>
-                                        {ALL_UNITS[choice.id]?.name || choice.name}
+                                    <div className="pool-choice-card__details">
+                                        <div className="pool-choice-card__title">{ALL_UNITS[choice.id]?.name || choice.name} <span>★{ALL_UNITS[choice.id]?.tier ?? ''}</span></div>
+                                        <p>{ALL_UNITS[choice.id]?.description ?? '選擇此角色加入本次冒險。'}</p>
                                     </div>
 
                                     {/* Synergy Badges */}
