@@ -450,7 +450,8 @@ function App() {
 
     // Summary Screen Stages
     const [summaryStage, setSummaryStage] = useState<1 | 2>(1);
-    const [summaryTab, setSummaryTab] = useState<'team' | 'history'>('team');
+    const [summaryTab, setSummaryTab] = useState<'team' | 'battle' | 'achievement'>('team');
+    const [summaryTeamSide, setSummaryTeamSide] = useState<'player' | 'enemy'>('player');
 
     const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
     const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
@@ -2400,18 +2401,17 @@ function App() {
                                         <span>冒險主角</span>
                                         <strong>{selectedTrainer?.name ?? '訓練家'}</strong>
                                     </div>
-                                    <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="難度" />
                                     <div className="summary-identity-stats">
                                         <div className="stat-box"><div className="stat-box-label">場數</div><div className="stat-box-value">{totalGames}</div></div>
                                         <div className="stat-box"><div className="stat-box-label">勝／平／敗</div><div className="stat-box-value">{game.wins}／{game.drawCount || 0}／{game.lossCount || 0}</div></div>
                                         <div className="stat-box"><div className="stat-box-label">勝率</div><div className="stat-box-value">{winRate}%</div></div>
                                     </div>
+                                    <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="難度" />
                                     <div className="summary-actions">
                                         <button className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('team'); }}>隊伍</button>
-                                        <button className={`summary-tab-btn-compact ${summaryTab === 'history' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('history'); }}>對戰</button>
-                                        <button type="button" className="summary-restart-action" onClick={() => handleRestart()}>
-                                            重新開始
-                                        </button>
+                                        <button className={`summary-tab-btn-compact ${summaryTab === 'battle' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('battle'); }}>對戰</button>
+                                        <button className={`summary-tab-btn-compact ${summaryTab === 'achievement' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('achievement'); }}>成就</button>
+                                        <button type="button" className="summary-restart-action" onClick={() => handleRestart()}>重啟</button>
                                     </div>
                                 </div>
 
@@ -2419,7 +2419,11 @@ function App() {
                                 <div className="summary-tab-content" onClick={() => setActiveSynergyId(null)}>
                                     {summaryTab === 'team' ? (
                                         <div className="summary-team-display" style={{ marginTop: '-5px' }}>
-                                            <div className="summary-units-grid">
+                                            <div className="summary-team-toggle">
+                                                <button className={summaryTeamSide === 'player' ? 'is-active' : ''} onClick={() => setSummaryTeamSide('player')}>我方隊伍</button>
+                                                <button className={summaryTeamSide === 'enemy' ? 'is-active' : ''} onClick={() => setSummaryTeamSide('enemy')}>敵方隊伍</button>
+                                            </div>
+                                            <div className={`summary-units-grid summary-team-panel ${summaryTeamSide === 'player' ? 'is-visible' : ''}`}>
                                                 {/* Synergy Display repositioned to top-left of this grid via CSS absolute positioning */}
                                                 <div className="summary-synergies-row" onClick={(e) => e.stopPropagation()}>
                                                     {getSynergyStatus(initialPlayerTeamForSynergy.length > 0 ? initialPlayerTeamForSynergy : game.playerTeam, activeEdition).map(syn => (
@@ -2462,7 +2466,7 @@ function App() {
 
                                             {/* Enemy Team Section - Compressed and Headerless */}
                                             {game.opponentTeam && (
-                                                <div style={{ marginTop: '20px' }}>
+                                                <div className={`summary-team-panel ${summaryTeamSide === 'enemy' ? 'is-visible' : ''}`} style={{ marginTop: '20px' }}>
                                                     <div className="summary-units-grid">
                                                         <div className="summary-synergies-row">
                                                             {getSynergyStatus(initialEnemyTeamForSynergy.length > 0 ? initialEnemyTeamForSynergy : game.opponentTeam, activeEdition).map(syn => (
@@ -2507,7 +2511,7 @@ function App() {
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="summary-history-display">
+                                        <div className={`summary-history-display summary-history-display--${summaryTab} ${summaryTab === 'achievement' ? 'summary-achievement-display' : ''}`}>
                                             {(() => {
                                                 const history = game.battleHistory || [];
 
@@ -2588,13 +2592,14 @@ function App() {
                                                                     <div key={idx} className={`hero-card ${hero.isPlayer ? 'hero-card--player' : ''}`}>
                                                                         <div className="hero-label">{hero.label}</div>
                                                                         {info.url && <img src={info.url} className="hero-img" alt={info.name} />}
+                                                                        <div className="hero-name">{info.name}</div>
                                                                     </div>
                                                                 );
                                                             })}
                                                         </div>
 
                                                         <div className="summary-history-grid" style={{ marginTop: '5px' }}>
-                                                            {history.slice(-48).map((entry, idx) => {
+                                                            {history.slice(-12).map((entry, idx) => {
                                                                 const info = getConsolidatedInfo(entry.opponentId);
                                                                 const origOp = allEditionOpponents.find(o => o.id === entry.opponentId);
                                                                 const displayUrl = origOp ? origOp.url : info.url;
