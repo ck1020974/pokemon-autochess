@@ -2635,7 +2635,7 @@ h3 {
 .battle-result-overlay.battle-result--loss .result-subtitle,
 .battle-result-overlay.battle-result--draw .result-subtitle { color: #245356 !important; }
 .game-result-overlay.result-screen--champion { background: radial-gradient(ellipse at 50% 4%, #fff0aa 0%, #d3a735 9%, transparent 30%), linear-gradient(180deg, #112c55 0%, #214c80 49%, #0a1d38 100%) !important; backdrop-filter: none !important; }
-.game-result-overlay.result-screen--game-over { background: radial-gradient(ellipse at 50% 70%, #1a2530 0%, #090d13 48%, #020407 100%) !important; backdrop-filter: none !important; }
+.game-result-overlay.result-screen--game-over { background: radial-gradient(ellipse at 50% 68%, #718891 0%, #314a5a 48%, #172933 100%) !important; backdrop-filter: none !important; }
 .game-result-overlay.result-screen--champion::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .55; background: repeating-linear-gradient(90deg, transparent 0 12%, rgba(255, 238, 167, .14) 12.25% 14.5%, transparent 14.75% 25%), linear-gradient(180deg, transparent 0 68%, rgba(0, 0, 0, .22) 69% 100%); clip-path: polygon(0 100%, 6% 56%, 11% 56%, 17% 100%, 24% 100%, 29% 43%, 35% 43%, 40% 100%, 60% 100%, 65% 43%, 71% 43%, 76% 100%, 83% 100%, 89% 56%, 94% 56%, 100% 100%); }
 .game-result-overlay.result-screen--game-over::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .28; background: linear-gradient(108deg, transparent 0 46%, rgba(137, 171, 187, .28) 46.2% 46.4%, transparent 46.6% 100%), linear-gradient(72deg, transparent 0 55%, rgba(137, 171, 187, .18) 55.2% 55.35%, transparent 55.5% 100%); }
 .game-result-overlay .result-content { position: relative; color: #fffdf3; }
@@ -3597,9 +3597,9 @@ h3 {
 }
 
 .game-result-overlay.result-screen--game-over .summary-container {
-  background: rgba(22, 29, 37, .97);
+  background: rgba(43, 61, 71, .95);
   color: #e3e7e8;
-  box-shadow: 0 18px 54px rgba(0, 0, 0, .72);
+  box-shadow: 0 18px 54px rgba(6, 20, 27, .42);
 }
 
 .summary-identity { display: flex; align-items: center; gap: 10px; min-width: 0; padding-bottom: 10px; border-bottom: 1px solid rgba(25, 68, 76, .18); }
@@ -3623,7 +3623,7 @@ h3 {
 .result-screen--game-over .summary-actions .summary-tab-btn-compact.is-active { background: #657681; color: #fff; }
 
 .game-result-overlay .summary-tab-content { min-height: min(340px, 44vh); max-height: 44vh; padding: 12px; border-radius: 12px; background: rgba(22, 74, 78, .07); }
-.result-screen--game-over .summary-tab-content { background: rgba(0, 0, 0, .2); }
+.result-screen--game-over .summary-tab-content { background: rgba(255, 255, 255, .08); }
 .result-screen--champion .summary-history-display .hero-label { color: #7c5715; text-shadow: none; }
 .result-screen--game-over .summary-history-display .hero-label { color: #e4bd62; }
 
@@ -3671,6 +3671,7 @@ h3 {
 .summary-team-toggle button.is-active { background: #e9c969; color: #183f47; }
 .summary-team-panel { display: none; }
 .summary-team-panel.is-visible { display: block; }
+.summary-units-grid.summary-team-panel.is-visible { display: flex; }
 .summary-history-display--battle .history-hero-grid { display: none; }
 .summary-history-display--achievement .summary-history-grid { display: none; }
 .summary-achievement-display .hero-name, .hero-name { margin-top: 5px; font-size: .72rem; font-weight: 800; text-align: center; }

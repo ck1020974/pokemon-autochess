@@ -149,13 +149,14 @@ try {
   assert.match(appSource, /summaryTeamSide/);
   assert.match(appSource, /history\.slice\(-12\)/);
   assert.match(appSource, /summary-achievement-display/);
-  assert.match(appSource, /history\.slice\(-12\)/);
+  assert.match(appCss, /\.summary-units-grid\.summary-team-panel\.is-visible\s*\{\s*display:\s*flex/);
+  assert.match(appCss, /result-screen--game-over\s*\{[^}]*#314a5a/s);
   assert.match(appSource, /label: '手下敗將'/);
   assert.doesNotMatch(appSource, /label: '角色敗將'/);
   assert.match(appSource, /opponent-card__portrait/);
   assert.match(appSource, /opponent-card__name/);
   assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*#112c55/s);
-  assert.match(appCss, /\.game-result-overlay\.result-screen--game-over\s*\{[^}]*#020407/s);
+  assert.match(appCss, /\.game-result-overlay\.result-screen--game-over\s*\{[^}]*#314a5a/s);
   assert.match(appCss, /\.game-result-overlay\.result-screen--champion \.result-title/);
   assert.match(appCss, /\.result-screen--champion \.summary-history-display \.hero-label/);
   assert.match(appCss, /\.summary-history-grid\s*\{[^}]*grid-template-columns:\s*repeat\(12, 1fr\)/s);
