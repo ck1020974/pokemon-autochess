@@ -41,8 +41,8 @@ try {
   assert.match(selectorSource, /onPointerMove/);
   assert.doesNotMatch(selectorSource, /<header className="trainer-selector-heading">\s*<p>/s);
   assert.match(selectorSource, /trainer-selector-name/);
-  assert.match(selectorSource, /trainer\.description/);
-  assert.match(selectorSource, /trainer-selector-description/);
+  assert.doesNotMatch(selectorSource, /trainer\.description/);
+  assert.doesNotMatch(selectorSource, /trainer-selector-description/);
   assert.doesNotMatch(selectorSource, /requireConfirmation/);
   assert.doesNotMatch(selectorSource, /previewedTrainerId/);
   assert.match(selectorSource, /點擊角色開始旅途/);
@@ -89,6 +89,8 @@ try {
   assert.match(appSource, /pool-choice-card__details/);
   assert.match(appSource, /pool-choice-card__synergies/);
   assert.match(appSource, /onClick=\{\(\) => void handlePoolSelect\(choice\)\}/);
+  assert.match(appSource, /gridTemplateColumns:\s*'repeat\(3, minmax\(0, 1fr\)\)'/);
+  assert.match(appSource, /gap:\s*'clamp\(32px, 4vw, 52px\)'/);
   assert.match(appSource, /冒險失敗/);
   assert.match(appSource, /你的眼前一片漆黑/);
   assert.match(appSource, /summary-identity-stats/);

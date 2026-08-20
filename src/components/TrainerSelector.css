@@ -59,8 +59,6 @@
 .trainer-selector-figure.is-active img { filter: drop-shadow(0 0 23px rgba(244, 195, 77, .72)) drop-shadow(0 14px 9px rgba(25,65,70,.22)); }
 .trainer-selector-name { display: none; position: absolute; top: calc(100% - 6px); left: 50%; min-width: max-content; transform: translateX(-50%); color: #17334d; font-family: Georgia, "Noto Serif TC", serif; font-size: clamp(17px, 1.9vw, 22px); font-weight: 800; letter-spacing: .08em; text-shadow: 0 1px 0 rgba(255,255,255,.56); }
 .trainer-selector-figure.is-active .trainer-selector-name { display: block; }
-.trainer-selector-description { display: none; position: absolute; top: calc(100% + 24px); left: 50%; min-width: max-content; transform: translateX(-50%); color: #285b62; font-size: clamp(12px, 1.35vw, 15px); font-weight: 700; letter-spacing: .05em; text-shadow: 0 1px 0 rgba(255,255,255,.5); }
-.trainer-selector-figure.is-active .trainer-selector-description { display: block; }
 .trainer-selector-figure:focus-visible { outline: 4px solid #eb9e3e; outline-offset: 4px; }
 
 .trainer-selector-footnote { margin: 0; padding: 0 24px; color: #174e54; text-align: center; font-size: clamp(13px, 1.45vw, 16px); font-weight: 800; letter-spacing: .08em; text-shadow: 0 1px 0 rgba(255,255,255,.56); }
@@ -74,7 +72,6 @@
     .trainer-selector-overlay { padding-top: 30px; }
     .trainer-selector-carousel { min-height: 260px; padding-bottom: 34px; transform: translateY(-14px); }
     .trainer-selector-name { top: calc(100% - 1px); font-size: 16px; }
-    .trainer-selector-description { top: calc(100% + 22px); font-size: 12px; }
     .trainer-selector-track { width: calc(100vw - 32px); height: 230px; }
     .trainer-selector-figure { width: 164px; transform: translateX(-50%) scale(.6); }
     .trainer-selector-figure.is-active { transform: translateX(-50%) scale(.88); }

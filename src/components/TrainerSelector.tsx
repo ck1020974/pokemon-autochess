@@ -115,7 +115,6 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
                             >
                                 <img src={trainer.imageUrl} alt={trainer.name} />
                                 <span className="trainer-selector-name">{trainer.name}</span>
-                                <span className="trainer-selector-description">{trainer.description}</span>
                             </button>
                         );
                     })}

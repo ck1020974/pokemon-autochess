@@ -3087,7 +3087,7 @@ function App() {
                         <div className="opponent-cards-container" style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                            gap: 'clamp(28px, 3.5vw, 48px)',
+                            gap: 'clamp(32px, 4vw, 52px)',
                             justifyContent: 'center',
                             width: 'min(760px, 90vw)'
                         }}>
