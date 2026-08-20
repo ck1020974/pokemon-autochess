@@ -318,6 +318,7 @@ function App() {
 
     const [rewardChoices, setRewardChoices] = useState<RewardDefinition[]>([]);
     const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
+    const [selectedPoolPreviewId, setSelectedPoolPreviewId] = useState<string | null>(null);
     const [isPoolProcessing, setIsPoolProcessing] = useState(false);
     const update = useForceUpdate();
 
@@ -350,6 +351,7 @@ function App() {
         setActiveSynergyId(null);
         setShowOpponentSelect(false);
         setSelectedOpponent(null);
+        setSelectedPoolPreviewId(null);
         setSelectedBattleSceneClass('');
         setRecentBattleSceneClasses([]);
         setOpponentChoices([]);
@@ -1778,8 +1780,18 @@ function App() {
 
         game.applyPoolChoice(choice, unselectedIds);
         setSelectedPoolId(null);
+        setSelectedPoolPreviewId(null);
         setIsPoolProcessing(false);
         update();
+    };
+
+    const handlePoolCardClick = (choice: PoolChoice) => {
+        if (isPoolProcessing) return;
+        if (selectedPoolPreviewId === choice.id) {
+            void handlePoolSelect(choice);
+            return;
+        }
+        setSelectedPoolPreviewId(choice.id);
     };
 
     // Calculate Synergies (All)
@@ -1844,7 +1856,6 @@ function App() {
             {showTrainerSelector && (
                 <TrainerSelector
                     trainers={PLAYER_TRAINERS}
-                    requireConfirmation={activeEdition.id === 'infinite'}
                     onSelect={(trainer) => {
                         setSelectedTrainer(trainer);
                         setShowTrainerSelector(false);
@@ -3170,6 +3181,23 @@ function App() {
                             請選擇你的角色池
                         </h2>
 
+                        {selectedPoolPreviewId && (() => {
+                            const choice = game.poolChoices.find((item) => item.id === selectedPoolPreviewId);
+                            const unit = choice ? ALL_UNITS[choice.id] : undefined;
+                            if (!choice || !unit) return null;
+                            return (
+                                <div className="pool-choice-info" aria-live="polite">
+                                    <img src={unit.imageUrl} alt={unit.name} />
+                                    <div>
+                                        <span>角色資訊</span>
+                                        <strong>{unit.name} · ★{unit.tier}</strong>
+                                        <p>{unit.description}</p>
+                                        <small>{unit.synergies.map((id) => SYNERGIES[id]?.name ?? id).join(' · ')} 再點一次此卡片確認選擇</small>
+                                    </div>
+                                </div>
+                            );
+                        })()}
+
                         <div className="opponent-cards-container" style={{
                             display: 'flex',
                             gap: '60px', // Increased gap for more breathing room
@@ -3179,8 +3207,8 @@ function App() {
                             {game.poolChoices.map((choice, idx) => (
                                 <div
                                     key={idx}
-                                    className={`opponent-card is-selection-pool-card ${(selectedPoolId && selectedPoolId !== choice.id) ? 'pool-card-destroy' : ''}`}
-                                    onClick={() => handlePoolSelect(choice)}
+                                    className={`opponent-card is-selection-pool-card ${selectedPoolPreviewId === choice.id ? 'is-previewed' : ''} ${(selectedPoolId && selectedPoolId !== choice.id) ? 'pool-card-destroy' : ''}`}
+                                    onClick={() => handlePoolCardClick(choice)}
                                     style={{
                                         display: 'flex',
                                         flexDirection: 'column',

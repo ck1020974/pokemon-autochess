@@ -39,9 +39,8 @@ try {
   assert.match(selectorSource, /onPointerMove/);
   assert.doesNotMatch(selectorSource, /<header className="trainer-selector-heading">\s*<p>/s);
   assert.match(selectorSource, /trainer-selector-name/);
-  assert.match(selectorSource, /requireConfirmation/);
-  assert.match(selectorSource, /previewedTrainerId/);
-  assert.match(selectorSource, /點擊角色查看資訊，再點一次開始旅途/);
+  assert.doesNotMatch(selectorSource, /requireConfirmation/);
+  assert.doesNotMatch(selectorSource, /previewedTrainerId/);
   assert.match(selectorSource, /點擊角色開始旅途/);
   assert.doesNotMatch(selectorSource, /trainer-selector-arrow/);
   assert.doesNotMatch(selectorSource, /trainer-selector-pick/);
@@ -79,7 +78,9 @@ try {
   assert.match(appSource, /label:\s*'我方主角'/);
   assert.match(appSource, /label:\s*'冒險的起點'/);
   assert.doesNotMatch(appSource, /label:\s*'對戰勁敵'/);
-  assert.match(appSource, /requireConfirmation=\{activeEdition\.id === 'infinite'\}/);
+  assert.match(appSource, /selectedPoolPreviewId/);
+  assert.match(appSource, /handlePoolCardClick/);
+  assert.match(appSource, /角色資訊/);
   assert.doesNotMatch(appSource, /<div className="silence-overlay"\s*\/>/);
   assert.match(appCss, /\.battle-stage-shell\.is-battling/);
   assert.doesNotMatch(appCss, /\.battle-stage-shell\.is-battling::before/);

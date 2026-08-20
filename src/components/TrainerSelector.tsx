@@ -6,7 +6,6 @@ import './TrainerSelector.css';
 interface TrainerSelectorProps {
     trainers: readonly PlayerTrainer[];
     onSelect: (trainer: PlayerTrainer) => void;
-    requireConfirmation?: boolean;
 }
 
 const getDistance = (index: number, activeIndex: number, length: number) => {
@@ -14,24 +13,12 @@ const getDistance = (index: number, activeIndex: number, length: number) => {
     return offset > length / 2 ? offset - length : offset;
 };
 
-export function TrainerSelector({ trainers, onSelect, requireConfirmation = false }: TrainerSelectorProps) {
+export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
     const [activeIndex, setActiveIndex] = useState(0);
-    const [previewedTrainerId, setPreviewedTrainerId] = useState<string | null>(null);
     const pointerStart = useRef<number | null>(null);
     const hoverDelayRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
     const hoverRepeatRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
-    const move = (direction: -1 | 1) => {
-        setPreviewedTrainerId(null);
-        setActiveIndex((index) => (index + direction + trainers.length) % trainers.length);
-    };
-
-    const activateTrainer = (trainer: PlayerTrainer) => {
-        if (!requireConfirmation || previewedTrainerId === trainer.id) {
-            onSelect(trainer);
-            return;
-        }
-        setPreviewedTrainerId(trainer.id);
-    };
+    const move = (direction: -1 | 1) => setActiveIndex((index) => (index + direction + trainers.length) % trainers.length);
 
     const stopHoverMove = () => {
         if (hoverDelayRef.current !== null) window.clearTimeout(hoverDelayRef.current);
@@ -61,7 +48,7 @@ export function TrainerSelector({ trainers, onSelect, requireConfirmation = fals
             move(1);
         } else if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            activateTrainer(trainers[activeIndex]);
+            onSelect(trainers[activeIndex]);
         }
     };
 
@@ -124,13 +111,7 @@ export function TrainerSelector({ trainers, onSelect, requireConfirmation = fals
                                 type="button"
                                 role="listitem"
                                 tabIndex={visible ? 0 : -1}
-                                onClick={() => {
-                                    if (distance === 0) activateTrainer(trainer);
-                                    else {
-                                        setPreviewedTrainerId(null);
-                                        setActiveIndex(index);
-                                    }
-                                }}
+                                onClick={() => distance === 0 ? onSelect(trainer) : setActiveIndex(index)}
                             >
                                 <img src={trainer.imageUrl} alt={trainer.name} />
                                 <span className="trainer-selector-name">{trainer.name}</span>
@@ -147,16 +128,7 @@ export function TrainerSelector({ trainers, onSelect, requireConfirmation = fals
                     onPointerLeave={stopHoverMove}
                 />
             </div>
-            {requireConfirmation && previewedTrainerId && (
-                <aside className="trainer-selector-info" aria-live="polite">
-                    <span>角色資訊</span>
-                    <strong>{trainers.find((trainer) => trainer.id === previewedTrainerId)?.name}</strong>
-                    <p>無限模式的冒險主角。此選擇不影響遊戲數值；再點一次角色即可開始旅途。</p>
-                </aside>
-            )}
-            <p className="trainer-selector-footnote">
-                {requireConfirmation ? '點擊角色查看資訊，再點一次開始旅途' : '點擊角色開始旅途'}
-            </p>
+            <p className="trainer-selector-footnote">點擊角色開始旅途</p>
         </section>
     );
 }

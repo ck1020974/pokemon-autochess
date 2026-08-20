@@ -62,11 +62,6 @@
 .trainer-selector-figure:focus-visible { outline: 4px solid #eb9e3e; outline-offset: 4px; }
 
 .trainer-selector-footnote { margin: 0; padding: 0 24px; color: #174e54; text-align: center; font-size: clamp(17px, 2.1vw, 24px); font-weight: 800; letter-spacing: .08em; text-shadow: 0 1px 0 rgba(255,255,255,.56); }
-.trainer-selector-info { position: absolute; z-index: 9; right: clamp(20px, 6vw, 86px); bottom: clamp(70px, 11vh, 122px); width: min(300px, calc(100vw - 40px)); padding: 16px 18px; border: 1px solid rgba(25, 89, 82, .28); border-radius: 18px; background: rgba(255,255,249,.88); box-shadow: 0 14px 34px rgba(28, 89, 80, .18); color: #174e54; text-align: left; animation: trainer-info-in .22s ease-out; }
-.trainer-selector-info span { display: block; color: #a46d1d; font-size: 12px; font-weight: 900; letter-spacing: .14em; }
-.trainer-selector-info strong { display: block; margin-top: 3px; font-family: Georgia, "Noto Serif TC", serif; font-size: 24px; }
-.trainer-selector-info p { margin: 7px 0 0; font-size: 13px; font-weight: 650; line-height: 1.55; }
-@keyframes trainer-info-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (hover: hover) and (pointer: fine) {
     .trainer-selector-hover-zone { pointer-events: auto; }
@@ -77,7 +72,6 @@
     .trainer-selector-overlay { padding-top: 30px; }
     .trainer-selector-carousel { min-height: 260px; padding-bottom: 28px; transform: translateY(-6px); }
     .trainer-selector-name { top: calc(100% + 1px); font-size: 17px; }
-    .trainer-selector-info { right: 50%; bottom: 72px; transform: translateX(50%); width: min(310px, calc(100vw - 32px)); padding: 12px 15px; }
     .trainer-selector-track { width: calc(100vw - 32px); height: 230px; }
     .trainer-selector-figure { width: 164px; transform: translateX(-50%) scale(.6); }
     .trainer-selector-figure.is-active { transform: translateX(-50%) scale(.88); }

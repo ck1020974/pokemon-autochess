@@ -2670,6 +2670,14 @@ h3 {
 
 .opponent-select-overlay .opponent-card:hover .opponent-name { color: #9a6818 !important; }
 
+.pool-choice-info { display: flex; align-items: center; gap: 14px; width: min(560px, 94vw); margin: -12px 0 22px; padding: 12px 16px; border: 1px solid rgba(28, 100, 95, .26); border-radius: 18px; background: rgba(255,255,250,.88); box-shadow: 0 12px 28px rgba(34, 100, 92, .16); color: #184d4e; text-align: left; }
+.pool-choice-info img { width: 72px; height: 72px; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 5px 7px rgba(27, 77, 78, .18)); }
+.pool-choice-info span { display: block; color: #a46d1d; font-size: 11px; font-weight: 900; letter-spacing: .13em; }
+.pool-choice-info strong { display: block; margin-top: 2px; font-family: Georgia, "Noto Serif TC", serif; font-size: 20px; }
+.pool-choice-info p { margin: 3px 0; font-size: 13px; line-height: 1.45; }
+.pool-choice-info small { color: #2d716b; font-size: 12px; font-weight: 750; }
+.opponent-select-overlay .opponent-card.is-selection-pool-card.is-previewed { border-color: #d6a43c !important; box-shadow: 0 0 0 4px rgba(255, 239, 171, .78), 0 14px 28px rgba(46, 111, 103, .24) !important; transform: translateY(-6px) scale(1.04) !important; }
+
 .tutorial-highlight.no-arrow::after {
   content: none !important;
 }
