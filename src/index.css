@@ -2634,10 +2634,16 @@ h3 {
 .battle-result-overlay.battle-result--win .result-subtitle,
 .battle-result-overlay.battle-result--loss .result-subtitle,
 .battle-result-overlay.battle-result--draw .result-subtitle { color: #245356 !important; }
-.game-result-overlay.result-screen--champion { background: radial-gradient(circle at 50% 18%, #fffce7 0%, #d9e9c0 45%, #84ad88 100%) !important; backdrop-filter: none !important; }
-.game-result-overlay.result-screen--game-over { background: radial-gradient(circle at 50% 18%, #fff8f6 0%, #ead7df 45%, #bf8195 100%) !important; backdrop-filter: none !important; }
-.game-result-overlay .result-content { color: #173f45; }
-.game-result-overlay .result-subtitle { color: #28575a; }
+.game-result-overlay.result-screen--champion { background: radial-gradient(ellipse at 50% 4%, #fff0aa 0%, #d3a735 9%, transparent 30%), linear-gradient(180deg, #112c55 0%, #214c80 49%, #0a1d38 100%) !important; backdrop-filter: none !important; }
+.game-result-overlay.result-screen--game-over { background: radial-gradient(ellipse at 50% 70%, #1a2530 0%, #090d13 48%, #020407 100%) !important; backdrop-filter: none !important; }
+.game-result-overlay.result-screen--champion::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .55; background: repeating-linear-gradient(90deg, transparent 0 12%, rgba(255, 238, 167, .14) 12.25% 14.5%, transparent 14.75% 25%), linear-gradient(180deg, transparent 0 68%, rgba(0, 0, 0, .22) 69% 100%); clip-path: polygon(0 100%, 6% 56%, 11% 56%, 17% 100%, 24% 100%, 29% 43%, 35% 43%, 40% 100%, 60% 100%, 65% 43%, 71% 43%, 76% 100%, 83% 100%, 89% 56%, 94% 56%, 100% 100%); }
+.game-result-overlay.result-screen--game-over::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .28; background: linear-gradient(108deg, transparent 0 46%, rgba(137, 171, 187, .28) 46.2% 46.4%, transparent 46.6% 100%), linear-gradient(72deg, transparent 0 55%, rgba(137, 171, 187, .18) 55.2% 55.35%, transparent 55.5% 100%); }
+.game-result-overlay .result-content { position: relative; color: #fffdf3; }
+.game-result-overlay .result-kicker { font-size: clamp(.65rem, 1.2vw, .82rem); letter-spacing: .18em; opacity: .8; }
+.game-result-overlay.result-screen--champion .result-title { margin: 22px 0 6px; color: #fff4c4; font-size: clamp(3.2rem, 10vw, 6.3rem); letter-spacing: .12em; text-shadow: 0 4px 0 rgba(6, 19, 42, .5), 0 0 34px rgba(255, 218, 107, .46); animation: fadeInUp .6s ease-out; }
+.game-result-overlay.result-screen--game-over .result-title { margin: 22px 0 6px; color: #d8dee1; font-size: clamp(3.1rem, 10vw, 6rem); letter-spacing: .12em; text-shadow: none; animation: fadeInUp .6s ease-out; }
+.game-result-overlay .result-subtitle { color: inherit; font-size: clamp(1rem, 2vw, 1.45rem); }
+.game-result-overlay .result-continue { margin-top: 40px; color: inherit; font-size: .78rem; letter-spacing: .15em; opacity: .66; }
 
 /* Bright adventure treatment for opponent, reward, and pool choices. */
 .opponent-select-overlay {
@@ -3571,4 +3577,65 @@ h3 {
   .adventure-choice-icon--edition { width: 62px; height: 62px; }
   .adventure-choice-icon--difficulty { width: 58px; height: 58px; }
   .adventure-footer { margin: 0; }
+}
+
+/* Terminal journey scenes: an ornate hall for victory and a quiet blackout for defeat. */
+.game-result-overlay .summary-container {
+  position: relative;
+  width: min(760px, 94vw);
+  max-width: 760px;
+  gap: 12px;
+  padding: clamp(16px, 2.4vw, 25px);
+  border: 0;
+  border-radius: 18px;
+  background: rgba(255, 252, 237, .96);
+  color: #143743;
+  box-shadow: 0 20px 55px rgba(2, 13, 30, .38);
+  backdrop-filter: none;
+}
+
+.game-result-overlay.result-screen--game-over .summary-container {
+  background: rgba(22, 29, 37, .97);
+  color: #e3e7e8;
+  box-shadow: 0 18px 54px rgba(0, 0, 0, .72);
+}
+
+.summary-identity { display: flex; align-items: center; gap: 12px; min-width: 0; padding-bottom: 13px; border-bottom: 1px solid rgba(25, 68, 76, .18); }
+.result-screen--game-over .summary-identity { border-color: rgba(227, 231, 232, .14); }
+.summary-trainer-image, .summary-trainer-fallback { width: 50px; height: 50px; flex: 0 0 50px; object-fit: contain; border-radius: 50%; background: #e8c96d; color: #143743; display: grid; place-items: center; font-size: 24px; }
+.result-screen--game-over .summary-trainer-image, .result-screen--game-over .summary-trainer-fallback { background: #52616b; color: #f0f2f2; filter: grayscale(.6); }
+.summary-identity-copy { min-width: 0; flex: 1; }
+.summary-identity-copy span, .summary-identity-copy small { display: block; font-size: .72rem; letter-spacing: .12em; opacity: .65; }
+.summary-identity-copy strong { display: block; margin: 2px 0; font-size: clamp(1.1rem, 2.5vw, 1.45rem); }
+.summary-identity .difficulty-icon-img { width: 44px; height: 44px; filter: drop-shadow(0 3px 5px rgba(18, 52, 59, .2)); }
+
+.summary-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 4px 0; }
+.summary-metrics .stat-box { min-width: 0; padding: 5px 2px; text-align: center; }
+.game-result-overlay .stat-box-label { color: inherit; font-size: .68rem; opacity: .6; }
+.game-result-overlay .stat-box-value { color: inherit; font-size: clamp(1rem, 2.4vw, 1.3rem); white-space: nowrap; }
+
+.summary-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 10px; background: rgba(20, 65, 72, .09); }
+.result-screen--game-over .summary-tabs { background: rgba(255, 255, 255, .08); }
+.summary-tabs .summary-tab-btn-compact { width: 100%; border: 0; border-radius: 7px; padding: 9px 10px; background: transparent; color: inherit; font-size: .85rem; font-weight: 800; opacity: .65; box-shadow: none; }
+.summary-tabs .summary-tab-btn-compact.is-active { background: #e9c969; color: #183f47; opacity: 1; box-shadow: none; }
+.result-screen--game-over .summary-tabs .summary-tab-btn-compact.is-active { background: #657681; color: #fff; }
+
+.game-result-overlay .summary-tab-content { min-height: min(390px, 48vh); max-height: 48vh; padding: 14px; border-radius: 12px; background: rgba(22, 74, 78, .07); }
+.result-screen--game-over .summary-tab-content { background: rgba(0, 0, 0, .2); }
+.result-screen--champion .summary-history-display .hero-label { color: #7c5715; text-shadow: none; }
+.result-screen--champion .summary-history-display .hero-name { color: #173f45; }
+.result-screen--game-over .summary-history-display .hero-label { color: #e4bd62; }
+
+.summary-restart-row { display: flex; justify-content: center; padding-top: 2px; }
+.summary-restart-action { border: 0; border-radius: 9px; padding: 10px 30px; background: #174653; color: #fffaf0; font: inherit; font-size: .95rem; font-weight: 900; letter-spacing: .12em; cursor: pointer; box-shadow: 0 4px 10px rgba(2, 27, 34, .2); transition: transform .2s, background .2s; }
+.summary-restart-action:hover { background: #0e3540; transform: translateY(-1px); }
+.result-screen--game-over .summary-restart-action { background: #657681; color: #fff; box-shadow: 0 4px 10px rgba(0, 0, 0, .4); }
+.result-screen--game-over .summary-restart-action:hover { background: #778a95; }
+
+@media (max-width: 600px) {
+  .game-result-overlay .summary-container { width: min(94vw, 520px); padding: 15px; }
+  .summary-metrics { gap: 2px; }
+  .game-result-overlay .stat-box-value { font-size: .95rem; }
+  .summary-identity { gap: 10px; }
+  .game-result-overlay .summary-tab-content { min-height: 300px; max-height: 48vh; padding: 10px; }
 }

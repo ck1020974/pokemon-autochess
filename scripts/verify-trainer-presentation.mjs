@@ -93,7 +93,7 @@ try {
   assert.match(appCss, /\.board-vs\s*\{[^}]*display:\s*none/s);
   assert.doesNotMatch(appCss, /\.board-container\.is-battling::before\s*\{/);
   assert.match(appCss, /\.battle-result-overlay\.battle-result--win\s*\{[^}]*#d9eef0/s);
-  assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*#d9e9c0/s);
+  assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*#112c55/s);
   assert.match(appCss, /\.hero-card\.hero-card--player\s*\{[^}]*border:\s*2px solid #d7a837/s);
   assert.match(appSource, /className="tier-text"\s+style=\{\{\s*color:\s*'#175b5c'/s);
   assert.match(appCss, /\.opponent-select-overlay\s*\{[^}]*background:\s*radial-gradient[^}]*linear-gradient[^}]*!important/s);
@@ -116,6 +116,17 @@ try {
   assert.match(appCss, /\.adventure-brand\s*\+\s*\.adventure-loading\s*\{[^}]*margin-top:\s*clamp\(32px,\s*5vh,\s*72px\)/s);
   assert.match(appCss, /\.adventure-choice-grid--difficulty\s*\{[^}]*width:\s*min\(920px,\s*92vw\)/s);
   assert.doesNotMatch(appCss, /\.adventure-road\s*\{[^}]*clip-path:/s);
+  assert.match(appSource, /game\.phase === GamePhase\.VICTORY\)\s*\{\s*music\.playOneShot\('championwin'\)/s);
+  assert.match(appSource, /game\.phase === GamePhase\.GAME_OVER\)\s*\{\s*music\.stop\(\)/s);
+  assert.match(appSource, /聯盟冠軍/);
+  assert.match(appSource, /冒險暫止/);
+  assert.match(appSource, /summary-identity/);
+  assert.match(appSource, /summary-metrics/);
+  assert.match(appSource, /className="summary-restart-action"/);
+  assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*#112c55/s);
+  assert.match(appCss, /\.game-result-overlay\.result-screen--game-over\s*\{[^}]*#020407/s);
+  assert.match(appCss, /\.game-result-overlay\.result-screen--champion \.result-title/);
+  assert.match(appCss, /\.result-screen--champion \.summary-history-display \.hero-label/);
   const tutorialCss = readFileSync(resolve(root, 'src', 'components', 'TutorialModal.css'), 'utf8');
   assert.match(tutorialCss, /\.tutorial-entry-modal\s*\{[^}]*max-width:\s*440px/s);
   assert.match(tutorialCss, /\.tutorial-entry-actions\s*\{[^}]*flex-wrap:\s*nowrap/s);

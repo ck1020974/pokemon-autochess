@@ -881,8 +881,12 @@ function App() {
                 // Initial game start (no last result)
                 music.play('pokemonmart', true);
             }
-        } else if (game.phase === GamePhase.GAME_OVER || game.phase === GamePhase.VICTORY) {
+        } else if (game.phase === GamePhase.VICTORY) {
+            music.playOneShot('championwin');
+            setBattleElapsedSeconds(0);
+        } else if (game.phase === GamePhase.GAME_OVER) {
             music.stop();
+            setBattleElapsedSeconds(0);
         } else {
             setBattleElapsedSeconds(0);
         }
@@ -1301,7 +1305,6 @@ function App() {
         if (!battleResult) return;
 
         if (game.lives <= 0 || game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER) {
-            music.stop();
             return;
         }
 
@@ -1737,11 +1740,6 @@ function App() {
                 setTimeout(() => setHpLossAnim(false), 800);
             }
 
-            // Ensure music stops if game is over
-            const currentPhase = game.phase as string;
-            if (currentPhase === GamePhase.GAME_OVER || currentPhase === GamePhase.VICTORY) {
-                music.stop();
-            }
         }
 
         if (tutorialStep === 7) setTutorialStep(8);
@@ -2366,8 +2364,6 @@ function App() {
                                 style={{
                                     position: 'fixed',
                                     top: 0, left: 0, right: 0, bottom: 0,
-                                    background: 'rgba(0,0,0,0.9)',
-                                    backdropFilter: 'blur(20px)',
                                     zIndex: 30000,
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -2379,21 +2375,14 @@ function App() {
                                 onClick={() => setSummaryStage(2)}
                             >
                                 <div className="result-content" style={{ textAlign: 'center' }}>
-                                    <div className="result-title" style={{
-                                        fontSize: 'clamp(3.5rem, 12vw, 6rem)',
-                                        margin: 0,
-                                        color: game.phase === GamePhase.VICTORY ? '#fbbf24' : '#ef4444',
-                                        textShadow: '0 0 40px rgba(0,0,0,0.8)',
-                                        animation: 'fadeInUp 0.6s ease-out'
-                                    }}>
-                                        {game.phase === GamePhase.VICTORY ? 'CHAMPION! 🏆' : 'GAME OVER 💀'}
+                                    <div className="result-kicker">POKÉMON AUTOCHESS · {game.phase === GamePhase.VICTORY ? 'HALL OF FAME' : 'JOURNEY PAUSED'}</div>
+                                    <div className="result-title">
+                                        {game.phase === GamePhase.VICTORY ? '聯盟冠軍' : '冒險暫止'}
                                     </div>
-                                    <div className="result-subtitle" style={{ fontSize: '1.8rem', opacity: 0.9, marginTop: '10px' }}>
-                                        {game.phase === GamePhase.VICTORY ? '恭喜你稱霸了聯盟！' : '眼前變得一片漆黑...'}
+                                    <div className="result-subtitle">
+                                        {game.phase === GamePhase.VICTORY ? '你的夥伴與你，一同留名殿堂' : '生命值歸零，但旅途還能重新啟程。'}
                                     </div>
-                                    <div className="result-subtitle" style={{ fontSize: '1rem', opacity: 0.5, marginTop: '40px', letterSpacing: '2px' }}>
-                                        [ 點擊畫面查看詳細數據 ]
-                                    </div>
+                                    <div className="result-continue">點擊畫面查看冒險紀錄</div>
                                 </div>
                             </div>
                         );
@@ -2405,8 +2394,6 @@ function App() {
                             style={{
                                 position: 'fixed',
                                 top: 0, left: 0, right: 0, bottom: 0,
-                                background: 'rgba(0,0,0,0.92)',
-                                backdropFilter: 'blur(30px)',
                                 zIndex: 30000,
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -2419,65 +2406,23 @@ function App() {
                             onClick={() => setActiveSynergyId(null)}
                         >
                             <div className="summary-container" style={{ position: 'relative' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                {/* Compact Consolidated Header Row */}
-                                <div className="summary-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px', marginBottom: '15px' }} onClick={(e: React.MouseEvent) => { e.stopPropagation(); }}>
-                                    <div className="summary-stat-group" style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
-                                        {/* 1. Difficulty Icon */}
-                                        <div className="difficulty-badge-container">
-                                            <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="difficulty" />
-                                        </div>
-
-                                        {/* 2. Title (CHAMPION/GAME OVER) */}
-                                        <div style={{
-                                            textAlign: 'center',
-                                            fontSize: '1.8rem',
-                                            fontWeight: '900',
-                                            letterSpacing: '4px',
-                                            color: game.phase === GamePhase.VICTORY ? '#fbbf24' : '#ef4444',
-                                            textShadow: '0 0 15px rgba(0,0,0,0.5)',
-                                            margin: '0 10px'
-                                        }}>
-                                            {game.phase === GamePhase.VICTORY ? 'CHAMPION' : 'GAME OVER'}
-                                        </div>
-
-                                        {/* 3. Total Rounds */}
-                                        <div className="stat-box">
-                                            <div className="stat-box-label">總場數</div>
-                                            <div className="stat-box-value">
-                                                {(game.gymBattleCount || 0) + (game.eliteBattleCount || 0) + (game.championBattleCount || 0)} 場
-                                            </div>
-                                        </div>
-
-                                        {/* 4. Battle Stats */}
-                                        <div className="stat-box">
-                                            <div className="stat-box-label">⚔️ 戰績 (勝/平/敗)</div>
-                                            <div className="stat-box-value">{game.wins} / {game.drawCount || 0} / {game.lossCount || 0}</div>
-                                        </div>
-
-                                        {/* 5. Win Rate */}
-                                        <div className="stat-box">
-                                            <div className="stat-box-label">勝率</div>
-                                            <div className="stat-box-value" style={{ color: winRate >= 80 ? '#4ade80' : winRate >= 50 ? '#fbbf24' : '#ef4444' }}>
-                                                {winRate}%
-                                            </div>
-                                        </div>
+                                <div className="summary-identity" onClick={(e: React.MouseEvent) => { e.stopPropagation(); }}>
+                                    {selectedTrainer?.imageUrl ? <img src={selectedTrainer.imageUrl} alt="" className="summary-trainer-image" /> : <div className="summary-trainer-fallback">★</div>}
+                                    <div className="summary-identity-copy">
+                                        <span>冒險主角</span>
+                                        <strong>{selectedTrainer?.name ?? '訓練家'}</strong>
+                                        <small>{game.phase === GamePhase.VICTORY ? '聯盟冠軍' : '冒險暫止'}</small>
                                     </div>
-
-                                    {/* Tabs moved into header row to save space */}
-                                    <div className="summary-stat-btn-group">
-                                        <button
-                                            className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`}
-                                            onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('team'); }}
-                                        >
-                                            最終隊伍
-                                        </button>
-                                        <button
-                                            className={`summary-tab-btn-compact ${summaryTab === 'history' ? 'is-active' : ''}`}
-                                            onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('history'); }}
-                                        >
-                                            對戰紀錄
-                                        </button>
-                                    </div>
+                                    <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="難度" />
+                                </div>
+                                <div className="summary-metrics">
+                                    <div className="stat-box"><div className="stat-box-label">總場數</div><div className="stat-box-value">{totalGames}</div></div>
+                                    <div className="stat-box"><div className="stat-box-label">勝／平／敗</div><div className="stat-box-value">{game.wins}／{game.drawCount || 0}／{game.lossCount || 0}</div></div>
+                                    <div className="stat-box"><div className="stat-box-label">勝率</div><div className="stat-box-value">{winRate}%</div></div>
+                                </div>
+                                <div className="summary-tabs">
+                                    <button className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('team'); }}>最終隊伍</button>
+                                    <button className={`summary-tab-btn-compact ${summaryTab === 'history' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('history'); }}>冒險歷程</button>
                                 </div>
 
                                 {/* Content Area */}
@@ -2683,37 +2628,10 @@ function App() {
                                     )}
                                 </div>
 
-                                {/* Restart Action - Cleaned up and inserted correctly */}
-                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0px' }}>
-                                    <div
-                                        onClick={() => handleRestart()}
-                                        style={{
-                                            color: '#fff',
-                                            fontSize: '0.95rem',
-                                            fontWeight: '900',
-                                            letterSpacing: '2px',
-                                            cursor: 'pointer',
-                                            padding: '10px 30px',
-                                            borderRadius: '12px',
-                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))',
-                                            border: '1px solid rgba(255,255,255,0.3)',
-                                            transition: 'all 0.2s',
-                                            boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
-                                            textTransform: 'uppercase',
-                                            position: 'relative',
-                                            top: '-12px'
-                                        }}
-                                        onMouseOver={(e: React.MouseEvent<HTMLDivElement>) => {
-                                            e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
-                                            e.currentTarget.style.transform = 'translateY(-1px)';
-                                        }}
-                                        onMouseOut={(e: React.MouseEvent<HTMLDivElement>) => {
-                                            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))';
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                        }}
-                                    >
+                                <div className="summary-restart-row">
+                                    <button type="button" className="summary-restart-action" onClick={() => handleRestart()}>
                                         重新開始
-                                    </div>
+                                    </button>
                                 </div>
                             </div>
                         </div>
