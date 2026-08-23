@@ -158,7 +158,12 @@ try {
   assert.match(appSource, /summary-synergies-row[\s\S]*summary-team-toggle/s);
   assert.doesNotMatch(appSource, /style=\{\{ marginTop: '20px' \}\}/);
   assert.match(appCss, /\.summary-units-grid\.summary-team-panel\.is-visible\s*\{\s*display:\s*flex/);
-  assert.match(appCss, /\.summary-synergies-row \.summary-team-toggle\s*\{[^}]*margin-left:\s*auto/s);
+  assert.match(appCss, /\.summary-units-grid\s*\{[^}]*width:\s*100%[^}]*margin:\s*0[^}]*padding-top:\s*0/s);
+  assert.match(appCss, /\.summary-synergies-row\s*\{[^}]*position:\s*static[^}]*flex:\s*0 0 100%/s);
+  assert.match(appCss, /\.summary-synergies-row \.summary-team-toggle\s*\{[^}]*order:\s*2[^}]*margin-left:\s*auto/s);
+  assert.match(appCss, /\.game-result-overlay \.summary-tab-content\s*\{[^}]*overflow-y:\s*auto !important[^}]*overflow-x:\s*hidden !important/s);
+  assert.doesNotMatch(appCss, /@media\s*\(max-width:\s*768px\)\s*\{[\s\S]*?\.summary-synergies-row\s*\{\s*display:\s*none !important/s);
+  assert.match(appCss, /@media\s*\(max-width:\s*768px\)\s*\{[\s\S]*?\.summary-synergy-item\s*\{\s*display:\s*none !important/s);
   assert.match(appCss, /\.summary-achievement-display \.hero-card\.hero-card--player\s*\{[^}]*transform:\s*none/s);
   assert.match(appCss, /\.summary-achievement-display \.hero-name\s*\{[^}]*margin-top:\s*10px[^}]*font-size:\s*\.88rem/s);
   assert.match(appCss, /result-screen--game-over\s*\{[^}]*#314a5a/s);

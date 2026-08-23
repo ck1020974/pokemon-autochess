@@ -3028,11 +3028,11 @@ h3 {
   justify-content: center;
   gap: 20px;
   flex-wrap: wrap;
-  width: fit-content;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   position: relative;
-  padding-top: 24px;
-  /* Increased from 18px to add breathing room */
+  padding-top: 0;
+  box-sizing: border-box;
 }
 
 /* Removed redundant icon style */
@@ -3086,19 +3086,19 @@ h3 {
 
 .summary-synergies-row {
   display: flex;
+  position: static;
+  flex: 0 0 100%;
   flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
-  position: absolute;
-  top: -12px;
-  /* Lowered from -22px to move closer to unit images */
-  left: 3px;
-  z-index: 100;
-  max-width: 400px;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 8px !important;
+  box-sizing: border-box;
   pointer-events: auto;
   justify-content: flex-start;
   background: none !important;
   border: none !important;
-  padding: 0 !important;
 }
 
 .summary-synergy-item {
@@ -3111,9 +3111,9 @@ h3 {
   margin: -4px;
 }
 
-/* 隱藏手機版結算畫面羈絆以節省高度 */
+/* 手機版保留隊伍切換，只隱藏羈絆圖示以節省高度。 */
 @media (max-width: 768px) {
-  .summary-synergies-row {
+  .summary-synergy-item {
     display: none !important;
   }
 }
@@ -3622,7 +3622,7 @@ h3 {
 .summary-actions .summary-tab-btn-compact.is-active { background: #e9c969; color: #183f47; opacity: 1; box-shadow: none; }
 .result-screen--game-over .summary-actions .summary-tab-btn-compact.is-active { background: #657681; color: #fff; }
 
-.game-result-overlay .summary-tab-content { min-height: min(340px, 44vh); max-height: 44vh; padding: 12px; border-radius: 12px; background: rgba(22, 74, 78, .07); }
+.game-result-overlay .summary-tab-content { min-height: min(340px, 44vh); max-height: 44vh; padding: 12px; border-radius: 12px; overflow-y: auto !important; overflow-x: hidden !important; background: rgba(22, 74, 78, .07); }
 .result-screen--game-over .summary-tab-content { background: rgba(255, 255, 255, .08); }
 .result-screen--champion .summary-history-display .hero-label { color: #7c5715; text-shadow: none; }
 .result-screen--game-over .summary-history-display .hero-label { color: #e4bd62; }
@@ -3667,7 +3667,7 @@ h3 {
 
 /* Summary tabs: keep the identity cluster compact and show one result view at a time. */
 .summary-team-toggle { display: flex; gap: 6px; margin: 0; }
-.summary-synergies-row .summary-team-toggle { margin-left: auto; flex: 0 0 auto; }
+.summary-synergies-row .summary-team-toggle { order: 2; margin-left: auto; flex: 0 0 auto; }
 .summary-team-toggle button { border: 0; border-radius: 7px; padding: 6px 10px; background: rgba(20, 65, 72, .09); color: inherit; font: inherit; font-size: .76rem; font-weight: 800; cursor: pointer; }
 .summary-team-toggle button.is-active { background: #e9c969; color: #183f47; }
 .summary-team-panel { display: none; }
