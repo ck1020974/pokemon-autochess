@@ -2401,12 +2401,12 @@ function App() {
                                         <span>冒險主角</span>
                                         <strong>{selectedTrainer?.name ?? '訓練家'}</strong>
                                     </div>
+                                    <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="難度" />
                                     <div className="summary-identity-stats">
                                         <div className="stat-box"><div className="stat-box-label">場數</div><div className="stat-box-value">{totalGames}</div></div>
                                         <div className="stat-box"><div className="stat-box-label">勝／平／敗</div><div className="stat-box-value">{game.wins}／{game.drawCount || 0}／{game.lossCount || 0}</div></div>
                                         <div className="stat-box"><div className="stat-box-label">勝率</div><div className="stat-box-value">{winRate}%</div></div>
                                     </div>
-                                    <img src={getDifficultyIcon()} className="difficulty-icon-img" alt="難度" />
                                     <div className="summary-actions">
                                         <button className={`summary-tab-btn-compact ${summaryTab === 'team' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('team'); }}>隊伍</button>
                                         <button className={`summary-tab-btn-compact ${summaryTab === 'battle' ? 'is-active' : ''}`} onClick={(e: React.MouseEvent) => { e.stopPropagation(); setSummaryTab('battle'); }}>對戰</button>
@@ -2419,13 +2419,13 @@ function App() {
                                 <div className="summary-tab-content" onClick={() => setActiveSynergyId(null)}>
                                     {summaryTab === 'team' ? (
                                         <div className="summary-team-display" style={{ marginTop: '-5px' }}>
-                                            <div className="summary-team-toggle">
-                                                <button className={summaryTeamSide === 'player' ? 'is-active' : ''} onClick={() => setSummaryTeamSide('player')}>我方隊伍</button>
-                                                <button className={summaryTeamSide === 'enemy' ? 'is-active' : ''} onClick={() => setSummaryTeamSide('enemy')}>敵方隊伍</button>
-                                            </div>
                                             <div className={`summary-units-grid summary-team-panel ${summaryTeamSide === 'player' ? 'is-visible' : ''}`}>
                                                 {/* Synergy Display repositioned to top-left of this grid via CSS absolute positioning */}
                                                 <div className="summary-synergies-row" onClick={(e) => e.stopPropagation()}>
+                                                    <div className="summary-team-toggle">
+                                                        <button className={summaryTeamSide === 'player' ? 'is-active' : ''} onClick={() => setSummaryTeamSide('player')}>我方隊伍</button>
+                                                        <button className={summaryTeamSide === 'enemy' ? 'is-active' : ''} onClick={() => setSummaryTeamSide('enemy')}>敵方隊伍</button>
+                                                    </div>
                                                     {getSynergyStatus(initialPlayerTeamForSynergy.length > 0 ? initialPlayerTeamForSynergy : game.playerTeam, activeEdition).map(syn => (
                                                         <SynergyIcon
                                                             key={syn.id}
@@ -2466,9 +2466,13 @@ function App() {
 
                                             {/* Enemy Team Section - Compressed and Headerless */}
                                             {game.opponentTeam && (
-                                                <div className={`summary-team-panel ${summaryTeamSide === 'enemy' ? 'is-visible' : ''}`} style={{ marginTop: '20px' }}>
+                                                <div className={`summary-team-panel ${summaryTeamSide === 'enemy' ? 'is-visible' : ''}`}>
                                                     <div className="summary-units-grid">
                                                         <div className="summary-synergies-row">
+                                                            <div className="summary-team-toggle">
+                                                                <button className={summaryTeamSide === 'player' ? 'is-active' : ''} onClick={() => setSummaryTeamSide('player')}>我方隊伍</button>
+                                                                <button className={summaryTeamSide === 'enemy' ? 'is-active' : ''} onClick={() => setSummaryTeamSide('enemy')}>敵方隊伍</button>
+                                                            </div>
                                                             {getSynergyStatus(initialEnemyTeamForSynergy.length > 0 ? initialEnemyTeamForSynergy : game.opponentTeam, activeEdition).map(syn => (
                                                                 <SynergyIcon
                                                                     key={syn.id}
@@ -2599,7 +2603,7 @@ function App() {
                                                         </div>
 
                                                         <div className="summary-history-grid" style={{ marginTop: '5px' }}>
-                                                            {history.slice(-12).map((entry, idx) => {
+                                                            {history.map((entry, idx) => {
                                                                 const info = getConsolidatedInfo(entry.opponentId);
                                                                 const origOp = allEditionOpponents.find(o => o.id === entry.opponentId);
                                                                 const displayUrl = origOp ? origOp.url : info.url;

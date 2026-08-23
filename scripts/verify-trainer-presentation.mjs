@@ -41,6 +41,7 @@ try {
   assert.match(selectorSource, /onPointerMove/);
   assert.doesNotMatch(selectorSource, /<header className="trainer-selector-heading">\s*<p>/s);
   assert.match(selectorSource, /trainer-selector-name/);
+  assert.match(selectorSource, /trainer-selector-name[\s\S]*<img/s);
   assert.doesNotMatch(selectorSource, /trainer\.description/);
   assert.doesNotMatch(selectorSource, /trainer-selector-description/);
   assert.doesNotMatch(selectorSource, /requireConfirmation/);
@@ -54,6 +55,7 @@ try {
   assert.match(selectorCss, /\.trainer-selector-figure\.is-active\s+\.trainer-selector-name/);
   assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*padding-bottom:\s*clamp\(46px, 6vh, 62px\)/s);
   assert.match(selectorCss, /\.trainer-selector-name\s*\{[^}]*font-size:\s*clamp\(17px, 1\.9vw, 22px\)/s);
+  assert.match(selectorCss, /\.trainer-selector-name\s*\{[^}]*top:\s*2px/s);
   assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*translateY\(clamp\(-46px, -4vh, -26px\)\)/s);
   assert.match(selectorCss, /\.trainer-selector-footnote\s*\{[^}]*font-size:\s*clamp\(13px, 1\.45vw, 16px\)/s);
 
@@ -139,17 +141,26 @@ try {
   assert.doesNotMatch(appSource, /<div className="summary-identity-copy">[\s\S]*?<small>\{game\.phase === GamePhase\.(?:VICTORY|GAME_OVER)[\s\S]*?<\/small>/);
   assert.match(appSource, /className="hero-name"/);
   assert.match(appSource, /className="summary-actions"/);
-  assert.match(appSource, /summary-identity-copy[\s\S]*summary-identity-stats[\s\S]*difficulty-icon-img[\s\S]*summary-actions/s);
-  assert.match(appCss, /\.summary-actions\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*34px\)/s);
+  assert.match(appSource, /summary-identity-copy[\s\S]*difficulty-icon-img[\s\S]*summary-identity-stats[\s\S]*summary-actions/s);
+  assert.match(appCss, /\.summary-actions\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*62px\)/s);
+  assert.match(appCss, /\.summary-actions \.summary-tab-btn-compact\s*\{[^}]*width:\s*62px[^}]*height:\s*34px/s);
+  assert.match(appCss, /\.summary-restart-action\s*\{[^}]*width:\s*62px[^}]*height:\s*34px/s);
+  assert.match(appCss, /\.summary-history-display--battle\s*\{[^}]*overflow-y:\s*auto/s);
   assert.match(appSource, /className="summary-restart-action"/);
   assert.match(appSource, />隊伍<\/button>/);
   assert.match(appSource, />對戰<\/button>/);
   assert.match(appSource, /useState<'team' \| 'battle' \| 'achievement'>\('team'\)/);
   assert.match(appSource, />成就<\/button>/);
   assert.match(appSource, /summaryTeamSide/);
-  assert.match(appSource, /history\.slice\(-12\)/);
+  assert.match(appSource, /history\.map\(\(entry, idx\)/);
+  assert.doesNotMatch(appSource, /history\.slice\(-12\)/);
   assert.match(appSource, /summary-achievement-display/);
+  assert.match(appSource, /summary-synergies-row[\s\S]*summary-team-toggle/s);
+  assert.doesNotMatch(appSource, /style=\{\{ marginTop: '20px' \}\}/);
   assert.match(appCss, /\.summary-units-grid\.summary-team-panel\.is-visible\s*\{\s*display:\s*flex/);
+  assert.match(appCss, /\.summary-synergies-row \.summary-team-toggle\s*\{[^}]*margin-left:\s*auto/s);
+  assert.match(appCss, /\.summary-achievement-display \.hero-card\.hero-card--player\s*\{[^}]*transform:\s*none/s);
+  assert.match(appCss, /\.summary-achievement-display \.hero-name\s*\{[^}]*margin-top:\s*10px[^}]*font-size:\s*\.88rem/s);
   assert.match(appCss, /result-screen--game-over\s*\{[^}]*#314a5a/s);
   assert.match(appSource, /label: '手下敗將'/);
   assert.doesNotMatch(appSource, /label: '角色敗將'/);

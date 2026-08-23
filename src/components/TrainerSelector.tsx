@@ -113,8 +113,8 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
                                 tabIndex={visible ? 0 : -1}
                                 onClick={() => distance === 0 ? onSelect(trainer) : setActiveIndex(index)}
                             >
-                                <img src={trainer.imageUrl} alt={trainer.name} />
                                 <span className="trainer-selector-name">{trainer.name}</span>
+                                <img src={trainer.imageUrl} alt={trainer.name} />
                             </button>
                         );
                     })}
