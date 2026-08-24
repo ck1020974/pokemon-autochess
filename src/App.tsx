@@ -2418,7 +2418,7 @@ function App() {
                                 {/* Content Area */}
                                 <div className="summary-tab-content" onClick={() => setActiveSynergyId(null)}>
                                     {summaryTab === 'team' ? (
-                                        <div className="summary-team-display" style={{ marginTop: '-5px' }}>
+                                        <div className="summary-team-display">
                                             <div className={`summary-units-grid summary-team-panel ${summaryTeamSide === 'player' ? 'is-visible' : ''}`}>
                                                 {/* Synergy Display repositioned to top-left of this grid via CSS absolute positioning */}
                                                 <div className="summary-synergies-row" onClick={(e) => e.stopPropagation()}>
@@ -2614,7 +2614,9 @@ function App() {
                                                                         title={`${info.name} - ${entry.result}`}
                                                                     >
                                                                         <img src={displayUrl} alt={info.name} />
-                                                                        <div className="history-result-tag">{entry.result === 'WIN' ? 'W' : entry.result === 'LOSS' ? 'L' : 'D'}</div>
+                                                                        <div className={`history-result-stamp history-result-stamp--${entry.result.toLowerCase()}`}>
+                                                                            {entry.result === 'WIN' ? 'WIN' : entry.result === 'LOSS' ? 'LOSE' : 'DRAW'}
+                                                                        </div>
                                                                     </div>
                                                                 );
                                                             })}

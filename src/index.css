@@ -2840,8 +2840,6 @@ h3 {
 
 .history-item.is-loss,
 .history-item.is-draw {
-  filter: grayscale(100%) brightness(0.7);
-  opacity: 0.6;
 }
 
 .history-item img {
@@ -2865,6 +2863,30 @@ h3 {
   background: rgba(0, 0, 0, 0.6);
   color: #fff;
 }
+
+.history-result-stamp {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  padding: 1px 3px;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  background: rgba(8, 24, 28, .5);
+  color: #f4f7f5;
+  font-size: .58rem;
+  font-weight: 950;
+  letter-spacing: .05em;
+  line-height: 1;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, .5);
+  transform: translate(-50%, -50%) rotate(-18deg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .32);
+  pointer-events: none;
+}
+
+.history-result-stamp--win { color: #35c66b; background: rgba(16, 78, 42, .56); }
+.history-result-stamp--loss { color: #ef5a5a; background: rgba(112, 28, 35, .56); }
+.history-result-stamp--draw { color: #d0d5d7; background: rgba(58, 66, 69, .56); }
 
 /* Team Display */
 .summary-team-display {
@@ -3064,7 +3086,6 @@ h3 {
 }
 
 .history-item.is-draw {
-  filter: grayscale(0.5) opacity(0.85);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -3108,7 +3129,7 @@ h3 {
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   transform: scale(0.85);
   transform-origin: top left;
-  margin: -4px;
+  margin: 0;
 }
 
 /* 手機版保留隊伍切換，只隱藏羈絆圖示以節省高度。 */
@@ -3594,6 +3615,8 @@ h3 {
   color: #143743;
   box-shadow: 0 20px 55px rgba(2, 13, 30, .38);
   backdrop-filter: none;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .game-result-overlay.result-screen--game-over .summary-container {
@@ -3609,9 +3632,9 @@ h3 {
 .summary-identity-copy { min-width: 0; flex: 0 0 auto; margin-right: 8px; }
 .summary-identity-copy span { display: block; font-size: .72rem; letter-spacing: .12em; opacity: .65; }
 .summary-identity-copy strong { display: block; margin: 2px 0; font-size: clamp(1.1rem, 2.5vw, 1.45rem); }
-.summary-identity .difficulty-icon-img { width: 44px; height: 44px; filter: drop-shadow(0 3px 5px rgba(18, 52, 59, .2)); }
+.summary-identity .difficulty-icon-img { width: 44px; height: 44px; margin-right: 12px; filter: drop-shadow(0 3px 5px rgba(18, 52, 59, .2)); }
 
-.summary-identity-stats { display: grid; grid-template-columns: repeat(3, auto); gap: clamp(14px, 2vw, 24px); margin-left: 0; }
+.summary-identity-stats { display: grid; grid-template-columns: repeat(3, auto); gap: clamp(22px, 2.8vw, 34px); margin-left: 0; }
 .summary-identity-stats .stat-box { min-width: 0; padding: 3px 0; text-align: center; }
 .game-result-overlay .stat-box-label { color: inherit; font-size: .68rem; opacity: .6; }
 .game-result-overlay .stat-box-value { color: inherit; font-size: clamp(1rem, 2.4vw, 1.3rem); white-space: nowrap; }
