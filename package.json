@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "test:smoke": "node scripts/smoke-test.mjs",
     "test:balance-values": "node scripts/verify-balance-values.mjs",
+    "test:permanent-family-buffs": "node scripts/verify-permanent-family-buffs.mjs",
+    "test:temporary-reward-order": "node scripts/verify-temporary-reward-order.mjs",
     "test:trainer-presentation": "node scripts/verify-trainer-presentation.mjs"
   },
   "dependencies": {

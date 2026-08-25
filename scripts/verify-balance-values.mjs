@@ -23,4 +23,7 @@ for (const [name, source] of Object.entries({ battle, headless })) {
 assert.ok(compact(headless).includes('constbuff=count>=5?2:1;'), '無介面模擬器的初始夥伴五層效果不是 +2/+2');
 assert.ok(compact(gameLoop).includes('constbuff=starterCount>=5?2:1;'), '正式遊戲的初始夥伴五層效果不是 +2/+2');
 
+assert.match(battle, /if \(unit\.family === 'slakoth'\)[\s\S]*?for \(const ally of myTeam\)[\s\S]*?const original = this\.originalPlayerTeam\?\.find\(o => o && o\.id === ally\.id\);[\s\S]*?this\.growUnit\(ally, buffHp, 0, '', original, true\);/);
+assert.match(battle, /if \(unit\.family === 'bagon'\)[\s\S]*?for \(const ally of myTeam\)[\s\S]*?const original = this\.originalPlayerTeam\?\.find\(o => o && o\.id === ally\.id\);[\s\S]*?this\.growUnit\(ally, 0, buffAtk, '', original, true\);/);
+
 console.log('Balance values verified.');

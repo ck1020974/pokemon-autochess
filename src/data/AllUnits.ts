@@ -1569,19 +1569,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'bagon', name: '寶貝龍', tier: 5, family: 'bagon',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/寶貝龍00.webp', battleImageUrl: 'assets/寶貝龍01.webp',
-        description: '友軍擊殺後，全體我方 +1 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'bagon_2'
+        description: '友軍擊殺後，全體我方永久 +1 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'bagon_2'
     },
     bagon_2: {
         id: 'bagon_2', name: '甲殼龍', tier: 5, family: 'bagon',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/甲殼龍00.webp', battleImageUrl: 'assets/甲殼龍01.webp',
-        description: '友軍擊殺後，全體我方 +2 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'bagon_3', isHiddenFromShop: true
+        description: '友軍擊殺後，全體我方永久 +2 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage'], evolveId: 'bagon_3', isHiddenFromShop: true
     },
     bagon_3: {
         id: 'bagon_3', name: '暴飛龍', tier: 5, family: 'bagon',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/暴飛龍00.webp', battleImageUrl: 'assets/暴飛龍01.webp',
-        description: '友軍擊殺後，全體我方 +5 攻擊；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Outrage', 'Intimidate'], isHiddenFromShop: true
+        description: '友軍擊殺後，全體我方永久 +5 攻擊。', synergies: ['Outrage', 'Intimidate'], isHiddenFromShop: true
     },
     shinx: {
         id: 'shinx', name: '小貓怪', tier: 4, family: 'shinx',
@@ -1691,19 +1691,19 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'slakoth', name: '懶人獺', tier: 5, family: 'slakoth',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/懶人獺00.webp', battleImageUrl: 'assets/懶人獺01.webp',
-        description: '友軍擊殺後，全體我方 +1 生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Normal'], evolveId: 'vigoroth'
+        description: '友軍擊殺後，全體我方永久 +1 生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Normal'], evolveId: 'vigoroth'
     },
     vigoroth: {
         id: 'vigoroth', name: '過動猿', tier: 5, family: 'slakoth',
         baseStats: { hp: 8, maxHp: 8, attack: 8 },
         imageUrl: 'assets/過動猿00.webp', battleImageUrl: 'assets/過動猿01.webp',
-        description: '友軍擊殺後，全體我方 +2 生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Normal', 'Angry'], evolveId: 'slaking', isHiddenFromShop: true
+        description: '友軍擊殺後，全體我方永久 +2 生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Normal', 'Angry'], evolveId: 'slaking', isHiddenFromShop: true
     },
     slaking: {
         id: 'slaking', name: '請假王', tier: 5, family: 'slakoth',
         baseStats: { hp: 10, maxHp: 10, attack: 10 },
         imageUrl: 'assets/請假王00.webp', battleImageUrl: 'assets/請假王01.webp',
-        description: '友軍擊殺後，全體我方 +5 生命；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
+        description: '友軍擊殺後，全體我方永久 +5 生命。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
     },
     mew: {
         id: 'mew', name: '夢幻', tier: 5, family: 'mew',

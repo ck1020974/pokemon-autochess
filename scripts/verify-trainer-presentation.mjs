@@ -53,9 +53,10 @@ try {
   assert.doesNotMatch(selectorCss, /overflow-x:\s*auto/);
   assert.doesNotMatch(selectorCss, /trainer-selector-figure::after/);
   assert.match(selectorCss, /\.trainer-selector-figure\.is-active\s+\.trainer-selector-name/);
+  assert.match(selectorCss, /\.trainer-selector-figure\.is-active\s*\{[^}]*transform:\s*translate\(-50%,\s*8px\)\s*scale\(\.88\)/s);
   assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*padding-bottom:\s*clamp\(46px, 6vh, 62px\)/s);
   assert.match(selectorCss, /\.trainer-selector-name\s*\{[^}]*font-size:\s*clamp\(17px, 1\.9vw, 22px\)/s);
-  assert.match(selectorCss, /\.trainer-selector-name\s*\{[^}]*top:\s*2px/s);
+  assert.match(selectorCss, /\.trainer-selector-name\s*\{[^}]*top:\s*14px/s);
   assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*translateY\(clamp\(-46px, -4vh, -26px\)\)/s);
   assert.match(selectorCss, /\.trainer-selector-footnote\s*\{[^}]*font-size:\s*clamp\(13px, 1\.45vw, 16px\)/s);
 
@@ -124,6 +125,7 @@ try {
   assert.match(appCss, /\.battle-stage-shell\.is-battling\s*>\s*:not\(\.battle-intro-overlay\):not\(\.battle-result-overlay\)\s*\{[^}]*z-index:\s*1;/s);
   assert.match(appCss, /\.battle-stage-shell\.is-battling\s*\{[^}]*min-height:\s*100vh;[^}]*background:\s*radial-gradient/s);
   assert.match(selectorCss, /\.trainer-selector-figure\.is-far\.is-left/);
+  assert.match(selectorCss, /@media\(max-width:640px\)\s*\{[\s\S]*?\.trainer-selector-figure\.is-active\s*\{[^}]*transform:\s*translate\(-50%,\s*8px\)\s*scale\(\.88\)/s);
   assert.match(selectorCss, /\.trainer-selector-carousel\s*\{[^}]*transform:\s*translateY\(clamp\(-46px,\s*-4vh,\s*-26px\)\)/s);
   assert.match(appCss, /\.adventure-panel,\s*\.adventure-choice\s*\{[^}]*background:\s*transparent\s*!important;/s);
   assert.match(appCss, /\.adventure-startup-overlay\s+\.loading-container\s*\{[^}]*box-shadow:\s*none\s*!important;/s);
@@ -203,6 +205,12 @@ try {
   assert.match(tutorialCss, /\.tutorial-modal:not\(\.tutorial-entry-modal\)\s*\{[^}]*height:\s*88vh/s);
   const simulatorSource = readFileSync(resolve(root, 'src', 'engine', 'BattleSimulator.ts'), 'utf8');
   const gameLoopSource = readFileSync(resolve(root, 'src', 'engine', 'GameLoop.ts'), 'utf8');
+  const unitSource = readFileSync(resolve(root, 'src', 'data', 'AllUnits.ts'), 'utf8');
+  for (const id of ['bagon', 'bagon_2', 'bagon_3', 'slakoth', 'vigoroth', 'slaking']) {
+    assert.match(unitSource, new RegExp(`${id}:[\\s\\S]*?description: '[^']*永久`, 's'), `${id} 必須標示永久加成`);
+  }
+  assert.match(unitSource, /bagon_3:[\s\S]*?description: '友軍擊殺後，全體我方永久 \+5 攻擊。'/s);
+  assert.match(unitSource, /slaking:[\s\S]*?description: '友軍擊殺後，全體我方永久 \+5 生命。'/s);
   assert.doesNotMatch(simulatorSource, /selectedTrainer/);
   assert.doesNotMatch(gameLoopSource, /selectedTrainer/);
 

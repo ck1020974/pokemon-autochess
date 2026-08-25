@@ -71,9 +71,6 @@ export class BattleSimulator {
         });
         this.eventBus = new EventBus();
 
-        // Apply Battle Rewards (Must be done after teams are initialized)
-        this.applyBattleRewards();
-
         // Register Initial Teams for Synergy Persistence
         this.playerTeam.forEach(u => { if (u) { this.initialPlayerSet.add(u); this.participantPlayerUnits.add(u); } });
         this.enemyTeam.forEach(u => { if (u) { this.participantEnemyUnits.add(u); } });
@@ -238,6 +235,9 @@ export class BattleSimulator {
 
         await this.applyBattleStartSynergies(this.playerTeam.filter(u => u !== null));
         await this.applyBattleStartSynergies(this.enemyTeam.filter(u => u !== null));
+
+        // Apply temporary rewards after all battle-start abilities and synergies resolve.
+        this.applyBattleRewards();
 
         // Psychic Synergy Start Message
         const hasPsychic = (this.playerSynergies.get('Psychic') || 0) >= 2 || (this.enemySynergies.get('Psychic') || 0) >= 2;
@@ -2348,7 +2348,8 @@ export class BattleSimulator {
                     }
                     for (const ally of myTeam) {
                         if (ally && ally.stats.hp > 0) {
-                            this.growUnit(ally, buffHp, 0, '', null, true);
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
+                            this.growUnit(ally, buffHp, 0, '', original, true);
                         }
                     }
                 }
@@ -2372,7 +2373,8 @@ export class BattleSimulator {
                     }
                     for (const ally of myTeam) {
                         if (ally && ally.stats.hp > 0) {
-                            this.growUnit(ally, 0, buffAtk, '', null, true);
+                            const original = this.originalPlayerTeam?.find(o => o && o.id === ally.id);
+                            this.growUnit(ally, 0, buffAtk, '', original, true);
                         }
                     }
                 }
