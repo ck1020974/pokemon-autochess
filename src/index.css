@@ -3695,7 +3695,9 @@ h3 {
 .summary-team-toggle button.is-active { background: #e9c969; color: #183f47; }
 .summary-team-panel { display: none; }
 .summary-team-panel.is-visible { display: block; }
-.summary-units-grid.summary-team-panel.is-visible { display: flex; }
+.summary-units-grid.summary-team-panel.is-visible { display: flex; flex-wrap: nowrap; gap: clamp(4px, 1.6vw, 12px); }
+.summary-units-grid.summary-team-panel.is-visible > .summary-unit-card { box-sizing: border-box; flex: 1 1 0; min-width: 0; width: auto; }
+.summary-units-grid.summary-team-panel.is-visible > .summary-unit-card .summary-unit-img { width: min(80px, 100%); height: clamp(42px, 10vw, 80px); }
 .summary-history-display--battle .history-hero-grid { display: none; }
 .summary-history-display--battle { max-height: calc(44vh - 30px); overflow-y: auto; overflow-x: hidden; padding-right: 4px; }
 .summary-history-display--achievement .summary-history-grid { display: none; }

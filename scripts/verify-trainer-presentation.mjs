@@ -162,6 +162,8 @@ try {
   assert.doesNotMatch(appSource, /summary-team-display" style=/);
   assert.doesNotMatch(appSource, /style=\{\{ marginTop: '20px' \}\}/);
   assert.match(appCss, /\.summary-units-grid\.summary-team-panel\.is-visible\s*\{\s*display:\s*flex/);
+  assert.match(appCss, /\.summary-units-grid\.summary-team-panel\.is-visible\s*\{[^}]*flex-wrap:\s*nowrap/s);
+  assert.match(appCss, /\.summary-units-grid\.summary-team-panel\.is-visible\s*>\s*\.summary-unit-card\s*\{[^}]*flex:\s*1 1 0[^}]*min-width:\s*0[^}]*width:\s*auto/s);
   assert.match(appCss, /\.summary-units-grid\s*\{[^}]*width:\s*100%[^}]*margin:\s*0[^}]*padding-top:\s*0/s);
   assert.match(appCss, /\.summary-synergies-row\s*\{[^}]*position:\s*static[^}]*flex:\s*0 0 100%/s);
   assert.match(appCss, /\.summary-synergies-row \.summary-team-toggle\s*\{[^}]*order:\s*2[^}]*margin-left:\s*auto/s);
