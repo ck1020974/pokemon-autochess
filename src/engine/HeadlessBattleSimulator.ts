@@ -1192,8 +1192,7 @@ export class HeadlessBattleSimulator {
 
                 if (unit.templateId === 'venusaur') {
                     for (let i = 0; i < 2; i++) {
-                        const { myTeam: currentTeam } = this.getTeams(unit);
-                        await this.spawnUnit(currentTeam, deathIdx + i, 'ivysaur', 1, 4, 4, true);
+                        await this.spawnUnit(initialTeam, deathIdx + i, 'ivysaur', 1, 4, 4, true);
                     }
                 } else if (unit.templateId === 'ivysaur') {
                     const { myTeam: currentTeam } = this.getTeams(unit);
@@ -1222,8 +1221,7 @@ export class HeadlessBattleSimulator {
                 const count = unit.level >= 3 ? 5 : 2;
                 const stats = [0, 1, 2, 5][unit.level] || 1;
                 for (let i = 0; i < count; i++) {
-                    const { myTeam: currentTeam } = this.getTeams(unit);
-                    await this.spawnUnit(currentTeam, deathIdx + i, 'mouse', 1, stats, stats, true);
+                    await this.spawnUnit(initialTeam, deathIdx + i, 'mouse', 1, stats, stats, true);
                 }
                 await this.compactTeams();
             });
@@ -1242,8 +1240,7 @@ export class HeadlessBattleSimulator {
                 const count = unit.level >= 3 ? 5 : 2;
                 const stats = [0, 1, 2, 5][unit.level] || 1;
                 for (let i = 0; i < count; i++) {
-                    const { myTeam: currentTeam } = this.getTeams(unit);
-                    await this.spawnUnit(currentTeam, deathIdx + i, 'stone', 1, stats, stats, true);
+                    await this.spawnUnit(initialTeam, deathIdx + i, 'stone', 1, stats, stats, true);
                 }
                 await this.compactTeams();
             });

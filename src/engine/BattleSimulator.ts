@@ -1647,9 +1647,8 @@ export class BattleSimulator {
                         await this.notifySkill(unit, '召喚了 2 隻妙蛙草');
                         await this.delay(100); // reduced from 200
                         for (let i = 0; i < 2; i++) {
-                            const { myTeam: currentTeam } = this.getTeams(unit);
                             const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
-                            await this.spawnUnit(currentTeam, targetIdx, 'ivysaur', 1, 4, 4, true);
+                            await this.spawnUnit(initialTeam, targetIdx, 'ivysaur', 1, 4, 4, true);
                         }
                     } else if (unit.templateId === 'ivysaur') {
                         // Ivysaur -> 1x Bulbasaur (2/2)
@@ -1694,9 +1693,8 @@ export class BattleSimulator {
                     // Fix: Match description. Lv1: 1/1, Lv2: 2/2, Lv3: 5/5
                     const stats = [0, 1, 2, 5][unit.level] || 1;
                     for (let i = 0; i < count; i++) {
-                        const { myTeam: currentTeam } = this.getTeams(unit);
                         const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
-                        await this.spawnUnit(currentTeam, targetIdx, 'mouse', 1, stats, stats, true);
+                        await this.spawnUnit(initialTeam, targetIdx, 'mouse', 1, stats, stats, true);
                     }
                     // COMPACTION REMOVED HERE
                 }
@@ -1721,9 +1719,8 @@ export class BattleSimulator {
                     const count = unit.level >= 3 ? 5 : 2;
                     const stats = [0, 1, 2, 5][unit.level] || 1;
                     for (let i = 0; i < count; i++) {
-                        const { myTeam: currentTeam } = this.getTeams(unit);
                         const targetIdx = (e.context.deathIdx !== undefined) ? e.context.deathIdx + i : deathIdx + i;
-                        await this.spawnUnit(currentTeam, targetIdx, 'stone', 1, stats, stats, true);
+                        await this.spawnUnit(initialTeam, targetIdx, 'stone', 1, stats, stats, true);
                     }
                 }
             });

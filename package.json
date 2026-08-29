@@ -12,7 +12,8 @@
     "test:balance-values": "node scripts/verify-balance-values.mjs",
     "test:permanent-family-buffs": "node scripts/verify-permanent-family-buffs.mjs",
     "test:temporary-reward-order": "node scripts/verify-temporary-reward-order.mjs",
-    "test:trainer-presentation": "node scripts/verify-trainer-presentation.mjs"
+    "test:trainer-presentation": "node scripts/verify-trainer-presentation.mjs",
+    "test:summon-ownership": "node scripts/verify-summon-ownership.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",
