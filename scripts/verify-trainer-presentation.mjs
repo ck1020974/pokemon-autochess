@@ -165,6 +165,7 @@ try {
   assert.match(appCss, /\.summary-team-units-grid\.summary-team-panel\.is-visible,\s*\.summary-team-panel\.is-visible\s*>\s*\.summary-team-units-grid\s*\{[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)/s);
   assert.match(appCss, /\.summary-team-units-grid\.summary-team-panel\.is-visible\s*>\s*\.summary-synergies-row,\s*\.summary-team-panel\.is-visible\s*>\s*\.summary-team-units-grid\s*>\s*\.summary-synergies-row\s*\{[^}]*grid-column:\s*1\s*\/\s*-1/s);
   assert.match(appCss, /\.summary-team-units-grid\.summary-team-panel\.is-visible\s*>\s*\.summary-unit-card,\s*\.summary-team-panel\.is-visible\s*>\s*\.summary-team-units-grid\s*>\s*\.summary-unit-card\s*\{[^}]*min-width:\s*0[^}]*width:\s*auto/s);
+  assert.match(appCss, /\.summary-team-display\s*>\s*\.summary-team-panel\s*\{[^}]*width:\s*100%/s);
   assert.match(appCss, /\.adventure-choice-grid\s*\{[^}]*justify-items:\s*center/s);
   assert.match(appCss, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(max-height:\s*500px\)\s*\{[\s\S]*?\.adventure-choice-grid:not\(\.adventure-choice-grid--difficulty\)\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)\s*!important/s);
   assert.match(appCss, /\.summary-units-grid\s*\{[^}]*width:\s*100%[^}]*margin:\s*0[^}]*padding-top:\s*0/s);

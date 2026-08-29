@@ -3696,6 +3696,7 @@ h3 {
 .summary-team-toggle button { border: 0; border-radius: 7px; padding: 6px 10px; background: rgba(20, 65, 72, .09); color: inherit; font: inherit; font-size: .76rem; font-weight: 800; cursor: pointer; }
 .summary-team-toggle button.is-active { background: #e9c969; color: #183f47; }
 .summary-team-panel { display: none; }
+.summary-team-display > .summary-team-panel { width: 100%; }
 .summary-team-panel.is-visible { display: block; }
 .summary-team-units-grid.summary-team-panel.is-visible,
 .summary-team-panel.is-visible > .summary-team-units-grid { display: grid; width: 100%; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: start; gap: clamp(2px, 1.2vw, 8px); }
