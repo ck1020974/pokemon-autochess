@@ -3462,6 +3462,7 @@ h3 {
 .adventure-choice-grid {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-items: center;
   gap: clamp(14px, 2.5vw, 30px) !important;
   width: min(950px, 94vw) !important;
   margin: 0 auto !important;
@@ -3596,6 +3597,7 @@ h3 {
   .adventure-title { font-size: clamp(2.1rem, 6vw, 3.2rem) !important; }
   .adventure-loading { padding: 12px 20px; }
   .adventure-choice-grid { width: min(900px, 92vw) !important; }
+  .adventure-choice-grid:not(.adventure-choice-grid--difficulty) { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
   .adventure-choice { min-height: 130px; padding: 12px; }
   .adventure-choice-icon--edition { width: 62px; height: 62px; }
   .adventure-choice-icon--difficulty { width: 58px; height: 58px; }
@@ -3695,9 +3697,14 @@ h3 {
 .summary-team-toggle button.is-active { background: #e9c969; color: #183f47; }
 .summary-team-panel { display: none; }
 .summary-team-panel.is-visible { display: block; }
-.summary-units-grid.summary-team-panel.is-visible { display: flex; flex-wrap: nowrap; gap: clamp(4px, 1.6vw, 12px); }
-.summary-units-grid.summary-team-panel.is-visible > .summary-unit-card { box-sizing: border-box; flex: 1 1 0; min-width: 0; width: auto; }
-.summary-units-grid.summary-team-panel.is-visible > .summary-unit-card .summary-unit-img { width: min(80px, 100%); height: clamp(42px, 10vw, 80px); }
+.summary-team-units-grid.summary-team-panel.is-visible,
+.summary-team-panel.is-visible > .summary-team-units-grid { display: grid; width: 100%; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: start; gap: clamp(2px, 1.2vw, 8px); }
+.summary-team-units-grid.summary-team-panel.is-visible > .summary-synergies-row,
+.summary-team-panel.is-visible > .summary-team-units-grid > .summary-synergies-row { grid-column: 1 / -1; }
+.summary-team-units-grid.summary-team-panel.is-visible > .summary-unit-card,
+.summary-team-panel.is-visible > .summary-team-units-grid > .summary-unit-card { box-sizing: border-box; min-width: 0; min-height: 0; width: auto !important; padding: clamp(3px, 1.2vw, 10px); padding-top: clamp(5px, 1.6vw, 15px); }
+.summary-team-units-grid.summary-team-panel.is-visible > .summary-unit-card .summary-unit-img,
+.summary-team-panel.is-visible > .summary-team-units-grid > .summary-unit-card .summary-unit-img { width: min(80px, 100%); height: clamp(42px, 10vw, 80px); }
 .summary-history-display--battle .history-hero-grid { display: none; }
 .summary-history-display--battle { max-height: calc(44vh - 30px); overflow-y: auto; overflow-x: hidden; padding-right: 4px; }
 .summary-history-display--achievement .summary-history-grid { display: none; }
@@ -3705,6 +3712,7 @@ h3 {
 .summary-achievement-display .hero-card.hero-card--player::before { display: none; }
 .summary-achievement-display .hero-card.hero-card--player .hero-label { color: #ffd700; text-shadow: 0 2px 4px rgba(0, 0, 0, .5); }
 .summary-achievement-display .hero-card.hero-card--player .hero-img { filter: drop-shadow(0 8px 16px rgba(0, 0, 0, .6)); }
+.result-screen--champion .summary-achievement-display .hero-name { color: #143743; text-shadow: none; }
 .summary-achievement-display .hero-name { margin-top: 10px; font-size: .88rem; font-weight: 800; text-align: center; }
 .hero-name { margin-top: 5px; font-size: .72rem; font-weight: 800; text-align: center; }
 .summary-history-grid .history-item.is-loss img, .summary-history-grid .history-item.is-draw img { filter: grayscale(1); opacity: .48; }

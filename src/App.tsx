@@ -2419,7 +2419,7 @@ function App() {
                                 <div className="summary-tab-content" onClick={() => setActiveSynergyId(null)}>
                                     {summaryTab === 'team' ? (
                                         <div className="summary-team-display">
-                                            <div className={`summary-units-grid summary-team-panel ${summaryTeamSide === 'player' ? 'is-visible' : ''}`}>
+                                            <div className={`summary-units-grid summary-team-units-grid summary-team-panel ${summaryTeamSide === 'player' ? 'is-visible' : ''}`}>
                                                 {/* Synergy Display repositioned to top-left of this grid via CSS absolute positioning */}
                                                 <div className="summary-synergies-row" onClick={(e) => e.stopPropagation()}>
                                                     <div className="summary-team-toggle">
@@ -2467,7 +2467,7 @@ function App() {
                                             {/* Enemy Team Section - Compressed and Headerless */}
                                             {game.opponentTeam && (
                                                 <div className={`summary-team-panel ${summaryTeamSide === 'enemy' ? 'is-visible' : ''}`}>
-                                                    <div className="summary-units-grid">
+                                                    <div className="summary-units-grid summary-team-units-grid">
                                                         <div className="summary-synergies-row">
                                                             <div className="summary-team-toggle">
                                                                 <button className={summaryTeamSide === 'player' ? 'is-active' : ''} onClick={() => setSummaryTeamSide('player')}>我方隊伍</button>

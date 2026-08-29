@@ -161,9 +161,12 @@ try {
   assert.match(appSource, /summary-synergies-row[\s\S]*summary-team-toggle/s);
   assert.doesNotMatch(appSource, /summary-team-display" style=/);
   assert.doesNotMatch(appSource, /style=\{\{ marginTop: '20px' \}\}/);
-  assert.match(appCss, /\.summary-units-grid\.summary-team-panel\.is-visible\s*\{\s*display:\s*flex/);
-  assert.match(appCss, /\.summary-units-grid\.summary-team-panel\.is-visible\s*\{[^}]*flex-wrap:\s*nowrap/s);
-  assert.match(appCss, /\.summary-units-grid\.summary-team-panel\.is-visible\s*>\s*\.summary-unit-card\s*\{[^}]*flex:\s*1 1 0[^}]*min-width:\s*0[^}]*width:\s*auto/s);
+  assert.equal((appSource.match(/summary-team-units-grid/g) ?? []).length, 2, '雙方隊伍必須共用同一個結算網格類別');
+  assert.match(appCss, /\.summary-team-units-grid\.summary-team-panel\.is-visible,\s*\.summary-team-panel\.is-visible\s*>\s*\.summary-team-units-grid\s*\{[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)/s);
+  assert.match(appCss, /\.summary-team-units-grid\.summary-team-panel\.is-visible\s*>\s*\.summary-synergies-row,\s*\.summary-team-panel\.is-visible\s*>\s*\.summary-team-units-grid\s*>\s*\.summary-synergies-row\s*\{[^}]*grid-column:\s*1\s*\/\s*-1/s);
+  assert.match(appCss, /\.summary-team-units-grid\.summary-team-panel\.is-visible\s*>\s*\.summary-unit-card,\s*\.summary-team-panel\.is-visible\s*>\s*\.summary-team-units-grid\s*>\s*\.summary-unit-card\s*\{[^}]*min-width:\s*0[^}]*width:\s*auto/s);
+  assert.match(appCss, /\.adventure-choice-grid\s*\{[^}]*justify-items:\s*center/s);
+  assert.match(appCss, /@media\s*\(orientation:\s*landscape\)\s*and\s*\(max-height:\s*500px\)\s*\{[\s\S]*?\.adventure-choice-grid:not\(\.adventure-choice-grid--difficulty\)\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)\s*!important/s);
   assert.match(appCss, /\.summary-units-grid\s*\{[^}]*width:\s*100%[^}]*margin:\s*0[^}]*padding-top:\s*0/s);
   assert.match(appCss, /\.summary-synergies-row\s*\{[^}]*position:\s*static[^}]*flex:\s*0 0 100%/s);
   assert.match(appCss, /\.summary-synergies-row \.summary-team-toggle\s*\{[^}]*order:\s*2[^}]*margin-left:\s*auto/s);
@@ -175,6 +178,7 @@ try {
   assert.doesNotMatch(appCss, /@media\s*\(max-width:\s*768px\)\s*\{[\s\S]*?\.summary-synergies-row\s*\{\s*display:\s*none !important/s);
   assert.match(appCss, /@media\s*\(max-width:\s*768px\)\s*\{[\s\S]*?\.summary-synergy-item\s*\{\s*display:\s*none !important/s);
   assert.match(appCss, /\.summary-achievement-display \.hero-card\.hero-card--player\s*\{[^}]*transform:\s*none/s);
+  assert.match(appCss, /\.result-screen--champion \.summary-achievement-display \.hero-name\s*\{[^}]*color:\s*#143743/s);
   assert.match(appCss, /\.summary-achievement-display \.hero-name\s*\{[^}]*margin-top:\s*10px[^}]*font-size:\s*\.88rem/s);
   assert.match(appCss, /result-screen--game-over\s*\{[^}]*#314a5a/s);
   assert.match(appSource, /label: '手下敗將'/);
