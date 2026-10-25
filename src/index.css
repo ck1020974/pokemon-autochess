@@ -2622,26 +2622,30 @@ h3 {
   color: #ffd700 !important;
 }
 
-.battle-result-overlay.battle-result--win { background: radial-gradient(circle at 50% 20%, #fffdf0 0%, #d9eef0 46%, #94c8bd 100%) !important; }
-.battle-result-overlay.battle-result--loss { background: radial-gradient(circle at 50% 20%, #fff7f5 0%, #f2d8df 46%, #d9a7b8 100%) !important; }
-.battle-result-overlay.battle-result--draw { background: radial-gradient(circle at 50% 20%, #fffceb 0%, #e8e3c5 46%, #b6c59c 100%) !important; }
+.battle-result-overlay.battle-result--win,
+.battle-result-overlay.battle-result--loss,
+.battle-result-overlay.battle-result--draw {
+  background: transparent !important;
+  backdrop-filter: none;
+  border-radius: 0;
+  box-shadow: none;
+}
 .battle-result-overlay.battle-result--win .result-content,
 .battle-result-overlay.battle-result--loss .result-content,
-.battle-result-overlay.battle-result--draw .result-content { color: #173f45; text-shadow: none; }
-.battle-result-overlay.battle-result--win .result-title { color: #21726f; text-shadow: 0 2px 0 rgba(255,255,255,.7); }
-.battle-result-overlay.battle-result--loss .result-title { color: #a64a67; text-shadow: 0 2px 0 rgba(255,255,255,.7); }
-.battle-result-overlay.battle-result--draw .result-title { color: #6d7b4f; text-shadow: 0 2px 0 rgba(255,255,255,.7); }
+.battle-result-overlay.battle-result--draw .result-content { color: #fffdf3; text-shadow: 0 2px 6px rgba(7, 24, 34, .85); }
+.battle-result-overlay.battle-result--win .result-title { color: #fff0b5; text-shadow: 0 2px 6px rgba(7, 24, 34, .85); }
+.battle-result-overlay.battle-result--loss .result-title { color: #ffe2e8; text-shadow: 0 2px 6px rgba(7, 24, 34, .85); }
+.battle-result-overlay.battle-result--draw .result-title { color: #edf5dd; text-shadow: 0 2px 6px rgba(7, 24, 34, .85); }
 .battle-result-overlay.battle-result--win .result-subtitle,
 .battle-result-overlay.battle-result--loss .result-subtitle,
-.battle-result-overlay.battle-result--draw .result-subtitle { color: #245356 !important; }
-.game-result-overlay.result-screen--champion { background: radial-gradient(ellipse at 50% 4%, #fff0aa 0%, #d3a735 9%, transparent 30%), linear-gradient(180deg, #112c55 0%, #214c80 49%, #0a1d38 100%) !important; backdrop-filter: none !important; }
-.game-result-overlay.result-screen--game-over { background: radial-gradient(ellipse at 50% 68%, #718891 0%, #314a5a 48%, #172933 100%) !important; backdrop-filter: none !important; }
-.game-result-overlay.result-screen--champion::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .55; background: repeating-linear-gradient(90deg, transparent 0 12%, rgba(255, 238, 167, .14) 12.25% 14.5%, transparent 14.75% 25%), linear-gradient(180deg, transparent 0 68%, rgba(0, 0, 0, .22) 69% 100%); clip-path: polygon(0 100%, 6% 56%, 11% 56%, 17% 100%, 24% 100%, 29% 43%, 35% 43%, 40% 100%, 60% 100%, 65% 43%, 71% 43%, 76% 100%, 83% 100%, 89% 56%, 94% 56%, 100% 100%); }
-.game-result-overlay.result-screen--game-over::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .28; background: linear-gradient(108deg, transparent 0 46%, rgba(137, 171, 187, .28) 46.2% 46.4%, transparent 46.6% 100%), linear-gradient(72deg, transparent 0 55%, rgba(137, 171, 187, .18) 55.2% 55.35%, transparent 55.5% 100%); }
-.game-result-overlay .result-content { position: relative; color: #fffdf3; }
+.battle-result-overlay.battle-result--draw .result-subtitle { color: #fffdf3 !important; }
+.game-result-overlay.result-screen--champion { background: transparent !important; backdrop-filter: none !important; }
+.game-result-overlay.result-screen--game-over { background: transparent !important; backdrop-filter: none !important; }
+.game-result-overlay::before { content: none; }
+.game-result-overlay .result-content { position: relative; color: #fffdf3; text-shadow: 0 2px 6px rgba(7, 24, 34, .85); }
 .game-result-overlay .result-kicker { font-size: clamp(.65rem, 1.2vw, .82rem); letter-spacing: .18em; opacity: .8; }
 .game-result-overlay.result-screen--champion .result-title { margin: 22px 0 6px; color: #fff4c4; font-size: clamp(3.2rem, 10vw, 6.3rem); letter-spacing: .12em; text-shadow: 0 4px 0 rgba(6, 19, 42, .5), 0 0 34px rgba(255, 218, 107, .46); animation: fadeInUp .6s ease-out; }
-.game-result-overlay.result-screen--game-over .result-title { margin: 22px 0 6px; color: #d8dee1; font-size: clamp(3.1rem, 10vw, 6rem); letter-spacing: .12em; text-shadow: none; animation: fadeInUp .6s ease-out; }
+.game-result-overlay.result-screen--game-over .result-title { margin: 22px 0 6px; color: #d8dee1; font-size: clamp(3.1rem, 10vw, 6rem); letter-spacing: .12em; text-shadow: 0 2px 6px rgba(7, 24, 34, .85); animation: fadeInUp .6s ease-out; }
 .game-result-overlay .result-subtitle { color: inherit; font-size: clamp(1rem, 2vw, 1.45rem); }
 .game-result-overlay .result-continue { margin-top: 40px; color: inherit; font-size: .78rem; letter-spacing: .15em; opacity: .66; }
 
@@ -2814,7 +2818,7 @@ h3 {
 /* History Grid */
 .summary-history-grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: 5px;
   row-gap: 8px;
   justify-items: center;
@@ -2823,8 +2827,11 @@ h3 {
 }
 
 .history-item {
-  width: 44px;
-  height: 44px;
+  width: min(44px, 100%);
+  height: auto;
+  aspect-ratio: 1;
+  min-width: 0;
+  box-sizing: border-box;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.1);
@@ -3707,7 +3714,11 @@ h3 {
 .summary-team-units-grid.summary-team-panel.is-visible > .summary-unit-card .summary-unit-img,
 .summary-team-panel.is-visible > .summary-team-units-grid > .summary-unit-card .summary-unit-img { width: min(80px, 100%); height: clamp(42px, 10vw, 80px); }
 .summary-history-display--battle .history-hero-grid { display: none; }
-.summary-history-display--battle { max-height: calc(44vh - 30px); overflow-y: auto; overflow-x: hidden; padding-right: 4px; }
+.summary-history-display--battle { max-height: none; overflow: visible; padding-right: 0; }
+.game-result-overlay,
+.game-result-overlay .summary-tab-content { scrollbar-width: none; -ms-overflow-style: none; }
+.game-result-overlay::-webkit-scrollbar,
+.game-result-overlay .summary-tab-content::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .summary-history-display--achievement .summary-history-grid { display: none; }
 .summary-achievement-display .hero-card.hero-card--player { background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .1); box-shadow: none; transform: none; }
 .summary-achievement-display .hero-card.hero-card--player::before { display: none; }

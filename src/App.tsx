@@ -463,9 +463,9 @@ function App() {
 
     const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
     const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
-    const battleSceneClass = selectedBattleSceneClass;
+    const keepBattleScene = Boolean(selectedBattleSceneClass) && (game.phase === GamePhase.BATTLE || game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER);
+    const battleSceneClass = keepBattleScene ? selectedBattleSceneClass : '';
     const preparationSceneClass = (() => {
-        if (showOpponentSelect) return 'prep-scene--road';
         if (game.phase === GamePhase.POOL_SELECTION) return 'prep-scene--lab';
         if (game.phase === GamePhase.REWARD || game.lastResult === 'LOSS' || game.lastResult === 'DRAW') return 'prep-scene--center';
         if (game.phase === GamePhase.SHOP) {
@@ -1642,7 +1642,7 @@ function App() {
     }
 
     return (
-        <div className={`game-container battle-stage-shell ${preparationSceneClass} ${game.phase === GamePhase.BATTLE ? `is-battling ${battleSceneClass}` : ''}`} onClick={() => {
+        <div className={`game-container battle-stage-shell ${preparationSceneClass} ${keepBattleScene ? `is-battling ${battleSceneClass}` : ''}`} onClick={() => {
             music.resumeContext();
             if (focusedDifficulty) setFocusedDifficulty(null);
             setActiveSynergyId(null);
@@ -2059,7 +2059,7 @@ function App() {
                     {difficulty && (
                         <div className={`difficulty-badge ${difficulty}`} style={{
                             display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px',
-                            background: 'rgba(255,255,255,0.05)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.1)',
+                            background: 'transparent', borderRadius: 0, border: 'none',
                             cursor: 'pointer', transition: 'all 0.2s'
                         }}
                             title="重新選擇版本與難度"

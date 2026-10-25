@@ -2,6 +2,14 @@
    Rebuild with python scripts/draw_battle_scenes.py from the game repository. */
 @import './sceneAssets.css';
 
+.game-container.battle-stage-shell .header {
+  background: transparent;
+  border-bottom: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
 /* Extend the same scene behind the centered game on large desktop screens. */
 body:has(.game-container.is-battling) { background: #101d2d var(--battle-scene-illustration) center / cover no-repeat fixed; }
 .game-container.battle-stage-shell.is-battling[class*='battle-scene--'] { background-attachment: fixed; }
@@ -31,9 +39,14 @@ body:has(.game-container.is-battling) { background: #101d2d var(--battle-scene-i
 
 .battle-stage-shell.is-battling[class*='battle-scene--'] .header {
   color: var(--scene-ui-ink, #edf6f8);
-  background: var(--scene-ui-panel, transparent);
-  border-bottom-color: rgba(208, 230, 242, .18);
+  background: transparent;
+  border-bottom: 0;
   text-shadow: 0 1px 4px var(--scene-ui-shadow, rgba(3, 17, 31, .65));
+}
+
+.battle-stage-shell.is-battling[class*='battle-scene--champion-hall'] .header {
+  color: #edf6f8;
+  text-shadow: 0 1px 4px rgba(3, 17, 31, .8);
 }
 
 .battle-stage-shell.is-battling[class*='battle-scene--'] .board-container {
@@ -46,6 +59,30 @@ body:has(.game-container.is-battling) { background: #101d2d var(--battle-scene-i
   margin-top: clamp(0px, calc(35vh - 235px), 145px);
 }
 .battle-stage-shell.is-battling[class*='battle-scene--'] .floor-marker { background: rgba(0, 0, 0, .22); box-shadow: 0 4px 12px rgba(0, 0, 0, .18); }
+
+.battle-stage-shell.is-battling .board-teams-horizontal {
+  --team-separation: clamp(56px, 10vw, 160px);
+  gap: var(--team-separation) !important;
+  padding-right: 0 !important;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.battle-stage-shell.is-battling .board-side {
+  min-width: 0;
+  max-width: calc((100% - var(--team-separation)) / 2);
+  flex-shrink: 1;
+}
+.battle-stage-shell.is-battling .board-side .unit-wrapper {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.game-container:not(.is-battling) .board-container .floor-marker {
+  background: rgba(30, 58, 64, .48);
+  box-shadow: 0 3px 8px rgba(15, 35, 40, .2);
+}
 
 /* Keep the intro's trainers and timing, reveal the same environment beneath them. */
 .battle-intro-scene[class*='battle-scene--'] :is(.battle-intro-sky, .battle-intro-horizon, .battle-intro-ground) { display: none; }
@@ -69,8 +106,9 @@ body:has(.game-container[class*='prep-scene--']:not(.is-battling)) {
   border-color: transparent;
 }
 .game-container[class*='prep-scene--']:not(.is-battling) .header {
-  background: rgba(248, 250, 238, .58);
-  border-radius: 12px 12px 0 0;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 0;
 }
 .game-container[class*='prep-scene--']:not(.is-battling) .shop-container {
   background: rgba(252, 251, 241, .9);

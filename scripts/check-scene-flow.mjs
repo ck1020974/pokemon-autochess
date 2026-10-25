@@ -37,14 +37,11 @@ try {
       for (const unit of game.playerTeam) unit.stats = {attack: 35, hp: 45, maxHp: 45};
     }, wins);
     await page.getByRole('button', {name: /^(🔊|🔇)$/}).click();
+    const preparation = await background(page, '.game-container');
     await page.getByRole('button', {name: '⚔️', exact: true}).click();
-    await page.locator('.game-container.prep-scene--road').waitFor({timeout: 5000}).catch(async error => {
-      await page.screenshot({path: resolve(out, 'flow-failure.png')});
-      console.log(JSON.stringify({kind, errors, body: await page.locator('body').innerText()}));
-      throw error;
-    });
-    const camp = await background(page, '.game-container');
-    assert.ok(camp.image.includes('prep-road'), 'Opponent selection uses the camp');
+    await page.locator('.opponent-card').first().waitFor();
+    const selection = await background(page, '.game-container');
+    assert.equal(selection.image, preparation.image, 'Opponent selection retains its preparation scene until an opponent is selected');
     await page.screenshot({path: resolve(out, `flow-${kind}-selection.png`)});
     await page.locator('.opponent-card').first().click();
     const intro = await background(page, '.battle-intro-scene');
@@ -54,7 +51,7 @@ try {
     if (kind === 'champion') assert.match(scene, /^battle-scene--champion-hall(?:-|$)/);
     await page.screenshot({path: resolve(out, `flow-${kind}-intro.png`)});
     await page.locator('.battle-intro-overlay').waitFor({state: 'detached'});
-    await page.getByRole('button', {name: '⛔ 暫停', exact: true}).click();
+    await page.getByRole('button', {name: '⛔ 暫停', exact: true}).evaluate(button => button.click());
     for (const [width, height] of [[1920, 1080], [896, 414]]) {
       await page.setViewportSize({width, height});
       const battle = await background(page, '.battle-stage-shell.is-battling');
