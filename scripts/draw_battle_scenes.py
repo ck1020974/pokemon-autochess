@@ -354,7 +354,7 @@ SCENES={
  'waterfall':(lakeside,('#a1c7ce','#d6e0c7','#bfd0b4','#eff7d7')),
  'harbor':(harbor_day,('#8ebdca','#d1e3d6','#a5b8b4','#fff0c4')),
  'library':(library_day,('#9fbdb9','#e5ddc2','#bdb89f','#fff4c9')),
- 'stadium':(stadium,('#648da5','#bed6d2','#93b5bc','#e0f1d8')),
+ 'stadium':(lambda:stadium_emblem(stadium(),'#b8e0e2'),('#648da5','#bed6d2','#93b5bc','#e0f1d8')),
  'grassland':(grassland,('#8ebec4','#d6e4bf','#bad19e','#fff3bb')),
  'desert':(desert,('#a6c6c5','#f4d8b2','#e0bd8e','#fff0bf')),
  'beach':(beach,('#a0cdd1','#dce9d4','#e7d5ac','#fff0be')),
