@@ -1,0 +1,140 @@
+[
+  {
+    "id": "champion-hall",
+    "title": "冠軍殿堂",
+    "kind": "battle",
+    "status": "已確認"
+  },
+  {
+    "id": "garden",
+    "title": "森林",
+    "kind": "battle",
+    "status": "微調"
+  },
+  {
+    "id": "volcanic",
+    "title": "熔岩場",
+    "kind": "battle",
+    "status": "微調"
+  },
+  {
+    "id": "cavern",
+    "title": "冰川",
+    "kind": "battle",
+    "status": "微調"
+  },
+  {
+    "id": "library",
+    "title": "圖書館",
+    "kind": "battle",
+    "status": "微調"
+  },
+  {
+    "id": "waterfall",
+    "title": "湖畔",
+    "kind": "battle",
+    "status": "微調"
+  },
+  {
+    "id": "harbor",
+    "title": "海港",
+    "kind": "battle",
+    "status": "微調"
+  },
+  {
+    "id": "stadium",
+    "title": "競技場・青藍",
+    "kind": "battle",
+    "status": "已確認"
+  },
+  {
+    "id": "route",
+    "title": "鄉間道路",
+    "kind": "battle",
+    "status": "微調"
+  },
+  {
+    "id": "grassland",
+    "title": "草原",
+    "kind": "battle",
+    "status": "已確認"
+  },
+  {
+    "id": "desert",
+    "title": "沙漠",
+    "kind": "battle",
+    "status": "微調"
+  },
+  {
+    "id": "beach",
+    "title": "海灘",
+    "kind": "battle",
+    "status": "微調"
+  },
+  {
+    "id": "ocean",
+    "title": "海洋",
+    "kind": "battle",
+    "status": "微調"
+  },
+  {
+    "id": "stadium-coral",
+    "title": "競技場・珊瑚",
+    "kind": "battle",
+    "status": "已確認"
+  },
+  {
+    "id": "prep-mart",
+    "title": "備戰區・商店",
+    "kind": "preparation",
+    "status": "微調"
+  },
+  {
+    "id": "prep-center",
+    "title": "備戰區・休息中心",
+    "kind": "preparation",
+    "status": "微調"
+  },
+  {
+    "id": "prep-road",
+    "title": "備戰區・林間營地",
+    "kind": "preparation",
+    "status": "微調"
+  },
+  {
+    "id": "stadium-mint",
+    "title": "競技場・薄荷",
+    "kind": "battle",
+    "status": "新增"
+  },
+  {
+    "id": "stadium-lilac",
+    "title": "競技場・薰衣草",
+    "kind": "battle",
+    "status": "新增"
+  },
+  {
+    "id": "stadium-gold",
+    "title": "競技場・金砂",
+    "kind": "battle",
+    "status": "新增"
+  },
+  {
+    "id": "prep-lab",
+    "title": "備戰區・研究所",
+    "kind": "preparation",
+    "status": "新增"
+  },
+  {
+    "id": "champion-hall-lilac",
+    "title": "冠軍殿堂・薰衣草",
+    "kind": "battle",
+    "status": "新增"
+  },
+  {
+    "id": "champion-hall-gold",
+    "title": "冠軍殿堂・白金",
+    "kind": "battle",
+    "status": "新增"
+  }
+]

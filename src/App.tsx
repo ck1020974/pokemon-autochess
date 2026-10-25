@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 // Last updated: 2026-03-06 - Balance Fix Deploy
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
+import './presentation/battleScenes.css';
 import { GameLoop, GamePhase, type PoolChoice } from './engine/GameLoop';
 import { music } from './engine/MusicManager';
 
@@ -455,14 +456,13 @@ function App() {
 
     const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
     const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
-    const battleSceneClass = selectedBattleSceneClass || (selectedOpponent
-        ? getBattleSceneClass(getPresentationKind(game.wins), selectedOpponent.id, recentBattleSceneClasses)
-        : '');
+    const battleSceneClass = selectedBattleSceneClass;
     const preparationSceneClass = (() => {
         if (showOpponentSelect) return 'prep-scene--road';
+        if (game.phase === GamePhase.POOL_SELECTION) return 'prep-scene--lab';
         if (game.phase === GamePhase.REWARD || game.lastResult === 'LOSS' || game.lastResult === 'DRAW') return 'prep-scene--center';
-        if (game.phase === GamePhase.POOL_SELECTION) return 'prep-scene--mart';
         if (game.phase === GamePhase.SHOP) {
+            if (activeEdition.id === 'infinite' && game.turn === 1) return 'prep-scene--lab';
             return game.lastResult === 'WIN' && game.wins >= 8 && game.wins < 12
                 ? 'prep-scene--road'
                 : 'prep-scene--mart';
@@ -1699,7 +1699,9 @@ function App() {
     };
 
     const handleOpponentSelect = (opponent: SelectedOpponent) => {
-        const nextSceneClass = getBattleSceneClass(getPresentationKind(game.wins), opponent.id, recentBattleSceneClasses);
+        const definition = allEditionOpponents.find(candidate => candidate.id === opponent.id);
+        const teamSynergies = (definition?.coreUnits ?? []).flatMap(id => ALL_UNITS[id] ? [ALL_UNITS[id].synergies] : []);
+        const nextSceneClass = getBattleSceneClass(getPresentationKind(game.wins), opponent.id, recentBattleSceneClasses, { teamSynergies });
         setSelectedOpponent(opponent);
         setSelectedBattleSceneClass(nextSceneClass);
         setRecentBattleSceneClasses((recent) => [...recent, nextSceneClass].slice(-2));
@@ -1855,6 +1857,7 @@ function App() {
                     playerTrainer={selectedTrainer}
                     opponent={pendingBattleOpponent}
                     kind={getPresentationKind(game.wins)}
+                    sceneClass={selectedBattleSceneClass}
                     quick={false}
                     onComplete={beginBattle}
                 />

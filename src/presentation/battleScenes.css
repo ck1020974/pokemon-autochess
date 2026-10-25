@@ -1,0 +1,80 @@
+/* Original SVG environments shared by the game and video workbench.
+   Rebuild with python scripts/draw_battle_scenes.py from the game repository. */
+@import './sceneAssets.css';
+
+/* Extend the same scene behind the centered game on large desktop screens. */
+body:has(.game-container.is-battling) { background: #101d2d var(--battle-scene-illustration) center / cover no-repeat fixed; }
+.game-container.battle-stage-shell.is-battling[class*='battle-scene--'] { background-attachment: fixed; }
+
+:is(.battle-stage-shell.is-battling, .battle-intro-scene)[class*='battle-scene--'] {
+  background-color: #101d2d;
+  background-image: linear-gradient(180deg, rgba(255, 250, 232, .015), rgba(255, 250, 232, .015) 65%, rgba(20, 43, 57, .035)), var(--battle-scene-illustration);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.battle-stage-shell.is-battling[class*='battle-scene--']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 29%, rgba(var(--battle-light), .1), transparent 46%);
+  animation: battle-scene-ambient 8s ease-in-out infinite alternate;
+}
+
+.battle-stage-shell.is-battling[class*='battle-scene--']::after {
+  position: absolute;
+  background: radial-gradient(ellipse at 50% 44%, transparent 52%, rgba(13, 35, 48, .04) 100%);
+}
+
+.battle-stage-shell.is-battling[class*='battle-scene--'] .header {
+  color: var(--scene-ui-ink, #edf6f8);
+  background: var(--scene-ui-panel, transparent);
+  border-bottom-color: rgba(208, 230, 242, .18);
+  text-shadow: 0 1px 4px var(--scene-ui-shadow, rgba(3, 17, 31, .65));
+}
+
+.battle-stage-shell.is-battling[class*='battle-scene--'] .board-container {
+  background: transparent;
+  box-shadow: none;
+}
+
+.battle-stage-shell.is-battling[class*='battle-scene--'] .board-container::after { display: none; }
+.game-container.battle-stage-shell.is-battling[class*='battle-scene--'] .board-container {
+  margin-top: clamp(0px, calc(35vh - 235px), 145px);
+}
+.battle-stage-shell.is-battling[class*='battle-scene--'] .floor-marker { background: rgba(0, 0, 0, .22); box-shadow: 0 4px 12px rgba(0, 0, 0, .18); }
+
+/* Keep the intro's trainers and timing, reveal the same environment beneath them. */
+.battle-intro-scene[class*='battle-scene--'] :is(.battle-intro-sky, .battle-intro-horizon, .battle-intro-ground) { display: none; }
+.battle-intro-scene[class*='battle-scene--'] .battle-intro-mist { opacity: .18; }
+
+@keyframes battle-scene-ambient { from { opacity: .3; } to { opacity: .8; } }
+
+/* Preparation rooms follow the game's existing shop / recovery / departure states. */
+body:has(.game-container[class*='prep-scene--']:not(.is-battling)) {
+  background: #dce8df var(--preparation-scene-illustration) center / cover no-repeat fixed;
+}
+.game-container[class*='prep-scene--']:not(.is-battling) {
+  box-sizing: border-box;
+  background: #dce8df var(--preparation-scene-illustration) center / cover no-repeat fixed;
+  box-shadow: none;
+  border-color: rgba(95, 132, 137, .16);
+}
+.game-container[class*='prep-scene--']:not(.is-battling) .board-container {
+  background: transparent;
+  box-shadow: none;
+  border-color: transparent;
+}
+.game-container[class*='prep-scene--']:not(.is-battling) .header {
+  background: rgba(248, 250, 238, .58);
+  border-radius: 12px 12px 0 0;
+}
+.game-container[class*='prep-scene--']:not(.is-battling) .shop-container {
+  background: rgba(252, 251, 241, .9);
+}
+@media (prefers-reduced-motion: reduce) {
+  .battle-stage-shell.is-battling[class*='battle-scene--']::before { animation: none; opacity: .4; }
+}

@@ -16,53 +16,67 @@ export const getBattleIntroDuration = (
     return kind === 'regular' ? 1400 : 2000;
 };
 
-interface BattleSceneDescriptor {
-    scene: string;
-    landmark: string;
+const arenas = ['stadium', 'stadium-coral', 'stadium-mint', 'stadium-lilac', 'stadium-gold'] as const;
+const halls = ['champion-hall', 'champion-hall-lilac', 'champion-hall-gold'] as const;
+const regularScenes = ['route', 'garden', 'harbor', 'grassland', 'desert', 'beach', ...arenas];
+
+interface SceneTheme {
+    synergies: readonly string[];
+    scenes: readonly string[];
 }
 
-const sceneVariants: Record<BattlePresentationKind, readonly BattleSceneDescriptor[]> = {
-    regular: [
-        { scene: 'route', landmark: 'wooden-fence' },
-        { scene: 'garden', landmark: 'glasshouse' },
-        { scene: 'harbor', landmark: 'pier' },
-        { scene: 'stadium', landmark: 'scoreboard' },
-    ],
-    elite: [
-        { scene: 'cavern', landmark: 'crystal-arch' },
-        { scene: 'library', landmark: 'book-towers' },
-        { scene: 'waterfall', landmark: 'cascade' },
-        { scene: 'volcanic', landmark: 'lava-ridge' },
-    ],
-    champion: [{ scene: 'champion-hall', landmark: 'league-columns' }],
-};
+// Existing game synergy IDs select scenery without affecting combat rules.
+const sceneThemes: readonly SceneTheme[] = [
+    { synergies: ['Fire'], scenes: ['volcanic'] },
+    { synergies: ['Water'], scenes: ['waterfall', 'harbor', 'beach', 'ocean'] },
+    { synergies: ['Grass', 'BugBite'], scenes: ['garden', 'grassland'] },
+    { synergies: ['Snow'], scenes: ['cavern'] },
+    { synergies: ['Cave'], scenes: ['desert', 'route'] },
+    { synergies: ['Psychic', 'Ghost'], scenes: ['library'] },
+    { synergies: ['Charge', 'Hard'], scenes: arenas },
+];
 
-const stableIndex = (value: string, length: number) => {
-    const sum = [...value].reduce((total, char) => total + char.charCodeAt(0), 0);
-    return sum % length;
+interface BattleSceneOptions {
+    teamSynergies?: readonly (readonly string[])[];
+    random?: () => number;
+}
+
+const getScenePool = (kind: BattlePresentationKind, team: readonly (readonly string[])[]): readonly string[] => {
+    if (kind === 'champion') return halls;
+    if (kind === 'elite') return arenas;
+    let bestScore = 0;
+    let bestTheme: SceneTheme | undefined;
+    for (const theme of sceneThemes) {
+        const score = team.filter(unit => theme.synergies.some(id => unit.includes(id))).length;
+        if (score > bestScore) {
+            bestScore = score;
+            bestTheme = theme;
+        }
+    }
+    // A theme must cover at least half the core; other mixed teams use the general pool.
+    return bestTheme && bestScore >= Math.ceil(team.length / 2) ? bestTheme.scenes : regularScenes;
 };
 
 export const getBattleSceneClass = (
     kind: BattlePresentationKind,
-    opponentId: string,
+    _opponentId: string,
     recentSceneClasses: readonly string[] = [],
+    { teamSynergies = [], random = Math.random }: BattleSceneOptions = {},
 ): string => {
-    const variants = sceneVariants[kind];
-    const startIndex = stableIndex(opponentId, variants.length);
-    let descriptor = variants[startIndex];
-
-    for (let offset = 0; offset < variants.length; offset += 1) {
-        const candidate = variants[(startIndex + offset) % variants.length];
-        if (!recentSceneClasses.includes(`battle-scene--${candidate.scene}`)) {
-            descriptor = candidate;
-            break;
-        }
-    }
-
-    return `battle-scene--${descriptor.scene}`;
+    const pool = getScenePool(kind, teamSynergies);
+    const fresh = pool.filter(id => !recentSceneClasses.includes(`battle-scene--${id}`));
+    const previous = recentSceneClasses[recentSceneClasses.length - 1];
+    const notPrevious = pool.filter(id => `battle-scene--${id}` !== previous);
+    const choices = fresh.length ? fresh : notPrevious.length ? notPrevious : pool;
+    const index = Math.min(choices.length - 1, Math.max(0, Math.floor(random() * choices.length)));
+    return `battle-scene--${choices[index]}`;
 };
 
-export const getBattleSceneDescriptor = (kind: BattlePresentationKind, opponentId: string): BattleSceneDescriptor => {
-    const variants = sceneVariants[kind];
-    return variants[stableIndex(opponentId, variants.length)];
+export const getBattleSceneDescriptor = (
+    kind: BattlePresentationKind,
+    opponentId: string,
+    options: BattleSceneOptions = {},
+): { scene: string; landmark: string } => {
+    const scene = getBattleSceneClass(kind, opponentId, [], options).replace('battle-scene--', '');
+    return { scene, landmark: scene };
 };

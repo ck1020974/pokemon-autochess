@@ -13,6 +13,7 @@
     "test:permanent-family-buffs": "node scripts/verify-permanent-family-buffs.mjs",
     "test:temporary-reward-order": "node scripts/verify-temporary-reward-order.mjs",
     "test:trainer-presentation": "node scripts/verify-trainer-presentation.mjs",
+    "test:battle-scenes": "node scripts/verify-battle-scenes.mjs",
     "test:summon-ownership": "node scripts/verify-summon-ownership.mjs"
   },
   "dependencies": {

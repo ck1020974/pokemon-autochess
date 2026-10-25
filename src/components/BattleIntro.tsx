@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { getBattleIntroDuration, getBattleSceneClass, type BattlePresentationKind } from '../presentation/battlePresentation';
+import { getBattleIntroDuration, type BattlePresentationKind } from '../presentation/battlePresentation';
 import type { PlayerTrainer } from '../presentation/trainers';
 import './BattleIntro.css';
 
@@ -14,6 +14,7 @@ interface BattleIntroProps {
     playerTrainer: PlayerTrainer;
     opponent: BattleIntroOpponent;
     kind: BattlePresentationKind;
+    sceneClass: string;
     quick: boolean;
     onComplete: () => void;
 }
@@ -32,7 +33,7 @@ const useReducedMotion = () => {
     return reducedMotion;
 };
 
-export function BattleIntro({ playerTrainer, opponent, kind, quick, onComplete }: BattleIntroProps) {
+export function BattleIntro({ playerTrainer, opponent, kind, sceneClass, quick, onComplete }: BattleIntroProps) {
     const completed = useRef(false);
     const reducedMotion = useReducedMotion();
     const duration = getBattleIntroDuration(kind, quick, reducedMotion);
@@ -48,7 +49,6 @@ export function BattleIntro({ playerTrainer, opponent, kind, quick, onComplete }
         return () => window.clearTimeout(timer);
     }, [complete, duration]);
 
-    const sceneClass = getBattleSceneClass(kind, opponent.id);
     const style = { '--battle-intro-duration': `${duration}ms` } as CSSProperties;
 
     return (
