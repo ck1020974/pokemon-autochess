@@ -13,7 +13,6 @@ import { ALL_UNITS, PREFERRED_POSITIONS } from './data/AllUnits';
 import type { PreferredPosition } from './data/AllUnits';
 import { SYNERGIES } from './models/Synergies';
 import { Unit, type UnitTemplate } from './models/Unit';
-import { REWARD_DATA } from './models/RewardData';
 import type { RewardDefinition } from './models/RewardData';
 import type { GameEdition } from './models/Edition';
 import { ClassicEdition } from './data/editions/classic';
@@ -23,6 +22,10 @@ import { TrainerSelector } from './components/TrainerSelector';
 import { BattleIntro, type BattleIntroOpponent } from './components/BattleIntro';
 import { getBattleSceneClass, getPresentationKind } from './presentation/battlePresentation';
 import { PLAYER_TRAINERS, type PlayerTrainer } from './presentation/trainers';
+import {BOOT_ASSETS, getEditionAssets} from './loading/assetCatalog';
+import {prioritizeImages} from './loading/gameAssets';
+import {useAssetGroup} from './loading/useAssetGroup';
+import {AssetLoadStatus} from './loading/AssetLoadStatus';
 
 const gameWindow = window as Window & typeof globalThis & { game?: GameLoop };
 
@@ -300,7 +303,6 @@ function App() {
     const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
     const [focusedVersionId, setFocusedVersionId] = useState<string | null>(null);
     const [, setLoadingStage] = useState<number>(1);
-    const [phase1Loaded, setPhase1Loaded] = useState(false);
 
     const gameRef = useRef<GameLoop | null>(null);
     if (!gameRef.current) {
@@ -410,9 +412,14 @@ function App() {
 
     // --- Difficulty & Preloading States ---
     const [difficulty, setDifficulty] = useState<'NORMAL' | 'GREAT' | 'ULTRA' | 'MASTER' | null>(null);
-    const [hasLoaded, setHasLoaded] = useState(false);
+    const editionAssets = React.useMemo(() => selectedVersionId ? getEditionAssets(activeEdition) : [], [selectedVersionId, activeEdition]);
+    const bootProgress = useAssetGroup(BOOT_ASSETS, 0);
+    const editionProgress = useAssetGroup(editionAssets, 1);
+    const phase1Loaded = bootProgress.ready;
+    const hasLoaded = Boolean(selectedVersionId) && editionProgress.ready;
     const [hasStarted, setHasStarted] = useState(false);
-    const [loadingProgress, setLoadingProgress] = useState(0);
+    const loadingState = selectedVersionId ? editionProgress : bootProgress;
+    const loadingProgress = loadingState.percent;
     const [isPortrait, setIsPortrait] = useState(false);
 
     // Battle Paused State
@@ -572,193 +579,23 @@ function App() {
         }
     }, [tutorialStep, game.phase, battleResult, update, game.playerTeam, game.gold, game.shop]); // Changed from gameRef.current.phase
 
-    // Image Preloading - Split into Critical (Tier 1/2) and Background (Tier 3+)
-    // PHASE 1: Core Assets (Mount)
-    useEffect(() => {
-        const loadCoreAssets = async () => {
-            console.log(`[系統] 開始階段 1：核心資源預載入...`);
-            const urls = new Set<string>();
-            urls.add(normalBall);
-            urls.add(greatBall);
-            urls.add(ultraBall);
-            urls.add(masterBall);
-            urls.add('icon-192.png');
-            urls.add('icon-002.png');
-            urls.add('icon-003.png');
-
-            const musicNames = ['start'];
-
-            let loadedCount = 0;
-            const total = urls.size + musicNames.length;
-            const updateProgress = () => {
-                loadedCount++;
-                setLoadingProgress(Math.floor((loadedCount / total) * 100));
-            };
-
-            const imagePromises = Array.from(urls).map(url => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.src = url;
-                    const handleLoad = () => { updateProgress(); resolve(url); };
-                    img.onload = handleLoad;
-                    img.onerror = handleLoad;
-                });
-            });
-
-            const musicPromises = musicNames.map(name => {
-                return music.preload([name]).then(() => { updateProgress(); });
-            });
-
-            await Promise.all([...imagePromises, ...musicPromises]);
-            setPhase1Loaded(true);
-            console.log(`[系統] 核心資源已就緒！`);
-        };
-        loadCoreAssets();
-    }, []);
-
-    // PHASE 2 & 3: Edition Specific Assets (Triggered after selection)
-    useEffect(() => {
-        if (!selectedVersionId) return;
-
-        const loadEditionAssets = async () => {
-            console.log(`[系統] 開始支援 ${activeEdition.name} 的資源載入...`);
-            setHasLoaded(false);
-            setLoadingProgress(0);
-
-            const loadImages = async (urls: string[]) => {
-                const imagePromises = urls.map(url => {
-                    return new Promise((resolve) => {
-                        const img = new Image();
-                        img.src = url;
-                        const handleLoad = () => resolve(url);
-                        img.onload = handleLoad;
-                        img.onerror = handleLoad;
-                    });
-                });
-                await Promise.all(imagePromises);
-            };
-
-            // --- PHASE 2: 核心遊玩資源 (Tier 1-2, 初階對手, 獎勵, 核心音樂) ---
-            const phase2Urls = new Set<string>();
-            const phase2Music = ['pokemonmart', 'gymfight', 'gymwin', 'pokemoncenter', 'recover', 'level up'];
-
-            Object.values(ALL_UNITS).forEach(t => {
-                if (t.tier <= 2 || t.id === 'sprout') {
-                    if (t.imageUrl) phase2Urls.add(t.imageUrl);
-                    if (t.battleImageUrl) phase2Urls.add(t.battleImageUrl);
-                }
-            });
-
-            activeEdition.noviceOpponents.forEach(op => {
-                if (op.url) phase2Urls.add(op.url);
-                if (op.coreUnits && Array.isArray(op.coreUnits)) {
-                    op.coreUnits.forEach((id: string) => {
-                        const t = ALL_UNITS[id];
-                        if (t) {
-                            if (t.imageUrl) phase2Urls.add(t.imageUrl);
-                            if (t.battleImageUrl) phase2Urls.add(t.battleImageUrl);
-                        }
-                    });
-                }
-            });
-
-            REWARD_DATA.forEach(reward => {
-                if (reward.imageUrl) phase2Urls.add(reward.imageUrl);
-            });
-
-            setLoadingProgress(20);
-            await loadImages(Array.from(phase2Urls));
-            setLoadingProgress(60);
-            await music.preload(phase2Music);
-
-            setHasLoaded(true);
-            setLoadingProgress(100);
-            console.log(`[系統] ${activeEdition.name} 核心遊玩資源已就緒！`);
-
-            // --- PHASE 3: 背景漸進加載 (後期音樂與高階精靈) ---
-            // 延遲 2 秒開始，避免與剛開始的遊戲邏輯爭搶資源
-            setTimeout(async () => {
-                console.log(`[系統] 開始背景異步載入後期資源...`);
-
-                // 1. 先載入高階精靈圖片 (圖片負擔較小，先一次性處理)
-                const phase3Urls = new Set<string>();
-                Object.values(ALL_UNITS).forEach(t => {
-                    if (t.tier > 2 && t.id !== 'sprout') {
-                        if (t.imageUrl) phase3Urls.add(t.imageUrl);
-                        if (t.battleImageUrl) phase3Urls.add(t.battleImageUrl);
-                    }
-                });
-                [...activeEdition.intermOpponents, ...activeEdition.advancedOpponents, ...activeEdition.eliteOpponents, ...activeEdition.championOpponents].forEach(op => {
-                    if (op.url) phase3Urls.add(op.url);
-                });
-                await loadImages(Array.from(phase3Urls));
-
-                // 2. 音樂文件分批次載入 (最關鍵的優化：每個間隔 1.5 秒，避免阻塞 Stream)
-                const phase3Music = ['victoryroad', 'elitefourfight', 'elitefourwin', 'championfight', 'championwin'];
-                for (const m of phase3Music) {
-                    await new Promise(resolve => setTimeout(resolve, 1500));
-                    await music.preload([m]);
-                    console.log(`[系統] 流暢解析完成: ${m}`);
-                }
-
-                console.log(`[系統] 所有資源背景載入完成。`);
-            }, 2000);
-        };
-
-        loadEditionAssets();
-    }, [selectedVersionId, activeEdition]);
-
-    // --- Dynamic Preloading for Current Team & Opponents ---
-    useEffect(() => {
-        const teamUrls: string[] = [];
-        game.playerTeam.forEach(u => {
-            if (u) {
-                if (u.imageUrl) teamUrls.push(u.imageUrl);
-                if (u.battleImageUrl) teamUrls.push(u.battleImageUrl);
-            }
-        });
-
-        // Current Opponent Preload
-        if (game.currentOpponentId) {
-            const op = allEditionOpponents.find(o => o.id === game.currentOpponentId);
-            if (op) {
-                if (op.url) teamUrls.push(op.url);
-                if (op.coreUnits && Array.isArray(op.coreUnits)) {
-                    op.coreUnits.forEach((id: string) => {
-                        const t = ALL_UNITS[id];
-                        // Get evolved forms for boss level 2 or 3 too (just basic heuristic: push the base templates, we can't perfectly predict their final generated team, but core units cover 80% of it)
-                        let currentTemplate = t;
-                        for (let i = 0; i < 3; i++) {
-                            if (currentTemplate) {
-                                if (currentTemplate.imageUrl) teamUrls.push(currentTemplate.imageUrl);
-                                if (currentTemplate.battleImageUrl) teamUrls.push(currentTemplate.battleImageUrl);
-                                if (currentTemplate.evolveId && ALL_UNITS[currentTemplate.evolveId]) {
-                                    currentTemplate = ALL_UNITS[currentTemplate.evolveId];
-                                } else {
-                                    break;
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-        }
-
-        if (teamUrls.length > 0) {
-            // Silent background load
-            teamUrls.forEach(url => {
-                const img = new Image();
-                img.src = url;
-            });
-        }
-    }, [game.playerTeam, game.currentOpponentId, game.turn, allEditionOpponents]);
+    // Promote visible choices while the shared startup queue keeps running.
+    const visibleImageUrls = [
+        ...game.playerTeam.flatMap(unit => unit ? [unit.imageUrl, unit.battleImageUrl] : []),
+        ...game.shop.slots.flatMap(unit => unit ? [unit.imageUrl, unit.battleImageUrl] : []),
+        ...opponentChoices.map(opponent => opponent.url),
+        ...rewardChoices.map(reward => reward.imageUrl),
+        ...game.poolChoices.flatMap(choice => choice.displayImages),
+        selectedTrainer?.imageUrl,
+    ].filter((url): url is string => Boolean(url)).join('|');
+    useEffect(() => { prioritizeImages(visibleImageUrls.split('|')); }, [visibleImageUrls]);
 
     // --- BGM Initial Logic ---
     useEffect(() => {
-        if (!difficulty) {
+        if (!difficulty && hasLoaded) {
             music.play('start', true);
         }
-    }, [difficulty]);
+    }, [difficulty, hasLoaded]);
 
     // Keep track of entering/leaving battle for UI synergy calculation
     useEffect(() => {
@@ -2083,12 +1920,13 @@ function App() {
 
                         {!phase1Loaded && (
                             <div className="loading-container adventure-panel adventure-loading">
-                                <div className="loading-bar-wrapper">
+                                <div className="loading-bar-wrapper" role="progressbar" aria-label="圖片載入進度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={loadingProgress}>
                                     <div className="loading-bar-fill" style={{ width: `${loadingProgress}%` }} />
                                 </div>
                                 <p className="adventure-loading-copy">
-                                    核心資源載入中... {loadingProgress}%
+                                    正在準備冒險... {loadingProgress}%
                                 </p>
+                                <AssetLoadStatus progress={loadingState} assets={BOOT_ASSETS} />
                             </div>
                         )}
 
@@ -2110,7 +1948,6 @@ function App() {
 
                                             // Handle selecting the version
                                             if (focusedVersionId === v.id) {
-                                                music.play('start', true);
                                                 setSelectedVersionId(v.id);
                                                 const nextEdition = v.id === 'modern' ? ModernEdition : (v.id === 'infinite' ? InfiniteEdition : ClassicEdition);
                                                 setActiveEdition(nextEdition);
@@ -2155,12 +1992,13 @@ function App() {
                         </div>
 
                         <div className="loading-container adventure-panel adventure-loading">
-                            <div className="loading-bar-wrapper">
+                            <div className="loading-bar-wrapper" role="progressbar" aria-label="圖片載入進度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={loadingProgress}>
                                 <div className="loading-bar-fill" style={{ width: `${loadingProgress}%` }} />
                             </div>
                             <p className="adventure-loading-copy">
-                                版本資源載入中... {loadingProgress}%
+                                正在準備遊戲圖片... {loadingProgress}%
                             </p>
+                            <AssetLoadStatus progress={loadingState} assets={editionAssets} />
                         </div>
                     </div>
                 )

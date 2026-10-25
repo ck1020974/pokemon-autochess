@@ -158,6 +158,7 @@ class MusicManager {
             } else {
                 if (!this.bgmElement) {
                     this.bgmElement = new Audio();
+                    this.bgmElement.preload = 'none';
                     this.bgmElement.crossOrigin = "anonymous";
                 }
 

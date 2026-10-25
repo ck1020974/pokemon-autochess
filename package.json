@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/generate-asset-manifest.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/generate-asset-manifest.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -14,6 +16,7 @@
     "test:temporary-reward-order": "node scripts/verify-temporary-reward-order.mjs",
     "test:trainer-presentation": "node scripts/verify-trainer-presentation.mjs",
     "test:battle-scenes": "node scripts/verify-battle-scenes.mjs",
+    "test:assets": "node scripts/verify-asset-loader.mjs && node scripts/verify-asset-cache.mjs && node scripts/verify-asset-catalog.mjs",
     "test:summon-ownership": "node scripts/verify-summon-ownership.mjs"
   },
   "dependencies": {
