@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {chromium} from 'playwright';
-const out = resolve('../output/黑灰介面與競技場-20261026'); await mkdir(out, {recursive: true});
+const out = resolve('../output/全畫面勝敗與雙方陰影-20261026'); await mkdir(out, {recursive: true});
 const browser = await chromium.launch({channel: 'chrome', headless: true});
 const context = await browser.newContext({viewport: {width: 1280, height: 720}});
 const page = await context.newPage();
@@ -13,8 +13,17 @@ page.on('pageerror', error => errors.push(error.message));
 const styles = selector => page.locator(selector).first().evaluate(el => {
   const style = getComputedStyle(el);
   return {background: style.backgroundColor, image: style.backgroundImage, filter: style.backdropFilter,
-    border: style.borderBottomWidth, shadow: style.boxShadow, classes: el.className};
+    border: style.borderBottomWidth, shadow: style.boxShadow, classes: el.className,
+    position: style.position, radius: style.borderRadius,
+    rect: {left: el.getBoundingClientRect().left, top: el.getBoundingClientRect().top,
+      right: el.getBoundingClientRect().right, bottom: el.getBoundingClientRect().bottom}};
 });
+const assertFullscreen = (style, width, height) => {
+  assert.equal(style.position, 'fixed', 'Result backdrops must be fixed to the entire viewport');
+  assert.equal(style.radius, '0px', 'Full-screen backdrops must have no rounded corners');
+  for (const [edge,expected] of Object.entries({left:0, top:0, right:width, bottom:height}))
+    assert.ok(Math.abs(style.rect[edge]-expected) < 1, `${edge}: backdrop must meet viewport edge ${expected}, got ${style.rect[edge]}`);
+};
 const enter = async () => {
   await page.goto('http://127.0.0.1:5173/');
   const version = page.getByRole('button', {name: /^經典版本 經典版本/});
@@ -81,6 +90,7 @@ try {
     for (const [width, height] of [[1280, 720], [896, 414]]) {
       await page.setViewportSize({width, height});
       const outcome = await styles(`.battle-result--${result.toLowerCase()}`);
+      assertFullscreen(outcome, width, height);
       assert.equal(outcome.background, selectionOverlay.background, 'Round backdrop must match opponent selection');
       assert.equal(outcome.image, 'none');
       assert.equal(outcome.filter, selectionOverlay.filter);
@@ -155,6 +165,7 @@ try {
       await page.getByRole('button', {name: /^(🔊|🔇)$/}).evaluate(button => button.click());
       await page.locator('.game-result-overlay').waitFor();
       const ending = await styles('.game-result-overlay');
+      const viewport = page.viewportSize(); assertFullscreen(ending, viewport.width, viewport.height);
       assert.equal(ending.background, selectionOverlay.background); assert.equal(ending.image, 'none'); assert.equal(ending.filter, selectionOverlay.filter);
       assert.ok((await styles('.game-container')).classes.includes(scene), 'Final result must keep the last battlefield');
       await page.locator('.game-result-overlay').evaluate(el => Promise.all(el.getAnimations({subtree:true}).filter(a => a.effect.getTiming().iterations !== Infinity).map(a => a.finished)));
@@ -166,6 +177,20 @@ try {
       window.game.battleHistory = Array.from({length: 96}, (_, i) => ({opponentId: ids[i % ids.length], result: i % 3 === 0 ? 'LOSS' : 'WIN'}));
     });
     await page.locator('.game-result-overlay').click();
+    // Both tabs use the same shadow; switching teams must not override the image filter.
+    for (const [width,height] of [[1280,720], [896,414]]) {
+      await page.setViewportSize({width,height});
+      const filters = () => page.locator('.summary-team-panel.is-visible .summary-unit-img').evaluateAll(images => images.map(img => getComputedStyle(img).filter));
+      const playerFilters = await filters();
+      assert.ok(playerFilters.length > 0 && playerFilters.every(filter => filter.includes('drop-shadow(')));
+      await page.screenshot({path:resolve(out, `09-${result}-我方-${width}.png`)});
+      await page.locator('.summary-team-panel.is-visible').getByRole('button', {name:'敵方隊伍',exact:true}).click();
+      const enemyFilters = await filters();
+      assert.ok(enemyFilters.length > 0 && enemyFilters.every(filter => filter === playerFilters[0]), 'Enemy and player portraits must share the same shadow');
+      findings.push({state:'summary-shadows',result,width,playerFilters,enemyFilters});
+      await page.screenshot({path:resolve(out, `09-${result}-敵方-${width}.png`)});
+      await page.locator('.summary-team-panel.is-visible').getByRole('button', {name:'我方隊伍',exact:true}).click();
+    }
     await page.getByRole('button', {name: '對戰', exact: true}).click();
     for (const [width, height] of [[1280, 720], [896, 414], [667, 375]]) {
       await page.setViewportSize({width, height});

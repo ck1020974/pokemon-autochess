@@ -2340,7 +2340,6 @@ function App() {
                                                                             src={img00}
                                                                             className="summary-unit-img"
                                                                             alt={u.name}
-                                                                            style={{ filter: 'grayscale(0.2)' }}
                                                                         />
                                                                     </div>
                                                                     {/* <div className="summary-unit-name">{u.name}</div> */}
