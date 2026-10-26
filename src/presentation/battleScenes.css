@@ -79,6 +79,21 @@ body:has(.game-container.is-battling) { background: #101d2d var(--battle-scene-i
   flex-shrink: 1;
 }
 
+/* Each set of synergies shares the coordinate system of its own five-slot formation. */
+.board-side { position: relative; }
+.board-side > .board-synergies {
+  top: -20px;
+  left: 0 !important;
+  right: 0 !important;
+  justify-content: center;
+  max-width: 100%;
+}
+.board-teams-horizontal { padding-top: 24px; }
+@media (orientation: landscape) and (max-height: 500px) {
+  .board-teams-horizontal { padding-top: 20px; }
+  .board-side > .board-synergies { top: -16px; gap: 4px; }
+}
+
 .game-container:not(.is-battling) .board-container .floor-marker {
   background: rgba(30, 58, 64, .48);
   box-shadow: 0 3px 8px rgba(15, 35, 40, .2);

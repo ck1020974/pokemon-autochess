@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {chromium} from 'playwright';
-const out = resolve('../output/全畫面勝敗與雙方陰影-20261026'); await mkdir(out, {recursive: true});
+const out = resolve('../output/對戰體驗與教學-20261026'); await mkdir(out, {recursive: true});
 const browser = await chromium.launch({channel: 'chrome', headless: true});
 const context = await browser.newContext({viewport: {width: 1280, height: 720}});
 const page = await context.newPage();
@@ -73,8 +73,13 @@ try {
     await page.screenshot({path: resolve(out, `02-${result}-選敵.png`)});
     await page.locator('.opponent-card').first().click();
     const intro = await styles('.battle-intro-scene');
+    const previewIds = await page.locator('.battle-intro-opponent .battle-intro-lineup img').evaluateAll(images => images.map(img => img.dataset.templateId));
+    assert.ok(previewIds.length > 0, 'Enemy lineup must appear underneath its trainer before the battle');
+    assert.ok(await page.locator('.battle-intro-player .battle-intro-lineup img').count() > 0, 'Player lineup must appear underneath its trainer');
     const scene = intro.classes.match(/battle-scene--[\w-]+/)?.[0]; assert.ok(scene);
     await page.locator('.battle-intro-overlay').waitFor({state: 'detached'});
+    const battleIds = await page.evaluate(() => window.game.opponentTeam.filter(Boolean).map(unit => unit.templateId));
+    assert.deepEqual(previewIds, battleIds, 'Intro must show the actual enemy team without rerolling');
     const stage = await styles('.game-container'); assert.ok(stage.classes.includes(scene));
     const spacing = await page.locator('.board-teams-horizontal').evaluate(el => {
       const left = el.querySelector('.player').getBoundingClientRect(), right = el.querySelector('.enemy').getBoundingClientRect();

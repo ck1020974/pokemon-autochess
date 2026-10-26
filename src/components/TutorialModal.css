@@ -177,11 +177,8 @@
 .tutorial-entry-overlay {
     z-index: 100000;
     padding: 24px;
-    background:
-        radial-gradient(circle at 18% 16%, rgba(255, 250, 220, 0.78), transparent 32%),
-        radial-gradient(circle at 82% 84%, rgba(119, 214, 202, 0.34), transparent 38%),
-        rgba(219, 247, 241, 0.8);
-    backdrop-filter: blur(10px);
+    background: rgba(219, 247, 241, .32);
+    backdrop-filter: blur(6px);
 }
 
 .tutorial-entry-modal {
@@ -193,10 +190,10 @@
     justify-content: center;
     text-align: center;
     overflow-y: auto;
-    background: linear-gradient(145deg, rgba(255, 254, 247, 0.96), rgba(242, 255, 250, 0.9));
-    border: 1px solid rgba(22, 104, 98, 0.22);
-    border-radius: 28px;
-    box-shadow: 0 24px 60px rgba(19, 89, 84, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    background: rgba(255, 254, 247, .78);
+    border: 1px solid rgba(255, 255, 248, .6);
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(19, 89, 84, .12);
 }
 
 .tutorial-entry-title {

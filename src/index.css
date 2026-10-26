@@ -437,7 +437,10 @@ h3 {
 .battle-log-entry { color: inherit; }
 .battle-log-entry.is-latest { font-weight: 700; }
 @media (orientation: landscape) and (max-height: 500px) {
-  .battle-log { gap: 6px; padding: 6px 12px; }
+  .battle-log { gap: 4px; padding: 4px 12px; font-size: .75rem; line-height: 1.45; }
+}
+@media (max-width: 600px) {
+  .battle-log { font-size: .75rem; }
 }
 
 /* Battle Result Overlay */
@@ -2447,7 +2450,7 @@ h3 {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(17, 44, 52, .16);
   z-index: 9998;
   pointer-events: auto;
   /* blocks clicks on background */

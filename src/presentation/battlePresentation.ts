@@ -13,7 +13,7 @@ export const getBattleIntroDuration = (
 ): number => {
     if (reducedMotion) return 0;
     if (quick) return 600;
-    return kind === 'regular' ? 1400 : 2000;
+    return kind === 'regular' ? 2400 : 2800;
 };
 
 const arenas = ['stadium', 'stadium-coral', 'stadium-mint', 'stadium-lilac', 'stadium-gold'] as const;

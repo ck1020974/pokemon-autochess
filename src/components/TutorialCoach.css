@@ -1,0 +1,31 @@
+.tutorial-coach {
+  position: fixed;
+  z-index: 10100;
+  top: clamp(96px, 23vh, 220px);
+  right: max(5vw, 20px);
+  box-sizing: border-box;
+  width: min(360px, 40vw);
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 248, .55);
+  border-radius: 16px;
+  background: rgba(255, 255, 248, .72);
+  backdrop-filter: blur(8px);
+  color: #173f45;
+  box-shadow: 0 6px 18px rgba(20, 60, 58, .08);
+  text-align: left;
+  pointer-events: none;
+}
+.tutorial-coach-progress { display: flex; justify-content: space-between; gap: 12px; color: #245356; font-size: 11px; letter-spacing: .12em; margin-bottom: 8px; }
+.tutorial-coach-title { display: block; font-size: 18px; line-height: 1.4; }
+.tutorial-coach-task { margin: 6px 0 0; font-size: 14px; line-height: 1.6; }
+.tutorial-coach button { margin-top: 12px; padding: 8px 16px; border: 0; border-radius: 8px; background: #245356; color: #fffdf3; font: inherit; pointer-events: auto; cursor: pointer; }
+.tutorial-coach button:focus-visible { outline: 3px solid #d8a93a; outline-offset: 3px; }
+@media (orientation: landscape) and (max-height: 500px) {
+  .tutorial-coach { top: 72px; right: 24px; width: min(320px, 42vw); padding: 10px 14px; border-radius: 12px; }
+  .tutorial-coach-progress { font-size: 10px; margin-bottom: 4px; }
+  .tutorial-coach-title { font-size: 14px; }
+  .tutorial-coach-task { margin-top: 4px; font-size: 12px; line-height: 1.5; }
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .tutorial-coach { top: auto; bottom: 18px; right: 5vw; width: 90vw; }
+}
