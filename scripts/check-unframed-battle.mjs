@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {chromium} from 'playwright';
-const out = resolve('../output/介面微調-20261026'); await mkdir(out, {recursive: true});
+const out = resolve('../output/勝敗與訊息可讀性-20261026'); await mkdir(out, {recursive: true});
 const browser = await chromium.launch({channel: 'chrome', headless: true});
 const context = await browser.newContext({viewport: {width: 1280, height: 720}});
 const page = await context.newPage();
@@ -41,10 +41,15 @@ try {
   await page.screenshot({path: resolve(out, '01-備戰資訊列.png')});
   for (const result of ['WIN', 'LOSS']) {
     if (result === 'LOSS') await enter();
-    await page.evaluate(result => {
+    await page.evaluate(async result => {
       const game = window.game; game.gold = 0;
-      game.playerTeam = game.shop.slots.filter(Boolean).slice(0, result === 'WIN' ? 4 : 1);
-      for (const unit of game.playerTeam) unit.stats = result === 'WIN' ? {attack: 300, hp: 300, maxHp: 300} : {attack: 0, hp: 1, maxHp: 1};
+      const {Unit} = await import('/src/models/Unit.ts');
+      const {ALL_UNITS} = await import('/src/data/AllUnits.ts');
+      // Houndour always emits a real opening skill message. Basic-only combat may emit none.
+      game.playerTeam = result === 'WIN'
+        ? Array.from({length: 4}, () => new Unit(ALL_UNITS.houndour))
+        : [new Unit(ALL_UNITS.rattata)];
+      for (const unit of game.playerTeam) unit.stats = result === 'WIN' ? {attack: 300, hp: 300, maxHp: 300} : {attack: 0, hp: 3, maxHp: 3};
     }, result);
     await page.getByRole('button', {name: /^(🔊|🔇)$/}).click();
     const before = await styles('.game-container');
@@ -70,14 +75,34 @@ try {
     assert.equal(battleHeader.background, 'rgba(0, 0, 0, 0)'); assert.equal(battleHeader.border, '0px');
     const overlay = page.locator(`.battle-result--${result.toLowerCase()}`);
     await overlay.waitFor({timeout: 60000});
+    await overlay.evaluate(el => Promise.all(el.getAnimations({subtree:true}).filter(a => a.effect.getTiming().iterations !== Infinity).map(a => a.finished)));
     for (const [width, height] of [[1280, 720], [896, 414]]) {
       await page.setViewportSize({width, height});
       const outcome = await styles(`.battle-result--${result.toLowerCase()}`);
-      assert.equal(outcome.background, 'rgba(0, 0, 0, 0)'); assert.equal(outcome.image, 'none'); assert.equal(outcome.filter, 'none');
+      assert.ok(outcome.image.includes('radial-gradient'), 'Round results need an opaque background');
       assert.ok((await styles('.game-container')).classes.includes(scene), 'The battle result must retain the selected scene');
       findings.push({state: result, width, ...outcome, scene});
       await page.screenshot({path: resolve(out, `03-${result}-${width}.png`)});
     }
+    // Read real combat messages, including the older entries. All lines remain opaque.
+    const log = await page.locator('.battle-log').evaluate(el => ({
+      background: getComputedStyle(el).backgroundColor,
+      entries: [...el.querySelectorAll('.battle-log-entry')].map(line => ({text: line.textContent,
+        opacity: getComputedStyle(line).opacity, color: getComputedStyle(line).color,
+        latest: line.classList.contains('is-latest')}))
+    }));
+    assert.equal(log.background, 'rgba(17, 44, 85, 0.94)');
+    if (result === 'WIN') assert.ok(log.entries.length > 0);
+    assert.ok(log.entries.every(line => line.opacity === '1'));
+    assert.equal(log.entries.filter(line => line.latest).length, Math.min(1, log.entries.length));
+    if (log.entries.length) assert.ok(log.entries.at(-1).latest, 'Last available message must be emphasized, even when fewer than three');
+    findings.push({state: 'battle-log', result, ...log});
+    await overlay.evaluate(el => el.style.visibility = 'hidden');
+    for (const [width, height] of [[1280, 720], [896, 414]]) {
+      await page.setViewportSize({width, height});
+      await page.screenshot({path: resolve(out, `06-${result}-訊息-${width}.png`)});
+    }
+    await overlay.evaluate(el => el.style.visibility = '');
     await page.setViewportSize({width: 1280, height: 720});
     await page.evaluate(result => { if (result === 'WIN') window.game.wins = 12; else window.game.lives = 1; }, result);
     await overlay.click();
@@ -88,8 +113,9 @@ try {
       await page.getByRole('button', {name: /^(🔊|🔇)$/}).evaluate(button => button.click());
       await page.locator('.game-result-overlay').waitFor();
       const ending = await styles('.game-result-overlay');
-      assert.equal(ending.background, 'rgba(0, 0, 0, 0)'); assert.equal(ending.image, 'none'); assert.equal(ending.filter, 'none');
+      assert.ok(ending.image.includes('radial-gradient'), 'Final results need their own background'); assert.equal(ending.filter, 'none');
       assert.ok((await styles('.game-container')).classes.includes(scene), 'Final result must keep the last battlefield');
+      await page.locator('.game-result-overlay').evaluate(el => Promise.all(el.getAnimations({subtree:true}).filter(a => a.effect.getTiming().iterations !== Infinity).map(a => a.finished)));
       findings.push({state: phase, ...ending});
       await page.screenshot({path: resolve(out, `04-${result}-${phase}.png`)});
     }

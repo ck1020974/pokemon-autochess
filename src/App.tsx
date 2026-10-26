@@ -2877,26 +2877,16 @@ function App() {
                         </div>
 
                         {/* 2. Battle Log (Bottom) */}
-                        <div style={{ textAlign: 'center', color: '#888', fontSize: '0.9rem', zIndex: 5, minHeight: '4.5em', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div className="battle-log" role="log" aria-label="對戰訊息">
                             {logs.length > 0 ? (
                                 logs.slice(-3).map((log, i) => (
-                                    <div key={i} style={{ opacity: i === 2 ? 1 : (i === 1 ? 0.6 : 0.3) }}>
+                                    <div key={i} className={`battle-log-entry${i === Math.min(logs.length, 3) - 1 ? ' is-latest' : ''}`}>
                                         {log.message}
                                     </div>
                                 ))
                             ) : (
                                 <div>戰鬥進行中...</div>
                             )}
-                            {/* Synergy Badges */}
-                            <div style={{
-                                display: 'flex',
-                                gap: '6px',
-                                justifyContent: 'center',
-                                flexWrap: 'wrap',
-                                width: '100%'
-                            }}>
-                                {/* (Synergy Icon Logic) */}
-                            </div>
                         </div>
                     </div>
                 )
