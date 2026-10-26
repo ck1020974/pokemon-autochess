@@ -108,11 +108,9 @@ try {
   assert.match(appCss, /\.board-container:not\(\.is-battling\)\s*\{[^}]*background:\s*linear-gradient\(180deg, #7eaaa0/s);
   assert.match(appCss, /\.board-vs\s*\{[^}]*display:\s*none/s);
   assert.doesNotMatch(appCss, /\.board-container\.is-battling::before\s*\{/);
-  assert.match(appCss, /\.battle-result-overlay\.battle-result--draw\s*\{[^}]*background:\s*radial-gradient/s);
-  assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*background:\s*radial-gradient/s);
   assert.match(appCss, /\.hero-card\.hero-card--player\s*\{[^}]*border:\s*2px solid #d7a837/s);
   assert.match(appSource, /className="tier-text"\s+style=\{\{\s*color:\s*'#175b5c'/s);
-  assert.match(appCss, /\.pool-selection-overlay\s*\{[^}]*background:\s*radial-gradient[^}]*linear-gradient[^}]*!important/s);
+  assert.match(appCss, /\.pool-selection-overlay\s*\{[^}]*background:\s*var\(--selection-backdrop\)[^}]*!important/s);
   assert.doesNotMatch(appCss, /\.opponent-select-overlay \.opponent-card\s*\{/);
   assert.match(appCss, /--stage-glow/);
   assert.doesNotMatch(appCss, /--stage-landmark/);
@@ -181,13 +179,12 @@ try {
   assert.match(appCss, /\.summary-achievement-display \.hero-card\.hero-card--player\s*\{[^}]*transform:\s*none/s);
   assert.match(appCss, /\.result-screen--champion \.summary-achievement-display \.hero-name\s*\{[^}]*color:\s*#143743/s);
   assert.match(appCss, /\.summary-achievement-display \.hero-name\s*\{[^}]*margin-top:\s*10px[^}]*font-size:\s*\.88rem/s);
+  assert.match(appCss, /\.game-result-overlay\s*\{[^}]*background:\s*var\(--selection-backdrop\)/s);
   assert.match(appCss, /\.game-result-overlay::before\s*\{\s*content:\s*none/s);
   assert.match(appSource, /label: '手下敗將'/);
   assert.doesNotMatch(appSource, /label: '角色敗將'/);
   assert.match(appSource, /opponent-card__portrait/);
   assert.match(appSource, /opponent-card__name/);
-  assert.match(appCss, /\.game-result-overlay\.result-screen--champion\s*\{[^}]*background:\s*radial-gradient/s);
-  assert.match(appCss, /\.game-result-overlay\.result-screen--game-over\s*\{[^}]*background:\s*radial-gradient/s);
   assert.match(appCss, /\.game-result-overlay\.result-screen--champion \.result-title/);
   assert.match(appCss, /\.result-screen--champion \.summary-history-display \.hero-label/);
   assert.match(appCss, /\.summary-history-grid\s*\{[^}]*grid-template-columns:\s*repeat\(12, minmax\(0, 1fr\)\)/s);

@@ -1538,7 +1538,7 @@ function App() {
     const handleOpponentSelect = (opponent: SelectedOpponent) => {
         const definition = allEditionOpponents.find(candidate => candidate.id === opponent.id);
         const teamSynergies = (definition?.coreUnits ?? []).flatMap(id => ALL_UNITS[id] ? [ALL_UNITS[id].synergies] : []);
-        const nextSceneClass = getBattleSceneClass(getPresentationKind(game.wins), opponent.id, recentBattleSceneClasses, { teamSynergies });
+        const nextSceneClass = getBattleSceneClass(getPresentationKind(game.wins), opponent.id, recentBattleSceneClasses, { teamSynergies, opponentName: opponent.name });
         setSelectedOpponent(opponent);
         setSelectedBattleSceneClass(nextSceneClass);
         setRecentBattleSceneClasses((recent) => [...recent, nextSceneClass].slice(-2));
@@ -1702,10 +1702,10 @@ function App() {
 
             {/* Reward Selection Overlay (Z-Index 20000) */}
             {game.phase === 'REWARD' && (
-                <div className="opponent-select-overlay pool-selection-overlay show" style={{
+                <div className="opponent-select-overlay pool-selection-overlay reward-selection-overlay show" style={{
                     position: 'fixed',
                     top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.85)',
+                    background: 'var(--selection-backdrop)',
                     backdropFilter: 'blur(8px)',
                     zIndex: 20000,
                     display: 'flex',
@@ -1798,8 +1798,8 @@ function App() {
                                     </div>
                                 )}
 
-                                <div style={{
-                                    color: '#cbd5e1',
+                                <div className="reward-description" style={{
+                                    color: '#245356',
                                     fontSize: '1.05rem',
                                     textAlign: 'left',
                                     lineHeight: '1.6',
@@ -2485,7 +2485,7 @@ function App() {
                         style={{
                             position: 'fixed',
                             top: 0, left: 0, right: 0, bottom: 0,
-                            background: 'rgba(0,0,0,0.85)',
+                            background: 'var(--selection-backdrop)',
                             backdropFilter: 'blur(8px)',
                             zIndex: 10001,
                             display: 'flex',
@@ -2897,7 +2897,7 @@ function App() {
                 <div className="opponent-select-overlay show" style={{
                     position: 'fixed',
                     top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.85)',
+                    background: 'var(--selection-backdrop)',
                     backdropFilter: 'blur(8px)',
                     zIndex: 20000,
                     display: 'flex',

@@ -15,6 +15,27 @@ try {
   const pick = (kind, roll, teamSynergies = [], recent = []) =>
     getBattleSceneClass(kind, 'same-opponent', recent, {teamSynergies, random: () => roll}).replace(prefix, '');
 
+  // Arenas are reserved for the elite stage and Ash; champion-stage halls take precedence.
+  for (const [id, exported] of [['classic', 'ClassicEdition'], ['modern', 'ModernEdition'], ['infinite', 'InfiniteEdition']]) {
+    const module = await server.ssrLoadModule(`/src/data/editions/${id}/index.ts`);
+    const edition = module[exported];
+    for (const opponent of [...edition.noviceOpponents, ...edition.intermOpponents, ...edition.advancedOpponents]) {
+      const teamSynergies = opponent.coreUnits.flatMap(unit => ALL_UNITS[unit] ? [ALL_UNITS[unit].synergies] : []);
+      for (let i = 0; i < 100; i++) {
+        const scene = getBattleSceneClass('regular', opponent.id, [], {opponentName: opponent.name, teamSynergies, random: () => i / 100}).replace(prefix, '');
+        assert.equal(stadiums.includes(scene), opponent.name === '小智', `${id}/${opponent.id}/${opponent.name}: only Ash may use regular-stage arenas`);
+      }
+    }
+  }
+  for (const roll of [0, .2, .4, .6, .9]) {
+    const ash = (kind, recent = []) => getBattleSceneClass(kind, 'ash', recent, {opponentName: '小智', teamSynergies: [['Fire']], random: () => roll}).replace(prefix, '');
+    assert.ok(stadiums.includes(ash('regular')));
+    assert.ok(halls.includes(ash('champion')), 'Ash as champion must still use a champion hall');
+    assert.notEqual(ash('regular', [prefix + 'stadium']), 'stadium', 'Ash also avoids recent arenas');
+    assert.ok(!stadiums.includes(pick('regular', roll, [['Charge'], ['Hard']])));
+    assert.ok(!stadiums.includes(pick('regular', roll)), 'The fallback pool must never leak arenas to regular opponents');
+  }
+
   assert.equal(getPresentationKind(7), 'regular');
   assert.equal(getPresentationKind(8), 'elite');
   assert.equal(getPresentationKind(11), 'elite');
@@ -37,7 +58,6 @@ try {
     {team: [['Snow'], ['Snow'], ['Normal']], allowed: ['cavern']},
     {team: [['Cave'], ['Cave']], allowed: ['desert', 'route']},
     {team: [['Psychic'], ['Ghost']], allowed: ['library']},
-    {team: [['Charge'], ['Hard']], allowed: stadiums},
   ];
   for (const {team, allowed} of themes) {
     const realIds = new Set(Object.values(ALL_UNITS).flatMap(unit => unit.synergies));
@@ -65,7 +85,7 @@ try {
   for (const id of [...catalogIds, ...stadiums, ...halls]) {
     assert.ok(existsSync(resolve(root, `src/assets/battle-scenes/${id}.svg`)), `Missing SVG: ${id}`);
   }
-  console.log('Battle scene rules verified: arenas, three halls, team themes, randomness, recent-scene avoidance and fallback assets.');
+  console.log('Battle scene rules verified: arenas reserved for elites/Ash across all three editions, champion halls, themes and recent-scene avoidance.');
 } finally {
   await server.close();
 }

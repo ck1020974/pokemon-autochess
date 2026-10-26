@@ -2,12 +2,13 @@ import assert from 'node:assert/strict';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {chromium} from 'playwright';
-const out = resolve('../output/勝敗與訊息可讀性-20261026'); await mkdir(out, {recursive: true});
+const out = resolve('../output/黑灰介面與競技場-20261026'); await mkdir(out, {recursive: true});
 const browser = await chromium.launch({channel: 'chrome', headless: true});
 const context = await browser.newContext({viewport: {width: 1280, height: 720}});
 const page = await context.newPage();
 page.setDefaultTimeout(90000);
 const errors = [], findings = [];
+const winOnly = process.argv.includes('--win-only');
 page.on('pageerror', error => errors.push(error.message));
 const styles = selector => page.locator(selector).first().evaluate(el => {
   const style = getComputedStyle(el);
@@ -39,7 +40,7 @@ try {
   assert.equal(header.border, '0px'); assert.equal(header.shadow, 'none');
   findings.push({state: 'preparation-header', ...header});
   await page.screenshot({path: resolve(out, '01-備戰資訊列.png')});
-  for (const result of ['WIN', 'LOSS']) {
+  for (const result of winOnly ? ['WIN'] : ['WIN', 'LOSS']) {
     if (result === 'LOSS') await enter();
     await page.evaluate(async result => {
       const game = window.game; game.gold = 0;
@@ -55,6 +56,7 @@ try {
     const before = await styles('.game-container');
     await page.getByRole('button', {name: '⚔️', exact: true}).click();
     await page.locator('.opponent-card').first().waitFor();
+    const selectionOverlay = await styles('.opponent-select-overlay');
     const selecting = await styles('.game-container');
     assert.equal(selecting.image, before.image, 'Selecting an opponent must retain the preparation backdrop');
     assert.ok(!selecting.classes.includes('battle-scene--'), 'No battlefield before selecting an opponent');
@@ -79,7 +81,9 @@ try {
     for (const [width, height] of [[1280, 720], [896, 414]]) {
       await page.setViewportSize({width, height});
       const outcome = await styles(`.battle-result--${result.toLowerCase()}`);
-      assert.ok(outcome.image.includes('radial-gradient'), 'Round results need an opaque background');
+      assert.equal(outcome.background, selectionOverlay.background, 'Round backdrop must match opponent selection');
+      assert.equal(outcome.image, 'none');
+      assert.equal(outcome.filter, selectionOverlay.filter);
       assert.ok((await styles('.game-container')).classes.includes(scene), 'The battle result must retain the selected scene');
       findings.push({state: result, width, ...outcome, scene});
       await page.screenshot({path: resolve(out, `03-${result}-${width}.png`)});
@@ -91,7 +95,7 @@ try {
         opacity: getComputedStyle(line).opacity, color: getComputedStyle(line).color,
         latest: line.classList.contains('is-latest')}))
     }));
-    assert.equal(log.background, 'rgba(17, 44, 85, 0.94)');
+    assert.equal(log.background, 'rgba(0, 0, 0, 0)', 'Combat messages must have no panel');
     if (result === 'WIN') assert.ok(log.entries.length > 0);
     assert.ok(log.entries.every(line => line.opacity === '1'));
     assert.equal(log.entries.filter(line => line.latest).length, Math.min(1, log.entries.length));
@@ -102,10 +106,48 @@ try {
       await page.setViewportSize({width, height});
       await page.screenshot({path: resolve(out, `06-${result}-訊息-${width}.png`)});
     }
+    if (result === 'WIN') {
+      const originalClass = await page.locator('.game-container').getAttribute('class');
+      for (const [width,height] of [[1280,720], [896,414]]) {
+        await page.setViewportSize({width,height});
+        for (const [id,expected] of [['champion-hall','rgb(0, 0, 0)'], ['champion-hall-gold','rgb(0, 0, 0)'], ['volcanic','rgb(0, 0, 0)'], ['cavern','rgb(0, 0, 0)']]) {
+          await page.locator('.game-container').evaluate((el,id) => {el.className = el.className.replace(/battle-scene--[\w-]+/, `battle-scene--${id}`);}, id);
+          const message = await page.locator('.battle-log').evaluate(el => ({color:getComputedStyle(el).color,
+            background:getComputedStyle(el).backgroundColor, border:getComputedStyle(el).borderWidth,
+            radius:getComputedStyle(el).borderRadius, shadow:getComputedStyle(el).boxShadow,
+            lines:[...el.children].map(line => getComputedStyle(line).color)}));
+          assert.equal(message.color, expected); assert.equal(message.background,'rgba(0, 0, 0, 0)');
+          assert.equal(message.border,'0px'); assert.equal(message.radius,'0px'); assert.equal(message.shadow,'none');
+          assert.ok(message.lines.every(color => color === expected));
+          findings.push({state:'adaptive-log',id,width,...message});
+          await page.screenshot({path:resolve(out, `08-${id}-${width}.png`)});
+        }
+      }
+      await page.locator('.game-container').evaluate((el,classes) => {el.className = classes;}, originalClass);
+    }
     await overlay.evaluate(el => el.style.visibility = '');
     await page.setViewportSize({width: 1280, height: 720});
-    await page.evaluate(result => { if (result === 'WIN') window.game.wins = 12; else window.game.lives = 1; }, result);
-    await overlay.click();
+    if (result === 'WIN') {
+      await overlay.click();
+      const reward = page.locator('.reward-selection-overlay');
+      await reward.waitFor();
+      const rewardStyle = await styles('.reward-selection-overlay');
+      assert.equal(rewardStyle.background, selectionOverlay.background);
+      assert.equal(rewardStyle.image, 'none'); assert.equal(rewardStyle.filter, selectionOverlay.filter);
+      const descriptionColors = await reward.locator('.reward-description').evaluateAll(lines => lines.map(line => getComputedStyle(line).color));
+      assert.ok(descriptionColors.length > 0 && descriptionColors.every(color => color === 'rgb(36, 83, 86)'), 'Reward effects must use dark text on light cards');
+      findings.push({state:'reward', ...rewardStyle});
+      for (const [width, height] of [[1280,720], [896,414]]) {
+        await page.setViewportSize({width,height});
+        await page.screenshot({path:resolve(out, `07-獎勵-${width}.png`)});
+      }
+      await reward.locator('.opponent-card').first().click();
+      await page.evaluate(() => { window.game.phase = 'VICTORY'; });
+      await page.getByRole('button', {name: /^(🔊|🔇)$/}).evaluate(button => button.click());
+    } else {
+      await page.evaluate(() => { window.game.lives = 1; });
+      await overlay.click();
+    }
     await page.locator('.game-result-overlay').waitFor();
     assert.equal(await page.locator('.battle-result--win,.battle-result--loss').count(), 0, 'The final result must replace the round prompt');
     for (const phase of ['VICTORY', 'GAME_OVER']) {
@@ -113,7 +155,7 @@ try {
       await page.getByRole('button', {name: /^(🔊|🔇)$/}).evaluate(button => button.click());
       await page.locator('.game-result-overlay').waitFor();
       const ending = await styles('.game-result-overlay');
-      assert.ok(ending.image.includes('radial-gradient'), 'Final results need their own background'); assert.equal(ending.filter, 'none');
+      assert.equal(ending.background, selectionOverlay.background); assert.equal(ending.image, 'none'); assert.equal(ending.filter, selectionOverlay.filter);
       assert.ok((await styles('.game-container')).classes.includes(scene), 'Final result must keep the last battlefield');
       await page.locator('.game-result-overlay').evaluate(el => Promise.all(el.getAnimations({subtree:true}).filter(a => a.effect.getTiming().iterations !== Infinity).map(a => a.finished)));
       findings.push({state: phase, ...ending});
@@ -139,6 +181,6 @@ try {
     await page.setViewportSize({width: 1280, height: 720});
   }
   assert.deepEqual(errors, []);
-  await writeFile(resolve(out, 'verification.json'), JSON.stringify({errors, findings}, null, 2));
+  await writeFile(resolve(out, winOnly ? 'verification-reward.json' : 'verification.json'), JSON.stringify({errors, findings}, null, 2));
   console.log(JSON.stringify({errors, states: findings.map(f => f.state)}));
 } finally { await browser.close(); }

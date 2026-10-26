@@ -18,7 +18,7 @@ export const getBattleIntroDuration = (
 
 const arenas = ['stadium', 'stadium-coral', 'stadium-mint', 'stadium-lilac', 'stadium-gold'] as const;
 const halls = ['champion-hall', 'champion-hall-lilac', 'champion-hall-gold'] as const;
-const regularScenes = ['route', 'garden', 'harbor', 'grassland', 'desert', 'beach', ...arenas];
+const regularScenes = ['route', 'garden', 'harbor', 'grassland', 'desert', 'beach'];
 
 interface SceneTheme {
     synergies: readonly string[];
@@ -33,17 +33,17 @@ const sceneThemes: readonly SceneTheme[] = [
     { synergies: ['Snow'], scenes: ['cavern'] },
     { synergies: ['Cave'], scenes: ['desert', 'route'] },
     { synergies: ['Psychic', 'Ghost'], scenes: ['library'] },
-    { synergies: ['Charge', 'Hard'], scenes: arenas },
 ];
 
 interface BattleSceneOptions {
+    opponentName?: string;
     teamSynergies?: readonly (readonly string[])[];
     random?: () => number;
 }
 
-const getScenePool = (kind: BattlePresentationKind, team: readonly (readonly string[])[]): readonly string[] => {
+const getScenePool = (kind: BattlePresentationKind, team: readonly (readonly string[])[], opponentName: string): readonly string[] => {
     if (kind === 'champion') return halls;
-    if (kind === 'elite') return arenas;
+    if (kind === 'elite' || opponentName === '小智') return arenas;
     let bestScore = 0;
     let bestTheme: SceneTheme | undefined;
     for (const theme of sceneThemes) {
@@ -61,9 +61,9 @@ export const getBattleSceneClass = (
     kind: BattlePresentationKind,
     _opponentId: string,
     recentSceneClasses: readonly string[] = [],
-    { teamSynergies = [], random = Math.random }: BattleSceneOptions = {},
+    { teamSynergies = [], opponentName = '', random = Math.random }: BattleSceneOptions = {},
 ): string => {
-    const pool = getScenePool(kind, teamSynergies);
+    const pool = getScenePool(kind, teamSynergies, opponentName);
     const fresh = pool.filter(id => !recentSceneClasses.includes(`battle-scene--${id}`));
     const previous = recentSceneClasses[recentSceneClasses.length - 1];
     const notPrevious = pool.filter(id => `battle-scene--${id}` !== previous);

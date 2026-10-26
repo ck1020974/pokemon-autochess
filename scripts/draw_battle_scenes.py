@@ -409,5 +409,12 @@ if __name__=='__main__':
             ink='#edf6f8' if name in {'champion-hall','volcanic'} else '#244655'
             shadow='rgba(3, 17, 31, .65)' if ink=='#edf6f8' else 'rgba(255, 255, 255, .5)'
             panel='rgba(16, 32, 48, .15)' if ink=='#edf6f8' else 'rgba(247, 251, 239, .35)'
-            rules.append(f'.battle-scene--{name}, body:has(.game-container.is-battling.battle-scene--{name}) {{ --battle-scene-illustration: url(\'../assets/battle-scenes/{name}.svg\'); --battle-light: {rgb}; --scene-ui-ink: {ink}; --scene-ui-shadow: {shadow}; --scene-ui-panel: {panel}; }}')
+            # Messages sit on the floor; the header/sky palette can have opposite brightness.
+            ground=SCENES[name][1][2].lstrip('#')
+            channels=[int(ground[i:i+2],16)/255 for i in [0,2,4]]
+            linear=[v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4 for v in channels]
+            luminance=sum(v*w for v,w in zip(linear,[.2126,.7152,.0722]))
+            log_ink='#000' if (luminance+.05)/.05 >= 1.05/(luminance+.05) else '#fff'
+            log_shadow='0 1px 2px rgba(255, 255, 255, .65)' if log_ink=='#000' else '0 1px 3px rgba(0, 0, 0, .8)'
+            rules.append(f'.battle-scene--{name}, body:has(.game-container.is-battling.battle-scene--{name}) {{ --battle-scene-illustration: url(\'../assets/battle-scenes/{name}.svg\'); --battle-light: {rgb}; --scene-ui-ink: {ink}; --scene-ui-shadow: {shadow}; --scene-ui-panel: {panel}; --scene-log-ink: {log_ink}; --scene-log-shadow: {log_shadow}; }}')
     (OUT.parent.parent/'presentation/sceneAssets.css').write_text('\n'.join(rules)+'\n',encoding='utf-8')
