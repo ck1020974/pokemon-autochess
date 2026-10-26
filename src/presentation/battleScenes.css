@@ -83,15 +83,31 @@ body:has(.game-container.is-battling) { background: #101d2d var(--battle-scene-i
 .board-side { position: relative; }
 .board-side > .board-synergies {
   top: -20px;
-  left: 0 !important;
-  right: 0 !important;
-  justify-content: center;
-  max-width: 100%;
+  width: max-content;
+  justify-content: flex-start;
+}
+.board-side.player > .board-synergies {
+  left: var(--synergy-anchor-left, 0px) !important;
+  right: auto !important;
+  max-width: calc(100% - var(--synergy-anchor-left, 0px));
+}
+.board-side.enemy > .board-synergies {
+  left: auto !important;
+  right: var(--synergy-anchor-right, 0px) !important;
+  max-width: calc(100% - var(--synergy-anchor-right, 0px));
 }
 .board-teams-horizontal { padding-top: 24px; }
 @media (orientation: landscape) and (max-height: 500px) {
   .board-teams-horizontal { padding-top: 20px; }
   .board-side > .board-synergies { top: -16px; gap: 4px; }
+}
+@media (min-width: 1100px) and (min-height: 600px) {
+  #root:has(.game-container.is-battling) { max-width: 1680px; }
+  .battle-stage-shell.is-battling .board-teams-horizontal { --team-separation: clamp(144px, 12vw, 240px); }
+  .battle-stage-shell.is-battling .board-side { flex: 1 1 0; gap: clamp(8px, .75vw, 16px) !important; }
+  .battle-stage-shell.is-battling .board-side > .unit-wrapper { flex: 1 1 0; }
+  .battle-stage-shell.is-battling .board-side :is(.unit-card, .slot-placeholder) { width: min(100%, 105px); margin: 0; }
+  .battle-stage-shell.is-battling .board-side .unit-image { width: min(100%, 100px); }
 }
 
 .game-container:not(.is-battling) .board-container .floor-marker {

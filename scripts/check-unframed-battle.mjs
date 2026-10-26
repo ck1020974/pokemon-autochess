@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {chromium} from 'playwright';
-const out = resolve('../output/對戰體驗與教學-20261026'); await mkdir(out, {recursive: true});
+const out = resolve('../output/教學焦點與隊伍間距-20261026'); await mkdir(out, {recursive: true});
 const browser = await chromium.launch({channel: 'chrome', headless: true});
 const context = await browser.newContext({viewport: {width: 1280, height: 720}});
 const page = await context.newPage();

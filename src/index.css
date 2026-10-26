@@ -2450,7 +2450,7 @@ h3 {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(17, 44, 52, .16);
+  background: rgba(17, 44, 52, .52);
   z-index: 9998;
   pointer-events: auto;
   /* blocks clicks on background */
@@ -2462,6 +2462,7 @@ h3 {
   z-index: 9999 !important;
   pointer-events: auto !important;
   border-radius: inherit;
+  box-shadow: 0 0 0 2px rgba(255, 227, 171, .9), 0 0 24px rgba(255, 205, 92, .5);
   animation: tutorialGlowPulse 1.5s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -2490,12 +2491,22 @@ h3 {
 
 @keyframes tutorialGlowPulse {
   from {
-    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5), 0 0 10px rgba(96, 165, 250, 0.2) !important;
+    box-shadow: 0 0 0 2px rgba(255, 227, 171, .85), 0 0 14px rgba(255, 205, 92, .35);
   }
 
   to {
-    box-shadow: 0 0 0 4px rgba(96, 165, 250, 1), 0 0 25px rgba(96, 165, 250, 0.6) !important;
+    box-shadow: 0 0 0 4px rgba(255, 227, 171, 1), 0 0 28px rgba(255, 205, 92, .65);
   }
+}
+
+.tutorial-target-glow {
+  outline: 2px solid #ffe3ab;
+  outline-offset: 3px;
+  box-shadow: 0 0 18px rgba(255, 205, 92, .6);
+  animation: tutorialGlowPulse 1.5s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-target-glow, .tutorial-highlight { animation: none; }
 }
 
 /* Hide highlights during battle to avoid distraction */
@@ -2632,6 +2643,10 @@ h3 {
   z-index: 10000 !important;
   position: relative;
   pointer-events: auto !important;
+}
+
+.card-lock-overlay.tutorial-elevate {
+  position: absolute;
 }
 
 .opponent-card {

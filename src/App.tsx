@@ -10,6 +10,7 @@ import { music } from './engine/MusicManager';
 import { BattleSimulator } from './engine/BattleSimulator';
 import {createEnemyTeam} from './engine/createEnemyTeam';
 import {TutorialCoach} from './components/TutorialCoach';
+import {useFormationSynergyAnchor} from './presentation/useFormationSynergyAnchor';
 import type { BattleLog } from './engine/BattleSimulator';
 import { ALL_UNITS } from './data/AllUnits';
 import { SYNERGIES } from './models/Synergies';
@@ -166,7 +167,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
             {/* Direct Lock Icon Button (Only if onToggleFreeze provided) */}
             {onToggleFreeze && (
                 <div
-                    className={`card-lock-overlay ${frozen ? 'locked' : ''} ${tutorialHighlightLock ? 'tutorial-elevate' : ''}`}
+                    className={`card-lock-overlay ${frozen ? 'locked' : ''} ${tutorialHighlightLock ? 'tutorial-elevate tutorial-target-glow' : ''}`}
                     onClick={(e) => { e.stopPropagation(); onToggleFreeze(); }}
                     title={frozen ? "解除鎖定" : "鎖定角色"}
                 >
@@ -442,6 +443,8 @@ function App() {
     const [showTutorial, setShowTutorial] = useState<boolean>(true); // Changed to true to auto-prompt tutorial
     const [showTrainerSelector, setShowTrainerSelector] = useState(false);
     const [selectedTrainer, setSelectedTrainer] = useState<PlayerTrainer | null>(null);
+    const playerFormation = useRef<HTMLDivElement>(null);
+    const enemyFormation = useRef<HTMLDivElement>(null);
     const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null);
     const [tutorialStep, setTutorialStep] = useState<number>(0);
     const [tutorialShake, setTutorialShake] = useState<boolean>(false);
@@ -468,6 +471,12 @@ function App() {
 
     const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
     const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
+    const playerAnchorTeam = game.phase === GamePhase.BATTLE && initialPlayerTeamForSynergy.length ? initialPlayerTeamForSynergy : game.playerTeam;
+    const enemyAnchorTeam = initialEnemyTeamForSynergy.length ? initialEnemyTeamForSynergy : displayEnemyTeam;
+    const lastOccupied = (team: (Unit | null)[]) => team.reduce((last, unit, index) => unit ? index : last, -1);
+    const formationKey = `${game.phase}:${game.playerTeam.map(unit => unit?.id ?? '').join(',')}:${game.opponentTeam.map(unit => unit?.id ?? '').join(',')}`;
+    useFormationSynergyAnchor(playerFormation, lastOccupied(playerAnchorTeam), formationKey);
+    useFormationSynergyAnchor(enemyFormation, lastOccupied(enemyAnchorTeam), formationKey);
     const keepBattleScene = Boolean(selectedBattleSceneClass) && (game.phase === GamePhase.BATTLE || game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER);
     const battleSceneClass = keepBattleScene ? selectedBattleSceneClass : '';
     const preparationSceneClass = (() => {
@@ -508,6 +517,27 @@ function App() {
         // Reset game but PRESERVE title-screen-state
         const newGame = new GameLoop();
         gameRef.current = newGame;
+        preparedEnemyTeam.current = null;
+        simulatorRef.current = null;
+        setIntroEnemyTeam([]);
+        setPendingBattleOpponent(null);
+        setSelectedOpponent(null);
+        setSelected(null);
+        setDraggedItem(null);
+        setBattleResult(null);
+        setInitialEnemyTeam([]);
+        setInitialPlayerTeamForSynergy([]);
+        setInitialEnemyTeamForSynergy([]);
+        setShowOpponentSelect(false);
+        setOpponentChoices([]);
+        setActiveSynergyId(null);
+        setBattleElapsedSeconds(0);
+        setSelectedBattleSceneClass('');
+        setRecentBattleSceneClasses([]);
+        setLogs([]);
+        setIsPaused(false);
+        isPausedRef.current = false;
+        setSelectedTrainer(trainer => trainer ?? PLAYER_TRAINERS[0]);
 
         // Setup Tutorial Context
         newGame.gold = 10;
@@ -2308,7 +2338,7 @@ function App() {
                     filter: (game.phase === GamePhase.BATTLE) ? 'none' : (tutorialStep > 0 && tutorialStep !== 2 && tutorialStep !== 3 && tutorialStep !== 4 && tutorialStep !== 7 && tutorialStep !== 8 && tutorialStep !== 9 && tutorialStep !== 10 && tutorialStep !== 11) ? 'grayscale(100%) brightness(50%)' : 'none'
                 }}>
                     {/* Left Side: Player Team */}
-                    <div className={`board-side player ${(tutorialStep === 4 || tutorialStep === 8 || tutorialStep === 9 || tutorialStep === 10) && game.phase === GamePhase.SHOP ? 'tutorial-elevate' : ''}`}>
+                    <div ref={playerFormation} className={`board-side player ${(tutorialStep === 4 || tutorialStep === 8 || tutorialStep === 9 || tutorialStep === 10) && game.phase === GamePhase.SHOP ? 'tutorial-elevate' : ''}`}>
                 {/* 1. Synergies (Player) */}
                 <div className={`board-synergies ${([2, 3, 4, 7, 8, 9, 10, 11].includes(tutorialStep) && game.phase !== GamePhase.BATTLE) ? 'tutorial-elevate' : ''}`}>
                     {(() => {
@@ -2391,7 +2421,7 @@ function App() {
                     <div className="board-vs">VS</div>
 
                     {/* Right Side: Enemy Team (Flipped) */}
-                    <div className="board-side enemy">
+                    <div ref={enemyFormation} className="board-side enemy">
                 {/* 2. Synergies (Enemy) */}
                 {(initialEnemyTeam.length > 0 || displayEnemyTeam) && (
                     <div className="board-synergies" style={{ left: 'auto', right: '10px', flexDirection: 'row-reverse' }}>
@@ -2460,7 +2490,7 @@ function App() {
                             {/* Row 2: Battle Button - Centered and Slimmer */}
                             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px', position: 'relative' }}>
                                 <button
-                                    className="btn-premium btn-battle"
+                                    className={`btn-premium btn-battle ${(tutorialStep === 7 || tutorialStep === 10) ? 'tutorial-target-glow' : ''}`}
                                     onClick={handleStartBattle}
                                     style={{ height: '50px', width: '60px', zIndex: (tutorialStep === 7 || tutorialStep === 10) ? 10000 : 'auto' }}
                                 >
@@ -2510,7 +2540,7 @@ function App() {
                                     const isDimmed = !isHighlighted && tutorialStep > 0 && tutorialStep !== 6 && tutorialStep !== 7 && tutorialStep !== 8 && game.phase === GamePhase.SHOP;
 
                                     return (
-                                        <div key={i} style={{ position: 'relative', filter: isDimmed ? 'grayscale(100%) brightness(50%)' : 'none', opacity: isDimmed ? 0.6 : 1 }} className={`${isHighlighted && tutorialStep !== 6 && tutorialStep !== 8 ? 'tutorial-highlight' : ''} ${(tutorialStep === 6 || tutorialStep === 8) && unit?.family === 'charmander' ? 'tutorial-elevate' : ''}`}>
+                                        <div key={i} style={{ position: 'relative', filter: isDimmed ? 'grayscale(100%) brightness(50%)' : 'none', opacity: isDimmed ? 0.6 : 1 }} className={`${isHighlighted && tutorialStep !== 6 && tutorialStep !== 8 ? 'tutorial-highlight' : ''} ${(tutorialStep === 6 || tutorialStep === 8) && unit?.family === 'charmander' ? 'tutorial-elevate' : ''} ${tutorialStep === 8 && isHighlighted ? 'tutorial-target-glow' : ''}`}>
                                             <UnitCard
                                                 unit={unit}
                                                 onClick={() => handleSelect(unit, i, 'SHOP')}
@@ -2521,7 +2551,7 @@ function App() {
                                                 onToggleFreeze={() => handleFreezeToggle(i)}
                                                 showMergeGlow={!!unit && unit.isMergeable}
                                                 isEvolving={!!unit && evolvingUnitId === unit.id}
-                                                tutorialHighlightLock={false}
+                                                tutorialHighlightLock={tutorialStep === 6 && unit?.family === 'charmander' && !game.shop.frozen[i]}
                                                 synergyHighlight={!!(activeSyn && unit && activeSyn.activeTemplateIds?.has(unit.templateId))}
                                             />
                                         </div>
@@ -2758,7 +2788,7 @@ function App() {
                 selected && (
                     <div className="detail-panel" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                         {/* Close Button (Top Left X) */}
-                        <button
+                        <button className={tutorialStep === 3 ? 'tutorial-target-glow' : ''}
                             style={{
                                 position: 'absolute',
                                 top: '10px',
@@ -2789,7 +2819,7 @@ function App() {
 
                                 {/* Action Buttons (Buy/Sell) */}
                                 {selected.source === 'SHOP' && (
-                                    <button className="btn-premium btn-reroll" style={{
+                                    <button className={`btn-premium btn-reroll ${tutorialStep > 0 ? 'tutorial-target-glow' : ''}`} style={{
                                         background: 'linear-gradient(to bottom, #10b981, #059669)',
                                         border: '1px solid #10b981', color: 'white', width: '90%',
                                         display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px'
