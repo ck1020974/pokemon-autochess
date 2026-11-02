@@ -10,6 +10,7 @@ import { music } from './engine/MusicManager';
 import { BattleSimulator } from './engine/BattleSimulator';
 import {createEnemyTeam} from './engine/createEnemyTeam';
 import {TutorialCoach} from './components/TutorialCoach';
+import {BattleControls} from './components/BattleControls';
 import {useFormationSynergyAnchor} from './presentation/useFormationSynergyAnchor';
 import type { BattleLog } from './engine/BattleSimulator';
 import { ALL_UNITS } from './data/AllUnits';
@@ -2601,18 +2602,12 @@ function App() {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px', padding: '0 0', marginTop: '8px' }}>
                         {/* 1. Battle Controls (Top) */}
                         <div className="battle-controls-container" style={{ zIndex: 10, position: 'relative' }}>
-                            <div className="battle-controls-row">
-                                <button className="battle-pause-btn" onClick={togglePause}>
-                                    {isPaused ? '▶️ 繼續' : '⛔ 暫停'}
-                                </button>
-                                <button
-                                    className={`battle-speed-btn ${battleSpeed > 1 ? 'active' : ''}`}
-                                    onClick={toggleBattleSpeed}
-                                    title="切換戰鬥速度"
-                                >
-                                    ⏩ {battleSpeed}x
-                                </button>
-                            </div>
+                            <BattleControls
+                                isPaused={isPaused}
+                                speed={battleSpeed}
+                                onTogglePause={togglePause}
+                                onToggleSpeed={toggleBattleSpeed}
+                            />
                         </div>
 
                         {/* 2. Battle Log (Bottom) */}
