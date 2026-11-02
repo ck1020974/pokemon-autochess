@@ -34,7 +34,7 @@ export const SYNERGIES: Record<string, SynergyConfig> = {
     'Trick': { id: 'Trick', name: '戲法', icon: '🪄', description: '[2] 戰鬥開始時，和隨機敵方對調生命', tiers: [2], color: '#a855f7' },
     'BugBite': { id: 'BugBite', name: '蟲咬', icon: '🪲', description: '[2] 擊殺敵方後，永久 +1 生命', tiers: [2], color: '#4ade80' },
     'Charge': { id: 'Charge', name: '電光', icon: '⚡', description: '[2/3/5] 戰鬥開始時，隨機增加 0~3/2~6/6~12 攻擊', tiers: [2, 3, 5], color: '#fde047' },
-    'Thief': { id: 'Thief', name: '小偷', icon: '👤', description: '[2／5] 戰鬥開始時，從最強的敵方角色偷取 2／8 點攻擊。', tiers: [2, 5], color: '#64748b' },
+    'Thief': { id: 'Thief', name: '小偷', icon: '👤', description: '[2／5] 戰鬥開始時，從最強的敵方角色隨機偷取 2／5 點攻擊或生命。', tiers: [2, 5], color: '#64748b' },
     'Charm': { id: 'Charm', name: '撒嬌', icon: '💖', description: '[2/3/5] 戰鬥開始時，首位敵方攻擊降低 33/50/99% (最低為 1)', tiers: [2, 3, 5], color: '#f472b6' },
     'BatonPass': { id: 'BatonPass', name: '接棒', icon: '🏃', description: '[2/5] 死亡後，隨機 1 位角色繼承攻擊與生命', tiers: [2, 5], color: '#fb923c' },
     'Outrage': { id: 'Outrage', name: '逆鱗', icon: '🐲', description: '[2] 可能額外再攻擊 1 個敵方或是無法攻擊。', tiers: [2, 3], color: '#f59e0b' },

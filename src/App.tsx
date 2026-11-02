@@ -11,6 +11,8 @@ import { BattleSimulator } from './engine/BattleSimulator';
 import {createEnemyTeam} from './engine/createEnemyTeam';
 import {TutorialCoach} from './components/TutorialCoach';
 import {BattleControls} from './components/BattleControls';
+import {analytics, startAnalyticsDelivery} from './analytics/collector';
+import {terminalOutcome} from './analytics/gameTracking';
 import {useFormationSynergyAnchor} from './presentation/useFormationSynergyAnchor';
 import type { BattleLog } from './engine/BattleSimulator';
 import { ALL_UNITS } from './data/AllUnits';
@@ -327,11 +329,15 @@ function App() {
     const [isPoolProcessing, setIsPoolProcessing] = useState(false);
     const update = useForceUpdate();
 
+    useEffect(() => startAnalyticsDelivery(), []);
+
     useEffect(() => {
         console.log("Pokemon AutoChess v4.8.5 - Quality Update");
     }, [game]);
 
     const handleRestart = (newEdition?: GameEdition) => {
+        analytics.finishRun('abandoned');
+        void analytics.flush();
         music.stop();
         // 1. Reset Core Engine
         const targetEdition = newEdition || activeEdition;
@@ -512,6 +518,7 @@ function App() {
 
     // --- Tutorial Logic ---
     const startTutorial = () => {
+        analytics.finishRun('abandoned');
         // Reset game but PRESERVE title-screen-state
         const newGame = new GameLoop();
         gameRef.current = newGame;
@@ -794,6 +801,15 @@ function App() {
                 
                 const sim = new BattleSimulator(game.playerTeam, enemyTeam, game.savedTeam, activeMultiplier, battleSpeedAtStart, game.psychicN, enemyPsychicN, false, activeBuffs);
                 simulatorRef.current = sim;
+                const activeSynergies = Object.fromEntries([...sim.playerSynergies].filter(([id, count]) => count >= (SYNERGIES[id]?.tiers[0] ?? Infinity)));
+                analytics.startBattle({
+                    edition: activeEdition.id, difficulty: difficulty ?? game.difficultyName,
+                    turn: game.turn, wins: game.wins, lives: game.lives,
+                    opponentId: game.currentOpponentId, opponentDifficulty: game.currentOpponentDifficulty,
+                    playerTeam: sim.playerTeam, enemyTeam: sim.enemyTeam,
+                    synergies: activeSynergies, psychicN: game.psychicN,
+                }, tutorialStep > 0);
+                void analytics.flush();
                 
                 // Sync difficulty-scaled stats back to GameLoop and UI state for accurate settlement display
                 // Snapshot the team using clones to prevent modifications from the simulator affecting the summary
@@ -885,6 +901,12 @@ function App() {
             setInitialEnemyTeam([]);
         }
     }, [game.phase, activeEdition, difficulty, game, selectedOpponent, tutorialStep]);
+
+    useEffect(() => {
+        if (!battleResult || tutorialStep > 0) return;
+        analytics.finishBattle(battleResult, terminalOutcome(game, battleResult));
+        void analytics.flush();
+    }, [battleResult, game, tutorialStep]);
 
     // Handle Battle Result Music
     useEffect(() => {

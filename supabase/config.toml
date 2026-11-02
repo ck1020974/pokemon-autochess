@@ -1,0 +1,6 @@
+project_id = "pokemon-autochess-analytics"
+
+# This endpoint performs publishable-key authorization in its own handler.
+# The platform JWT gate cannot validate modern publishable keys.
+[functions.pa-ingest]
+verify_jwt = false

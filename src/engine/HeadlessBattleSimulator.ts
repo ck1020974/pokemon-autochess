@@ -560,7 +560,7 @@ export class HeadlessBattleSimulator {
             }
         }
 
-        // Thief Synergy: Steal Atk
+        // Thief Synergy: Each unit randomly steals attack or health.
         if (unit.synergies.includes('Thief')) {
             const count = this.getSynergyCountForUnit(unit, 'Thief');
             if (count >= 2) {
@@ -575,15 +575,21 @@ export class HeadlessBattleSimulator {
                             maxPower = power;
                         }
                     }
-                    const buff = count >= 5 ? 8 : 2;
-                    const stealAmt = Math.min(strongest.stats.attack - 1, buff);
+                    const buff = count >= 5 ? 5 : 2;
+                    const stealHp = Math.random() < 0.5;
+                    const stealAmt = stealHp
+                        ? Math.min(strongest.stats.hp - 1, buff)
+                        : strongest.family === 'sneasel' ? 0 : Math.min(strongest.stats.attack - 1, buff);
                     if (stealAmt > 0) {
-                        if (strongest.family !== 'sneasel') {
+                        if (stealHp) {
+                            strongest.stats.hp -= stealAmt;
+                            strongest.stats.maxHp -= stealAmt;
+                        } else {
                             strongest.stats.attack -= stealAmt;
-                            strongest.capStats();
                         }
+                        strongest.capStats();
                         const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
-                        this.growUnit(unit, 0, stealAmt, original, true);
+                        this.growUnit(unit, stealHp ? stealAmt : 0, stealHp ? 0 : stealAmt, original, true);
                     }
                 }
             }

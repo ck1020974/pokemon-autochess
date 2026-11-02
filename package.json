@@ -13,6 +13,8 @@
     "test:smoke": "node scripts/smoke-test.mjs",
     "test:balance-values": "node scripts/verify-balance-values.mjs",
     "test:psychic-thief": "node scripts/verify-psychic-thief.mjs",
+    "test:analytics": "node scripts/verify-analytics-tracker.mjs && node scripts/verify-analytics-validation.mjs",
+    "test:author-ui": "node scripts/verify-author-dashboard-ui.mjs",
     "test:permanent-family-buffs": "node scripts/verify-permanent-family-buffs.mjs",
     "test:temporary-reward-order": "node scripts/verify-temporary-reward-order.mjs",
     "test:trainer-presentation": "node scripts/verify-trainer-presentation.mjs",
@@ -21,6 +23,7 @@
     "test:summon-ownership": "node scripts/verify-summon-ownership.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.118.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

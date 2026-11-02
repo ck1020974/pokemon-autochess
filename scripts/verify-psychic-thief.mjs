@@ -84,25 +84,71 @@ try {
     }
     }
     for (const count of [2, 4, 5]) {
-      await test(`${Simulator.name}: Thief ${count} steals per unit, permanently, from strongest total stats`, async () => {
-        const originals = [make('thief-a', ['Thief']), make('thief-b', ['Thief'])];
+      for (const stat of ['attack', 'hp']) {
+      await test(`${Simulator.name}: Thief ${count} steals ${stat} per unit, permanently, from strongest total stats`, async () => {
+        const originals = [make('thief-a', ['Thief'], 10, 10), make('thief-b', ['Thief'], 10, 10)];
         const sim = build(originals, [make('strong', [], 20, 50), make('high-attack', [], 30, 10)]);
         sim.playerSynergies.set('Thief', count);
-        for (const unit of sim.playerTeam) await sim.executeUnitStartOfBattleAbility(unit);
-        const amount = count >= 5 ? 8 : 2;
-        assert.equal(sim.enemyTeam[0].stats.attack, 20 - amount * 2);
+        const previousRandom = Math.random;
+        try {
+          Math.random = () => stat === 'hp' ? 0.25 : 0.75;
+          for (const unit of sim.playerTeam) await sim.executeUnitStartOfBattleAbility(unit);
+        } finally { Math.random = previousRandom; }
+        const amount = count >= 5 ? 5 : 2;
+        assert.equal(sim.enemyTeam[0].stats.attack, stat === 'attack' ? 20 - amount * 2 : 20);
+        assert.equal(sim.enemyTeam[0].stats.hp, stat === 'hp' ? 50 - amount * 2 : 50);
+        assert.equal(sim.enemyTeam[0].stats.maxHp, stat === 'hp' ? 50 - amount * 2 : 50);
         assert.equal(sim.enemyTeam[1].stats.attack, 30);
-        assert.deepEqual(sim.playerTeam.map(u => u.stats.attack), [10 + amount, 10 + amount]);
-        assert.deepEqual(originals.map(u => u.stats.attack), [10 + amount, 10 + amount]);
+        for (const team of [sim.playerTeam, originals]) {
+          assert.deepEqual(team.map(u => u.stats.attack), [10, 10].map(value => value + (stat === 'attack' ? amount : 0)));
+          assert.deepEqual(team.map(u => u.stats.hp), [10, 10].map(value => value + (stat === 'hp' ? amount : 0)));
+          assert.deepEqual(team.map(u => u.stats.maxHp), [10, 10].map(value => value + (stat === 'hp' ? amount : 0)));
+        }
+      });
+      }
+    }
+    for (const stat of ['attack', 'hp']) {
+    await test(`${Simulator.name}: Thief leaves one ${stat} and transfers only available amount`, async () => {
+      const originals = [make('thief-a', ['Thief'], 10, 10), make('thief-b', ['Thief'], 10, 10)];
+      const sim = build(originals, [make('poor', [], 3, 3)]);
+      sim.playerSynergies.set('Thief', 5);
+      const previousRandom = Math.random;
+      try {
+        Math.random = () => stat === 'hp' ? 0.25 : 0.75;
+        for (const unit of sim.playerTeam) await sim.executeUnitStartOfBattleAbility(unit);
+      } finally { Math.random = previousRandom; }
+      assert.equal(sim.enemyTeam[0].stats[stat], 1);
+      assert.deepEqual(originals.map(u => u.stats[stat]), [12, 10]);
+    });
+    }
+    for (const stat of ['attack', 'hp']) {
+      await test(`${Simulator.name}: enemy Thief transfers ${stat} without permanently debuffing player`, async () => {
+        const originals = [make('victim', [], 20, 40)];
+        const sim = build(originals, [make('enemy-thief-a', ['Thief'], 10, 10), make('enemy-thief-b', ['Thief'], 10, 10)]);
+        sim.enemySynergies.set('Thief', 5);
+        const previousRandom = Math.random;
+        try {
+          Math.random = () => stat === 'hp' ? 0.25 : 0.75;
+          for (const unit of sim.enemyTeam) await sim.executeUnitStartOfBattleAbility(unit);
+        } finally { Math.random = previousRandom; }
+        assert.equal(sim.playerTeam[0].stats[stat], stat === 'hp' ? 30 : 10);
+        assert.deepEqual(sim.enemyTeam.map(unit => unit.stats[stat]), [15, 15]);
+        assert.equal(originals[0].stats.attack, 20);
+        assert.equal(originals[0].stats.hp, 40);
       });
     }
-    await test(`${Simulator.name}: Thief leaves one attack and transfers only available attack`, async () => {
-      const originals = [make('thief-a', ['Thief']), make('thief-b', ['Thief'])];
-      const sim = build(originals, [make('poor', [], 3)]);
+    await test(`${Simulator.name}: attack immunity cannot create a stolen buff`, async () => {
+      const original = make('immune-thief', ['Thief']);
+      const immune = make('sneasel', [], 20, 50);
+      const sim = build([original], [immune]);
       sim.playerSynergies.set('Thief', 5);
-      for (const unit of sim.playerTeam) await sim.executeUnitStartOfBattleAbility(unit);
-      assert.equal(sim.enemyTeam[0].stats.attack, 1);
-      assert.deepEqual(originals.map(u => u.stats.attack), [12, 10]);
+      const previousRandom = Math.random;
+      try {
+        Math.random = () => 0.75;
+        await sim.executeUnitStartOfBattleAbility(sim.playerTeam[0]);
+      } finally { Math.random = previousRandom; }
+      assert.equal(sim.enemyTeam[0].stats.attack, 20);
+      assert.equal(original.stats.attack, 10);
     });
   }
 } finally {

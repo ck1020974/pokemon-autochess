@@ -764,11 +764,11 @@ export class BattleSimulator {
 
         // --- New Synergies ---
 
-        // Thief Synergy: Steal Attack
+        // Thief Synergy: Each unit randomly steals attack or health.
         if (unit.synergies.includes('Thief')) {
             const count = this.getSynergyCountForUnit(unit, 'Thief');
             if (count >= 2) {
-                const buff = count >= 5 ? 8 : 2;
+                const buff = count >= 5 ? 5 : 2;
                 const candidates = opTeam.filter(e => e && e.stats.hp > 0);
                 if (candidates.length > 0) {
                     // Find strongest: sum of HP and Attack
@@ -785,15 +785,21 @@ export class BattleSimulator {
                     this.log(`${unit.name} 對 ${strongest.name} 發動了小偷`);
                     await this.notifySkill(unit, `發動了小偷`);
 
-                    const stealAmt = Math.min(strongest.stats.attack - 1, buff);
+                    const stealHp = Math.random() < 0.5;
+                    const stealAmt = stealHp
+                        ? Math.min(strongest.stats.hp - 1, buff)
+                        : strongest.family === 'sneasel' ? 0 : Math.min(strongest.stats.attack - 1, buff);
                     if (stealAmt > 0) {
-                        if (strongest.family !== 'sneasel') {
+                        if (stealHp) {
+                            strongest.stats.hp -= stealAmt;
+                            strongest.stats.maxHp -= stealAmt;
+                        } else {
                             strongest.stats.attack -= stealAmt;
-                            strongest.capStats();
                         }
+                        strongest.capStats();
                         const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
                         // Permanent increase for player's unit
-                        this.growUnit(unit, 0, stealAmt, '小偷', original, true);
+                        this.growUnit(unit, stealHp ? stealAmt : 0, stealHp ? 0 : stealAmt, '小偷', original, true);
                     }
                     this.playAnimation(unit, 'jump', 200);
                 }
