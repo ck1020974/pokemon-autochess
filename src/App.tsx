@@ -471,12 +471,9 @@ function App() {
 
     const displayPlayerTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.playerTeam : game.playerTeam;
     const displayEnemyTeam = (game.phase === GamePhase.BATTLE && simulatorRef.current) ? simulatorRef.current.enemyTeam : Array(5).fill(null);
-    const playerAnchorTeam = game.phase === GamePhase.BATTLE && initialPlayerTeamForSynergy.length ? initialPlayerTeamForSynergy : game.playerTeam;
-    const enemyAnchorTeam = initialEnemyTeamForSynergy.length ? initialEnemyTeamForSynergy : displayEnemyTeam;
-    const lastOccupied = (team: (Unit | null)[]) => team.reduce((last, unit, index) => unit ? index : last, -1);
     const formationKey = `${game.phase}:${game.playerTeam.map(unit => unit?.id ?? '').join(',')}:${game.opponentTeam.map(unit => unit?.id ?? '').join(',')}`;
-    useFormationSynergyAnchor(playerFormation, lastOccupied(playerAnchorTeam), formationKey);
-    useFormationSynergyAnchor(enemyFormation, lastOccupied(enemyAnchorTeam), formationKey);
+    useFormationSynergyAnchor(playerFormation, formationKey);
+    useFormationSynergyAnchor(enemyFormation, formationKey);
     const keepBattleScene = Boolean(selectedBattleSceneClass) && (game.phase === GamePhase.BATTLE || game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER);
     const battleSceneClass = keepBattleScene ? selectedBattleSceneClass : '';
     const preparationSceneClass = (() => {

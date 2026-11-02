@@ -367,7 +367,7 @@ export class GameLoop {
 
         // For Psychic: Directly update the global SYNERGIES object so all UI components (including Encyclopedia) see the value.
         const psychic = SYNERGIES.Psychic;
-        const template = '[2/3/5] 兩回合後，對隨機 2 位敵方造成 [N] 傷害 (每場戰鬥後增強)';
+        const template = '[2／3／5] 兩回合後，對隨機 2／3／5 名敵人各造成 [N] 點傷害。（每場戰鬥後增強）';
         psychic.description = template; // Let UI (SynergyIcon) handle [N] replacement based on isEnemy
     }
 
@@ -718,15 +718,7 @@ export class GameLoop {
         // getUniqueCount correctly handles Espeon (Eevee form) as +1
         const pCount = this.getUniqueCount(psychicUnits, 'Psychic');
         if (pCount >= 2) {
-            let increment = 0;
-            if (pCount >= 5) {
-                increment = 2;
-            } else if (pCount === 3) {
-                // Odd Round +2, Even Round +1 (Turn 1 is odd)
-                increment = (this.turn % 2 === 1) ? 2 : 1;
-            } else {
-                increment = 1;
-            }
+            const increment = 1;
             this.psychicN += increment;
             console.log(`念力羈絆增強！累積威力：${this.psychicN} (+${increment}) - 當前回合：${this.turn}`);
         }

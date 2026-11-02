@@ -24,16 +24,16 @@ export class HeadlessBattleSimulator {
     private participantEnemyUnits = new Set<Unit>();
     private originalPlayerTeam: (Unit | null)[] | null = null;
     private grassHealedTargets = new Set<Unit>();
-    private playerWins: number = 0;
-    private playerAttackCount: number = 0;
-    private enemyAttackCount: number = 0;
+    private psychicN: number = 2;
+    private enemyPsychicN: number = 2;
     private psychicTriggered: Set<string> = new Set();
     private fireLogged: Set<string> = new Set();
     private grassLogged: Set<string> = new Set();
     private angryLoggedThisTurn: Set<string> = new Set();
 
-    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], _playerWins: number = 0) {
-        this.playerWins = _playerWins;
+    constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], _playerWins: number = 0, psychicN: number = 2, enemyPsychicN: number = _playerWins + 1) {
+        this.psychicN = psychicN;
+        this.enemyPsychicN = enemyPsychicN;
         this.originalPlayerTeam = originalPlayerTeam || null;
         this.playerTeam = this.cloneTeam(playerTeam, u => this.cloneUnit(u));
         this.enemyTeam = this.cloneTeam(enemyTeam, u => {
@@ -567,21 +567,23 @@ export class HeadlessBattleSimulator {
                 const enemies = opTeam.filter(u => u && u.stats.hp > 0);
                 if (enemies.length > 0) {
                     let strongest = enemies[0];
-                    let maxAtk = strongest.stats.attack;
+                    let maxPower = strongest.stats.hp + strongest.stats.attack;
                     for (const e of enemies) {
-                        if (e.stats.attack > maxAtk) {
+                        const power = e.stats.hp + e.stats.attack;
+                        if (power > maxPower) {
                             strongest = e;
-                            maxAtk = e.stats.attack;
+                            maxPower = power;
                         }
                     }
-                    const factor = count >= 4 ? 0.5 : 0.33;
-                    const stealAmt = Math.floor(strongest.stats.attack * factor);
+                    const buff = count >= 5 ? 8 : 2;
+                    const stealAmt = Math.min(strongest.stats.attack - 1, buff);
                     if (stealAmt > 0) {
                         if (strongest.family !== 'sneasel') {
                             strongest.stats.attack -= stealAmt;
                             strongest.capStats();
                         }
-                        this.growUnit(unit, 0, stealAmt, null, true);
+                        const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
+                        this.growUnit(unit, 0, stealAmt, original, true);
                     }
                 }
             }
@@ -1981,42 +1983,19 @@ export class HeadlessBattleSimulator {
         }
         await this.eventBus.emit({ type: 'AFTER_ATTACK', source: attacker, target: actualDefender, context: {} });
 
-        // Psychic Synergy: "Future Sight"
-        const attackerIsEnemy = this.enemyTeam.includes(attacker);
-        if (attackerIsEnemy) {
-            this.enemyAttackCount++;
-            const psychicCount = this.playerSynergies.get('Psychic') || 0;
-            if (this.enemyAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('player')) {
-                this.psychicTriggered.add('player');
-                this.enemyAttackCount = 0;
-
-                const targets = this.enemyTeam;
-                const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
-                if (livingEnemies.length > 0) {
-                    const targetCount = 2; // Updated from all
-                    const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
-                    const selectedTargets = shuffled.slice(0, targetCount);
-                    // In Headless, we use playerWins as a proxy for 'N' scaling
-                    const dmg = 2 + this.playerWins;
-                    for (const target of selectedTargets) await this.dealDamage(null, target, dmg, true, true);
-                }
-            }
-        } else {
-            this.playerAttackCount++;
-            const psychicCount = this.enemySynergies.get('Psychic') || 0;
-            if (this.playerAttackCount >= 2 && psychicCount >= 2 && !this.psychicTriggered.has('enemy')) {
-                this.psychicTriggered.add('enemy');
-                this.playerAttackCount = 0;
-
-                const targets = this.playerTeam;
-                const livingAllies = targets.filter(u => u && u.stats.hp > 0);
-                if (livingAllies.length > 0) {
-                    const targetCount = 2; // Updated from all
-                    const shuffled = [...livingAllies].sort(() => 0.5 - Math.random());
-                    const selectedTargets = shuffled.slice(0, targetCount);
-                    const dmg = Math.max(1, this.playerWins); // Scaling for enemy psychic
-                    for (const target of selectedTargets) await this.dealDamage(null, target, dmg, true, true);
-                }
+        // Match the visible battle: third combat round, once per side.
+        for (const isPlayer of [true, false]) {
+            const side = isPlayer ? 'player' : 'enemy';
+            const count = (isPlayer ? this.playerSynergies : this.enemySynergies).get('Psychic') || 0;
+            if (this.turnCount !== 3 || count < 2 || this.psychicTriggered.has(side)) continue;
+            this.psychicTriggered.add(side);
+            const targets = isPlayer ? this.enemyTeam : this.playerTeam;
+            const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
+            const targetCount = count >= 5 ? 5 : count >= 3 ? 3 : 2;
+            const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
+            const dmg = isPlayer ? this.psychicN : this.enemyPsychicN;
+            for (const target of shuffled.slice(0, targetCount)) {
+                await this.dealDamage(null, target, dmg, true, true);
             }
         }
     }

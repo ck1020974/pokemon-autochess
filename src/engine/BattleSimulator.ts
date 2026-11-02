@@ -768,7 +768,7 @@ export class BattleSimulator {
         if (unit.synergies.includes('Thief')) {
             const count = this.getSynergyCountForUnit(unit, 'Thief');
             if (count >= 2) {
-                const buff = count >= 5 ? 5 : 2;
+                const buff = count >= 5 ? 8 : 2;
                 const candidates = opTeam.filter(e => e && e.stats.hp > 0);
                 if (candidates.length > 0) {
                     // Find strongest: sum of HP and Attack
@@ -2615,7 +2615,7 @@ export class BattleSimulator {
                         const livingEnemies = targets.filter(u => u && u.stats.hp > 0);
 
                         if (livingEnemies.length > 0) {
-                            const targetCount = 2; // Updated from 3
+                            const targetCount = count >= 5 ? 5 : count >= 3 ? 3 : 2;
                             const shuffled = [...livingEnemies].sort(() => 0.5 - Math.random());
                             const selectedTargets = shuffled.slice(0, targetCount);
 
