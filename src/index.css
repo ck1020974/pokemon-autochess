@@ -910,6 +910,9 @@ h3 {
 
 /* Visual Wrapper for Flip/Transform Isolation */
 .unit-visual-wrapper {
+  position: relative;
+  /* Flips create a stacking context; keep the whole portrait above its floor disc. */
+  z-index: 2;
   width: 100%;
   display: flex;
   justify-content: center;
