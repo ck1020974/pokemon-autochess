@@ -21,18 +21,18 @@ try {
     catch (error) { failed++; console.error(`FAIL ${name}: ${error.message}`); }
   };
 
-  for (const count of [0, 1, 2, 3, 4, 5]) {
-    await test(`Psychic ${count}: only active tiers grow by one each battle`, () => {
+  for (const count of [0, 1, 2, 3, 4, 5, 6]) {
+    await test(`Psychic ${count}: active tiers grow by one, five or more by two`, () => {
       const game = new GameLoop();
       game.playerTeam = Array.from({ length: count }, (_, i) => make(`psychic-${i}`, ['Psychic']));
       for (let turn = 1; turn <= 4; turn++) {
         game.turn = turn;
         game.processRoundScaling();
-        assert.equal(game.psychicN, 2 + (count >= 2 ? turn : 0));
+        assert.equal(game.psychicN, 2 + (count >= 5 ? turn * 2 : count >= 2 ? turn : 0));
       }
       game.playerTeam = [];
       game.processRoundScaling();
-      assert.equal(game.psychicN, 2 + (count >= 2 ? 4 : 0), 'Removing Psychic preserves accumulated power');
+      assert.equal(game.psychicN, 2 + (count >= 5 ? 8 : count >= 2 ? 4 : 0), 'Removing Psychic preserves accumulated power');
     });
   }
 

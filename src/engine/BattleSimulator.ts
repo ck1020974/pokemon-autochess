@@ -2077,8 +2077,9 @@ export class BattleSimulator {
                     const livingEnemies = opTeam.filter(u => u && u.stats.hp > 0);
 
                     if (livingEnemies.length > 1) {
-                        const target = livingEnemies[1]; // Single target at 2nd position
-                        await this.dealDamage(unit, target, dmg, true, true);
+                        const target = livingEnemies[1]; // Single rear hit, matching the headless engine.
+                        await this.notifySkill(unit, `發動了噴射火焰`);
+                        await this.dealDamage(unit, target, dmg, true);
                         if (this.onUpdate) this.onUpdate();
                     }
                 }
@@ -2533,21 +2534,6 @@ export class BattleSimulator {
             }
         }
 
-
-        // Charmander (Revised): Splash to neighbor (Inherited from old Totodile)
-        if (attacker.family === 'charmander' && !this.unitStates.get(attacker)?.isSilenced) {
-            const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';
-            const opTeam = side === 'enemy' ? this.enemyTeam : this.playerTeam;
-            const idx = opTeam.indexOf(actualDefender);
-            if (idx !== -1 && idx < opTeam.length - 1) {
-                const neighbor = opTeam[idx + 1];
-                if (neighbor && neighbor.stats.hp > 0) {
-                    const splashDmg = attacker.scalingValue;
-                    await this.notifySkill(attacker, `發動了噴射火焰`);
-                    attackPromises.push(this.dealDamage(attacker, neighbor, splashDmg, true));
-                }
-            }
-        }
 
         if (attacker.family === 'ralts' && !this.unitStates.get(attacker)?.isSilenced) {
             const side = this.initialPlayerSet.has(attacker) ? 'enemy' : 'player';

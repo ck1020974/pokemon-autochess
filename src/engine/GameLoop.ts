@@ -718,7 +718,7 @@ export class GameLoop {
         // getUniqueCount correctly handles Espeon (Eevee form) as +1
         const pCount = this.getUniqueCount(psychicUnits, 'Psychic');
         if (pCount >= 2) {
-            const increment = 1;
+            const increment = pCount >= 5 ? 2 : 1;
             this.psychicN += increment;
             console.log(`念力羈絆增強！累積威力：${this.psychicN} (+${increment}) - 當前回合：${this.turn}`);
         }
