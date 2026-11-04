@@ -1,0 +1,117 @@
+/* Approved v3: one quiet surface across the three choices; identity/effect before supporting detail. */
+.selection-dialog {
+  --choice-bg: #282e35;
+  --choice-selected: #254955;
+  --choice-border: #535e68;
+  --choice-accent: #77c9e1;
+  --choice-ink: #f2f5f7;
+  --choice-muted: #d6dfe5;
+  --choice-height: 360px;
+  --choice-art: 160px;
+  position: fixed; inset: 0; z-index: 20000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 32px; padding: 24px 16px;
+  background: var(--selection-backdrop); backdrop-filter: blur(8px);
+  overflow-y: auto; overscroll-behavior: contain;
+}
+.selection-dialog .selection-title {
+  flex-shrink: 0; margin: 0 !important; padding: 0;
+  color: var(--choice-ink) !important; font-size: 32px; line-height: 48px;
+  font-weight: 700; letter-spacing: 4px; text-align: center;
+  text-shadow: 0 2px 6px #000a;
+}
+.selection-dialog .selection-choices {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  width: min(836px, 100%) !important; gap: 28px !important; flex-shrink: 0;
+}
+.selection-dialog .selection-choices .selection-card {
+  position: relative; display: flex; flex-direction: column !important;
+  align-items: center !important; justify-content: flex-start;
+  box-sizing: border-box; width: 100% !important; max-width: none;
+  height: var(--choice-height); min-height: var(--choice-height); min-width: 0;
+  padding: 24px 18px !important; gap: 0;
+  background: var(--choice-bg) !important; color: var(--choice-ink);
+  border: 2px solid var(--choice-border) !important; border-radius: 16px !important;
+  box-shadow: 0 10px 24px #0003 !important; backdrop-filter: none !important;
+  cursor: pointer; transition: background .16s, border-color .16s;
+  transform: none !important;
+}
+.selection-dialog .selection-choices .selection-card:hover { border-color: #9baab5 !important; }
+.selection-dialog .selection-choices .selection-card.is-selected {
+  background: var(--choice-selected) !important; border-color: var(--choice-accent) !important;
+  box-shadow: 0 0 0 2px #77c9e11f, 0 10px 24px #0003 !important;
+}
+.selection-dialog .selection-card:focus-visible { outline: 3px solid #b5eaff; outline-offset: 4px; }
+.selection-dialog .selection-card[aria-disabled=true] { cursor: default; }
+.selection-dialog .selection-card .selection-art,
+.selection-dialog .selection-card .pool-card-img-wrapper {
+  display: flex; align-items: center; justify-content: center;
+  width: 100% !important; height: var(--choice-art); flex: 0 0 var(--choice-art) !important;
+  aspect-ratio: auto !important; margin: 0 0 12px !important;
+  background: transparent; border: none;
+}
+.selection-dialog .selection-card .selection-art img,
+.selection-dialog .selection-card .pool-card-img-wrapper img {
+  display: block; width: 154px !important; height: 150px !important;
+  max-width: 100%; object-fit: contain; filter: drop-shadow(0 4px 8px #0004);
+}
+.selection-dialog .selection-card .pool-choice-card__details { width: 100%; padding: 0; }
+.selection-dialog .selection-card .pool-choice-card__heading { gap: 10px; }
+.selection-dialog .selection-card .pool-choice-card__title,
+.selection-dialog .selection-card .opponent-name,
+.selection-dialog .selection-card:hover .opponent-name {
+  color: var(--choice-ink) !important; font-family: inherit; font-size: 22px;
+  line-height: 32px; letter-spacing: 1px; font-weight: 700; text-align: center;
+  text-shadow: none !important; margin: 0;
+}
+.selection-dialog .selection-card .pool-choice-card__synergies { gap: 5px; flex-wrap: nowrap; }
+.selection-dialog .selection-card .synergy-icon { transform: none; width: 28px; height: 28px; flex-shrink: 0; font-size: 18px; }
+.selection-dialog .selection-card .pool-choice-card__details p,
+.selection-dialog .selection-card .reward-description {
+  width: 100%; min-height: 0; margin: 18px 0 0; padding: 0;
+  color: var(--choice-muted); font-size: 14px; line-height: 1.65; text-align: left;
+  overflow-wrap: anywhere;
+}
+.selection-dialog .selection-card .reward-description { font-size: 16px; margin-top: 16px; }
+.selection-dialog .selection-card .opponent-portrait { --choice-art: 180px; }
+.selection-dialog .selection-card .opponent-portrait img { width: 180px !important; height: 170px !important; }
+.selection-dialog .opponent-card--choice .opponent-name { margin-bottom: 20px; }
+.selection-dialog .opponent-core { display: flex; justify-content: center; gap: 13px; margin-top: auto; }
+.selection-dialog .opponent-core img { width: 50px; height: 50px; object-fit: contain; }
+.selection-dialog .selection-badge {
+  position: absolute; top: 12px; left: 12px; padding: 5px 9px;
+  color: white; background: #7750b6; border-radius: 6px;
+  font-size: 12px; font-weight: 700; line-height: 16px; letter-spacing: 1px;
+}
+.selection-dialog .difficulty-EASY { background: #237346; }
+.selection-dialog .difficulty-NORMAL { background: #126e99; }
+.selection-dialog .difficulty-HARD { background: #a85d23; }
+.selection-dialog .difficulty-VERY_HARD { background: #b63030; }
+@media (max-height: 600px) and (min-width: 601px) {
+  .selection-dialog { --choice-height: 260px; --choice-art: 104px; gap: 16px; padding: 12px 16px; }
+  .selection-dialog .selection-title { font-size: 24px; line-height: 36px; }
+  .selection-dialog .selection-choices { width: min(836px, 100%) !important; gap: 20px !important; }
+  .selection-dialog .selection-choices .selection-card { padding: 16px 14px !important; }
+  .selection-dialog .selection-card .selection-art img,
+  .selection-dialog .selection-card .pool-card-img-wrapper img { height: 100px !important; width: 112px !important; }
+  .selection-dialog .selection-card .opponent-portrait { --choice-art: 110px; }
+  .selection-dialog .selection-card .opponent-portrait img { width: 120px !important; height: 108px !important; }
+  .selection-dialog .selection-card .pool-choice-card__title,
+  .selection-dialog .selection-card .opponent-name { font-size: 18px; line-height: 26px; }
+  .selection-dialog .selection-card .pool-choice-card__details p,
+  .selection-dialog .selection-card .reward-description { font-size: 13px; margin-top: 10px; }
+  .selection-dialog .opponent-core img { width: 42px; height: 42px; }
+  .selection-dialog .opponent-card--choice .opponent-name { margin-bottom: 10px; }
+}
+@media (max-width: 600px) {
+  .selection-dialog { justify-content: flex-start; gap: 24px; padding: 24px 16px; }
+  .selection-dialog .selection-title { font-size: 24px; line-height: 36px; letter-spacing: 2px; }
+  .selection-dialog .selection-choices { width: min(260px, 100%) !important; grid-template-columns: minmax(0, 1fr) !important; gap: 20px !important; }
+  .selection-dialog .selection-card .synergy-tooltip {
+    left: auto !important; right: 0 !important; width: 228px; max-width: calc(100vw - 48px);
+    top: auto !important; bottom: 115% !important; transform: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .selection-dialog .selection-card { transition: none; }
+}

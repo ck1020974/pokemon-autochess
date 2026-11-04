@@ -45,6 +45,7 @@ try {
     await page.getByRole('button', { name: /^(🔊|🔇)$/ }).click();
     await page.getByRole('button', { name: '⚔️', exact: true }).click();
     await page.locator('.opponent-card').first().click();
+    await page.locator('.opponent-card').first().click();
     await page.locator('.battle-result-overlay').waitFor();
     await page.waitForTimeout(500);
     assert.equal(events.filter(event => event.kind === 'visit').length, 1);

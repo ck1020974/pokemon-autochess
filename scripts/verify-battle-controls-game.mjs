@@ -28,6 +28,7 @@ try {
     await page.getByRole('button', { name: /^(🔊|🔇)$/ }).click();
     await page.getByRole('button', { name: '⚔️', exact: true }).click();
     await page.locator('.opponent-card').first().click();
+    await page.locator('.opponent-card').first().click();
     await page.locator('.battle-intro-overlay').waitFor({ state: 'detached' });
     const pause = page.getByRole('button', { name: '暫停戰鬥', exact: true });
     await pause.click();

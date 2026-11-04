@@ -4,6 +4,9 @@ import { createPortal } from 'react-dom';
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import './presentation/battleScenes.css';
+import './components/selectionCards.css';
+import {SelectionCard} from './components/SelectionCard';
+import {useTwoTapChoice} from './components/useTwoTapChoice';
 import { GameLoop, GamePhase, type PoolChoice } from './engine/GameLoop';
 import { music } from './engine/MusicManager';
 
@@ -1402,6 +1405,9 @@ function App() {
         update();
     };
 
+    const poolSelection = useTwoTapChoice(game.poolChoices, (choice) => { void handlePoolSelect(choice); });
+    const opponentSelection = useTwoTapChoice(opponentChoices, handleOpponentSelect);
+
     // Calculate Synergies (All)
     const activeTeamForSynergy = (game.phase === GamePhase.BATTLE || game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER)
         ? (initialPlayerTeamForSynergy.length > 0 ? initialPlayerTeamForSynergy : displayPlayerTeam)
@@ -1486,113 +1492,16 @@ function App() {
 
             {/* Reward Selection Overlay (Z-Index 20000) */}
             {game.phase === 'REWARD' && (
-                <div className="opponent-select-overlay pool-selection-overlay reward-selection-overlay show" style={{
-                    position: 'fixed',
-                    top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'var(--selection-backdrop)',
-                    backdropFilter: 'blur(8px)',
-                    zIndex: 20000,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    animation: 'fadeIn 0.3s ease-out'
-                }}>
-                    <h2 style={{
-                        color: '#fff',
-                        fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
-                        marginBottom: 'clamp(20px, 4vw, 40px)',
-                        textShadow: '0 2px 10px rgba(0,0,0,0.8)',
-                        letterSpacing: '4px'
-                    }}>
-                        請選擇你的獎勵
-                    </h2>
-
-                    <div className="opponent-cards-container" style={{
-                        display: 'flex',
-                        gap: 'clamp(20px, 5vw, 60px)',
-                        justifyContent: 'center',
-                        flexWrap: 'wrap'
-                    }}>
+                <div className="opponent-select-overlay selection-dialog reward-selection-overlay show" role="dialog" aria-modal="true" aria-labelledby="reward-selection-title">
+                    <h2 id="reward-selection-title" className="selection-title">請選擇你的獎勵</h2>
+                    <div className="opponent-cards-container selection-choices">
                         {rewardChoices.map((reward, idx) => (
-                            <div
-                                key={idx}
-                                className="opponent-card"
-                                onClick={() => handleRewardSelect(reward)}
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    cursor: 'pointer',
-                                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
-                                    padding: 'clamp(15px, 3vw, 25px)',
-                                    borderRadius: '16px',
-                                    border: '2px solid rgba(255,255,255,0.1)',
-                                    transition: 'all 0.2s',
-                                    width: 'clamp(130px, 25vw, 200px)', // Matched to opponent-card width
-                                    position: 'relative',
-                                    minHeight: '260px' // Slightly adjusted for items
-                                }}
-                            >
-                                <img
-                                    src={reward.imageUrl}
-                                    alt={reward.item}
-                                    style={{
-                                        width: 'clamp(80px, 15vw, 120px)', // Matched scale
-                                        height: 'clamp(80px, 15vw, 120px)',
-                                        objectFit: 'contain',
-                                        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))',
-                                        marginBottom: '15px'
-                                    }}
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src = 'item/星星碎片.png';
-                                    }}
-                                />
-
-                                <div className="opponent-name" style={{
-                                    color: '#fff',
-                                    fontSize: '1.4rem',
-                                    fontWeight: 'bold',
-                                    letterSpacing: '2px',
-                                    marginBottom: '10px',
-                                    textAlign: 'center'
-                                }}>
-                                    {reward.item}
-                                </div>
-
-                                {/* Temporary Badge */}
-                                {(reward.category === 'BATTLE_SYNERGY' || reward.category === 'BATTLE_NONE') && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '10px',
-                                        left: '10px',
-                                        padding: '4px 10px',
-                                        borderRadius: '6px',
-                                        fontSize: '0.85rem',
-                                        fontWeight: '900',
-                                        color: '#fff',
-                                        zIndex: 20,
-                                        backgroundColor: '#8b5cf6', // Violet color to distinguish from NORMAL difficulty
-                                        boxShadow: '0 4px 8px rgba(0,0,0,0.4)',
-                                        textTransform: 'uppercase',
-                                        border: '1px solid rgba(255,255,255,0.3)',
-                                        letterSpacing: '1px'
-                                    }}>
-                                        暫時
-                                    </div>
-                                )}
-
-                                <div className="reward-description" style={{
-                                    color: '#245356',
-                                    fontSize: '1.05rem',
-                                    textAlign: 'left',
-                                    lineHeight: '1.6',
-                                    padding: '0 15px',
-                                    width: '100%'
-                                }}>
-                                    {reward.effect}
-                                </div>
-                            </div>
+                            <SelectionCard key={idx} onChoose={() => handleRewardSelect(reward)}>
+                                <div className="selection-art"><img src={reward.imageUrl} alt={reward.item} onError={event => { event.currentTarget.src = 'item/星星碎片.png'; }} /></div>
+                                <div className="opponent-name">{reward.item}</div>
+                                {(reward.category === 'BATTLE_SYNERGY' || reward.category === 'BATTLE_NONE') && <span className="selection-badge">暫時</span>}
+                                <div className="reward-description">{reward.effect}</div>
+                            </SelectionCard>
                         ))}
                     </div>
                 </div>
@@ -2240,104 +2149,18 @@ function App() {
             {/* Opponent Selection Overlay */}
             {
                 showOpponentSelect && (
-                    <div
-                        className="opponent-select-overlay"
-                        style={{
-                            position: 'fixed',
-                            top: 0, left: 0, right: 0, bottom: 0,
-                            background: 'var(--selection-backdrop)',
-                            backdropFilter: 'blur(8px)',
-                            zIndex: 10001,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            animation: 'fadeIn 0.3s ease-out'
-                        }}
-                    >
-                        <h2 style={{
-                            color: '#fff',
-                            fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
-                            marginBottom: 'clamp(20px, 4vw, 40px)',
-                            textShadow: '0 2px 10px rgba(0,0,0,0.8)',
-                            letterSpacing: '4px'
-                        }}>
-                            請選擇你的對手
-                        </h2>
-
-                        <div className="opponent-cards-container" style={{
-                            display: 'flex',
-                            gap: 'clamp(20px, 5vw, 60px)',
-                            justifyContent: 'center',
-                            flexWrap: 'wrap'
-                        }}>
-                            {opponentChoices.map((npc, idx) => (
-                                <div
-                                    key={idx}
-                                    className="opponent-card opponent-card--choice"
-                                    onClick={() => handleOpponentSelect(npc)}
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        cursor: 'pointer',
-                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
-                                        padding: 'clamp(15px, 3vw, 25px)',
-                                        borderRadius: '16px',
-                                        border: '2px solid rgba(255,255,255,0.1)',
-                                        transition: 'all 0.2s',
-                                        width: 'clamp(130px, 25vw, 200px)',
-                                        position: 'relative'
-                                    }}
-                                >
-                                    {/* Difficulty Badge */}
-                                    {npc.difficulty && (
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: '10px',
-                                            left: '10px',
-                                            padding: '4px 10px',
-                                            borderRadius: '6px',
-                                            fontSize: '0.85rem',
-                                            fontWeight: '900',
-                                            color: '#fff',
-                                            zIndex: 20,
-                                            backgroundColor:
-                                                npc.difficulty === 'EASY' ? '#22c55e' :
-                                                    npc.difficulty === 'NORMAL' ? '#0ea5e9' :
-                                                        npc.difficulty === 'HARD' ? '#f97316' : '#ef4444',
-                                            boxShadow: '0 4px 8px rgba(0,0,0,0.4)',
-                                            textTransform: 'uppercase',
-                                            border: '1px solid rgba(255,255,255,0.3)',
-                                            letterSpacing: '1px'
-                                        }}>
-                                            {npc.difficulty === 'VERY_HARD' ? 'EXTREME' : npc.difficulty}
-                                        </div>
-                                    )}
-
-                                    <img
-                                        src={npc.url}
-                                        alt={npc.name}
-                                        className="opponent-card__portrait"
-                                        style={{
-                                            width: 'clamp(100px, 20vw, 150px)',
-                                            height: 'clamp(100px, 20vw, 150px)',
-                                            objectFit: 'contain',
-                                            marginBottom: '15px',
-                                            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
-                                        }}
-                                    />
-                                    <div className="opponent-name opponent-card__name" style={{
-                                        color: '#fff',
-                                        fontSize: 'clamp(1.2rem, 2.5vw, 1.8rem)',
-                                        fontWeight: 'bold',
-                                        letterSpacing: '2px',
-                                        textShadow: '1px 1px 3px rgba(0,0,0,0.8)',
-                                        textAlign: 'center'
-                                    }}>
-                                        {npc.name}
+                    <div className="opponent-select-overlay selection-dialog" role="dialog" aria-modal="true" aria-labelledby="opponent-selection-title">
+                        <h2 id="opponent-selection-title" className="selection-title">請選擇你的對手</h2>
+                        <div className="opponent-cards-container selection-choices">
+                            {opponentChoices.map((npc) => (
+                                <SelectionCard key={npc.id} className="opponent-card--choice" selected={opponentSelection.selected === npc} onChoose={() => opponentSelection.choose(npc)}>
+                                    {npc.difficulty && <span className={`selection-badge difficulty-${npc.difficulty}`}>{npc.difficulty === 'VERY_HARD' ? 'EXTREME' : npc.difficulty}</span>}
+                                    <div className="selection-art opponent-portrait"><img src={npc.url} alt={npc.name} /></div>
+                                    <div className="opponent-name opponent-card__name">{npc.name}</div>
+                                    <div className="opponent-core" aria-label="代表角色">
+                                        {(allEditionOpponents.find(definition => definition.id === npc.id)?.coreUnits ?? []).slice(0, 3).map((id, index) => ALL_UNITS[id] && <img key={`${id}-${index}`} src={ALL_UNITS[id].imageUrl} alt={ALL_UNITS[id].name} title={ALL_UNITS[id].name} />)}
                                     </div>
-                                </div>
+                                </SelectionCard>
                             ))}
                         </div>
                     </div>
@@ -2650,98 +2473,17 @@ function App() {
 
             {/* Pool Selection Overlay (Moved to end to ensure maximum stacking priority) */}
             {hasStarted && game.phase === 'POOL_SELECTION' && !showTutorial && (
-                <div className="opponent-select-overlay show" style={{
-                    position: 'fixed',
-                    top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'var(--selection-backdrop)',
-                    backdropFilter: 'blur(8px)',
-                    zIndex: 20000,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    animation: 'fadeIn 0.3s ease-out',
-                    overflow: 'hidden',
-                    padding: '20px'
-                }}>
-                    <div style={{
-                        maxWidth: '1200px',
-                        width: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center'
-                    }}>
-                        <h2 style={{
-                            color: '#fff',
-                            fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
-                            marginBottom: 'clamp(20px, 4vw, 40px)',
-                            textShadow: '0 2px 10px rgba(0,0,0,0.8)',
-                            letterSpacing: '4px',
-                            textAlign: 'center'
-                        }}>
-                            請選擇你的角色池
-                        </h2>
-
-                        <div className="opponent-cards-container" style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                            gap: 'clamp(32px, 4vw, 52px)',
-                            justifyContent: 'center',
-                            width: 'min(760px, 90vw)'
-                        }}>
-                            {game.poolChoices.map((choice, idx) => (
-                                <div
-                                    key={idx}
-                                    className={`opponent-card is-selection-pool-card pool-choice-card ${(selectedPoolId && selectedPoolId !== choice.id) ? 'pool-card-destroy' : ''}`}
-                                    onClick={() => void handlePoolSelect(choice)}
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        cursor: isPoolProcessing ? 'default' : 'pointer',
-                                        background: 'rgba(255,255,250,.92)',
-                                        padding: 'clamp(8px, 1.2vw, 12px)',
-                                        borderRadius: '18px',
-                                        border: '1px solid rgba(26,92,88,.22)',
-                                        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        width: '100%',
-                                        position: 'relative',
-                                        boxShadow: '0 10px 24px rgba(27,92,86,.14)',
-                                        backdropFilter: 'none',
-                                        opacity: (selectedPoolId && selectedPoolId === choice.id) ? 1 : undefined,
-                                        transform: (selectedPoolId && selectedPoolId === choice.id) ? 'scale(1.05)' : undefined,
-                                        zIndex: (selectedPoolId && selectedPoolId === choice.id) ? 100 : undefined
-                                    }}
-                                >
-                                    <div className="pool-card-img-wrapper" style={{
-                                        width: '100%',
-                                        aspectRatio: '1.2',
-                                        background: 'transparent',
-                                        borderRadius: '16px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        marginBottom: '5px',
-                                        border: 'none',
-                                        overflow: 'hidden'
-                                    }}>
-                                        <img
-                                            src={ALL_UNITS[choice.id]?.imageUrl || choice.imageUrl}
-                                            alt={ALL_UNITS[choice.id]?.name || choice.name}
-                                            style={{
-                                                width: '85%',
-                                                height: '85%',
-                                                objectFit: 'contain',
-                                                filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))'
-                                            }}
-                                        />
-                                    </div>
-
-                                    <div className="pool-choice-card__details">
-                                        <div className="pool-choice-card__heading">
-                                            <div className="pool-choice-card__title">{ALL_UNITS[choice.id]?.name || choice.name}</div>
-                                            <div className="pool-choice-card__synergies">
-                                        {choice.synergies && choice.synergies.map((s: string) => {
+                <div className="opponent-select-overlay selection-dialog show" role="dialog" aria-modal="true" aria-labelledby="pool-selection-title">
+                    <h2 id="pool-selection-title" className="selection-title">請選擇你的角色池</h2>
+                    <div className="opponent-cards-container selection-choices">
+                        {game.poolChoices.map((choice, idx) => (
+                            <SelectionCard key={choice.id + '-' + idx} className={`pool-choice-card ${selectedPoolId && selectedPoolId !== choice.id ? 'pool-card-destroy' : ''}`} selected={poolSelection.selected === choice} disabled={isPoolProcessing} onChoose={() => poolSelection.choose(choice)}>
+                                <div className="pool-card-img-wrapper"><img src={ALL_UNITS[choice.id]?.imageUrl || choice.imageUrl} alt={ALL_UNITS[choice.id]?.name || choice.name} /></div>
+                                <div className="pool-choice-card__details">
+                                    <div className="pool-choice-card__heading">
+                                        <div className="pool-choice-card__title">{ALL_UNITS[choice.id]?.name || choice.name}</div>
+                                        <div className="pool-choice-card__synergies">
+                                            {choice.synergies && choice.synergies.map((s: string) => {
                                             const synergy = SYNERGIES[s];
                                             if (!synergy) return null;
 
@@ -2786,13 +2528,12 @@ function App() {
                                                 tooltipLeft={idx === 2}
                                             />;
                                         })}
-                                            </div>
                                         </div>
-                                        <p>{ALL_UNITS[choice.id]?.description ?? '選擇此角色加入本次冒險。'}</p>
                                     </div>
+                                    <p>{ALL_UNITS[choice.id]?.description ?? '選擇此角色加入本次冒險。'}</p>
                                 </div>
-                            ))}
-                        </div>
+                            </SelectionCard>
+                        ))}
                     </div>
                 </div>
             )}
