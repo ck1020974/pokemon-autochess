@@ -802,7 +802,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'togepi', name: '波克比', tier: 4, family: 'togepi',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/波克比00.webp', battleImageUrl: 'assets/波克比01.webp',
-        description: '攻擊後自身與後方角色永久 +1 攻擊。', synergies: ['Trick'], evolveId: 'togetic'
+        description: '攻擊後自身與後方角色永久 +2 攻擊。', synergies: ['Trick'], evolveId: 'togetic'
     },
     togetic: {
         id: 'togetic', name: '波克基古', tier: 4, family: 'togepi',
@@ -1145,7 +1145,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'happiny', name: '小福蛋', tier: 4, family: 'happiny',
         baseStats: { hp: 4, maxHp: 4, attack: 4 },
         imageUrl: 'assets/小福蛋00.webp', battleImageUrl: 'assets/小福蛋01.webp',
-        description: '攻擊後自身與後方角色永久 +1 生命。', synergies: ['Normal', 'Charm'], evolveId: 'chansey'
+        description: '攻擊後自身與後方角色永久 +2 生命。', synergies: ['Normal', 'Charm'], evolveId: 'chansey'
     },
     chansey: {
         id: 'chansey', name: '吉利蛋', tier: 4, family: 'happiny',
@@ -1164,7 +1164,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'raikou', name: '雷公', tier: 5, family: 'raikou',
         baseStats: { hp: 15, maxHp: 15, attack: 15 },
         imageUrl: 'assets/雷公00.webp', battleImageUrl: 'assets/雷公01.webp',
-        description: '戰鬥開始時，對所有敵方造成 5-15 傷害。', synergies: ['Charge']
+        description: '戰鬥開始時，對所有敵方造成 10-15 傷害。', synergies: ['Charge']
     },
     entei: {
         id: 'entei', name: '炎帝', tier: 5, family: 'entei',
@@ -1587,37 +1587,37 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'shinx', name: '小貓怪', tier: 4, family: 'shinx',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/小貓怪00.webp', battleImageUrl: 'assets/小貓怪01.webp',
-        description: '戰鬥開始時攻擊永久 +1 並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], evolveId: 'luxio', attackCap: 60
+        description: '戰鬥開始時攻擊永久 +3 並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], evolveId: 'luxio', attackCap: 60
     },
     luxio: {
         id: 'luxio', name: '勒克貓', tier: 4, family: 'shinx',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/勒克貓00.webp', battleImageUrl: 'assets/勒克貓01.webp',
-        description: '戰鬥開始時攻擊永久 +2 並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], evolveId: 'luxray', isHiddenFromShop: true, attackCap: 60
+        description: '戰鬥開始時攻擊永久 +4 並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], evolveId: 'luxray', isHiddenFromShop: true, attackCap: 60
     },
     luxray: {
         id: 'luxray', name: '倫琴貓', tier: 4, family: 'shinx',
         baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/倫琴貓00.webp', battleImageUrl: 'assets/倫琴貓01.webp',
-        description: '戰鬥開始時攻擊永久 +5 並有著更高的攻擊上限。', synergies: ['Charge', 'Intimidate'], isHiddenFromShop: true, attackCap: 60
+        description: '戰鬥開始時攻擊永久 +5 並有著更高的攻擊與生命上限。', synergies: ['Charge', 'Intimidate'], isHiddenFromShop: true, attackCap: 60, maxHpCap: 60
     },
     aron: {
         id: 'aron', name: '可可多拉', tier: 4, family: 'aron',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/可可多拉00.webp', battleImageUrl: 'assets/可可多拉01.webp',
-        description: '戰鬥開始時生命永久 +1 並有著更高的生命上限。', synergies: ['Hard'], evolveId: 'lairon', maxHpCap: 60
+        description: '戰鬥開始時生命永久 +3 並有著更高的生命上限。', synergies: ['Hard'], evolveId: 'lairon', maxHpCap: 60
     },
     lairon: {
         id: 'lairon', name: '可多拉', tier: 4, family: 'aron',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/可多拉00.webp', battleImageUrl: 'assets/可多拉01.webp',
-        description: '戰鬥開始時生命永久 +2 並有著更高的生命上限。', synergies: ['Hard'], evolveId: 'aggron', isHiddenFromShop: true, maxHpCap: 60
+        description: '戰鬥開始時生命永久 +4 並有著更高的生命上限。', synergies: ['Hard'], evolveId: 'aggron', isHiddenFromShop: true, maxHpCap: 60
     },
     aggron: {
         id: 'aggron', name: '波士可多拉', tier: 4, family: 'aron',
         baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/波士可多拉00.webp', battleImageUrl: 'assets/波士可多拉01.webp',
-        description: '戰鬥開始時生命永久 +5 並有著更高的生命上限。', synergies: ['Hard', 'Outrage'], isHiddenFromShop: true, maxHpCap: 60
+        description: '戰鬥開始時生命永久 +5 並有著更高的攻擊與生命上限。', synergies: ['Hard', 'Outrage'], isHiddenFromShop: true, maxHpCap: 60, attackCap: 60
     },
     darkrai: {
         id: 'darkrai', name: '達克萊伊', tier: 5, family: 'darkrai',

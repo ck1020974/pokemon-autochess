@@ -306,14 +306,14 @@ export class HeadlessBattleSimulator {
 
         // Shinx Family: Permanent Atk buff
         if (unit.family === 'shinx') {
-            const amount = [0, 1, 2, 5][unit.level] || 1;
+            const amount = [0, 3, 4, 5][unit.level] || 3;
             const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
             this.growUnit(unit, 0, amount, original, true);
         }
 
         // Aron Family: Permanent HP buff
         if (unit.family === 'aron') {
-            const amount = [0, 1, 2, 5][unit.level] || 1;
+            const amount = [0, 3, 4, 5][unit.level] || 3;
             const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
             this.growUnit(unit, amount, 0, original, true);
         }
@@ -497,11 +497,11 @@ export class HeadlessBattleSimulator {
 
         // --- Legendary Beasts ---
 
-        // Raikou: all enemies 5-15 damage
+        // Raikou: all enemies 10-15 damage
         if (unit.family === 'raikou') {
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
             for (const enemy of enemies) {
-                const dmg = 5 + Math.floor(Math.random() * 11);
+                const dmg = 10 + Math.floor(Math.random() * 6);
                 await this.dealDamage(unit, enemy, dmg, true, true);
             }
         }
@@ -1152,18 +1152,20 @@ export class HeadlessBattleSimulator {
                 const s = this.unitStates.get(unit);
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
-                    const selfAtks = [0, 1, 2, 5];
-                    const selfAtk = selfAtks[unit.level] || 1;
+                    const atks = [0, 2, 3, 5];
+                    const buffAtk = atks[unit.level] || 1;
                     const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
                     // Permanent growth for self
-                    this.growUnit(unit, 0, selfAtk, original, true);
+                    this.growUnit(unit, 0, buffAtk, original, true);
 
-                    const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
-                    if (aliveFriends.length > 0) {
-                        const randomFriend = aliveFriends[Math.floor(Math.random() * aliveFriends.length)];
-                        this.log(`${unit.name} 對 ${randomFriend.name} 發動了超幸運！`);
-                        // Friend buff is temporary (+5 Attack for this battle)
-                        this.buffAttack(randomFriend, 5, true);
+                    const idx = myTeam.indexOf(unit);
+                    const backUnit = (idx !== -1 && idx < myTeam.length - 1) ? myTeam[idx + 1] : null;
+                    if (backUnit && backUnit.stats.hp > 0) {
+                        await this.notifySkill(unit, `對 ${backUnit.name} 發動了超幸運！`);
+                        const backOriginal = this.playerTeam.includes(backUnit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === backUnit.id) : null;
+                        // Permanent growth for back ally
+                        this.growUnit(backUnit, 0, buffAtk, backOriginal, true);
+                        this.playAnimation(backUnit, 'glow-white', 600);
                     }
                 }
             });
@@ -1475,17 +1477,20 @@ export class HeadlessBattleSimulator {
                 const s = this.unitStates.get(unit);
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
-                    const selfGrowths = [0, 1, 2, 5];
-                    const selfGrow = selfGrowths[unit.level] || 1;
+                    const hps = [0, 2, 3, 5];
+                    const buffHp = hps[unit.level] || 1;
                     const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
-                    this.growUnit(unit, selfGrow, 0, original || null, true);
+                    // Permanent growth for self
+                    this.growUnit(unit, buffHp, 0, original, true);
 
-                    const aliveFriends = myTeam.filter((u: Unit) => u && u.stats.hp > 0);
-                    if (aliveFriends.length > 0) {
-                        const randomFriend = aliveFriends[Math.floor(Math.random() * aliveFriends.length)];
-                        this.log(`${unit.name} 對 ${randomFriend.name} 發動了生蛋！`);
-                        const fo = null; // Ally buff is temporary
-                        this.growUnit(randomFriend, 5, 0, fo, true);
+                    const idx = myTeam.indexOf(unit);
+                    const backUnit = (idx !== -1 && idx < myTeam.length - 1) ? myTeam[idx + 1] : null;
+                    if (backUnit && backUnit.stats.hp > 0) {
+                        await this.notifySkill(unit, `對 ${backUnit.name} 發動了生蛋！`);
+                        const backOriginal = this.playerTeam.includes(backUnit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === backUnit.id) : null;
+                        // Permanent growth for back ally
+                        this.growUnit(backUnit, buffHp, 0, backOriginal, true);
+                        this.playAnimation(backUnit, 'glow-green', 600);
                     }
                 }
             });

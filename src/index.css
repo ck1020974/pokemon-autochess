@@ -52,6 +52,7 @@ h3 {
 /* --- Containers --- */
 .game-container {
   display: flex;
+  box-sizing: border-box;
   flex-direction: column;
   gap: 30px;
   position: relative;
@@ -735,11 +736,25 @@ h3 {
 /* Right Shop Slots - Aligned Left */
 .shop-slots-area {
   flex: 1;
+  min-width: 0;
   display: flex;
   justify-content: flex-start;
   height: 100%;
   align-items: center;
   padding-left: 20px;
+}
+
+.shop-slot-scroll {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  /* Room for hover lift and glow; refresh remains outside the scrolling stock. */
+  padding: 12px 6px 6px;
+  box-sizing: border-box;
+}
+
+.shop-slots > * {
+  flex-shrink: 0;
 }
 
 .shop-slots {
@@ -761,6 +776,7 @@ h3 {
 .shop-slots .unit-image {
   width: 85px;
   height: 85px;
+  max-width: 100%;
 }
 
 /* Hide floor marker in shop only */
@@ -1880,7 +1896,7 @@ h3 {
 
   .shop-slots-area {
     padding-left: 0 !important;
-    overflow-x: auto;
+    overflow: visible;
     padding-bottom: 5px;
   }
 
@@ -2299,6 +2315,22 @@ h3 {
   .game-container {
     width: 100% !important;
     max-width: 100% !important;
+  }
+
+  .shop-slots {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px !important;
+  }
+
+  .shop-slots > * {
+    min-width: 0;
+  }
+
+  .shop-slots .unit-card,
+  .shop-slots .slot-placeholder {
+    width: 100% !important;
+    max-width: 75px;
   }
 
   .board-container,

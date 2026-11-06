@@ -722,14 +722,14 @@ export class BattleSimulator {
 
         // Shinx Family: Permanent Atk buff
         if (unit.family === 'shinx') {
-            const amount = [0, 1, 2, 5][unit.level] || 1;
+            const amount = [0, 3, 4, 5][unit.level] || 3;
             const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
             this.growUnit(unit, 0, amount, undefined, original, true);
         }
 
         // Aron Family: Permanent HP buff
         if (unit.family === 'aron') {
-            const amount = [0, 1, 2, 5][unit.level] || 1;
+            const amount = [0, 3, 4, 5][unit.level] || 3;
             const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
             this.growUnit(unit, amount, 0, undefined, original, true);
         }
@@ -874,15 +874,15 @@ export class BattleSimulator {
 
         // --- Legendary Beasts ---
 
-        // Raikou: all enemies 5-15 damage
+        // Raikou: all enemies 10-15 damage
         if (unit.family === 'raikou') {
             // Removed notifySkill as per request
             this.log(`雷公使用了打雷，向敵方劈下暴雷`);
 
-            // All enemies 5-15 damage
+            // All enemies 10-15 damage
             const enemies = opTeam.filter(u => u && u.stats.hp > 0);
             for (const enemy of enemies) {
-                const dmg = 5 + Math.floor(Math.random() * 11); // 5 to 15
+                const dmg = 10 + Math.floor(Math.random() * 6); // 10 to 15
                 await this.dealDamage(unit, enemy, dmg, true, true); // Silent damage
             }
             if (this.onUpdate) this.onUpdate();
@@ -1953,7 +1953,7 @@ export class BattleSimulator {
                 const s = this.unitStates.get(unit);
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
-                    const atks = [0, 1, 3, 5];
+                    const atks = [0, 2, 3, 5];
                     const buffAtk = atks[unit.level] || 1;
                     const original = this.originalPlayerTeam?.find(o => o && o.id === unit.id);
                     // Permanent growth for self
@@ -2028,7 +2028,7 @@ export class BattleSimulator {
                 const s = this.unitStates.get(unit);
                 const { myTeam } = this.getTeams(unit);
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {
-                    const hps = [0, 1, 3, 5];
+                    const hps = [0, 2, 3, 5];
                     const buffHp = hps[unit.level] || 1;
                     const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
                     // Permanent growth for self

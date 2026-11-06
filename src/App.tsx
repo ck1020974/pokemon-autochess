@@ -2366,6 +2366,7 @@ function App() {
                                 🔄
                             </button>
 
+                            <div className="shop-slot-scroll">
                             <div className="shop-slots">
                                 {/* Render Active Slots */}
                                 {game.shop.slots.map((unit: Unit | null, i: number) => {
@@ -2435,6 +2436,7 @@ function App() {
                                         </div>
                                     );
                                 })}
+                            </div>
                             </div>
                         </div>
                     </div>

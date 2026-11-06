@@ -22,6 +22,21 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
 
     let enemyTeam: (Unit | null)[] = [];
 
+    const getEvolvedTemplate = (template: UnitTemplate, targetLevel: number): UnitTemplate => {
+        let current = template;
+        for (let level = 1; level < targetLevel && current.evolveId; level++) {
+            const next = ALL_UNITS[current.evolveId];
+            if (!next) break;
+            current = next;
+        }
+        return current;
+    };
+    // Forced stars promote art, abilities, synergies and caps together.
+    const promoteEnemy = (unit: Unit, targetLevel: number) => {
+        const template = getEvolvedTemplate(ALL_UNITS[unit.templateId], targetLevel - unit.level + 1);
+        Object.assign(unit, new Unit(template), {id: unit.id, level: targetLevel});
+    };
+
     // Helper to bias enemy generation towards higher tiers in mid/late game
     const getRandomEnemyTemplate = (templates: UnitTemplate[]) => {
         if (game.turn >= 8 && Math.random() < 0.6) {
@@ -112,20 +127,6 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
                 bossLevel = 3;
             }
 
-            // Helper to dynamically evolve core units
-            const getEvolvedTemplate = (t: UnitTemplate, targetLevel: number) => {
-                let current = t;
-                if (!current) return null;
-                for (let i = 1; i < targetLevel; i++) {
-                    if (current && current.evolveId && ALL_UNITS[current.evolveId]) {
-                        current = ALL_UNITS[current.evolveId];
-                    } else {
-                        break;
-                    }
-                }
-                return current;
-            };
-
             // 1. Create Core Units
             const candidateUnits: Unit[] = [];
             let coreCount = 0;
@@ -212,7 +213,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
             if (fbCandidateUnits.length >= enemyCount) break;
             const t = ALL_UNITS[coreId];
             if (t && activeEdition.availableUnitIds.includes(coreId)) {
-                const u = new Unit(t);
+                const u = new Unit(getEvolvedTemplate(t, enemyBaseLevel));
                 u.level = enemyBaseLevel;
                 fbCandidateUnits.push(u);
             }
@@ -223,7 +224,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
             const allT = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= fbShopTier && activeEdition.availableUnitIds.includes(t.id));
             const t = getRandomEnemyTemplate(allT);
             if (t) {
-                const u = new Unit(t);
+                const u = new Unit(getEvolvedTemplate(t, enemyBaseLevel));
                 u.level = enemyBaseLevel;
                 fbCandidateUnits.push(u);
                 fbFillCount--;
@@ -240,7 +241,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
         for (const u of enemyTeam) {
             if (needed <= 0) break;
             if (u && u.level < 3) {
-                u.level = 3;
+                promoteEnemy(u, 3);
                 needed--;
             }
         }
@@ -251,7 +252,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
         for (const u of enemyTeam) {
             if (needed <= 0) break;
             if (u && u.level === 1) {
-                u.level = 2;
+                promoteEnemy(u, 2);
                 needed--;
             }
         }
