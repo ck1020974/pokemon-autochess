@@ -74,9 +74,11 @@ export class GameLoop {
     public bannedPoolUnitIds: string[] = [];
     public mewSynergies: string[] = [];
     private processedTurns: Set<number> = new Set();
+    private readonly evolutionRandom: () => number;
 
-    constructor(edition?: GameEdition) {
+    constructor(edition?: GameEdition, evolutionRandom: () => number = Math.random) {
         this.shop = new Shop();
+        this.evolutionRandom = evolutionRandom;
         if (edition) this.edition = edition;
 
         // Initialize Mew's random synergies for this session
@@ -1167,11 +1169,11 @@ export class GameLoop {
         }
 
         const expGain = (target.family === 'eevee') ? source.exp * 2 : source.exp;
-        this.handleUnitExpGain(target, expGain);
+        this.handleUnitExpGain(target, expGain, source);
         this.updateTeamCaps();
     }
 
-    public handleUnitExpGain(unit: Unit, amount: number) {
+    public handleUnitExpGain(unit: Unit, amount: number, consumedSource?: Unit) {
         const totalExp = unit.exp + amount;
         const oldLevel = unit.level;
         let predictedLevel = 1;
@@ -1188,7 +1190,7 @@ export class GameLoop {
             if (willEvolve) {
                 this.performEvolution(unit);
             } else if (unit.family === 'eevee') {
-                this.performEeveeEvolution(unit, predictedLevel);
+                this.performEeveeEvolution(unit, predictedLevel, consumedSource);
             } else {
                 // Robust Check: Ensure baseStats exists for the family template
                 const familyTemplate = ALL_UNITS[unit.family];
@@ -1222,12 +1224,33 @@ export class GameLoop {
         }
     }
 
-    private performEeveeEvolution(unit: Unit, newLevel: number) {
+    private performEeveeEvolution(unit: Unit, newLevel: number, consumedSource?: Unit) {
         unit.level = newLevel;
         // Case 1: Base Eevee evolving
         if (unit.templateId === 'eevee') {
             const forms = ['flareon', 'vaporeon', 'jolteon', 'espeon', 'umbreon', 'leafeon', 'glaceon', 'sylveon'];
-            let chosen = forms[Math.floor(Math.random() * forms.length)];
+            // Compare actual family counts across the whole team, including ties.
+            // Baton Pass is shared by every form and cannot indicate a direction.
+            // Board merges clear the consumed source slot after resolving EXP.
+            const allies = this.playerTeam.filter((ally): ally is Unit => !!ally && ally !== unit && ally !== consumedSource);
+            const synergyIds = new Set(allies.flatMap(ally => ally.synergies).filter(id => id !== 'BatonPass'));
+            const counts = new Map([...synergyIds].map(id => [id,
+                this.getUniqueCount(allies.filter(ally => ally.synergies.includes(id)), id)
+            ]));
+            const highestCount = Math.max(0, ...counts.values());
+            const weights = forms.map(id => ALL_UNITS[id].synergies.some(synergy =>
+                synergy !== 'BatonPass' && highestCount > 0 && counts.get(synergy) === highestCount
+            ) ? 2 : 1);
+            const sample = this.evolutionRandom() * weights.reduce((sum, weight) => sum + weight, 0);
+            let cumulativeWeight = 0;
+            let chosen = forms[forms.length - 1];
+            for (let index = 0; index < forms.length; index++) {
+                cumulativeWeight += weights[index];
+                if (sample < cumulativeWeight) {
+                    chosen = forms[index];
+                    break;
+                }
+            }
             if (newLevel === 3) chosen += '_final';
 
             const template = ALL_UNITS[chosen];

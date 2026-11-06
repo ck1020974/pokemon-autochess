@@ -161,3 +161,59 @@ body:has(.game-container[class*='prep-scene--']:not(.is-battling)) {
 @media (prefers-reduced-motion: reduce) {
   .battle-stage-shell.is-battling[class*='battle-scene--']::before { animation: none; opacity: .4; }
 }
+
+/* Preserve five logical boxes per side while allowing the portraits to overlap
+   neighbouring boxes slightly. Resizing a phone must never squeeze the artwork. */
+@media (max-width: 950px) or (max-height: 500px) {
+  .board-teams-horizontal,
+  .battle-stage-shell.is-battling .board-teams-horizontal {
+    --team-separation: clamp(48px, 8vw, 76px);
+    --mobile-unit-size: clamp(64px, 8.5vw, 80px);
+    gap: var(--team-separation) !important;
+    min-width: 0;
+    padding-right: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .board-side,
+  .battle-stage-shell.is-battling .board-side {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: calc((100% - var(--team-separation)) / 2);
+    gap: 0 !important;
+    min-height: 130px;
+  }
+
+  .board-side > .unit-wrapper,
+  .battle-stage-shell.is-battling .board-side > .unit-wrapper {
+    display: flex;
+    justify-content: center;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .board-side :is(.unit-card, .slot-placeholder) {
+    flex: none;
+    width: var(--mobile-unit-size);
+    height: 100px;
+    margin: 0 !important;
+  }
+
+  .board-side .unit-image {
+    flex: none;
+    width: var(--mobile-unit-size);
+    height: var(--mobile-unit-size);
+    max-width: none;
+  }
+}
+
+/* Larger phone landscapes already accommodated 100px portraits. Keep that
+   readable size while the five slot boxes continue to share the available row. */
+@media (min-width: 900px) and (min-height: 381px) and (orientation: landscape) {
+  @media (max-width: 950px) or (max-height: 500px) {
+    .board-teams-horizontal,
+    .battle-stage-shell.is-battling .board-teams-horizontal {
+      --mobile-unit-size: 100px;
+    }
+  }
+}

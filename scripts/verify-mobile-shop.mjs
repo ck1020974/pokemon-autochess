@@ -33,14 +33,15 @@ try {
  writeFileSync(resolve(output,'verification.json'),JSON.stringify({results,failures},null,2));
  assert.deepEqual(failures,[]);
  console.log(`PASS: ${results.length} mobile/desktop shop layouts, image bounds and fixed refresh.`);
- const server = await createServer({server:{host:'127.0.0.1',port:0}});
+ const server = await createServer({server:{host:'127.0.0.1',port:0,hmr:false}});
  try {
   await server.listen();
   await page.setViewportSize({width:844,height:390});
-  await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/`);
+  await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/`,{waitUntil:'domcontentloaded',timeout:180000});
   const version=page.getByRole('button',{name:/^經典版本 經典版本/});
   await version.click(); await version.click();
   const normal=page.getByRole('button',{name:'普通 普通',exact:true});
+  await normal.waitFor({timeout:180000});
   await normal.click(); await normal.click();
   await page.getByRole('button',{name:'跳過',exact:true}).click();
   await page.getByRole('listitem').filter({hasText:'小青'}).click();

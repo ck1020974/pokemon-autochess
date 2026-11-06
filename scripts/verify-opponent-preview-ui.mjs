@@ -7,7 +7,7 @@ import {chromium} from 'playwright';
 
 const root=fileURLToPath(new URL('..',import.meta.url));
 const output=resolve(root,'output/opponent-preview-20261107');mkdirSync(output,{recursive:true});
-const server=await createServer({root,server:{host:'127.0.0.1',port:0}});
+const server=await createServer({root,server:{host:'127.0.0.1',port:0,hmr:false}});
 const browser=await chromium.launch({channel:'chrome',headless:true});const results=[],errors=[];
 try{
  await server.listen();
@@ -15,9 +15,9 @@ try{
  await context.addInitScript(()=>localStorage.setItem('pokemon-analytics-opt-out','1'));
  const page=await context.newPage();page.setDefaultTimeout(60000);page.on('pageerror',error=>errors.push(error.message));
  for(const ash of [true,false]){
-  await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/`);
+  await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/`,{waitUntil:'domcontentloaded',timeout:180000});
   const version=page.getByRole('button',{name:/^帝王版本 帝王版本/});await version.click();await version.click();
-  const master=page.getByRole('button',{name:'大師 大師',exact:true});await master.click();await master.click();
+  const master=page.getByRole('button',{name:'大師 大師',exact:true});await master.waitFor({timeout:180000});await master.click();await master.click();
   await page.getByRole('button',{name:'跳過',exact:true}).click();
   await page.getByRole('listitem').filter({hasText:'小青'}).click();
   const opponent=await page.evaluate(async ash=>{

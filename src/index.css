@@ -3839,3 +3839,31 @@ h3 {
   .pool-choice-card .pool-choice-card__details { flex: 1; }
   .pool-choice-card .synergy-icon { transform: scale(.88); transform-origin: left center; }
 }
+
+/* A short viewport scrolls vertically; it must not turn seven stock cards into
+   unreadably narrow columns. Only this stock strip scrolls horizontally. */
+@media (max-width: 950px) or (max-height: 500px) {
+  .shop-slots {
+    display: flex;
+    gap: 8px !important;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .shop-slots > * { flex: 0 0 84px; width: 84px; }
+
+  .shop-slots .unit-card,
+  .shop-slots .slot-placeholder {
+    width: 84px !important;
+    max-width: 84px;
+    height: 100px !important;
+    margin: 0 !important;
+  }
+
+  .shop-slots .unit-image {
+    flex: none;
+    width: 76px !important;
+    height: 76px !important;
+    max-width: 100%;
+  }
+}

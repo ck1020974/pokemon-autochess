@@ -12,6 +12,8 @@ import { music } from './engine/MusicManager';
 
 import { BattleSimulator } from './engine/BattleSimulator';
 import {createEnemyTeam, prepareOpponentTeams} from './engine/createEnemyTeam';
+import {getOpponentStage, selectOpponentChoices} from './engine/opponentSelection';
+import {rateOpponent} from './data/opponentDifficulty';
 import {TutorialCoach} from './components/TutorialCoach';
 import {BattleControls} from './components/BattleControls';
 import {analytics, startAnalyticsDelivery} from './analytics/collector';
@@ -1116,8 +1118,7 @@ function App() {
                 ]);
             } else {
                 // Second tutorial: Force Champions to ensure player defeat
-                const shuffledChampions = [...activeEdition.championOpponents].sort(() => 0.5 - Math.random());
-                setPreparedOpponentChoices(shuffledChampions.slice(0, 3));
+                setPreparedOpponentChoices(selectOpponentChoices(activeEdition.championOpponents, game.defeatedOpponentIds));
             }
             setShowOpponentSelect(true);
             return;
@@ -1137,17 +1138,10 @@ function App() {
             npcPool = activeEdition.noviceOpponents;
         }
 
-        // We show opponent choices for Boss matches (Wins: 8~11 or 12) or special gym levels.
-        // Actually, user spec says: "這 4 場中，每場會在對手畫面跳出從四天王中挑選。 前八勝階段... 這些館主將出現在一般戰鬥中供玩家挑戰"
-        // Let's always show the opponent choice if we have a pool.
-        const ALL_NPCS = npcPool;
-        const unseenNpCS = ALL_NPCS.filter(boss => !game.defeatedOpponentIds?.includes(boss.id));
-        const finalPool = unseenNpCS.length > 0 ? unseenNpCS : ALL_NPCS;
-
-        const diffWeights: Record<string, number> = { 'EASY': 0, 'NORMAL': 1, 'HARD': 2, 'VERY_HARD': 3 };
-        const shuffled = [...finalPool].sort(() => 0.5 - Math.random());
-        const selected = shuffled.slice(0, 3);
-        selected.sort((a, b) => (diffWeights[a.difficulty || 'NORMAL'] ?? 1) - (diffWeights[b.difficulty || 'NORMAL'] ?? 1));
+        const stage = getOpponentStage(game.wins);
+        const ratedPool = npcPool.map(opponent => rateOpponent(opponent, activeEdition.id, stage, difficulty ?? game.difficultyName));
+        const isInfiniteChampion = activeEdition.id === 'infinite' && stage === 'champion';
+        const selected = selectOpponentChoices(ratedPool, game.defeatedOpponentIds, {diversify: !isInfiniteChampion});
 
         setPreparedOpponentChoices(selected);
         setShowOpponentSelect(true);
