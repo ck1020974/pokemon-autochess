@@ -27,6 +27,7 @@ body {
   background: radial-gradient(circle at 50% 5%, #e7f8f2 0%, #b9dfda 56%, #8ebda9 100%);
   color: #173f45;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   overflow: hidden;
@@ -93,6 +94,7 @@ h3 {
   --stage-glow: rgba(255, 242, 181, .46);
   --stage-ridge: rgba(221, 246, 210, .19);
   min-height: 100vh;
+  min-height: 100dvh;
   isolation: isolate;
   background: radial-gradient(ellipse at 50% 8%, var(--stage-glow), transparent 30%), linear-gradient(180deg, var(--stage-sky) 0%, var(--stage-horizon) 54%, var(--stage-ground) 100%);
 }
@@ -1529,19 +1531,32 @@ h3 {
 /* --- Mobile Responsiveness (Optimized for Landscape) --- */
 @media (max-width: 950px) or (max-height: 500px) {
   #root {
-    padding: 5px;
+    /* Standalone iPhones draw behind the status bar; compact spacing must keep its inset. */
+    padding: calc(5px + env(safe-area-inset-top, 0px))
+      calc(5px + env(safe-area-inset-right, 0px))
+      calc(5px + env(safe-area-inset-bottom, 0px))
+      calc(5px + env(safe-area-inset-left, 0px));
   }
 
-  .header {
+  body {
+    /* Keep controls reachable if safe areas leave less room than the game requires. */
+    overflow-y: auto;
+  }
+
+  .header,
+  .game-container:not(.is-battling) .header {
     font-size: 0.85rem;
     gap: 10px;
     padding: 5px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    flex-wrap: wrap;
   }
 
   .header-section {
     gap: 14px;
     white-space: nowrap;
+    flex-wrap: wrap;
+    min-width: 0;
   }
 
   .game-container {
@@ -1802,11 +1817,6 @@ h3 {
     height: 75px;
     margin: 0 4px;
     /* Wider gap for shop on very small screens */
-  }
-
-  .header {
-    display: none;
-    /* Hide header on extremely short screens to save space */
   }
 
   .board-container {
