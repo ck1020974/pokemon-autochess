@@ -30,6 +30,7 @@ export class HeadlessBattleSimulator {
     private fireLogged: Set<string> = new Set();
     private grassLogged: Set<string> = new Set();
     private angryLoggedThisTurn: Set<string> = new Set();
+    private readonly openingStats = new Map<Unit, Readonly<Unit['stats']>>();
 
     constructor(playerTeam: (Unit | null)[], enemyTeam: (Unit | null)[], originalPlayerTeam?: (Unit | null)[], _playerWins: number = 0, psychicN: number = 2, enemyPsychicN: number = _playerWins + 1) {
         this.psychicN = psychicN;
@@ -44,6 +45,9 @@ export class HeadlessBattleSimulator {
             // Actually Headless takes the same args. Let's check Headless constructor.
             return this.cloneUnit(u);
         });
+        for (const unit of [...this.playerTeam, ...this.enemyTeam]) {
+            if (unit) this.openingStats.set(unit, {...unit.stats});
+        }
         this.eventBus = new EventBus();
 
         this.playerTeam.forEach(u => { if (u) this.initialPlayerSet.add(u); });
@@ -598,15 +602,16 @@ export class HeadlessBattleSimulator {
         if (unit.family === 'plusle' || unit.family === 'minun') {
             const firstAlly = myTeam.find(u => u && u.stats.hp > 0);
             if (firstAlly && firstAlly !== unit) {
+                const opening = this.openingStats.get(unit) ?? unit.stats;
                 const ratio = [0, 0.25, 0.33, 0.5][unit.level] || 0.25;
                 if (unit.family === 'plusle') {
-                    const atkBuff = Math.floor(unit.stats.attack * ratio);
+                    const atkBuff = Math.floor(opening.attack * ratio);
                     if (atkBuff > 0) {
                         this.buffAttack(firstAlly, atkBuff, true);
                         this.log(`${unit.name} 對 ${firstAlly.name} 使用了幫助！`);
                     }
                 } else {
-                    const hpBuff = Math.floor(unit.stats.maxHp * ratio);
+                    const hpBuff = Math.floor(opening.maxHp * ratio);
                     if (hpBuff > 0) {
                         this.growUnit(firstAlly, hpBuff, 0, null, true);
                         this.log(`${unit.name} 對 ${firstAlly.name} 使用了幫助！`);

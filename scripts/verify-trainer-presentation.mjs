@@ -71,6 +71,7 @@ try {
 
   const appSource = readFileSync(resolve(root, 'src', 'App.tsx'), 'utf8');
   const appCss = readFileSync(resolve(root, 'src', 'index.css'), 'utf8');
+  const selectionCss = readFileSync(resolve(root, 'src', 'components', 'selectionCards.css'), 'utf8');
   const encyclopediaSource = readFileSync(resolve(root, 'src', 'components', 'EncyclopediaModal.tsx'), 'utf8');
   const presentationSource = readFileSync(resolve(root, 'src', 'presentation', 'battlePresentation.ts'), 'utf8');
   assert.match(appSource, /showTrainerSelector/);
@@ -89,9 +90,9 @@ try {
   assert.doesNotMatch(appSource, /handlePoolCardClick/);
   assert.match(appSource, /pool-choice-card__details/);
   assert.match(appSource, /pool-choice-card__synergies/);
-  assert.match(appSource, /onClick=\{\(\) => void handlePoolSelect\(choice\)\}/);
-  assert.match(appSource, /gridTemplateColumns:\s*'repeat\(3, minmax\(0, 1fr\)\)'/);
-  assert.match(appSource, /gap:\s*'clamp\(32px, 4vw, 52px\)'/);
+  // Selection cards have used the approved two-tap flow and shared layout since 0d86e1f.
+  assert.match(appSource, /onChoose=\{\(\) => poolSelection\.choose\(choice\)\}/);
+  assert.match(selectionCss, /\.selection-dialog \.selection-choices\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/s);
   assert.match(appSource, /冒險失敗/);
   assert.match(appSource, /你的眼前一片漆黑/);
   assert.match(appSource, /summary-identity-stats/);
@@ -179,7 +180,7 @@ try {
   assert.match(appCss, /\.game-result-overlay::before\s*\{\s*content:\s*none/s);
   assert.match(appSource, /label: '手下敗將'/);
   assert.doesNotMatch(appSource, /label: '角色敗將'/);
-  assert.match(appSource, /opponent-card__portrait/);
+  assert.match(appSource, /selection-art opponent-portrait/);
   assert.match(appSource, /opponent-card__name/);
   assert.match(appCss, /\.game-result-overlay\.result-screen--champion \.result-title/);
   assert.match(appCss, /\.result-screen--champion \.summary-history-display \.hero-label/);

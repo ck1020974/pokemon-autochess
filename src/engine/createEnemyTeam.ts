@@ -12,6 +12,21 @@ interface EnemyContext {
     opponent: {id: string} | null;
 }
 
+// Generate each choice once; the card, entrance and battle share these exact units.
+export function prepareOpponentTeams(context: Omit<EnemyContext, 'opponent'>, opponents: readonly {id: string}[]): Map<string, (Unit | null)[]> {
+    const teams = new Map<string, (Unit | null)[]>();
+    for (const opponent of opponents) {
+        if (teams.has(opponent.id)) continue;
+        try {
+            teams.set(opponent.id, createEnemyTeam({...context, opponent}));
+        } catch (error) {
+            console.error('Enemy preview preparation failed:', error);
+            teams.set(opponent.id, [new Unit(ALL_UNITS.rattata), null, null, null, null]);
+        }
+    }
+    return teams;
+}
+
 // Prepare once for the entrance, then hand the exact same lineup to the battle.
 export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, opponent}: EnemyContext): (Unit | null)[] {
     // Enemy Count Logic based on User Request
@@ -21,6 +36,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
     else enemyCount = 5;
 
     let enemyTeam: (Unit | null)[] = [];
+    let resolvedOpponent: {name: string} | undefined;
 
     const getEvolvedTemplate = (template: UnitTemplate, targetLevel: number): UnitTemplate => {
         let current = template;
@@ -96,6 +112,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
     if (tutorialStep > 0 && tutorialStep < 10) {
         // Tutorial Battle 1: Use Brock (novice_3 or in_3)'s team exactly
         const brock = activeEdition.noviceOpponents.find(n => n.id.includes('_3')) || activeEdition.noviceOpponents[0];
+        resolvedOpponent = brock;
         enemyTeam = (brock?.coreUnits || []).map((id: string) => {
             const t = ALL_UNITS[id];
             if (!t) {
@@ -114,6 +131,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
             activeEdition.intermOpponents.find(g => g.id === opponent.id) ||
             activeEdition.noviceOpponents.find(n => n.id === opponent.id);
 
+        resolvedOpponent = def;
         if (def) {
             // bossLevel for Core Units
             let bossLevel = enemyBaseLevel;
@@ -208,6 +226,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
         // This block executes if there's NO selected opponent (e.g., debugging or not opening the modal)
         const fallbackPool = game.wins >= 12 ? activeEdition.championOpponents : (game.wins >= 8 ? activeEdition.eliteOpponents : (game.wins >= 5 ? activeEdition.advancedOpponents : (game.wins >= 3 ? activeEdition.intermOpponents : activeEdition.noviceOpponents)));
         const def = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+        resolvedOpponent = def;
         const fbCandidateUnits: Unit[] = [];
         for (const coreId of def.coreUnits) {
             if (fbCandidateUnits.length >= enemyCount) break;
@@ -261,6 +280,10 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
     // Emulate evolution stat growth up to Level 3
     enemyTeam.forEach(u => {
         if (!u) return;
+        // Ash's partner keeps Pikachu's form at every star level; never mutate player templates.
+        if (resolvedOpponent?.name === '小智' && u.family === 'pichu') {
+            Object.assign(u, new Unit(ALL_UNITS.pikachu), {id: u.id, level: u.level, evolveId: undefined});
+        }
         const baseStats = ALL_UNITS[u.templateId]?.baseStats || u.stats;
         u.stats = { ...baseStats };
         for (let lv = 2; lv <= u.level; lv++) {

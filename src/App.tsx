@@ -11,7 +11,7 @@ import { GameLoop, GamePhase, type PoolChoice } from './engine/GameLoop';
 import { music } from './engine/MusicManager';
 
 import { BattleSimulator } from './engine/BattleSimulator';
-import {createEnemyTeam} from './engine/createEnemyTeam';
+import {createEnemyTeam, prepareOpponentTeams} from './engine/createEnemyTeam';
 import {TutorialCoach} from './components/TutorialCoach';
 import {BattleControls} from './components/BattleControls';
 import {analytics, startAnalyticsDelivery} from './analytics/collector';
@@ -372,6 +372,7 @@ function App() {
         setShowTrainerSelector(false);
         setPendingBattleOpponent(null);
         preparedEnemyTeam.current = null;
+        opponentPreviewTeams.current.clear();
         setIntroEnemyTeam([]);
         simulatorRef.current = null; // CRITICAL: Clear battle simulator
 
@@ -465,6 +466,7 @@ function App() {
     const [selectedOpponent, setSelectedOpponent] = useState<SelectedOpponent | null>(null);
     const [pendingBattleOpponent, setPendingBattleOpponent] = useState<SelectedOpponent | null>(null);
     const preparedEnemyTeam = useRef<(Unit | null)[] | null>(null);
+    const opponentPreviewTeams = useRef(new Map<string, (Unit | null)[]>());
     const [introEnemyTeam, setIntroEnemyTeam] = useState<(Unit | null)[]>([]);
     const [selectedBattleSceneClass, setSelectedBattleSceneClass] = useState('');
     const [recentBattleSceneClasses, setRecentBattleSceneClasses] = useState<string[]>([]);
@@ -526,6 +528,7 @@ function App() {
         const newGame = new GameLoop();
         gameRef.current = newGame;
         preparedEnemyTeam.current = null;
+        opponentPreviewTeams.current.clear();
         simulatorRef.current = null;
         setIntroEnemyTeam([]);
         setPendingBattleOpponent(null);
@@ -1089,6 +1092,11 @@ function App() {
         executeStartBattle();
     };
 
+    const setPreparedOpponentChoices = (choices: SelectedOpponent[]) => {
+        opponentPreviewTeams.current = prepareOpponentTeams({game, activeEdition, difficulty, tutorialStep}, choices);
+        setOpponentChoices(choices);
+    };
+
     const executeStartBattle = () => {
         // music.stop(); // MOVED to handleOpponentSelect: Only stop when NPC is chosen
         setSelected(null);
@@ -1101,7 +1109,7 @@ function App() {
                 const brock = activeEdition.noviceOpponents.find(n => n.name === '小剛') || activeEdition.noviceOpponents[0];
                 const brockId = brock.id;
 
-                setOpponentChoices([
+                setPreparedOpponentChoices([
                     { id: brockId, name: '小剛', url: 'gym/小剛01.webp', difficulty: 'EASY' },
                     { id: brockId, name: '小剛', url: 'gym/小剛02.webp', difficulty: 'NORMAL' },
                     { id: brockId, name: '小剛', url: 'gym/小剛03.webp', difficulty: 'HARD' }
@@ -1109,7 +1117,7 @@ function App() {
             } else {
                 // Second tutorial: Force Champions to ensure player defeat
                 const shuffledChampions = [...activeEdition.championOpponents].sort(() => 0.5 - Math.random());
-                setOpponentChoices(shuffledChampions.slice(0, 3));
+                setPreparedOpponentChoices(shuffledChampions.slice(0, 3));
             }
             setShowOpponentSelect(true);
             return;
@@ -1141,7 +1149,7 @@ function App() {
         const selected = shuffled.slice(0, 3);
         selected.sort((a, b) => (diffWeights[a.difficulty || 'NORMAL'] ?? 1) - (diffWeights[b.difficulty || 'NORMAL'] ?? 1));
 
-        setOpponentChoices(selected);
+        setPreparedOpponentChoices(selected);
         setShowOpponentSelect(true);
     };
 
@@ -1324,18 +1332,18 @@ function App() {
             game.currentOpponentDifficulty = opponent.difficulty;
         }
         setShowOpponentSelect(false);
-        if (!selectedTrainer) {
-            beginBattle();
-            return;
-        }
         let team: (Unit | null)[];
         try {
-            team = createEnemyTeam({game, activeEdition, difficulty, tutorialStep, opponent});
+            team = opponentPreviewTeams.current.get(opponent.id) ?? createEnemyTeam({game, activeEdition, difficulty, tutorialStep, opponent});
         } catch (error) {
             console.error('Enemy preview preparation failed:', error);
             team = [new Unit(ALL_UNITS.rattata), null, null, null, null];
         }
         preparedEnemyTeam.current = team;
+        if (!selectedTrainer) {
+            beginBattle();
+            return;
+        }
         setIntroEnemyTeam(team);
         prioritizeImages(team.flatMap(unit => unit ? [unit.imageUrl.replace('01.webp', '00.webp')] : []));
         setPendingBattleOpponent(opponent);
@@ -2158,7 +2166,7 @@ function App() {
                                     <div className="selection-art opponent-portrait"><img src={npc.url} alt={npc.name} /></div>
                                     <div className="opponent-name opponent-card__name">{npc.name}</div>
                                     <div className="opponent-core" aria-label="代表角色">
-                                        {(allEditionOpponents.find(definition => definition.id === npc.id)?.coreUnits ?? []).slice(0, 3).map((id, index) => ALL_UNITS[id] && <img key={`${id}-${index}`} src={ALL_UNITS[id].imageUrl} alt={ALL_UNITS[id].name} title={ALL_UNITS[id].name} />)}
+                                        {(opponentPreviewTeams.current.get(npc.id) ?? []).filter((unit): unit is Unit => unit !== null).slice(0, 3).map(unit => <img key={unit.id} src={unit.imageUrl.replace('01.webp', '00.webp')} alt={unit.name} title={unit.name} data-template-id={unit.templateId} data-unit-id={unit.id} />)}
                                     </div>
                                 </SelectionCard>
                             ))}

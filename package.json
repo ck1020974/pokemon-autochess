@@ -18,6 +18,8 @@
     "test:permanent-family-buffs": "node scripts/verify-permanent-family-buffs.mjs",
     "test:growth-exp-parity": "node scripts/verify-growth-exp-parity.mjs",
     "test:mobile-safe-area": "node scripts/verify-mobile-safe-area.mjs",
+    "test:opening-stats-opponents": "node scripts/verify-opening-stats-opponents.mjs",
+    "test:opponent-preview-ui": "node scripts/verify-opponent-preview-ui.mjs",
     "test:temporary-reward-order": "node scripts/verify-temporary-reward-order.mjs",
     "test:trainer-presentation": "node scripts/verify-trainer-presentation.mjs",
     "test:battle-scenes": "node scripts/verify-battle-scenes.mjs",
