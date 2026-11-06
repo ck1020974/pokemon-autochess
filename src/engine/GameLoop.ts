@@ -867,23 +867,10 @@ export class GameLoop {
         unit.exp += amount;
         unit.hasNewPermanentBuff = true; // Trigger glow for EXP rewards
 
-        // Loop to handle potential multiple level-ups/evolutions (e.g., from Lv1 straight to Lv3)
-        let canStillLevelUp = true;
-        while (canStillLevelUp) {
-            canStillLevelUp = false;
-
-            // Check thresholds
-            if (unit.exp >= 9 && unit.level < 3) {
-                // Trigger Level 3 (Evolve if applicable)
-                const dummy = new Unit(ALL_UNITS[unit.family]);
-                this.mergeUnits(unit, dummy);
-                canStillLevelUp = true; // Check again after merge/evolution
-            } else if (unit.exp >= 3 && unit.level < 2) {
-                // Trigger Level 2 (Evolve if applicable)
-                const dummy = new Unit(ALL_UNITS[unit.family]);
-                this.mergeUnits(unit, dummy);
-                canStillLevelUp = true;
-            }
+        // Resolve every reached evolution without adding merge EXP or merge-only effects.
+        while ((unit.exp >= 9 && unit.level < 3) || (unit.exp >= 3 && unit.level < 2)) {
+            this.handleUnitExpGain(unit, 0);
+            this.updateTeamCaps();
         }
     }
 

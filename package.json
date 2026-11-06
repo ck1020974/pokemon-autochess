@@ -16,6 +16,7 @@
     "test:analytics": "node scripts/verify-analytics-tracker.mjs && node scripts/verify-analytics-validation.mjs",
     "test:author-ui": "node scripts/verify-author-dashboard-ui.mjs",
     "test:permanent-family-buffs": "node scripts/verify-permanent-family-buffs.mjs",
+    "test:growth-exp-parity": "node scripts/verify-growth-exp-parity.mjs",
     "test:temporary-reward-order": "node scripts/verify-temporary-reward-order.mjs",
     "test:trainer-presentation": "node scripts/verify-trainer-presentation.mjs",
     "test:battle-scenes": "node scripts/verify-battle-scenes.mjs",

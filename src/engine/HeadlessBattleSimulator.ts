@@ -788,11 +788,12 @@ export class HeadlessBattleSimulator {
     private growUnit(unit: Unit, hp: number, atk: number, permanentTarget?: Unit | null, _silent: boolean = false) {
         void _silent;
         if (unit.family === 'sneasel' && atk < 0) atk = 0;
+        // Permanent growth uses the original's cap, independently of temporary battle buffs.
+        if (permanentTarget) permanentTarget.addGrowth(hp, atk);
         const hpToMax = hp > 0 ? Math.min(hp, unit.maxHpCap - unit.stats.maxHp) : hp;
         const atkToAtk = atk > 0 ? Math.min(atk, unit.attackCap - unit.stats.attack) : atk;
         if (hpToMax === 0 && atkToAtk === 0 && (hp <= 0 || unit.stats.hp >= unit.stats.maxHp)) return;
         unit.addGrowth(hp, atk);
-        if (permanentTarget) permanentTarget.addGrowth(hp, atk);
 
     }
 
@@ -1975,8 +1976,9 @@ export class HeadlessBattleSimulator {
 
         await Promise.all(promises);
         if (attacker.family === 'snover' && !s?.isSilenced) {
+            const buffAtk = [0, 1, 2, 5][attacker.level] || 1;
             const original = this.originalPlayerTeam?.find(u => u && u.id === attacker.id);
-            this.growUnit(attacker, 0, 1, original);
+            this.growUnit(attacker, 0, buffAtk, original);
             if (defender.stats.hp > 0) {
                 const { myTeam: defTeam } = this.getTeams(defender);
                 const idx = defTeam.indexOf(defender);
@@ -2105,18 +2107,13 @@ export class HeadlessBattleSimulator {
             const idx = this.enemyTeam.indexOf(unit);
             if (this.enemyTeam[idx] === unit || (this.enemyTeam[idx] && this.enemyTeam[idx].stats.hp <= 0)) this.enemyTeam[idx] = null;
         }
-        if (killer && killer.stats.hp > 0) {
+        if (killer && killer.stats.hp > 0 && !this.unitStates.get(killer)?.isSilenced) {
             const original = this.originalPlayerTeam?.find(u => u && u.id === killer.id) || null;
 
-            // Claw Synergy: Permanent Atk on kill
-            if (killer.synergies.includes('Claw') && this.getSynergyCountForUnit(killer, 'Claw') >= 2) {
-                this.growUnit(killer, 0, 3, original, true);
+            // BugBite: the live battle grants permanent +1 HP on a kill.
+            if (killer.synergies.includes('BugBite') && this.getSynergyCountForUnit(killer, 'BugBite') >= 2) {
+                this.growUnit(killer, 1, 0, original, true);
             }
-
-            // Silence check for unit abilities
-            if (this.unitStates.get(killer)?.isSilenced) return;
-
-
         }
         await this.compactTeams();
     }

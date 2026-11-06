@@ -1081,6 +1081,8 @@ export class BattleSimulator {
 
     private growUnit(unit: Unit, hp: number, atk: number, sourceName?: string, permanentTarget?: Unit | null, silent: boolean = false) {
         if (unit.family === 'sneasel' && atk < 0) atk = 0; // Protection
+        // Permanent growth uses the original's cap, independently of temporary battle buffs.
+        if (permanentTarget) permanentTarget.addGrowth(hp, atk);
         const hpToMax = hp > 0 ? Math.min(hp, unit.maxHpCap - unit.stats.maxHp) : hp;
         const atkToAtk = atk > 0 ? Math.min(atk, unit.attackCap - unit.stats.attack) : atk;
         // Early return ONLY if: No MaxHP growth possible AND No Atk growth possible AND (No healing needed OR no hp input)
@@ -1095,11 +1097,6 @@ export class BattleSimulator {
         }
         unit.stats.attack += atk;
         unit.capStats();
-
-        // 2. Apply to Permanent Target (Always grow)
-        if (permanentTarget) {
-            permanentTarget.addGrowth(hp, atk);
-        }
 
         if (sourceName && !silent) {
             if (hp > 0 && atk > 0) this.log(`${unit.name} 提高了 ${atk} 攻擊與生命`);
