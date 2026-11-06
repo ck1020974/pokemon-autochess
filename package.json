@@ -19,6 +19,7 @@
     "test:growth-exp-parity": "node scripts/verify-growth-exp-parity.mjs",
     "test:mobile-safe-area": "node scripts/verify-mobile-safe-area.mjs",
     "test:mobile-unit-sizes": "node scripts/verify-mobile-unit-sizes.mjs",
+    "test:mobile-scroll-lock": "node scripts/verify-mobile-scroll-lock.mjs",
     "test:eevee-evolution-weights": "node scripts/verify-eevee-evolution-weights.mjs",
     "test:opponent-choice-diversity": "node scripts/verify-opponent-choice-diversity.mjs",
     "test:opponent-choice-ui": "node scripts/verify-opponent-choice-ui.mjs",

@@ -62,15 +62,18 @@ try {
   for(const [width,height,top,left,right,bottom] of [[844,390,44,47,47,21],[844,390,59,47,47,21],[844,360,0,47,47,21],[667,375,0,0,0,0],[932,430,0,59,59,21],[844,390,0,47,47,21]]) {
    await page.setViewportSize({width,height});
    await cdp.send('Emulation.setSafeAreaInsetsOverride',{insets:{top,left,right,bottom}});
-   await page.evaluate(()=>{scrollTo(0,0);return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
+   await page.evaluate(()=>{scrollTo(0,300);document.querySelector('.game-container').scrollTop=500;return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
+   await cdp.send('Input.synthesizeScrollGesture',{x:width/2,y:height*.6,yDistance:-100,gestureSourceType:'touch'});
    const hud=await page.locator('.header').evaluate(el=>{
     const r=el.getBoundingClientRect();
     const children=[...el.querySelectorAll('.header-section > span,.difficulty-badge,button')].map(child=>{
      const b=child.getBoundingClientRect();return {text:child.textContent,left:b.left,right:b.right,top:b.top,bottom:b.bottom};
     });
-    return {top:r.top,height:r.height,children};
+    return {top:r.top,height:r.height,children,windowY:scrollY,documentHeight:document.documentElement.scrollHeight};
    });
    assert.ok(hud.height>0&&hud.top>=top,`Top HUD hidden at ${width}x${height}`);
+   assert.equal(hud.windowY,0,'Touch and stale scroll offsets must not pan the document');
+   assert.ok(hud.documentHeight<=height+1,'Document remains within the mobile viewport');
    for(const child of hud.children)assert.ok(child.left>=left&&child.right<=width-right+1,`HUD clipped at ${width}x${height}: ${JSON.stringify(child)}`);
    live.push({width,height,top,left,right,bottom,hud});
    await page.screenshot({path:resolve(out,`live-${width}x${height}-top${top}.png`)});

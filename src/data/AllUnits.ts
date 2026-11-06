@@ -903,7 +903,7 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'eevee', name: '伊布', tier: 3, family: 'eevee',
         baseStats: { hp: 3, maxHp: 3, attack: 3 },
         imageUrl: 'assets/伊布00.webp', battleImageUrl: 'assets/伊布01.webp',
-        description: '合成時額外獲得兩倍經驗值且隨機進化。依其他隊友羈絆數量（不計接棒），最多者對應進化型的抽選權重加倍；並列皆適用。', synergies: ['BatonPass', 'Normal']
+        description: '合成時額外獲得兩倍經驗值且隨機進化。', synergies: ['BatonPass', 'Normal']
     },
     flareon: {
         id: 'flareon', name: '火伊布', tier: 3, family: 'eevee',
