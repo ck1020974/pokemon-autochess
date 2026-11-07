@@ -128,6 +128,7 @@ interface UnitCardProps {
     draggable?: boolean;
     onDragStart?: (event: React.DragEvent) => void;
     flipped?: boolean;
+    useBattleArt?: boolean;
     isInteractive?: boolean;
     onToggleFreeze?: () => void;
     silenced?: boolean;
@@ -144,7 +145,7 @@ interface UnitCardProps {
 // --- Helper Components ---
 
 // UnitCard with Direct Lock & Silence Support
-function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock, synergyHighlight }: UnitCardProps) {
+function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, useBattleArt, isInteractive, onToggleFreeze, silenced, gastroAcid, hpSwapped, isSelected, isEvolving, showMergeGlow, tutorialHighlightLock, synergyHighlight }: UnitCardProps) {
     // Robust Check: Ensure unit and its stats exist
     if (!unit || !unit.stats || unit.stats.hp <= 0) {
         return (
@@ -187,7 +188,7 @@ function UnitCard({ unit, onClick, frozen, draggable, onDragStart, flipped, isIn
 
             <div className="unit-visual-wrapper">
                 <img
-                    src={unit.imageUrl}
+                    src={useBattleArt ? (unit.battleImageUrl || unit.imageUrl) : unit.imageUrl}
                     className="unit-image"
                     alt={unit.name}
                 />
@@ -1395,9 +1396,7 @@ function App() {
 
     const poolSelection = useTwoTapChoice(game.poolChoices, (choice) => { void handlePoolSelect(choice); });
     const opponentSelection = useTwoTapChoice(opponentChoices, handleOpponentSelect);
-    const isChoosing = showOpponentSelect
-        || game.phase === GamePhase.REWARD
-        || (hasStarted && game.phase === GamePhase.POOL_SELECTION && !showTutorial);
+    const showStatusBar = !!difficulty && game.phase === GamePhase.SHOP && !showOpponentSelect;
 
     // Calculate Synergies (All)
     const activeTeamForSynergy = (game.phase === GamePhase.BATTLE || game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER)
@@ -1485,6 +1484,7 @@ function App() {
             {game.phase === 'REWARD' && (
                 <div className="opponent-select-overlay selection-dialog reward-selection-overlay show" role="dialog" aria-modal="true" aria-labelledby="reward-selection-title">
                     <h2 id="reward-selection-title" className="selection-title">請選擇你的獎勵</h2>
+                    <p className="selection-status">❤️ 生命 {game.lives}</p>
                     <div className="opponent-cards-container selection-choices">
                         {rewardChoices.map((reward, idx) => (
                             <SelectionCard key={idx} onChoose={() => handleRewardSelect(reward)}>
@@ -1581,12 +1581,10 @@ function App() {
 
                         {!phase1Loaded && (
                             <div className="loading-container adventure-panel adventure-loading">
+                                <p className="adventure-loading-copy"><span>正在準備冒險</span><span>{loadingProgress}%</span></p>
                                 <div className="loading-bar-wrapper" role="progressbar" aria-label="圖片載入進度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={loadingProgress}>
                                     <div className="loading-bar-fill" style={{ width: `${loadingProgress}%` }} />
                                 </div>
-                                <p className="adventure-loading-copy">
-                                    正在準備冒險... {loadingProgress}%
-                                </p>
                                 <AssetLoadStatus progress={loadingState} assets={BOOT_ASSETS} />
                             </div>
                         )}
@@ -1653,12 +1651,10 @@ function App() {
                         </div>
 
                         <div className="loading-container adventure-panel adventure-loading">
+                            <p className="adventure-loading-copy"><span>正在準備遊戲圖片</span><span>{loadingProgress}%</span></p>
                             <div className="loading-bar-wrapper" role="progressbar" aria-label="圖片載入進度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={loadingProgress}>
                                 <div className="loading-bar-fill" style={{ width: `${loadingProgress}%` }} />
                             </div>
-                            <p className="adventure-loading-copy">
-                                正在準備遊戲圖片... {loadingProgress}%
-                            </p>
                             <AssetLoadStatus progress={loadingState} assets={editionAssets} />
                         </div>
                     </div>
@@ -1717,9 +1713,9 @@ function App() {
             }
 
             {/* Header */}
-            <div className={`header ${isChoosing ? 'header--choosing' : ''} ${difficulty ? '' : 'header--empty'}`} style={{ zIndex: 25000, position: 'relative' }}>
+            <div className={`header ${showStatusBar ? '' : 'header--hidden'}`} style={{ zIndex: 25000, position: 'relative' }}>
                 <div className="header-section">
-                    {difficulty && !isChoosing && (
+                    {difficulty && (
                         <div className={`difficulty-badge ${difficulty}`} style={{
                             display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px',
                             background: 'transparent', borderRadius: 0, border: 'none',
@@ -1752,6 +1748,7 @@ function App() {
                         <>
                             <span className={`${hpLossAnim ? 'shake-anim' : ''} ${tutorialStep === 11 ? 'tutorial-elevate synthetic-glow' : ''}`} style={{ color: hpLossAnim ? '#ef4444' : undefined, zIndex: tutorialStep === 11 ? 10005 : 'auto', position: 'relative', padding: '0 8px' }}>❤️ 生命: {game.lives}</span>
                             <span className={`${tutorialStep === 2 ? 'tutorial-highlight tutorial-pointer-left' : ''} ${goldErrorAnim ? 'shake-anim' : ''}`} style={{ padding: '0 8px', color: goldErrorAnim ? '#ef4444' : undefined, borderRadius: '8px', zIndex: tutorialStep === 2 ? 10000 : 'auto', position: 'relative' }}>💰 金幣: {game.gold}</span>
+                            <span className="tier-text" style={{ color: '#175b5c', fontSize: '1rem', opacity: 0.9 }}>商店 Lv.{game.shop.getTier(game.turn)}</span>
                         </>
                     )}
                 </div>
@@ -1766,24 +1763,22 @@ function App() {
                     {/* Help & Mute Toggle Buttons inside Header - Show alongside other game info */}
                     {difficulty && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginLeft: '10px' }}>
-                            {!isChoosing && (
-                                <button
-                                    className="mute-toggle-btn-header"
-                                    onClick={() => {
-                                        if (game.phase === GamePhase.BATTLE) return;
-                                        setShowTutorial(true);
-                                    }}
-                                    title="遊戲指南 (Tutorial)"
-                                    style={{
-                                        color: showTutorial ? '#facc15' : '#aaa',
-                                        borderRadius: '50%',
-                                        opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
-                                        cursor: game.phase === GamePhase.BATTLE ? 'default' : 'pointer'
-                                    }}
-                                >
-                                    ❓
-                                </button>
-                            )}
+                            <button
+                                className="mute-toggle-btn-header"
+                                onClick={() => {
+                                    if (game.phase === GamePhase.BATTLE) return;
+                                    setShowTutorial(true);
+                                }}
+                                title="遊戲指南 (Tutorial)"
+                                style={{
+                                    color: showTutorial ? '#facc15' : '#aaa',
+                                    borderRadius: '50%',
+                                    opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
+                                    cursor: game.phase === GamePhase.BATTLE ? 'default' : 'pointer'
+                                }}
+                            >
+                                ❓
+                            </button>
                             <button
                                 className="mute-toggle-btn-header"
                                 onClick={() => {
@@ -2238,6 +2233,7 @@ function App() {
                                     }}
                                 >
                                     <UnitCard
+                                        useBattleArt
                                         unit={unit}
                                         onClick={() => handleSelect(unit, i, 'BOARD')}
                                         draggable={isInteractive && !!unit}
@@ -2297,6 +2293,7 @@ function App() {
                             return (
                                 <div key={unit ? unit.id : `empty-${i}`} className="unit-wrapper">
                                     <UnitCard
+                                        useBattleArt
                                         unit={unit}
                                         onClick={() => handleSelect(unit, i, 'ENEMY')}
                                         flipped={true}
@@ -2318,48 +2315,30 @@ function App() {
             {
                 game.phase === GamePhase.SHOP && (
                     <div className={`shop-container ${tutorialStep === 6 ? 'tutorial-elevate' : ''}`} onClick={() => setActiveSynergyId(null)}>
-                        {/* Left Controls: Compact & Side-by-Side */}
-                        <div className="shop-controls">
-                            {/* Row 1: Shop Level Text - Higher and Better Color */}
-                            <div className="shop-info-row" style={{ justifyContent: 'center', marginBottom: '0px', marginTop: '-15px' }}>
-                                <span className="tier-text" style={{ color: '#175b5c', fontSize: '1rem', opacity: 0.9 }}>商店 Lv.{game.shop.getTier(game.turn)}</span>
-                            </div>
-
-                            {/* Row 2: Battle Button - Centered and Slimmer */}
-                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px', position: 'relative' }}>
+                        <div className="shop-actions">
+                            <button
+                                className={`reroll-icon-btn ${game.gold < 1 && game.freeRerolls === 0 ? 'btn-disabled' : ''} ${tutorialStep === 5 ? 'tutorial-highlight' : ''}`}
+                                onClick={handleReroll}
+                                disabled={game.gold < 1 && game.freeRerolls === 0}
+                                                                title="刷新商店 ($1)"
+                                aria-label={game.freeRerolls > 0 ? `刷新，免費 ${game.freeRerolls} 次` : '刷新'}
+                            >
+                                <svg className="shop-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8" /><path d="M4 3.5V8h4.5" /><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16" /><path d="M20 20.5V16h-4.5" /></svg>
+                                {game.freeRerolls > 0 && <span className="shop-action-count" aria-hidden="true">{game.freeRerolls}</span>}
+                            </button>
                                 <button
+                                    aria-label="對戰"
+                                    title="對戰"
                                     className={`btn-premium btn-battle ${(tutorialStep === 7 || tutorialStep === 10) ? 'tutorial-target-glow' : ''}`}
                                     onClick={handleStartBattle}
-                                    style={{ height: '50px', width: '60px', zIndex: (tutorialStep === 7 || tutorialStep === 10) ? 10000 : 'auto' }}
+                                    style={{ zIndex: (tutorialStep === 7 || tutorialStep === 10) ? 10000 : 'auto' }}
                                 >
-                                    <span style={{ fontSize: '1.5rem' }}>⚔️</span>
+                                    <svg className="shop-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 17.5L3 6V3h3l11.5 11.5" /><path d="M13 19l6-6" /><path d="M16 16l4 4" /><path d="M19 21l2-2" /><path d="M14.5 6.5L18 3h3v3l-3.5 3.5" /><path d="M5 14l4 4" /><path d="M7 17l-3 3" /><path d="M3 19l2 2" /></svg>
                                 </button>
-                            </div>
                         </div>
 
-                        {/* Right Shop Slots - Shifted right while button stays fixed */}
+                        {/* Stock slots */}
                         <div className="shop-slots-area" style={{ position: 'relative' }}>
-                            <button
-                                className={`reroll-icon-btn ${game.gold < 1 ? 'btn-disabled' : ''} ${tutorialStep === 5 ? 'tutorial-highlight' : ''}`}
-                                onClick={handleReroll}
-                                disabled={game.gold < 1}
-                                style={{
-                                    position: 'absolute',
-                                    top: '-5px',
-                                    left: '-5px',
-                                    background: 'transparent',
-                                    border: 'none',
-                                    color: game.gold < 1 ? '#555' : '#aaa',
-                                    fontSize: '2rem',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    zIndex: 10,
-                                    padding: '5px'
-                                }}
-                                title="刷新商店 ($1)"
-                            >
-                                🔄
-                            </button>
 
                             <div className="shop-slot-scroll">
                             <div className="shop-slots">
@@ -2443,12 +2422,14 @@ function App() {
                 game.phase === GamePhase.BATTLE && (
                     <div className="battle-feedback">
                         {/* 1. Battle Controls (Top) */}
-                        <div className="battle-controls-container" style={{ zIndex: 10, position: 'relative' }}>
+                        <div className="battle-controls-container">
                             <BattleControls
                                 isPaused={isPaused}
                                 speed={battleSpeed}
                                 onTogglePause={togglePause}
                                 onToggleSpeed={toggleBattleSpeed}
+                                isMuted={isMuted}
+                                onToggleMute={toggleMute}
                             />
                         </div>
 
@@ -2488,7 +2469,8 @@ function App() {
                                             const unitsForSyn = Object.values(ALL_UNITS).filter(t => {
                                                 const isEeveeFamily = t.family === 'eevee';
                                                 const isAvailable = activeEdition.availableUnitIds.includes(t.id) || (isEeveeFamily && activeEdition.availableUnitIds.includes('eevee'));
-                                                if (!t.synergies?.includes(s) || !isAvailable || t.id === 'sprout') return false;
+                                                const hasSynergy = t.synergies?.includes(s) || (t.id === 'mew' && game.mewSynergies.includes(s));
+                                                if (!hasSynergy || !isAvailable || t.id === 'sprout') return false;
 
                                                 if (isEeveeFamily) {
                                                     if (t.id === 'eevee') return true;

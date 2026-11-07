@@ -93,7 +93,7 @@ try{
   window.setTimeout=(callback,delay,...args)=>original(callback,delay===2800?15000:delay,...args);
  });
  await page.getByRole('button',{name:/^(🔊|🔇)$/}).click();
- await page.getByRole('button',{name:'⚔️',exact:true}).click(); await page.locator('.opponent-card').first().click();
+ await page.getByRole('button',{name:'對戰',exact:true}).click(); await page.locator('.opponent-card').first().click();
  const entrance=page.locator('.battle-intro-overlay');await entrance.waitFor();
  const preview=await page.locator('.battle-intro-opponent .battle-intro-lineup img').evaluateAll(images=>images.map(img=>img.dataset.templateId));
  assert.equal(preview.length,5);
@@ -122,7 +122,7 @@ try{
  // Re-open the course from an existing run's opponent selector, preserving the selected trainer.
  await page.evaluate(()=>{window.game.phase='SHOP';window.game.gold=0;});
  await page.getByRole('button',{name:/^(🔊|🔇)$/}).evaluate(button=>button.click());
- await page.getByRole('button',{name:'⚔️',exact:true}).click();
+ await page.getByRole('button',{name:'對戰',exact:true}).click();
  await page.locator('.opponent-card').first().waitFor();
  await page.getByTitle('遊戲指南 (Tutorial)',{exact:true}).click();
  await page.getByRole('button',{name:'開始',exact:true}).click(); await soundOff(); await coach(2); page.setDefaultTimeout(30000);
@@ -142,7 +142,7 @@ try{
  await page.locator('.shop-slots .card-lock-overlay').nth(0).click();
  await page.locator('.shop-slots .card-lock-overlay').nth(1).click(); await coach(7);
  await page.evaluate(()=>{for(const unit of window.game.playerTeam.filter(Boolean))unit.stats={attack:50,hp:50,maxHp:50};});
- await page.getByRole('button',{name:'⚔️',exact:true}).click(); await page.locator('.opponent-card').first().click();
+ await page.getByRole('button',{name:'對戰',exact:true}).click(); await page.locator('.opponent-card').first().click();
  await tutorialEntrance('first');
  await page.locator('.battle-result--win').waitFor({timeout:60000}); await page.locator('.battle-result--win').click();
  await page.locator('.reward-selection-overlay .opponent-card').first().click(); await coach(8);
@@ -159,7 +159,7 @@ try{
  await page.locator('.shop-slots .unit-card').filter({has:page.locator('img[alt="火球鼠"]')}).click();
  await page.getByRole('button',{name:/購買 \$3/}).click(); await coach(10);
  await page.evaluate(()=>{for(const unit of window.game.playerTeam.filter(Boolean))unit.stats={attack:0,hp:1,maxHp:1};});
- await page.getByRole('button',{name:'⚔️',exact:true}).click(); await page.locator('.opponent-card').first().click();
+ await page.getByRole('button',{name:'對戰',exact:true}).click(); await page.locator('.opponent-card').first().click();
  await tutorialEntrance('second');
  await page.locator('.battle-result--loss').waitFor({timeout:60000}); await page.locator('.battle-result--loss').click();
  await coach(11); await page.locator('.tutorial-coach').getByRole('button',{name:'繼續 →',exact:true}).click();

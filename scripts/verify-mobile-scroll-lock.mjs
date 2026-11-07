@@ -25,8 +25,6 @@ try{
   await page.locator('#last-control').scrollIntoViewIfNeeded();
   const bottomControl=await page.locator('#last-control').boundingBox();
   if(bottomControl.y<top||bottomControl.y+bottomControl.height>height-bottom)failures.push('Lower control is unreachable');
-  await page.locator('.shop-slot-scroll').evaluate(el=>{el.scrollLeft=200;});
-  assert.ok(await page.locator('.shop-slot-scroll').evaluate(el=>el.scrollLeft>0),'Stock still scrolls sideways');
   await page.screenshot({path:`${out}/${width}x${height}-${top}.png`});
  }
  // The game must still keep its HUD while battle fills the same bounded frame.

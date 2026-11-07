@@ -63,7 +63,7 @@ try {
     }, result);
     await page.getByRole('button', {name: /^(🔊|🔇)$/}).click();
     const before = await styles('.game-container');
-    await page.getByRole('button', {name: '⚔️', exact: true}).click();
+    await page.getByRole('button', {name:'對戰', exact: true}).click();
     await page.locator('.opponent-card').first().waitFor();
     const selectionOverlay = await styles('.opponent-select-overlay');
     const selecting = await styles('.game-container');

@@ -61,7 +61,7 @@ try {
     return gameAssets.progress(['icon-512.png']).ready;
   });
   await page.evaluate(() => { window.game.gold = 0; });
-  await page.getByRole('button', {name: '⚔️', exact: true}).click();
+  await page.getByRole('button', {name:'對戰', exact: true}).click();
   await page.locator('.opponent-card').first().waitFor();
   await checkImages('03-選敵');
   // Render every reward and tutorial-specific portrait from the real catalog, including later opponents.

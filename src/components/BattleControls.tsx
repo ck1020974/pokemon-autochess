@@ -3,9 +3,11 @@ interface BattleControlsProps {
     speed: number;
     onTogglePause: () => void;
     onToggleSpeed: () => void;
+    isMuted?: boolean;
+    onToggleMute?: () => void;
 }
 
-export function BattleControls({ isPaused, speed, onTogglePause, onToggleSpeed }: BattleControlsProps) {
+export function BattleControls({ isPaused, speed, onTogglePause, onToggleSpeed, isMuted, onToggleMute }: BattleControlsProps) {
     const nextSpeed = speed === 3 ? 1 : speed + 1;
 
     return (
@@ -33,6 +35,17 @@ export function BattleControls({ isPaused, speed, onTogglePause, onToggleSpeed }
             >
                 <span>{speed}×</span>
             </button>
+            {onToggleMute && (
+                <button
+                    type="button"
+                    className="battle-control-btn battle-sound-btn"
+                    onClick={onToggleMute}
+                    aria-label={isMuted ? '開啟聲音' : '靜音'}
+                    title={isMuted ? '開啟聲音' : '靜音'}
+                >
+                    <span aria-hidden="true">{isMuted ? '🔇' : '🔊'}</span>
+                </button>
+            )}
         </div>
     );
 }

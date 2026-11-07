@@ -45,7 +45,7 @@ try {
         window.game.playerTeam[0].stats = { attack: 300, hp: 300, maxHp: 300 };
     });
     await page.getByRole('button', { name: /^(🔊|🔇)$/ }).click();
-    await page.getByRole('button', { name: '⚔️', exact: true }).click();
+    await page.getByRole('button', { name:'對戰', exact: true }).click();
     await page.locator('.opponent-card--choice').first().waitFor();
     await capture('02-對手', '.opponent-card--choice');
     await page.locator('.opponent-card--choice').first().click();

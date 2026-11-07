@@ -54,7 +54,7 @@ try {
  // Gastly was already placed behind the two starters, so step4 naturally advances to refresh.
  await page.locator('.tutorial-coach[data-step="5"]').waitFor();await page.locator('.reroll-icon-btn').click();
  await page.locator('.tutorial-coach[data-step="6"]').waitFor();await shop.nth(0).locator('.card-lock-overlay').click();await shop.nth(1).locator('.card-lock-overlay').click();
- await page.locator('.tutorial-coach[data-step="7"]').waitFor();await page.getByRole('button',{name:'⚔️',exact:true}).click();
+ await page.locator('.tutorial-coach[data-step="7"]').waitFor();await page.getByRole('button',{name:'對戰',exact:true}).click();
  const cards=page.locator('.opponent-card--choice');await cards.first().waitFor();
  const choices=await cards.evaluateAll(cs=>cs.map(c=>({text:c.innerText,disabled:c.getAttribute('aria-disabled'),filter:getComputedStyle(c).filter,glow:getComputedStyle(c,'::before').animationName,shadow:getComputedStyle(c,'::before').boxShadow})));
  check('Unavailable Brock cards have no lock wording',choices.every(c=>!/(暫不開放|僅開放|未開放|鎖定)/.test(c.text)),choices);

@@ -27,7 +27,7 @@ try{
    game.wins=0;game.turn=1;game.gold=0;game.playerTeam=[new Unit(ALL_UNITS.rattata),null,null,null,null];
   },scarce);
   await page.getByRole('button',{name:/^(🔊|🔇)$/}).click();
-  await page.getByRole('button',{name:'⚔️',exact:true}).click();
+  await page.getByRole('button',{name:'對戰',exact:true}).click();
   await page.locator('.opponent-card').first().waitFor();
   const names=await page.locator('.opponent-card .opponent-name').allTextContents();
   const badges=await page.locator('.opponent-card .selection-badge').allTextContents();

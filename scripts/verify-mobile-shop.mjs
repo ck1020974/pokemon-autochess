@@ -24,9 +24,7 @@ try {
    const result=await inspect(); results.push({width,height,count,...result});
    if(result.area.right>result.container.right+1 || result.scroll>width+1) failures.push(`${width}x${height}/${count}: shop exceeds container`);
    for(const {card,image} of result.cards) if(image.left<card.left-1 || image.right>card.right+1) failures.push(`${width}x${height}/${count}: image exceeds slot`);
-   await page.locator('.shop-slot-scroll').evaluate(el=>{el.scrollLeft=el.scrollWidth;});
-   const after=await inspect();
-   assert.deepEqual(after.button,result.button,'Scrolling stock must not move refresh');
+   assert.ok(await page.locator('.shop-slot-scroll').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'Stock fits without scrolling');
    if(count===7) await page.screenshot({path:resolve(output,`${width}x${height}.png`)});
   }
  }
