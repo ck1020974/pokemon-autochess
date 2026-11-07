@@ -7,7 +7,7 @@ import './presentation/battleScenes.css';
 import './components/selectionCards.css';
 import {SelectionCard} from './components/SelectionCard';
 import {useTwoTapChoice} from './components/useTwoTapChoice';
-import { GameLoop, GamePhase, type PoolChoice } from './engine/GameLoop';
+import { DIFFICULTY_INITIAL_LIVES, GameLoop, GamePhase, type PoolChoice } from './engine/GameLoop';
 import { music } from './engine/MusicManager';
 
 import { BattleSimulator } from './engine/BattleSimulator';
@@ -1395,6 +1395,9 @@ function App() {
 
     const poolSelection = useTwoTapChoice(game.poolChoices, (choice) => { void handlePoolSelect(choice); });
     const opponentSelection = useTwoTapChoice(opponentChoices, handleOpponentSelect);
+    const isChoosing = showOpponentSelect
+        || game.phase === GamePhase.REWARD
+        || (hasStarted && game.phase === GamePhase.POOL_SELECTION && !showTutorial);
 
     // Calculate Synergies (All)
     const activeTeamForSynergy = (game.phase === GamePhase.BATTLE || game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER)
@@ -1689,6 +1692,7 @@ function App() {
                                 <button
                                     key={d.id}
                                     className={`difficulty-btn adventure-choice ${focusedDifficulty === d.id ? 'is-focused' : ''}`}
+                                    aria-description={`起始生命 ${DIFFICULTY_INITIAL_LIVES[d.id as keyof typeof DIFFICULTY_INITIAL_LIVES]}`}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         if (focusedDifficulty === d.id) {
@@ -1700,21 +1704,22 @@ function App() {
                                 >
                                     <img src={d.icon} alt={d.name} className="adventure-choice-icon adventure-choice-icon--difficulty" />
                                     <span className="adventure-choice-name">{d.name}</span>
+                                    <span className="adventure-choice-meta" aria-hidden="true">起始生命 {DIFFICULTY_INITIAL_LIVES[d.id as keyof typeof DIFFICULTY_INITIAL_LIVES]}</span>
                                 </button>
                             ))}
                         </div>
 
                         <div className="startup-footer-box adventure-footer">
-                            <p className="adventure-footer-copy">選擇本次挑戰難度</p>
+                            <p className="adventure-footer-copy">請選擇本次遊戲難度</p>
                         </div>
                     </div>
                 )
             }
 
             {/* Header */}
-            <div className="header" style={{ zIndex: 25000, position: 'relative' }}>
+            <div className={`header ${isChoosing ? 'header--choosing' : ''} ${difficulty ? '' : 'header--empty'}`} style={{ zIndex: 25000, position: 'relative' }}>
                 <div className="header-section">
-                    {difficulty && (
+                    {difficulty && !isChoosing && (
                         <div className={`difficulty-badge ${difficulty}`} style={{
                             display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px',
                             background: 'transparent', borderRadius: 0, border: 'none',
@@ -1753,30 +1758,32 @@ function App() {
                 <div className="header-section">
                     {difficulty && (
                         <>
-                            <span style={{ color: game.wins < 8 ? '#1d5353' : '#50706a' }}>🏅 道館: {Math.min(game.wins, 8)}/8</span>
-                            <span style={{ color: (game.wins >= 8 && game.wins < 12) ? '#1d5353' : '#50706a' }}>⚔️ 四天王: {Math.max(0, Math.min(game.wins - 8, 4))}/4</span>
-                            <span style={{ color: game.wins >= 12 ? '#1d5353' : '#50706a' }}>👑 冠軍: {game.edition.id === 'infinite' ? '∞' : `${Math.max(0, Math.min(game.wins - 12, 1))}/1`}</span>
+                            <span className={`header-progress ${game.wins < 8 ? 'is-current' : ''}`}>🏅 道館: {Math.min(game.wins, 8)}/8</span>
+                            <span className={`header-progress ${game.wins >= 8 && game.wins < 12 ? 'is-current' : ''}`}>⚔️ 四天王: {Math.max(0, Math.min(game.wins - 8, 4))}/4</span>
+                            <span className={`header-progress ${game.wins >= 12 ? 'is-current' : ''}`}>👑 冠軍: {game.edition.id === 'infinite' ? '∞' : `${Math.max(0, Math.min(game.wins - 12, 1))}/1`}</span>
                         </>
                     )}
                     {/* Help & Mute Toggle Buttons inside Header - Show alongside other game info */}
                     {difficulty && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginLeft: '10px' }}>
-                            <button
-                                className="mute-toggle-btn-header"
-                                onClick={() => {
-                                    if (game.phase === GamePhase.BATTLE) return;
-                                    setShowTutorial(true);
-                                }}
-                                title="遊戲指南 (Tutorial)"
-                                style={{
-                                    color: showTutorial ? '#facc15' : '#aaa',
-                                    borderRadius: '50%',
-                                    opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
-                                    cursor: game.phase === GamePhase.BATTLE ? 'default' : 'pointer'
-                                }}
-                            >
-                                ❓
-                            </button>
+                            {!isChoosing && (
+                                <button
+                                    className="mute-toggle-btn-header"
+                                    onClick={() => {
+                                        if (game.phase === GamePhase.BATTLE) return;
+                                        setShowTutorial(true);
+                                    }}
+                                    title="遊戲指南 (Tutorial)"
+                                    style={{
+                                        color: showTutorial ? '#facc15' : '#aaa',
+                                        borderRadius: '50%',
+                                        opacity: game.phase === GamePhase.BATTLE ? 0.3 : 1,
+                                        cursor: game.phase === GamePhase.BATTLE ? 'default' : 'pointer'
+                                    }}
+                                >
+                                    ❓
+                                </button>
+                            )}
                             <button
                                 className="mute-toggle-btn-header"
                                 onClick={() => {
