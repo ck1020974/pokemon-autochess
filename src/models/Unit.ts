@@ -17,6 +17,7 @@ export interface UnitTemplate {
   evolveId?: string; // ID of the unit this evolves into
   description: string;
   synergies: string[]; // e.g., ['Starter', 'Normal']
+  isPlayerOnly?: boolean; // Available to players but excluded from NPC lineups.
   isHiddenFromShop?: boolean; // If true, this unit cannot appear in the shop
   family?: string; // Family ID for synergy grouping
   abilityPower?: number; // Optional power value for specific abilities

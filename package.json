@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test:tinkatink-balance": "node scripts/verify-tinkatink-balance.mjs && node scripts/verify-player-only-npc.mjs",
     "predev": "node scripts/generate-asset-manifest.mjs",
     "dev": "vite",
     "prebuild": "node scripts/generate-asset-manifest.mjs",

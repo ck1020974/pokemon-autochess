@@ -370,23 +370,20 @@ export class BattleSimulator {
             }
         }
 
-        // Shuckle: Contrary (Start)
+        // Temporary bonuses use the stats captured before opening effects.
         if (unit.family === 'shuckle') {
-            const buffAtk = Math.floor(unit.stats.hp * 0.33);
-            if (buffAtk > 0) {
-                unit.stats.attack += buffAtk;
-                unit.capStats();
+            const hpBuff = Math.floor((this.openingStats.get(unit) ?? unit.stats).maxHp * 0.5);
+            if (hpBuff > 0) {
+                this.growUnit(unit, hpBuff, 0, '唱反調', null, true);
                 await this.notifySkill(unit, `發動了唱反調`);
                 this.playAnimation(unit, 'jump', 200);
             }
         }
 
-        // Kangaskhan: Parental Bond (Start)
         if (unit.family === 'kangaskhan') {
-            const hpBuff = Math.floor(unit.stats.attack * 0.33);
-            if (hpBuff > 0) {
-                // Kangaskhan's buff is temporary (not passed to originalPlayerTeam)
-                this.growUnit(unit, hpBuff, 0, '親子愛', null, true);
+            const atkBuff = Math.floor((this.openingStats.get(unit) ?? unit.stats).attack * 0.5);
+            if (atkBuff > 0) {
+                this.growUnit(unit, 0, atkBuff, '親子愛', null, true);
                 await this.notifySkill(unit, `發動了親子愛`);
                 this.playAnimation(unit, 'glow-white', 600);
             }
@@ -2054,7 +2051,7 @@ export class BattleSimulator {
         }
 
         // Larvitar Family: Single targets damage before own attack
-        if (unit.family === 'larvitar') {
+        if (unit.family === 'larvitar' || unit.family === 'tinkatink') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {

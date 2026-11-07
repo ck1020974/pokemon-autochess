@@ -5,6 +5,13 @@ import type {GameLoop} from './GameLoop';
 import type {GameEdition} from '../models/Edition';
 import {createTutorialEnemyTeam} from './tutorialOpponents';
 
+// Empty or player-only editions keep empty slots instead of forbidden fallback units.
+function fallbackEnemyTeam(edition: GameEdition): (Unit | null)[] {
+    const template = edition.availableUnitIds.map(id => ALL_UNITS[id])
+        .find(t => t && !t.isPlayerOnly && !t.isHiddenFromShop);
+    return [template ? new Unit(template) : null, null, null, null, null];
+}
+
 interface EnemyContext {
     game: GameLoop;
     activeEdition: GameEdition;
@@ -22,7 +29,7 @@ export function prepareOpponentTeams(context: Omit<EnemyContext, 'opponent'>, op
             teams.set(opponent.id, createEnemyTeam({...context, opponent}));
         } catch (error) {
             console.error('Enemy preview preparation failed:', error);
-            teams.set(opponent.id, [new Unit(ALL_UNITS.rattata), null, null, null, null]);
+            teams.set(opponent.id, fallbackEnemyTeam(context.activeEdition));
         }
     }
     return teams;
@@ -44,7 +51,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
         let current = template;
         for (let level = 1; level < targetLevel && current.evolveId; level++) {
             const next = ALL_UNITS[current.evolveId];
-            if (!next) break;
+            if (!next || next.isPlayerOnly) break;
             current = next;
         }
         return current;
@@ -57,6 +64,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
 
     // Helper to bias enemy generation towards higher tiers in mid/late game
     const getRandomEnemyTemplate = (templates: UnitTemplate[]) => {
+        if (templates.length === 0) return undefined;
         if (game.turn >= 8 && Math.random() < 0.6) {
             const maxTier = Math.max(...templates.map(t => t.tier));
             const highTierPool = templates.filter(t => t.tier >= maxTier - 1);
@@ -139,7 +147,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
             for (const coreId of def.coreUnits) {
                 if (coreCount >= enemyCount) break;
                 const baseT = ALL_UNITS[coreId];
-                if (baseT && activeEdition.availableUnitIds.includes(coreId)) {
+                if (baseT && !baseT.isPlayerOnly && activeEdition.availableUnitIds.includes(coreId)) {
                     const t = getEvolvedTemplate(baseT, bossLevel);
                     if (!t) continue;
                     const u = new Unit(t);
@@ -158,7 +166,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
             const shopTier = game.shop.getTier(game.turn);
 
             while (fillCount > 0 && attempts < MAX_ENEMY_ATTEMPTS) {
-                const availableTemplates = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= shopTier && activeEdition.availableUnitIds.includes(t.id));
+                const availableTemplates = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && !t.isPlayerOnly && t.tier <= shopTier && activeEdition.availableUnitIds.includes(t.id));
                 let pool = availableTemplates;
                 if (mainSynergy && Math.random() < 0.7) {
                     const sPool = availableTemplates.filter(t => t.synergies.includes(mainSynergy));
@@ -166,6 +174,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
                 }
 
                 const baseT = getRandomEnemyTemplate(pool);
+                if (!baseT) break;
                 const t = getEvolvedTemplate(baseT, bossLevel);
                 if (t) {
                     const u = new Unit(t);
@@ -208,7 +217,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
             }
         } else {
             // Fallback logic if ID not found (Should not happen)
-            enemyTeam = [new Unit(ALL_UNITS.rattata), null, null, null, null];
+            enemyTeam = fallbackEnemyTeam(activeEdition);
         }
     } else {
         // This block executes if there's NO selected opponent (e.g., debugging or not opening the modal)
@@ -216,10 +225,10 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
         const def = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
         resolvedOpponent = def;
         const fbCandidateUnits: Unit[] = [];
-        for (const coreId of def.coreUnits) {
+        for (const coreId of def?.coreUnits ?? []) {
             if (fbCandidateUnits.length >= enemyCount) break;
             const t = ALL_UNITS[coreId];
-            if (t && activeEdition.availableUnitIds.includes(coreId)) {
+            if (t && !t.isPlayerOnly && activeEdition.availableUnitIds.includes(coreId)) {
                 const u = new Unit(getEvolvedTemplate(t, enemyBaseLevel));
                 u.level = enemyBaseLevel;
                 fbCandidateUnits.push(u);
@@ -228,8 +237,9 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
         let fbFillCount = enemyCount - fbCandidateUnits.length;
         const fbShopTier = game.shop.getTier(game.turn);
         while (fbFillCount > 0) {
-            const allT = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && t.tier <= fbShopTier && activeEdition.availableUnitIds.includes(t.id));
+            const allT = Object.values(ALL_UNITS).filter(t => t.id !== 'sprout' && !t.isHiddenFromShop && !t.isPlayerOnly && t.tier <= fbShopTier && activeEdition.availableUnitIds.includes(t.id));
             const t = getRandomEnemyTemplate(allT);
+            if (!t) break;
             if (t) {
                 const u = new Unit(getEvolvedTemplate(t, enemyBaseLevel));
                 u.level = enemyBaseLevel;

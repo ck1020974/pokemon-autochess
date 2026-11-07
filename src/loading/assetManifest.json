@@ -1,5 +1,5 @@
 {
-  "version": "51a344b5bc7fce30",
+  "version": "d24531ea701e45d0",
   "publicAssets": {
     "apple-touch-icon.png": 116301,
     "assets/react.svg": 4126,
@@ -149,10 +149,16 @@
     "assets/小貓怪01.webp": 14604,
     "assets/小鋸鱷00.webp": 6828,
     "assets/小鋸鱷01.webp": 13492,
+    "assets/小鍛匠00.webp": 6546,
+    "assets/小鍛匠01.webp": 9598,
     "assets/岩殿居蟹00.webp": 6054,
     "assets/岩殿居蟹01.webp": 16376,
+    "assets/巧鍛匠00.webp": 5080,
+    "assets/巧鍛匠01.webp": 12066,
     "assets/巨沼怪00.webp": 7044,
     "assets/巨沼怪01.webp": 20226,
+    "assets/巨鍛匠00.webp": 4836,
+    "assets/巨鍛匠01.webp": 13376,
     "assets/巴大蝶00.webp": 7348,
     "assets/巴大蝶01.webp": 20110,
     "assets/巴布土撥00.webp": 9046,
