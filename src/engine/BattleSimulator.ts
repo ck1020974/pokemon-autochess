@@ -102,8 +102,10 @@ export class BattleSimulator {
         this.battleBuffs.forEach(reward => {
             const atkMatch = reward.effect.match(/\+(\d+)\s*(?:攻擊?|攻)/);
             const hpMatch = reward.effect.match(/\+(\d+)\s*(?:生命?|HP)/);
+            // "+2攻擊與生命" shares one number between both stats.
+            const bothMatch = reward.effect.match(/\+(\d+)\s*攻擊與生命/);
             const atk = atkMatch ? parseInt(atkMatch[1]) : 0;
-            const hp = hpMatch ? parseInt(hpMatch[1]) : 0;
+            const hp = bothMatch ? parseInt(bothMatch[1]) : (hpMatch ? parseInt(hpMatch[1]) : 0);
 
             let targets: Unit[] = [];
             const playerUnits = this.playerTeam.filter(u => u !== null) as Unit[];
@@ -120,10 +122,10 @@ export class BattleSimulator {
                 const synergyId = reward.synergyId;
                 targets = [...playerUnits, ...(this.enemyTeam.filter(u => u !== null) as Unit[])]
                     .filter(u => u.synergies.includes(synergyId ?? ''));
-            } else if (reward.effect.includes('我方')) {
-                targets = playerUnits;
             } else if (reward.synergyId) {
                 targets = playerUnits.filter(u => u.synergies.includes(reward.synergyId!));
+            } else if (reward.effect.includes('我方')) {
+                targets = playerUnits;
             }
 
             targets.forEach(u => {

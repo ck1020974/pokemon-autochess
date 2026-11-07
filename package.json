@@ -36,7 +36,9 @@
     "test:tutorial-opponents": "node scripts/verify-tutorial-opponents.mjs",
     "test:tutorial-ui": "node scripts/verify-seven-fixes-ui.mjs",
     "test:infinite-opening": "node scripts/verify-infinite-opening.mjs",
-    "test:tutorial-followup-ui": "node scripts/verify-tutorial-followup-ui.mjs"
+    "test:tutorial-followup-ui": "node scripts/verify-tutorial-followup-ui.mjs",
+    "test:battle-reward-targets": "node scripts/verify-battle-reward-targets.mjs",
+    "test:battle-formation-parity": "node scripts/verify-battle-formation-parity.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.118.0",

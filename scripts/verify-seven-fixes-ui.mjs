@@ -62,7 +62,7 @@ try {
  for(const [width,height,insets] of [[844,390,{top:0,left:0,right:0,bottom:0}],[667,375,{top:0,left:0,right:0,bottom:0}],[844,390,{top:0,left:47,right:47,bottom:21}],[844,360,{top:0,left:47,right:47,bottom:21}],[844,390,{top:44,left:47,right:47,bottom:21}],[932,430,{top:0,left:59,right:59,bottom:21}],[375,812,{top:44,left:0,right:0,bottom:34}]]) {
   await page.setViewportSize({width,height});await cdp.send('Emulation.setSafeAreaInsetsOverride',{insets});
   if(height>width) {
-   check('Portrait keeps the existing rotate-phone guide',await page.getByText('請旋轉手機',{exact:false}).isVisible());
+   check('Portrait keeps the existing rotate-phone guide',await page.getByText('請旋轉手機',{exact:false}).waitFor({timeout:3000}).then(()=>true,()=>false));
    await capture(page,'orientation-guide-portrait');
    continue;
   }

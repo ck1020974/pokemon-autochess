@@ -29,6 +29,13 @@ export interface PoolChoice {
     imageUrl: string;
 }
 
+export const DIFFICULTY_INITIAL_LIVES = {
+    NORMAL: 6,
+    GREAT: 5,
+    ULTRA: 4,
+    MASTER: 3
+} as const;
+
 export class GameLoop {
     public turn: number = 1;
     public gold: number = 10;
@@ -107,14 +114,8 @@ export class GameLoop {
             'ULTRA': 1.1,
             'MASTER': 1.5
         };
-        const initialLives = {
-            'NORMAL': 6,
-            'GREAT': 5,
-            'ULTRA': 4,
-            'MASTER': 3
-        };
         this.difficultyMultiplier = multipliers[level];
-        this.lives = initialLives[level];
+        this.lives = DIFFICULTY_INITIAL_LIVES[level];
         this.difficultyName = level;
     }
 
@@ -1013,6 +1014,7 @@ export class GameLoop {
                 const boughtUnit = this.shop.buy(shopIndex);
                 if (boughtUnit) {
                     this.playerTeam[targetIndex] = finalizePurchase(boughtUnit);
+                    this.updateTeamCaps();
                     return targetIndex;
                 }
                 return null;
@@ -1044,6 +1046,7 @@ export class GameLoop {
             const boughtUnit = this.shop.buy(shopIndex);
             if (boughtUnit) {
                 this.playerTeam[emptySlotIndex] = finalizePurchase(boughtUnit);
+                this.updateTeamCaps();
                 return emptySlotIndex;
             }
         }
@@ -1088,10 +1091,6 @@ export class GameLoop {
                     }
                 }
             }
-        }
-
-        if (targetIndex !== undefined || emptySlotIndex !== -1) {
-            this.updateTeamCaps();
         }
 
         return null;

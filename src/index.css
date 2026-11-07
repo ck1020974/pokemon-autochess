@@ -3,6 +3,12 @@
   --text-main: #ffffff;
   --text-dim: #a0a0a0;
   --selection-backdrop: rgba(0, 0, 0, .85);
+  /* One status bar for every phase, in the title's deep teal. */
+  --hud-surface: #174049;
+  --hud-ink: #f8f4e6;
+  --hud-muted: #a9c4bd;
+  --hud-line: rgba(248, 244, 230, .28);
+  --hud-shadow: 0 4px 14px rgba(10, 30, 36, .3);
 
   --primary-gradient: linear-gradient(135deg, #3b82f6, #2563eb);
   --accent-gradient: linear-gradient(135deg, #f59e0b, #d97706);
@@ -57,6 +63,9 @@ h3 {
   flex-direction: column;
   gap: 30px;
   position: relative;
+  /* Shared by preparation and battle so nothing moves when the phase changes. */
+  padding: 0 20px 20px;
+  border: 1px solid transparent;
 }
 
 .game-container:not(.is-battling) {
@@ -64,19 +73,17 @@ h3 {
   border: 1px solid rgba(22, 104, 98, .18);
   border-radius: 28px;
   box-shadow: 0 24px 60px rgba(19, 89, 84, .16);
-  padding: 0 20px 20px;
   color: #173f45;
 }
 
-.game-container:not(.is-battling) .header {
+.game-container .header {
   min-height: 32px;
-  padding: 8px 0;
-  border-bottom-color: rgba(22, 104, 98, .2);
-  color: #1d5353;
+  padding: 8px 16px;
+  color: var(--hud-ink);
   font-size: 1rem;
 }
 
-.game-container:not(.is-battling) .header-section { gap: clamp(10px, 1.8vw, 22px); }
+.game-container .header-section { gap: clamp(10px, 1.8vw, 22px); }
 
 .game-container.prep-scene--mart { background: linear-gradient(180deg, #b9d9e9 0%, #d9eef0 48%, #b6d8d0 100%); }
 .game-container.prep-scene--center { background: linear-gradient(180deg, #f1dce1 0%, #f9edf0 48%, #e8d8dd 100%); }
@@ -109,7 +116,6 @@ h3 {
 
 .battle-stage-shell.is-battling > :not(.battle-intro-overlay):not(.battle-result-overlay) { position: relative; z-index: 1; }
 
-.battle-stage-shell.is-battling .header { border-bottom-color: rgba(255,255,255,.34); text-shadow: 0 2px 7px rgba(4,25,31,.58); }
 .battle-stage-shell.is-battling .board-container { background: transparent; box-shadow: none; }
 .battle-stage-shell.is-battling .board-container.is-battling { background: transparent; box-shadow: none; }
 .battle-stage-shell.is-battling .board-container.is-battling::after { opacity: .45; }
@@ -240,8 +246,8 @@ h3 {
 }
 
 .header {
-  background: #e1f4e9;
-  color: #1d5353;
+  background: var(--hud-surface);
+  color: var(--hud-ink);
   text-shadow: none;
   display: flex;
   justify-content: space-between;
@@ -257,6 +263,11 @@ h3 {
   gap: 30px;
   align-items: center;
 }
+
+.header--empty { visibility: hidden; }
+
+.header-progress { color: var(--hud-muted); }
+.header-progress.is-current { color: var(--hud-ink); }
 
 /* --- Split Board Layout --- */
 .board-container {
@@ -1551,11 +1562,10 @@ h3 {
   }
 
   .header,
-  .game-container:not(.is-battling) .header {
+  .game-container .header {
     font-size: 0.85rem;
     gap: 10px;
-    padding: 5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 5px 6px;
     flex-wrap: wrap;
   }
 
@@ -1580,11 +1590,6 @@ h3 {
     position: sticky !important;
     top: 0;
     flex-shrink: 0;
-    background: #e1f4e9 !important;
-  }
-
-  .game-container.is-battling > .header {
-    background: #e1f4e9 !important;
   }
 
   /* 1. Scale down Board Section */
@@ -3613,6 +3618,17 @@ h3 {
   color: #426a6c !important;
   font-weight: 700;
   letter-spacing: clamp(1px, .35vw, 4px);
+}
+
+.adventure-choice-meta {
+  color: #426a6c;
+  font-size: .85rem;
+  font-weight: 700;
+}
+
+/* Short screens keep the difficulty page to its original height. */
+@media (max-height: 500px) {
+  .adventure-choice-meta { display: none !important; }
 }
 
 .adventure-footer-copy {
