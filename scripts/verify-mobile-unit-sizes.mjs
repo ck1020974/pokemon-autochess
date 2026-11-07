@@ -18,8 +18,8 @@ try{
  await context.addInitScript(()=>localStorage.setItem('pokemon-analytics-opt-out','1'));
  const page=await context.newPage();page.setDefaultTimeout(60000);const cdp=await context.newCDPSession(page);
  await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/`);
- const version=page.getByRole('button',{name:/^帝王版本 帝王版本/});await version.click();await version.click();
- const difficulty=page.getByRole('button',{name:'大師 大師',exact:true});await difficulty.click();await difficulty.click();
+ const version=page.getByRole('button',{name:/^帝王版本 帝王版本/});await version.waitFor({timeout:180000});await version.click();await page.locator('button.is-focused').filter({hasText:'帝王版本'}).waitFor();await version.click();
+ const difficulty=page.getByRole('button',{name:'大師 大師',exact:true});await difficulty.waitFor({timeout:180000});await difficulty.click();await page.locator('button.is-focused').filter({hasText:'大師'}).waitFor();await difficulty.click();
  await page.getByRole('button',{name:'跳過',exact:true}).click();
  await page.getByRole('listitem').filter({hasText:'小青'}).click();
  await page.evaluate(async()=>{

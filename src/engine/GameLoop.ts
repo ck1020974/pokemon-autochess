@@ -1228,11 +1228,20 @@ export class GameLoop {
         unit.level = newLevel;
         // Case 1: Base Eevee evolving
         if (unit.templateId === 'eevee') {
-            const forms = ['flareon', 'vaporeon', 'jolteon', 'espeon', 'umbreon', 'leafeon', 'glaceon', 'sylveon'];
             // Compare actual family counts across the whole team, including ties.
             // Baton Pass is shared by every form and cannot indicate a direction.
             // Board merges clear the consumed source slot after resolving EXP.
             const allies = this.playerTeam.filter((ally): ally is Unit => !!ally && ally !== unit && ally !== consumedSource);
+            const completedForms = new Set(allies.filter(ally => ally.family === 'eevee' && ally.level >= 3)
+                .map(ally => ally.templateId.replace(/_final$/, '')));
+            const forms = ['flareon', 'vaporeon', 'jolteon', 'espeon', 'umbreon', 'leafeon', 'glaceon', 'sylveon']
+                .filter(id => !completedForms.has(id));
+            // Impossible on a legal five-slot board, but malformed saves must not roll a blocked form.
+            if (forms.length === 0) {
+                const base = ALL_UNITS.eevee.baseStats;
+                unit.addGrowth(base.maxHp, base.attack);
+                return;
+            }
             const synergyIds = new Set(allies.flatMap(ally => ally.synergies).filter(id => id !== 'BatonPass'));
             const counts = new Map([...synergyIds].map(id => [id,
                 this.getUniqueCount(allies.filter(ally => ally.synergies.includes(id)), id)

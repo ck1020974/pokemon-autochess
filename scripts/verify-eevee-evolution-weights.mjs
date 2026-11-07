@@ -70,10 +70,40 @@ try {
         const allies = [ally, makeUnit('rattata', ['Normal']), makeUnit('charmander', ['Normal'])];
         assert.equal(evolve(allies, 0.3).unit.templateId, 'vaporeon');
     });
-    check('Three-star Eevee forms contribute three elemental counts', () => {
+    check('Three-star Eevee elemental leader cannot be selected again', () => {
         const ally = makeUnit('vaporeon_final'); ally.level = 3;
         const allies = [ally, makeUnit('rattata', ['Normal']), makeUnit('charmander', ['Normal']), makeUnit('bulbasaur', ['Normal'])];
-        assert.equal(evolve(allies, 0.3).unit.templateId, 'vaporeon');
+        assert.equal(evolve(allies, 0.3).unit.templateId, 'espeon');
+    });
+    const finalAlly = id => { const unit = makeUnit(`${id}_final`); unit.level = 3; return unit; };
+    for (const blocked of forms) check(`Never roll existing three-star ${blocked}`, () => {
+        for (let i = 0; i < 80; i++) {
+            const result = evolve([finalAlly(blocked)], (i + .5) / 80);
+            assert.notEqual(result.unit.templateId, blocked);
+            const direct = evolve([finalAlly(blocked)], (i + .5) / 80, {exp: 1, amount: 8});
+            assert.notEqual(direct.unit.templateId, `${blocked}_final`);
+        }
+    });
+    check('Several final forms are excluded and remaining weights are normalized', () => {
+        const allies = [finalAlly('flareon'), finalAlly('jolteon'), makeUnit('squirtle', ['Water']), makeUnit('squirtle', ['Water'])];
+        // Final forms contribute three, so Water is not the leader here; remaining six are uniform.
+        const remaining = forms.filter(id => !['flareon', 'jolteon'].includes(id));
+        for (let i = 0; i < remaining.length; i++) assert.equal(evolve(allies, (i+.5)/6).unit.templateId, remaining[i]);
+    });
+    check('Two-star forms remain available', () => {
+        const ally = makeUnit('flareon'); ally.level = 2;
+        assert.equal(evolve([ally], 0).unit.templateId, 'flareon');
+    });
+    check('Consumed three-star source is excluded from the blocker list', () => {
+        const game = new GameLoop(undefined, () => 0);
+        const unit = makeUnit('eevee'); unit.exp = 2;
+        const source = finalAlly('flareon');
+        game.playerTeam = [unit, source, null, null, null];
+        game.handleUnitExpGain(unit, 1, source);
+        assert.equal(unit.templateId, 'flareon');
+    });
+    check('Corrupt fully blocked roster never creates a duplicate or undefined template', () => {
+        assert.equal(evolve(forms.map(finalAlly), 0).unit.templateId, 'eevee');
     });
     check('Repeated Eevee forms use their highest star bonus once', () => {
         const first = makeUnit('vaporeon'); first.level = 2;

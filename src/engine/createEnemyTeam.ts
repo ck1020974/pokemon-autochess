@@ -3,6 +3,7 @@ import {ALL_UNITS, PREFERRED_POSITIONS} from '../data/AllUnits';
 import type {PreferredPosition} from '../data/AllUnits';
 import type {GameLoop} from './GameLoop';
 import type {GameEdition} from '../models/Edition';
+import {createTutorialEnemyTeam} from './tutorialOpponents';
 
 interface EnemyContext {
     game: GameLoop;
@@ -29,6 +30,7 @@ export function prepareOpponentTeams(context: Omit<EnemyContext, 'opponent'>, op
 
 // Prepare once for the entrance, then hand the exact same lineup to the battle.
 export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, opponent}: EnemyContext): (Unit | null)[] {
+    if (tutorialStep > 0 && tutorialStep < 10) return createTutorialEnemyTeam(opponent?.id);
     // Enemy Count Logic based on User Request
     // Turn <= 1 = 3, Turn 2+ = 5
     let enemyCount = 5;
@@ -109,21 +111,7 @@ export function createEnemyTeam({game, activeEdition, difficulty, tutorialStep, 
     }
 
     // 3. Strategy / Synergy Selection
-    if (tutorialStep > 0 && tutorialStep < 10) {
-        // Tutorial Battle 1: Use Brock (novice_3 or in_3)'s team exactly
-        const brock = activeEdition.noviceOpponents.find(n => n.id.includes('_3')) || activeEdition.noviceOpponents[0];
-        resolvedOpponent = brock;
-        enemyTeam = (brock?.coreUnits || []).map((id: string) => {
-            const t = ALL_UNITS[id];
-            if (!t) {
-                console.warn("Tutorial unit template not found:", id);
-                return new Unit(ALL_UNITS.rattata);
-            }
-            const u = new Unit(t);
-            u.level = 1;
-            return u;
-        }).concat(Array(5).fill(null)).slice(0, 5) as Unit[];
-    } else if (opponent && opponent.id) {
+    if (opponent && opponent.id) {
         // Real gameplay OR Tutorial Battle 2: Use chosen opponent's team
         const def = activeEdition.championOpponents.find(c => c.id === opponent.id) ||
             activeEdition.eliteOpponents.find(c => c.id === opponent.id) ||

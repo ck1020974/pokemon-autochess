@@ -6,10 +6,9 @@
   box-sizing: border-box;
   width: min(360px, 40vw);
   padding: 16px 20px;
-  border: 1px solid rgba(255, 255, 248, .55);
+  border: 0;
   border-radius: 16px;
-  background: rgba(255, 255, 248, .72);
-  backdrop-filter: blur(8px);
+  background: #fffef7;
   color: #173f45;
   box-shadow: 0 6px 18px rgba(20, 60, 58, .08);
   text-align: left;
@@ -21,7 +20,7 @@
 .tutorial-coach button { margin-top: 12px; padding: 8px 16px; border: 0; border-radius: 8px; background: #245356; color: #fffdf3; font: inherit; pointer-events: auto; cursor: pointer; }
 .tutorial-coach button:focus-visible { outline: 3px solid #d8a93a; outline-offset: 3px; }
 @media (orientation: landscape) and (max-height: 500px) {
-  .tutorial-coach { top: 72px; right: 24px; width: min(320px, 42vw); padding: 10px 14px; border-radius: 12px; }
+  .tutorial-coach { top: calc(72px + env(safe-area-inset-top, 0px)); right: calc(24px + env(safe-area-inset-right, 0px)); width: min(320px, 42vw); padding: 10px 14px; border-radius: 12px; }
   .tutorial-coach-progress { font-size: 10px; margin-bottom: 4px; }
   .tutorial-coach-title { font-size: 14px; }
   .tutorial-coach-task { margin-top: 4px; font-size: 12px; line-height: 1.5; }

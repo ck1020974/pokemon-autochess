@@ -681,6 +681,8 @@ export class BattleSimulator {
                     await this.notifySkill(unit, `使用了吞下！`);
                     const captured = this.cloneUnit(target);
                     captured.stats = { ...target.stats };
+                    const opening = this.openingStats.get(target);
+                    if (opening) this.openingStats.set(captured, opening);
                     const state = this.unitStates.get(unit) || {};
                     state.swallowedUnit = captured;
                     this.unitStates.set(unit, state);
@@ -933,7 +935,7 @@ export class BattleSimulator {
     }
 
     private getSynergyCountForUnit(unit: Unit, synergyId: string): number {
-        const isPlayer = this.initialPlayerSet.has(unit);
+        const isPlayer = this.participantPlayerUnits.has(unit);
         const map = isPlayer ? this.playerSynergies : this.enemySynergies;
         return map.get(synergyId) || 0;
     }
@@ -2170,7 +2172,10 @@ export class BattleSimulator {
                         this.log(`${unit.name} 使用了噴出，重新召喚了 ${captured.name} ！`);
                         await this.delay(250);
 
-                        await this.spawnUnit(myTeam, deathIdx, captured.templateId, captured.level, captured.stats.hp, captured.stats.attack, true);
+                        const returned = await this.spawnUnit(myTeam, deathIdx, captured.templateId, captured.level, captured.stats.hp, captured.stats.attack, true,
+                            captured.templateId === 'mew' ? captured.synergies : undefined);
+                        const opening = this.openingStats.get(captured);
+                        if (returned && opening) this.openingStats.set(returned, opening);
                     }
                 }
             });
@@ -2428,11 +2433,10 @@ export class BattleSimulator {
                 }
 
                 await this.notifySkill(unit, '發動了同步');
-                // Summon identical copy with same stats and level
-                const spawned = await this.spawnUnit(myTeam, deathIdx, 'mew_clone', unit.level, unit.stats.maxHp, unit.stats.attack, true);
+                // Restore full opening maximum HP and attack before opening buffs.
+                const opening = this.openingStats.get(unit) ?? unit.stats;
+                const spawned = await this.spawnUnit(myTeam, deathIdx, 'mew_clone', unit.level, opening.maxHp, opening.attack, true, unit.synergies);
                 if (spawned) {
-                    // Inherit synergies (important for dynamic Mew)
-                    spawned.synergies = [...unit.synergies];
                     // Re-calculate to ensure UI and logic see the new synergies
                     this.calculateCachedSynergies(Array.from(this.participantPlayerUnits), this.playerSynergies);
                     this.calculateCachedSynergies(Array.from(this.participantEnemyUnits), this.enemySynergies);
@@ -2848,7 +2852,7 @@ export class BattleSimulator {
         target.stats.hp = Math.min(target.stats.hp + amount, target.stats.maxHp);
     }
 
-    private async spawnUnit(team: BattleTeam, index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false): Promise<Unit | undefined> {
+    private async spawnUnit(team: BattleTeam, index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false, inheritedSynergies?: readonly string[]): Promise<Unit | undefined> {
         const template = ALL_UNITS[templateId];
         if (!template) return;
         const newUnit = new Unit(template);
@@ -2862,7 +2866,7 @@ export class BattleSimulator {
         // Feature: Cap spawned unit stats at 50/50
         newUnit.capStats();
         newUnit.family = template.family || template.id;
-        newUnit.synergies = [...template.synergies];
+        newUnit.synergies = [...(inheritedSynergies ?? template.synergies)];
 
         // User Request: Spawned tokens should use 01 (Battle Image) if available
         newUnit.imageUrl = template.battleImageUrl || template.imageUrl;

@@ -13,6 +13,7 @@ import { music } from './engine/MusicManager';
 import { BattleSimulator } from './engine/BattleSimulator';
 import {createEnemyTeam, prepareOpponentTeams} from './engine/createEnemyTeam';
 import {getOpponentStage, selectOpponentChoices} from './engine/opponentSelection';
+import {TUTORIAL_OPPONENTS, isTutorialOpponentAllowed} from './engine/tutorialOpponents';
 import {rateOpponent} from './data/opponentDifficulty';
 import {TutorialCoach} from './components/TutorialCoach';
 import {BattleControls} from './components/BattleControls';
@@ -590,15 +591,6 @@ function App() {
                 setTutorialStep(5);
                 setSelected(null);
             }
-        } else if (tutorialStep === 5) {
-            const isReplaced = game.shop.slots.length === 2 && game.shop.slots[0]?.family === 'charmander' && game.shop.slots[1]?.family === 'charmander';
-            if (game.gold < 10 && !isReplaced) {
-                game.shop.slots = [new Unit(ALL_UNITS.charmander), new Unit(ALL_UNITS.charmander), null];
-                game.shop.frozen = [false, false, false, false, false];
-                update();
-            } else if (game.gold < 10 && isReplaced) {
-                setTutorialStep(6);
-            }
         } else if (tutorialStep === 6) {
             if (game.shop.frozen[0] && game.shop.frozen[1]) {
                 setTutorialStep(7);
@@ -1005,7 +997,7 @@ function App() {
                 game.shop.slots = [
                     new Unit(ALL_UNITS.charmander),
                     new Unit(ALL_UNITS.charmander),
-                    new Unit(ALL_UNITS.squirtle)
+                    null
                 ];
                 setTutorialStep(6);
             }
@@ -1107,15 +1099,7 @@ function App() {
         // Prepare opponent choices
         if (tutorialStep > 0) {
             if (tutorialStep < 10) {
-                // First tutorial opponent: Brock Easter Egg (Three ways to face Brock!)
-                const brock = activeEdition.noviceOpponents.find(n => n.name === '小剛') || activeEdition.noviceOpponents[0];
-                const brockId = brock.id;
-
-                setPreparedOpponentChoices([
-                    { id: brockId, name: '小剛', url: 'gym/小剛01.webp', difficulty: 'EASY' },
-                    { id: brockId, name: '小剛', url: 'gym/小剛02.webp', difficulty: 'NORMAL' },
-                    { id: brockId, name: '小剛', url: 'gym/小剛03.webp', difficulty: 'HARD' }
-                ]);
+                setPreparedOpponentChoices(TUTORIAL_OPPONENTS.map(opponent => ({...opponent})));
             } else {
                 // Second tutorial: Force Champions to ensure player defeat
                 setPreparedOpponentChoices(selectOpponentChoices(activeEdition.championOpponents, game.defeatedOpponentIds));
@@ -1313,6 +1297,7 @@ function App() {
     };
 
     const handleOpponentSelect = (opponent: SelectedOpponent) => {
+        if (!isTutorialOpponentAllowed(tutorialStep, opponent.id)) return;
         const definition = allEditionOpponents.find(candidate => candidate.id === opponent.id);
         const teamSynergies = (definition?.coreUnits ?? []).flatMap(id => ALL_UNITS[id] ? [ALL_UNITS[id].synergies] : []);
         const nextSceneClass = getBattleSceneClass(getPresentationKind(game.wins), opponent.id, recentBattleSceneClasses, { teamSynergies, opponentName: opponent.name });
@@ -1395,11 +1380,9 @@ function App() {
             .filter(c => c.id !== choice.id)
             .map(c => c.id);
 
-        // Wait for destruction animation (matches CSS 0.6s)
-        await new Promise(resolve => setTimeout(resolve, 600));
-
-        // Short pause after destruction
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Keep the choice committed until the smooth retreat has finished.
+        const exitDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 120 : 400;
+        await new Promise(resolve => setTimeout(resolve, exitDuration));
 
         game.applyPoolChoice(choice, unselectedIds);
         setSelectedPoolId(null);
@@ -1432,7 +1415,7 @@ function App() {
     }
 
     return (
-        <div className={`game-container battle-stage-shell ${preparationSceneClass} ${keepBattleScene ? `is-battling ${battleSceneClass}` : ''}`} onClick={() => {
+        <div className={`game-container battle-stage-shell ${tutorialStep > 0 ? 'has-tutorial' : ''} ${preparationSceneClass} ${keepBattleScene ? `is-battling ${battleSceneClass}` : ''}`} onClick={() => {
             music.resumeContext();
             if (focusedDifficulty) setFocusedDifficulty(null);
             setActiveSynergyId(null);
@@ -1523,15 +1506,15 @@ function App() {
             {/* Tutorial Completion Screen (Step 12) */}
             {
                 tutorialStep === 12 && (
-                    <div className="battle-result-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.98)', zIndex: 30000, display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={() => handleRestart()}>
-                        <div className="result-content" style={{ textAlign: 'center' }}>
-                            <div className="result-title" style={{ fontSize: '4.5rem', color: '#ffd700', textShadow: '0 0 40px rgba(255,215,0,0.6)', marginBottom: '15px' }}>
+                    <div className="battle-result-overlay tutorial-completion-overlay" onClick={() => handleRestart()}>
+                        <div className="result-content">
+                            <div className="result-title">
                                 遊戲教學已結束
                             </div>
-                            <div className="result-subtitle" style={{ fontSize: '2rem', color: '#fff', marginBottom: '50px', opacity: 0.9 }}>
+                            <div className="result-subtitle">
                                 擊敗所有訓練師，成為寶可夢冠軍！
                             </div>
-                            <div style={{ fontSize: '1.3rem', color: '#aaa', animation: 'pulse 1.5s infinite' }}>
+                            <div className="tutorial-completion-continue">
                                 點擊任意處繼續
                             </div>
                         </div>
@@ -1767,9 +1750,9 @@ function App() {
                 <div className="header-section">
                     {difficulty && (
                         <>
-                            <span style={{ color: game.wins < 8 ? '#fff' : '#888' }}>🏅 道館: {Math.min(game.wins, 8)}/8</span>
-                            <span style={{ color: (game.wins >= 8 && game.wins < 12) ? '#fbbf24' : '#888' }}>⚔️ 四天王: {Math.max(0, Math.min(game.wins - 8, 4))}/4</span>
-                            <span style={{ color: game.wins >= 12 ? '#f472b6' : '#888' }}>👑 冠軍: {game.edition.id === 'infinite' ? '∞' : `${Math.max(0, Math.min(game.wins - 12, 1))}/1`}</span>
+                            <span style={{ color: game.wins < 8 ? '#1d5353' : '#50706a' }}>🏅 道館: {Math.min(game.wins, 8)}/8</span>
+                            <span style={{ color: (game.wins >= 8 && game.wins < 12) ? '#1d5353' : '#50706a' }}>⚔️ 四天王: {Math.max(0, Math.min(game.wins - 8, 4))}/4</span>
+                            <span style={{ color: game.wins >= 12 ? '#1d5353' : '#50706a' }}>👑 冠軍: {game.edition.id === 'infinite' ? '∞' : `${Math.max(0, Math.min(game.wins - 12, 1))}/1`}</span>
                         </>
                     )}
                     {/* Help & Mute Toggle Buttons inside Header - Show alongside other game info */}
@@ -2155,10 +2138,11 @@ function App() {
                         <h2 id="opponent-selection-title" className="selection-title">請選擇你的對手</h2>
                         <div className="opponent-cards-container selection-choices">
                             {opponentChoices.map((npc) => (
-                                <SelectionCard key={npc.id} className="opponent-card--choice" selected={opponentSelection.selected === npc} onChoose={() => opponentSelection.choose(npc)}>
+                                <SelectionCard key={npc.id} className="opponent-card--choice" selected={opponentSelection.selected === npc} disabled={!isTutorialOpponentAllowed(tutorialStep, npc.id)} onChoose={() => opponentSelection.choose(npc)}>
                                     {npc.difficulty && <span className={`selection-badge difficulty-${npc.difficulty}`}>{npc.difficulty === 'VERY_HARD' ? 'EXTREME' : npc.difficulty}</span>}
                                     <div className="selection-art opponent-portrait"><img src={npc.url} alt={npc.name} /></div>
                                     <div className="opponent-name opponent-card__name">{npc.name}</div>
+                                    {!isTutorialOpponentAllowed(tutorialStep, npc.id) && <span className="tutorial-opponent-lock">教學僅開放簡單</span>}
                                     <div className="opponent-core" aria-label="代表角色">
                                         {(opponentPreviewTeams.current.get(npc.id) ?? []).filter((unit): unit is Unit => unit !== null).slice(0, 3).map(unit => <img key={unit.id} src={unit.imageUrl.replace('01.webp', '00.webp')} alt={unit.name} title={unit.name} data-template-id={unit.templateId} data-unit-id={unit.id} />)}
                                     </div>
@@ -2448,7 +2432,7 @@ function App() {
             {/* Battle Log & Timeout HUD */}
             {
                 game.phase === GamePhase.BATTLE && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px', padding: '0 0', marginTop: '8px' }}>
+                    <div className="battle-feedback">
                         {/* 1. Battle Controls (Top) */}
                         <div className="battle-controls-container" style={{ zIndex: 10, position: 'relative' }}>
                             <BattleControls

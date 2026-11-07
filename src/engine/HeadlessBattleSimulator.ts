@@ -629,6 +629,8 @@ export class HeadlessBattleSimulator {
                     this.log(`${unit.name} 對 ${target.name} 使用了吞下！`);
                     const captured = this.cloneUnit(target);
                     captured.stats = { ...target.stats };
+                    const opening = this.openingStats.get(target);
+                    if (opening) this.openingStats.set(captured, opening);
                     const state = this.unitStates.get(unit) || {};
                     state.swallowedUnit = captured;
                     this.unitStates.set(unit, state);
@@ -640,7 +642,7 @@ export class HeadlessBattleSimulator {
     }
 
     private getSynergyCountForUnit(unit: Unit, synergyId: string): number {
-        const isPlayer = this.initialPlayerSet.has(unit);
+        const isPlayer = this.participantPlayerUnits.has(unit);
         const map = isPlayer ? this.playerSynergies : this.enemySynergies;
         return map.get(synergyId) || 0;
     }
@@ -1655,7 +1657,10 @@ export class HeadlessBattleSimulator {
                             if (deathIdx === -1) deathIdx = 0;
                         }
                         this.log(`${unit.name} 使用了噴出，重新召喚了 ${captured.name} ！`);
-                        await this.spawnUnit(myTeam, deathIdx, captured.templateId, captured.level, captured.stats.hp, captured.stats.attack, true);
+                        const returned = await this.spawnUnit(myTeam, deathIdx, captured.templateId, captured.level, captured.stats.hp, captured.stats.attack, true,
+                            captured.templateId === 'mew' ? captured.synergies : undefined);
+                        const opening = this.openingStats.get(captured);
+                        if (returned && opening) this.openingStats.set(returned, opening);
                     }
                 }
             });
@@ -1871,6 +1876,21 @@ export class HeadlessBattleSimulator {
                         }
                     }
                 }
+            });
+        }
+        // Mew: restore opening stats; clones cannot summon again.
+        if (unit.family === 'mew' && unit.templateId === 'mew') {
+            this.eventBus.on('AFTER_DEATH', async (e) => {
+                if (e.source !== unit || this.unitStates.get(unit)?.isSilenced) return;
+                const { myTeam } = this.getTeams(unit);
+                let deathIdx = myTeam.indexOf(unit);
+                if (deathIdx === -1) {
+                    deathIdx = myTeam.findIndex(u => !u || u.stats.hp <= 0);
+                    if (deathIdx === -1) deathIdx = 0;
+                }
+                await this.notifySkill(unit, '發動了同步');
+                const opening = this.openingStats.get(unit) ?? unit.stats;
+                await this.spawnUnit(myTeam, deathIdx, 'mew_clone', unit.level, opening.maxHp, opening.attack, true, unit.synergies);
             });
         }
     }
@@ -2153,7 +2173,7 @@ export class HeadlessBattleSimulator {
         if (target.stats.hp > 0) target.stats.hp = Math.min(target.stats.hp + amount, target.stats.maxHp);
     }
 
-    private async spawnUnit(team: BattleTeam, index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false) {
+    private async spawnUnit(team: BattleTeam, index: number, templateId: string, level: number, hp: number, attack: number, insert: boolean = false, inheritedSynergies?: readonly string[]): Promise<Unit | undefined> {
         const template = ALL_UNITS[templateId];
         if (!template) return;
 
@@ -2166,7 +2186,7 @@ export class HeadlessBattleSimulator {
         newUnit.stats.attack = safeAtk;
         newUnit.capStats();
         newUnit.family = template.family || template.id;
-        newUnit.synergies = [...template.synergies];
+        newUnit.synergies = [...(inheritedSynergies ?? template.synergies)];
 
         if (insert) {
             if (team[index] === null || (team[index] && team[index].stats.hp <= 0)) team[index] = newUnit;
@@ -2191,6 +2211,11 @@ export class HeadlessBattleSimulator {
         }
         this.unitStates.set(newUnit, {});
         this.registerUnitAbilities(newUnit);
+        if (team === this.playerTeam) this.participantPlayerUnits.add(newUnit);
+        else this.participantEnemyUnits.add(newUnit);
+        this.calculateCachedSynergies(Array.from(this.participantPlayerUnits), this.playerSynergies);
+        this.calculateCachedSynergies(Array.from(this.participantEnemyUnits), this.enemySynergies);
+        return newUnit;
     }
 
     public log(message: string) {

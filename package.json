@@ -30,7 +30,10 @@
     "test:trainer-presentation": "node scripts/verify-trainer-presentation.mjs",
     "test:battle-scenes": "node scripts/verify-battle-scenes.mjs",
     "test:assets": "node scripts/verify-asset-loader.mjs && node scripts/verify-asset-cache.mjs && node scripts/verify-asset-catalog.mjs",
-    "test:summon-ownership": "node scripts/verify-summon-ownership.mjs"
+    "test:summon-ownership": "node scripts/verify-summon-ownership.mjs",
+    "test:mew-opening-clone": "node scripts/verify-mew-opening-clone.mjs",
+    "test:tutorial-opponents": "node scripts/verify-tutorial-opponents.mjs",
+    "test:tutorial-ui": "node scripts/verify-seven-fixes-ui.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.118.0",

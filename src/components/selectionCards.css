@@ -34,7 +34,7 @@
   border: 2px solid var(--choice-border) !important; border-radius: 16px !important;
   box-shadow: 0 10px 24px #0003 !important; backdrop-filter: none !important;
   cursor: pointer; transition: background .16s, border-color .16s;
-  transform: none !important;
+  transform: none;
 }
 .selection-dialog .selection-choices .selection-card:hover { border-color: #9baab5 !important; }
 .selection-dialog .selection-choices .selection-card.is-selected {
@@ -114,4 +114,17 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .selection-dialog .selection-card { transition: none; }
+}
+.selection-dialog .opponent-card--choice[aria-disabled='true'] {
+  cursor: default;
+  border-color: var(--choice-border) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.selection-card[aria-disabled='true'] .opponent-portrait { opacity: .65; }
+.tutorial-opponent-lock {
+  color: var(--choice-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-block: 0 8px;
 }

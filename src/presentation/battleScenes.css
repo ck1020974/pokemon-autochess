@@ -2,12 +2,26 @@
    Rebuild with python scripts/draw_battle_scenes.py from the game repository. */
 @import './sceneAssets.css';
 
+/* Keep feedback in normal flow so wrapped messages never shrink or get clipped. */
+.battle-feedback {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+  padding-bottom: 12px;
+}
+.battle-feedback .battle-log { flex: 0 0 auto; width: min(760px, 100%); }
+
 .game-container.battle-stage-shell .header {
-  background: transparent;
+  background: #e1f4e9;
+  color: #1d5353;
   border-bottom: 0;
   border-radius: 0;
   box-shadow: none;
   backdrop-filter: none;
+  text-shadow: none;
 }
 
 /* Extend the same scene behind the centered game on large desktop screens. */
@@ -38,15 +52,15 @@ body:has(.game-container.is-battling) { background: #101d2d var(--battle-scene-i
 }
 
 .battle-stage-shell.is-battling[class*='battle-scene--'] .header {
-  color: var(--scene-ui-ink, #edf6f8);
-  background: transparent;
+  color: #1d5353;
+  background: #e1f4e9;
   border-bottom: 0;
-  text-shadow: 0 1px 4px var(--scene-ui-shadow, rgba(3, 17, 31, .65));
+  text-shadow: none;
 }
 
 .battle-stage-shell.is-battling[class*='battle-scene--champion-hall'] .header {
-  color: #edf6f8;
-  text-shadow: 0 1px 4px rgba(3, 17, 31, .8);
+  color: #1d5353;
+  text-shadow: none;
 }
 
 .battle-stage-shell.is-battling[class*='battle-scene--'] .board-container {
@@ -151,7 +165,7 @@ body:has(.game-container[class*='prep-scene--']:not(.is-battling)) {
   border-color: transparent;
 }
 .game-container[class*='prep-scene--']:not(.is-battling) .header {
-  background: transparent;
+  background: #e1f4e9;
   border-radius: 0;
   border-bottom: 0;
 }
@@ -216,4 +230,25 @@ body:has(.game-container[class*='prep-scene--']:not(.is-battling)) {
       --mobile-unit-size: 100px;
     }
   }
+}
+
+@media (max-width: 950px) or (max-height: 500px) {
+  .game-container.is-battling { gap: 4px; padding-bottom: 4px; }
+  .game-container.is-battling .board-container,
+  .game-container.has-tutorial .board-container {
+    flex: 0 0 auto;
+    margin-top: 0;
+    margin-bottom: 0 !important;
+    padding: 4px 10px;
+  }
+  .game-container.is-battling .board-side,
+  .game-container.has-tutorial .board-side {
+    min-height: 104px;
+    padding-block: 4px;
+  }
+  .game-container.is-battling .board-container { padding-block: 0; }
+  .game-container.is-battling .board-side { min-height: 100px; padding-block: 0; }
+  .game-container.has-tutorial:not(.is-battling) { gap: 12px; }
+  .battle-feedback { gap: 4px; margin-top: 0; padding-bottom: 4px; }
+  .battle-feedback .battle-log { min-height: 0; }
 }
