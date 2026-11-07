@@ -1497,37 +1497,37 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         id: 'plusle', name: '正電拍拍', tier: 2, family: 'plusle',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/正電拍拍00.webp', battleImageUrl: 'assets/正電拍拍01.webp',
-        description: '戰鬥開始時，首位友軍獲得正電拍拍開場攻擊的 25%。', synergies: ['Charge', 'BatonPass'], evolveId: 'plusle_2'
+        description: '戰鬥開始時，首位友軍獲得正電拍拍攻擊的 25%。', synergies: ['Charge', 'BatonPass'], evolveId: 'plusle_2'
     },
     plusle_2: {
         id: 'plusle_2', name: '正電拍拍', tier: 2, family: 'plusle',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/正電拍拍00.webp', battleImageUrl: 'assets/正電拍拍01.webp',
-        description: '戰鬥開始時，首位友軍獲得正電拍拍開場攻擊的 33%。', synergies: ['Charge', 'BatonPass'], evolveId: 'plusle_3', isHiddenFromShop: true
+        description: '戰鬥開始時，首位友軍獲得正電拍拍攻擊的 33%。', synergies: ['Charge', 'BatonPass'], evolveId: 'plusle_3', isHiddenFromShop: true
     },
     plusle_3: {
         id: 'plusle_3', name: '正電拍拍', tier: 2, family: 'plusle',
         baseStats: { hp: 2, maxHp: 2, attack: 4 },
         imageUrl: 'assets/正電拍拍00.webp', battleImageUrl: 'assets/正電拍拍01.webp',
-        description: '戰鬥開始時，首位友軍獲得正電拍拍開場攻擊的 50%。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true
+        description: '戰鬥開始時，首位友軍獲得正電拍拍攻擊的 50%。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true
     },
     minun: {
         id: 'minun', name: '負電拍拍', tier: 2, family: 'minun',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/負電拍拍00.webp', battleImageUrl: 'assets/負電拍拍01.webp',
-        description: '戰鬥開始時，首位友軍獲得負電拍拍開場生命的 25%。', synergies: ['Charge', 'BatonPass'], evolveId: 'minun_2'
+        description: '戰鬥開始時，首位友軍獲得負電拍拍生命的 25%。', synergies: ['Charge', 'BatonPass'], evolveId: 'minun_2'
     },
     minun_2: {
         id: 'minun_2', name: '負電拍拍', tier: 2, family: 'minun',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/負電拍拍00.webp', battleImageUrl: 'assets/負電拍拍01.webp',
-        description: '戰鬥開始時，首位友軍獲得負電拍拍開場生命的 33%。', synergies: ['Charge', 'BatonPass'], evolveId: 'minun_3', isHiddenFromShop: true
+        description: '戰鬥開始時，首位友軍獲得負電拍拍生命的 33%。', synergies: ['Charge', 'BatonPass'], evolveId: 'minun_3', isHiddenFromShop: true
     },
     minun_3: {
         id: 'minun_3', name: '負電拍拍', tier: 2, family: 'minun',
         baseStats: { hp: 4, maxHp: 4, attack: 2 },
         imageUrl: 'assets/負電拍拍00.webp', battleImageUrl: 'assets/負電拍拍01.webp',
-        description: '戰鬥開始時，首位友軍獲得負電拍拍開場生命的 50%。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true
+        description: '戰鬥開始時，首位友軍獲得負電拍拍生命的 50%。', synergies: ['Charge', 'BatonPass'], isHiddenFromShop: true
     },
     trapinch: {
         id: 'trapinch', name: '大顎蟻', tier: 3, family: 'trapinch',

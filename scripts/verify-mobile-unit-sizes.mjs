@@ -70,6 +70,9 @@ try{
  await page.getByRole('button',{name:'對戰',exact:true}).click();
  const opponent=page.locator('.opponent-card').first();await opponent.click();await opponent.click();
  await page.getByRole('button',{name:'略過戰鬥演出'}).click();await page.getByRole('button',{name:'暫停戰鬥',exact:true}).click();
+ // The enemy entrance scales portraits; measure the settled formation.
+ await page.waitForFunction(()=>document.getAnimations().every(a=>a.playState!=='running'||a.effect?.getComputedTiming().iterations===Infinity),null,{timeout:5000}).catch(()=>{});
+ await page.waitForTimeout(700);
  await capture('battle');
  // Empty logical slot 5 keeps its box and anchor, independent of the portrait.
  await page.locator('.board-side > .unit-wrapper:last-child').evaluateAll(els=>els.forEach(el=>el.innerHTML='<div class="slot-placeholder"></div>'));

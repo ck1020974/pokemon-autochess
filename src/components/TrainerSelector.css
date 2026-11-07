@@ -53,25 +53,15 @@
 .trainer-selector-figure.is-far.is-left { transform: translateX(calc(-50% - clamp(310px, 38vw, 475px))) scale(.32); }
 .trainer-selector-figure.is-far.is-right { transform: translateX(calc(-50% + clamp(310px, 38vw, 475px))) scale(.32); }
 .trainer-selector-figure.is-hidden { z-index: 1; pointer-events: none; opacity: 0; }
-/* The portraits are busts: the shop's paper card gives their cut-off edge a frame. */
 .trainer-selector-figure img {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    box-sizing: border-box;
     width: 100%;
-    height: auto;
-    aspect-ratio: 1;
+    height: 100%;
     object-fit: contain;
-    border: 1px solid rgba(22, 104, 98, .18);
-    border-radius: 16px;
-    background: rgba(252, 251, 241, .92);
-    box-shadow: 0 8px 18px rgba(21, 63, 69, .18);
-    transition: transform .2s ease, box-shadow .2s ease;
+    filter: drop-shadow(0 8px 6px rgba(21, 63, 69, .28));
+    transition: transform .2s ease;
 }
-.trainer-selector-figure.is-active img { border-color: #d8a93a; box-shadow: 0 0 0 2px #d8a93a, 0 10px 22px rgba(21, 63, 69, .24); }
 .trainer-selector-name { display: none; position: absolute; top: 14px; left: 50%; min-width: max-content; transform: translateX(-50%); color: var(--selector-ink); font-family: inherit; font-size: clamp(17px, 1.9vw, 22px); font-weight: 800; letter-spacing: .08em; text-shadow: 0 1px 0 rgba(255,255,255,.56); }
-.trainer-selector-figure.is-active .trainer-selector-name { display: block; top: auto; bottom: calc(var(--trainer-card) + 10px); }
+.trainer-selector-figure.is-active .trainer-selector-name { display: block; top: auto; bottom: calc(50% + var(--trainer-card) / 2 + 8px); }
 .trainer-selector-figure:focus-visible { outline: 4px solid #eb9e3e; outline-offset: 4px; }
 
 .trainer-selector-footnote { margin: 0; padding: 0 24px; color: #426a6c; text-align: center; font-size: clamp(13px, 1.45vw, 16px); font-weight: 800; letter-spacing: .08em; text-shadow: 0 1px 0 rgba(255,255,255,.56); }

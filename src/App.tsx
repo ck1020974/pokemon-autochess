@@ -2315,7 +2315,29 @@ function App() {
             {
                 game.phase === GamePhase.SHOP && (
                     <div className={`shop-container ${tutorialStep === 6 ? 'tutorial-elevate' : ''}`} onClick={() => setActiveSynergyId(null)}>
-                        {/* Right Shop Slots - Shifted right while button stays fixed */}
+                        <div className="shop-actions">
+                            <button
+                                className={`reroll-icon-btn ${game.gold < 1 && game.freeRerolls === 0 ? 'btn-disabled' : ''} ${tutorialStep === 5 ? 'tutorial-highlight' : ''}`}
+                                onClick={handleReroll}
+                                disabled={game.gold < 1 && game.freeRerolls === 0}
+                                                                title="刷新商店 ($1)"
+                                aria-label={game.freeRerolls > 0 ? `刷新，免費 ${game.freeRerolls} 次` : '刷新'}
+                            >
+                                <svg className="shop-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8" /><path d="M4 3.5V8h4.5" /><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16" /><path d="M20 20.5V16h-4.5" /></svg>
+                                {game.freeRerolls > 0 && <span className="shop-action-count" aria-hidden="true">{game.freeRerolls}</span>}
+                            </button>
+                                <button
+                                    aria-label="對戰"
+                                    title="對戰"
+                                    className={`btn-premium btn-battle ${(tutorialStep === 7 || tutorialStep === 10) ? 'tutorial-target-glow' : ''}`}
+                                    onClick={handleStartBattle}
+                                    style={{ zIndex: (tutorialStep === 7 || tutorialStep === 10) ? 10000 : 'auto' }}
+                                >
+                                    <svg className="shop-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 17.5L3 6V3h3l11.5 11.5" /><path d="M13 19l6-6" /><path d="M16 16l4 4" /><path d="M19 21l2-2" /><path d="M14.5 6.5L18 3h3v3l-3.5 3.5" /><path d="M5 14l4 4" /><path d="M7 17l-3 3" /><path d="M3 19l2 2" /></svg>
+                                </button>
+                        </div>
+
+                        {/* Stock slots */}
                         <div className="shop-slots-area" style={{ position: 'relative' }}>
 
                             <div className="shop-slot-scroll">
@@ -2390,23 +2412,6 @@ function App() {
                                 })}
                             </div>
                             </div>
-                        </div>
-                        <div className="shop-actions">
-                            <button
-                                className={`reroll-icon-btn ${game.gold < 1 && game.freeRerolls === 0 ? 'btn-disabled' : ''} ${tutorialStep === 5 ? 'tutorial-highlight' : ''}`}
-                                onClick={handleReroll}
-                                disabled={game.gold < 1 && game.freeRerolls === 0}
-                                                                title="刷新商店 ($1)"
-                            >
-                                {game.freeRerolls > 0 ? `免費 ×${game.freeRerolls}` : '刷新 $1'}
-                            </button>
-                                <button
-                                    className={`btn-premium btn-battle ${(tutorialStep === 7 || tutorialStep === 10) ? 'tutorial-target-glow' : ''}`}
-                                    onClick={handleStartBattle}
-                                    style={{ zIndex: (tutorialStep === 7 || tutorialStep === 10) ? 10000 : 'auto' }}
-                                >
-                                    <span>對戰</span>
-                                </button>
                         </div>
                     </div>
                 )
