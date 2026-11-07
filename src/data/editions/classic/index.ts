@@ -23,7 +23,7 @@ export const ClassicEdition: GameEdition = {
             'cubone', 'murkrow', 'bonsly', 'happiny', 'larvitar', 'dratini', 'raikou', 'entei', 'suicune', 'delibird', 'shuckle', 'riolu',
             'cramorant', 'comfey', 'mawile', 'grubbin', 'croagunk', 'munna', 'wooper', 'pumpkaboo', 'growlithe', 'swablu', 'plusle', 'minun', 'gulpin',
             'trapinch', 'pawmi', 'spheal', 'bagon', 'shinx', 'aron', 'darkrai', 'cresselia',
-            'cetoddle', 'noibat', 'cutiefly', 'slakoth', 'mew', 'absol'
+            'cetoddle', 'noibat', 'cutiefly', 'slakoth', 'mew', 'absol', 'tinkatink'
         ];
         return !u.family || !excludedFamilies.includes(u.family);
     }),

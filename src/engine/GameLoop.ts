@@ -635,7 +635,7 @@ export class GameLoop {
 
         // Larvitar/Dratini/Charmander/Pichu scaling logic (Apply to actual persistent team)
         this.playerTeam.forEach(u => {
-            if (u && (u.family === 'larvitar' || u.family === 'dratini' || u.family === 'bagon' || u.family === 'slakoth')) {
+            if (u && (u.family === 'larvitar' || u.family === 'tinkatink' || u.family === 'dratini' || u.family === 'bagon' || u.family === 'slakoth')) {
                 if (u.level < 3) {
                     u.battlesCount++;
                     if (u.battlesCount >= 3) {

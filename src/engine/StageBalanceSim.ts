@@ -46,7 +46,7 @@ function constructBossTeam(boss: OpponentDefinition, stageId: string): Unit[] {
     for (const coreId of boss.coreUnits) {
         if (team.length >= 5) break; // 最多 5 隻
         const t = ALL_UNITS[coreId];
-        if (t) {
+        if (t && !t.isPlayerOnly) {
             const u = new Unit(t);
             applyStatsByLevel(u, baseLevel);
 

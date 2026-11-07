@@ -581,21 +581,21 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
     // 29. Kangaskhan
     kangaskhan: {
         id: 'kangaskhan', name: '袋獸', tier: 4, family: 'kangaskhan',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '戰鬥開始時，獲得自身 33% 攻擊的生命。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_2'
+        description: '戰鬥開始時，攻擊提高 50%。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_2'
     },
     kangaskhan_2: {
         id: 'kangaskhan_2', name: '袋獸', tier: 4, family: 'kangaskhan',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '戰鬥開始時，獲得自身 33% 攻擊的生命。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
+        description: '戰鬥開始時，攻擊提高 50%。', synergies: ['Normal', 'Angry'], evolveId: 'kangaskhan_3', isHiddenFromShop: true
     },
     kangaskhan_3: {
         id: 'kangaskhan_3', name: '袋獸', tier: 4, family: 'kangaskhan',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 4, maxHp: 4, attack: 6 },
         imageUrl: 'assets/袋獸00.webp', battleImageUrl: 'assets/袋獸01.webp',
-        description: '戰鬥開始時，獲得自身 33% 攻擊的生命。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
+        description: '戰鬥開始時，攻擊提高 50%。', synergies: ['Normal', 'Angry'], isHiddenFromShop: true
     },
 
     // 30. Ditto
@@ -1216,6 +1216,24 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
         imageUrl: 'assets/班基拉斯00.webp', battleImageUrl: 'assets/班基拉斯01.webp',
         description: '同時對後方敵方造成 66% 傷害。', synergies: ['Thief', 'Cave'], isHiddenFromShop: true
     },
+    tinkatink: {
+        id: 'tinkatink', name: '小鍛匠', tier: 5, family: 'tinkatink',
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        imageUrl: 'assets/小鍛匠00.webp', battleImageUrl: 'assets/小鍛匠01.webp',
+        description: '同時對後方敵方造成 33% 傷害；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Charm', 'Hard'], isPlayerOnly: true, evolveId: 'tinkatuff'
+    },
+    tinkatuff: {
+        id: 'tinkatuff', name: '巧鍛匠', tier: 5, family: 'tinkatink',
+        baseStats: { hp: 8, maxHp: 8, attack: 8 },
+        imageUrl: 'assets/巧鍛匠00.webp', battleImageUrl: 'assets/巧鍛匠01.webp',
+        description: '同時對後方敵方造成 50% 傷害；每三場戰鬥後獲得 1 點 EXP。', synergies: ['Charm', 'Hard'], isPlayerOnly: true, evolveId: 'tinkaton', isHiddenFromShop: true
+    },
+    tinkaton: {
+        id: 'tinkaton', name: '巨鍛匠', tier: 5, family: 'tinkatink',
+        baseStats: { hp: 10, maxHp: 10, attack: 10 },
+        imageUrl: 'assets/巨鍛匠00.webp', battleImageUrl: 'assets/巨鍛匠01.webp',
+        description: '同時對後方敵方造成 66% 傷害。', synergies: ['Charm', 'Hard'], isPlayerOnly: true, isHiddenFromShop: true
+    },
     // 37. Delibird
     delibird: {
         id: 'delibird', name: '信使鳥', tier: 3, family: 'delibird',
@@ -1245,9 +1263,9 @@ export const ALL_UNITS: Record<string, UnitTemplate> = {
     // 38. Shuckle
     shuckle: {
         id: 'shuckle', name: '壺壺', tier: 4, family: 'shuckle',
-        baseStats: { hp: 6, maxHp: 6, attack: 6 },
+        baseStats: { hp: 6, maxHp: 6, attack: 4 },
         imageUrl: 'assets/壺壺00.webp', battleImageUrl: 'assets/壺壺01.webp',
-        description: '戰鬥開始時，獲得自身 33% 生命的攻擊。', synergies: ['BugBite', 'Hard']
+        description: '戰鬥開始時，生命提高 50%。', synergies: ['BugBite', 'Hard']
     },
     // 39. Riolu Family
     riolu: {
@@ -1802,6 +1820,7 @@ export const PREFERRED_POSITIONS: Record<string, PreferredPosition> = {
     'suicune': 'FRONT',
     'dratini': 'ALL',
     'larvitar': 'ALL',
+    'tinkatink': 'ALL',
     'delibird': 'ALL',
     'shuckle': 'FRONT_MID',
     'riolu': 'ALL',

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pkm-autochess-assets-51a344b5bc7fce30';
+const CACHE_NAME = 'pkm-autochess-assets-d24531ea701e45d0';
 
 // Content version is generated before dev/build; changed media gets a new cache.
 const inFlight = new Map();

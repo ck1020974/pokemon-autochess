@@ -478,23 +478,19 @@ export class HeadlessBattleSimulator {
             }
         }
 
-        // Shuckle: Contrary (Start)
+        // Temporary bonuses use the stats captured before opening effects.
         if (unit.family === 'shuckle') {
-            const buffAtk = Math.floor(unit.stats.hp * 0.33);
-            if (buffAtk > 0) {
-                unit.stats.attack += buffAtk;
-                // No change needed for shuckle as '唱反調' is correct or at least not requested to change
-                unit.capStats();
+            const hpBuff = Math.floor((this.openingStats.get(unit) ?? unit.stats).maxHp * 0.5);
+            if (hpBuff > 0) {
+                this.growUnit(unit, hpBuff, 0, null, true);
                 this.log(`${unit.name}發動了唱反調。`);
             }
         }
 
-        // Kangaskhan: Parental Bond (Start)
         if (unit.family === 'kangaskhan') {
-            const hpBuff = Math.floor(unit.stats.attack * 0.33);
-            if (hpBuff > 0) {
-                const original = this.playerTeam.includes(unit) ? this.originalPlayerTeam?.find((o: Unit | null) => o && o.id === unit.id) : null;
-                this.growUnit(unit, hpBuff, 0, original, true);
+            const atkBuff = Math.floor((this.openingStats.get(unit) ?? unit.stats).attack * 0.5);
+            if (atkBuff > 0) {
+                this.growUnit(unit, 0, atkBuff, null, true);
                 this.log(`${unit.name}發動了親子愛！`);
             }
         }
@@ -1504,7 +1500,7 @@ export class HeadlessBattleSimulator {
             });
         }
         // Larvitar Family: Single targets damage before own attack
-        if (unit.family === 'larvitar') {
+        if (unit.family === 'larvitar' || unit.family === 'tinkatink') {
             this.eventBus.on('BEFORE_ATTACK', async (e) => {
                 const s = this.unitStates.get(unit);
                 if (e.source === unit && unit.stats.hp > 0 && !s?.isSilenced) {

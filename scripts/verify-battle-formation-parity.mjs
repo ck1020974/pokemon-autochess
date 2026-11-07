@@ -5,7 +5,7 @@ import {fileURLToPath} from 'node:url';
 
 // The team stays where preparation placed it when the battle starts.
 const root=fileURLToPath(new URL('..',import.meta.url));
-const server=await createServer({root,server:{host:'127.0.0.1',port:0,hmr:false}});
+const server=await createServer({root,cacheDir:'tmp/seven-fixes-ui-cache',server:{host:'127.0.0.1',port:0,hmr:false}});
 const browser=await chromium.launch({channel:'chrome',headless:true});
 const measure=page=>page.evaluate(()=>{
  const read=selector=>{const r=document.querySelector(selector).getBoundingClientRect();return [r.left,r.top,r.right,r.bottom].map(Math.round);};
@@ -20,8 +20,8 @@ try{
   const page=await context.newPage();page.setDefaultTimeout(60000);
   await page.goto(url);
   if(inset)await (await context.newCDPSession(page)).send('Emulation.setSafeAreaInsetsOverride',{insets:{top:0,left:47,right:47,bottom:inset}});
-  const version=page.getByRole('button',{name:/^無限版本/});await version.click();await version.click();
-  const difficulty=page.getByRole('button',{name:'普通 普通',exact:true});await difficulty.click();await difficulty.click();
+  const version=page.getByRole('button',{name:/^無限版本/});await version.waitFor({timeout:180000});await version.click();await page.locator('button.is-focused').filter({hasText:'無限版本'}).waitFor();await version.click();
+  const difficulty=page.getByRole('button',{name:'普通 普通',exact:true});await difficulty.waitFor({timeout:180000});await difficulty.click();await page.locator('button.is-focused').filter({hasText:'普通'}).waitFor();await difficulty.click();
   await page.getByRole('button',{name:'跳過',exact:true}).click();
   await page.getByRole('listitem').filter({hasText:'小青'}).click();
   await page.waitForTimeout(1000);
