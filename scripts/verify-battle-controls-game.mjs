@@ -26,7 +26,7 @@ try {
         for (const unit of window.game.playerTeam) unit.stats = { attack: 1, hp: 50, maxHp: 50 };
     });
     await page.getByRole('button', { name: /^(🔊|🔇)$/ }).click();
-    await page.getByRole('button', { name: '⚔️', exact: true }).click();
+    await page.getByRole('button', { name:'對戰', exact: true }).click();
     await page.locator('.opponent-card').first().click();
     await page.locator('.opponent-card').first().click();
     await page.locator('.battle-intro-overlay').waitFor({ state: 'detached' });

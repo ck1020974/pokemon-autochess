@@ -80,11 +80,12 @@ export function TrainerSelector({ trainers, onSelect }: TrainerSelectorProps) {
 
     return (
         <section className="trainer-selector-overlay" aria-label="選擇訓練家" role="dialog" aria-modal="true" onKeyDown={onKeyDown}>
-            <div className="trainer-selector-atmosphere" aria-hidden="true">
-                <span className="trainer-selector-cloud cloud-one" />
-                <span className="trainer-selector-cloud cloud-two" />
-                <span className="trainer-selector-hill hill-one" />
-                <span className="trainer-selector-hill hill-two" />
+            <div className="adventure-scene" aria-hidden="true">
+                <span className="adventure-cloud adventure-cloud--one" />
+                <span className="adventure-cloud adventure-cloud--two" />
+                <span className="adventure-hill adventure-hill--one" />
+                <span className="adventure-hill adventure-hill--two" />
+                <span className="adventure-road" />
             </div>
             <header className="trainer-selector-heading">
                 <h2>請選擇你的角色</h2>

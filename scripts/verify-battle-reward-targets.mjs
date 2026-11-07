@@ -66,6 +66,23 @@ try {
     assert.equal(ally.attackCap, ALL_UNITS.darkrai.providedAttackCap, 'Ally attack cap must follow the provider');
   }
 
+  // Mew's infinite pool card shows this run's synergies.
+  const mewGame = new GameLoop();
+  mewGame.edition = { ...mewGame.edition, availableUnitIds: ['mew'] };
+  mewGame.generatePoolChoices(5);
+  assert.deepEqual(mewGame.poolChoices[0].synergies, mewGame.mewSynergies);
+
+  // Merging a stronger shop copy keeps the team's battle art.
+  const artGame = new GameLoop();
+  artGame.gold = 10;
+  const weak = new Unit(ALL_UNITS.bulbasaur);
+  weak.imageUrl = weak.battleImageUrl;
+  weak.stats = { hp: 1, maxHp: 1, attack: 1 };
+  artGame.playerTeam[0] = weak;
+  artGame.shop.slots[0] = new Unit(ALL_UNITS.bulbasaur);
+  artGame.buyUnit(0, 0);
+  assert.equal(artGame.playerTeam[0].imageUrl, ALL_UNITS.bulbasaur.battleImageUrl);
+
   // Each difficulty offers one speed-boosting 爽朗薄荷.
   const jolly = REWARD_DATA.filter(r => r.item === '爽朗薄荷');
   assert.deepEqual(jolly.map(r => r.difficulty).sort(), ['EASY', 'NORMAL']);

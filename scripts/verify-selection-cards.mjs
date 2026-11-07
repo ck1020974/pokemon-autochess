@@ -33,7 +33,7 @@ try{
  for(let i=0;i<4;i++){await cards.first().click();await cards.first().click();await page.waitForTimeout(850);}
  assert.equal(await cards.count(),0);
  await page.evaluate(async()=>{const {music}=await import('/src/engine/MusicManager.ts');music.stop();music.play=async()=>{};music.playOneShot=async()=>{};const{Unit}=await import('/src/models/Unit.ts');const{ALL_UNITS}=await import('/src/data/AllUnits.ts');window.game.gold=0;window.game.playerTeam=[new Unit(ALL_UNITS.rattata),null,null,null,null];window.game.playerTeam[0].stats={attack:300,hp:300,maxHp:300};});
- await page.getByRole('button',{name:/^(🔊|🔇)$/}).click();await page.getByRole('button',{name:'⚔️',exact:true}).click();
+ await page.getByRole('button',{name:/^(🔊|🔇)$/}).click();await page.getByRole('button',{name:'對戰',exact:true}).click();
  const opponents=page.locator('.opponent-card--choice');await opponents.first().waitFor();
  await opponents.first().click();await page.waitForTimeout(400);assert.equal(await opponents.count(),3);assert.equal(await opponents.first().getAttribute('aria-pressed'),'true');
  await opponents.nth(1).click();assert.equal(await opponents.count(),3);assert.equal(await opponents.nth(1).getAttribute('aria-pressed'),'true');

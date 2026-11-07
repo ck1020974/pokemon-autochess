@@ -234,7 +234,7 @@ export class GameLoop {
                 id: unit.id,
                 tier,
                 units: [unit.id],
-                synergies: unit.synergies,
+                synergies: unit.id === 'mew' ? this.mewSynergies : unit.synergies,
                 displayUnitNames: unit.name,
                 displayImages: [unit.imageUrl],
                 name: unit.name,    // Add field for UI lookup safety
@@ -1165,8 +1165,6 @@ export class GameLoop {
 
         if (sourcePower > targetPower) {
             target.stats = { ...source.stats };
-            target.imageUrl = source.imageUrl;
-            target.battleImageUrl = source.battleImageUrl;
         }
 
         target.scalingValue = Math.max(target.scalingValue || 1, source.scalingValue || 1);

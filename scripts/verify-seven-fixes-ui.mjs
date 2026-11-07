@@ -40,11 +40,11 @@ try {
  await page.locator('.tutorial-coach[data-step="5"]').waitFor();
  const after=await page.evaluate(()=>({gold:window.game.gold,shop:window.game.shop.slots.map(u=>u?.id??null),reroll:document.querySelector('.reroll-icon-btn').getBoundingClientRect().toJSON(),position:getComputedStyle(document.querySelector('.reroll-icon-btn')).position}));
  check('Ghost move preserves stock and gold',before.gold===after.gold&&JSON.stringify(before.shop)===JSON.stringify(after.shop),{before,after});
- check('Refresh hint preserves absolute position',after.position==='absolute'&&Math.abs(before.reroll.x-after.reroll.x)<1&&Math.abs(before.reroll.y-after.reroll.y)<1,{before,after});
+ check('Refresh hint stays in the action column',await page.locator('.shop-actions .reroll-icon-btn.tutorial-highlight').count()===1);
  await capture(page,'tutorial-step5');await page.locator('.reroll-icon-btn').click();
  await page.locator('.tutorial-coach[data-step="6"]').waitFor();
  await shop.nth(0).locator('.card-lock-overlay').click();await shop.nth(1).locator('.card-lock-overlay').click();
- await page.locator('.tutorial-coach[data-step="7"]').waitFor();await page.getByRole('button',{name:'⚔️',exact:true}).click();
+ await page.locator('.tutorial-coach[data-step="7"]').waitFor();await page.getByRole('button',{name:'對戰',exact:true}).click();
  const cards=page.locator('.opponent-card--choice');await cards.first().waitFor();
  const previews=await cards.evaluateAll(cs=>cs.map(c=>({disabled:c.getAttribute('aria-disabled'),templates:[...c.querySelectorAll('.opponent-core img')].map(i=>i.dataset.templateId)})));
  check('Tutorial cards show three different real rosters',new Set(previews.map(c=>c.templates.join(','))).size===3,previews);
@@ -54,9 +54,9 @@ try {
  await capture(page,'tutorial-brock-choices');
  await cards.first().click();await cards.first().click();
  await page.getByRole('button',{name:'略過戰鬥演出'}).click();await page.getByRole('button',{name:'暫停戰鬥',exact:true}).click();
- const battle=await page.locator('.header').evaluate(e=>({bg:getComputedStyle(e).backgroundColor,color:getComputedStyle(e).color,shadow:getComputedStyle(e).textShadow,filter:getComputedStyle(e).filter}));
- check('Preparation and battle HUD use identical opaque surface and ink',prep.bg===battle.bg&&prep.color===battle.color&&!prep.bg.includes('rgba'),{prep,battle});
- check('Battle HUD stays sharp',battle.shadow==='none'&&battle.filter==='none',battle);
+ const battle=await page.locator('.header').evaluate(e=>({visibility:getComputedStyle(e).visibility}));
+ check('Status text shows in preparation without a panel',prep.bg==='rgba(0, 0, 0, 0)',prep);
+ check('Status text hides during battle',battle.visibility==='hidden',battle);
  const cdp=await context.newCDPSession(page);
  await page.locator('.battle-log').evaluate(e=>{window.qaOriginalLogNodes=[...e.childNodes];});
  for(const [width,height,insets] of [[844,390,{top:0,left:0,right:0,bottom:0}],[667,375,{top:0,left:0,right:0,bottom:0}],[844,390,{top:0,left:47,right:47,bottom:21}],[844,360,{top:0,left:47,right:47,bottom:21}],[844,390,{top:44,left:47,right:47,bottom:21}],[932,430,{top:0,left:59,right:59,bottom:21}],[375,812,{top:44,left:0,right:0,bottom:34}]]) {
@@ -88,7 +88,7 @@ try {
  await page.locator('.tutorial-coach[data-step="9"]').waitFor();await capture(page,'tutorial-step9');
  await shop.nth(2).locator('.unit-card').click();await page.getByRole('button',{name:'購買 $3',exact:true}).click();
  await page.locator('.tutorial-coach[data-step="10"]').waitFor();await capture(page,'tutorial-step10');
- await page.getByRole('button',{name:'⚔️',exact:true}).click();
+ await page.getByRole('button',{name:'對戰',exact:true}).click();
  const champions=page.locator('.opponent-card--choice');await champions.first().waitFor();
  check('Second tutorial opponents remain selectable',await champions.evaluateAll(cs=>cs.every(c=>c.getAttribute('aria-disabled')!=='true')));
  await champions.first().click();await champions.first().click();await page.getByRole('button',{name:'略過戰鬥演出'}).click();

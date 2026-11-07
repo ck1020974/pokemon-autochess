@@ -32,7 +32,7 @@ try{
    return {id:def.id,name:def.name};
   },ash);
   await page.getByRole('button',{name:/^(🔊|🔇)$/}).click();
-  await page.getByRole('button',{name:'⚔️',exact:true}).click();
+  await page.getByRole('button',{name:'對戰',exact:true}).click();
   const card=page.locator('.opponent-card').first();await card.waitFor();
   const preview=await card.locator('.opponent-core img').evaluateAll(images=>images.map(img=>({id:img.dataset.unitId,templateId:img.dataset.templateId,name:img.alt,src:img.getAttribute('src')})));
   assert.equal(preview.length,3);assert.ok(preview.some(unit=>!['pichu','charmander','bulbasaur','squirtle'].includes(unit.templateId)));

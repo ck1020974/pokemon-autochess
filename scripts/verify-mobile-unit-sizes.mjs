@@ -61,15 +61,13 @@ try{
    if(phase==='shop'){
     check(data.shop.length===7,`${width}: need seven shop units`);
     for(const {card,image} of data.shop){check(image.left>=card.left-1&&image.right<=card.right+1,`${width}: shop portrait outside own card`);if(width<1000)check(image.width>=64&&image.height>=64,`${width}: shop portrait below 64px: ${image.width}`);}
-    await page.locator('.shop-slot-scroll').evaluate(el=>{el.scrollLeft=el.scrollWidth;});
-    check(JSON.stringify((await inspect()).refresh)===JSON.stringify(data.refresh),`${width}: scrolling moves refresh`);
-    await page.locator('.shop-slot-scroll').evaluate(el=>{el.scrollLeft=0;});
+    check(await page.locator('.shop-slot-scroll').evaluate(el=>el.scrollWidth<=el.clientWidth+1),`${width}: stock must fit without scrolling`);
    }
    await page.screenshot({path:resolve(output,`${phase}-${width}x${height}.png`),fullPage:true});
   }
  };
  await capture('shop');
- await page.getByRole('button',{name:'⚔️',exact:true}).click();
+ await page.getByRole('button',{name:'對戰',exact:true}).click();
  const opponent=page.locator('.opponent-card').first();await opponent.click();await opponent.click();
  await page.getByRole('button',{name:'略過戰鬥演出'}).click();await page.getByRole('button',{name:'暫停戰鬥',exact:true}).click();
  await capture('battle');

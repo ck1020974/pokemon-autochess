@@ -38,7 +38,7 @@ try {
     }, wins);
     await page.getByRole('button', {name: /^(🔊|🔇)$/}).click();
     const preparation = await background(page, '.game-container');
-    await page.getByRole('button', {name: '⚔️', exact: true}).click();
+    await page.getByRole('button', {name:'對戰', exact: true}).click();
     await page.locator('.opponent-card').first().waitFor();
     const selection = await background(page, '.game-container');
     assert.equal(selection.image, preparation.image, 'Opponent selection retains its preparation scene until an opponent is selected');
