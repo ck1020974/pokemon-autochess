@@ -120,11 +120,20 @@
   border-color: var(--choice-border) !important;
   box-shadow: none !important;
   transform: none !important;
+  filter: grayscale(1);
+  opacity: .65;
 }
-.selection-card[aria-disabled='true'] .opponent-portrait { opacity: .65; }
-.tutorial-opponent-lock {
-  color: var(--choice-muted);
-  font-size: 12px;
-  line-height: 1.5;
-  margin-block: 0 8px;
+.tutorial-opponent-available::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 18px rgba(255, 205, 92, .6);
+  animation: tutorialGlowPulse 1.5s ease-in-out infinite alternate;
+}
+/* The tutorial choice dialog must also cover the sticky HUD on short screens. */
+.selection-dialog:has(.tutorial-opponent-available) { z-index: 26000; }
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-opponent-available::before { animation: none; }
 }

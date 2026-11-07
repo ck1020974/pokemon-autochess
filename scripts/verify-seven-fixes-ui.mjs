@@ -109,12 +109,17 @@ try {
  await page.emulateMedia({reducedMotion:'reduce'});
  const reduced=await page.locator('#exit-animation-probe').evaluate(e=>getComputedStyle(e).animationDuration);
  check('Reduced motion exit is brief',parseFloat(reduced)<=.15,reduced);
- // Real infinite choice: first tap previews, second commits once, unchosen cards retreat.
+ // Infinite opens directly in the shop; later rounds retain manual drafting.
  const poolPage=await context.newPage();await poolPage.bringToFront();activePage=poolPage;poolPage.setDefaultTimeout(60000);poolPage.on('pageerror',e=>errors.push(e.message));
  await poolPage.goto(url,{waitUntil:'domcontentloaded',timeout:180000});
  const infinite=poolPage.getByRole('button',{name:/^無限版本/});await infinite.click();await poolPage.locator('button.is-focused').filter({hasText:'無限版本'}).waitFor();await infinite.click();
  const poolNormal=poolPage.getByRole('button',{name:'普通 普通',exact:true});await poolNormal.waitFor({timeout:180000});await poolNormal.click();await poolPage.locator('button.is-focused').filter({hasText:'普通'}).waitFor();await poolNormal.click();
  await poolPage.getByRole('button',{name:'跳過',exact:true}).click();await poolPage.getByRole('listitem').first().click();
+ await poolPage.locator('.shop-container').waitFor();
+ const opening=await poolPage.evaluate(()=>({phase:window.game.phase,pool:[...window.game.activePoolUnitIds],choices:window.game.poolChoices.length}));
+ check('Infinite first round skips drafting and retains starters plus five draws',opening.phase==='SHOP'&&opening.pool.length===17&&opening.choices===0,opening);
+ await poolPage.evaluate(()=>{window.game.turn=2;window.game.startShopPhase();});
+ await poolPage.getByRole('button',{name:/^(🔊|🔇)$/}).click();
  const poolCards=poolPage.locator('.pool-choice-card');await poolCards.first().waitFor();
  const starting=await poolPage.evaluate(()=>({phase:window.game.phase,pool:[...window.game.activePoolUnitIds]}));
  await poolCards.first().click();
@@ -144,7 +149,7 @@ try {
   await poolCards.first().click();await poolCards.first().click();
   await poolPage.waitForFunction(before=>window.game.activePoolUnitIds.length>before,count);
  }
- check('Initial infinite draft returns to preparation',await poolPage.evaluate(()=>window.game.phase)==='SHOP');
+ check('Second-round infinite draft returns to preparation',await poolPage.evaluate(()=>window.game.phase)==='SHOP');
  await poolPage.close();
  }
  check('No browser exceptions',errors.length===0,errors);

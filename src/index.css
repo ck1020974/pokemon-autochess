@@ -2613,6 +2613,10 @@ h3 {
   animation: tutorialGlowPulse 1.5s ease-in-out infinite alternate;
 }
 .reroll-icon-btn.tutorial-highlight { position: absolute !important; }
+/* A highlighted slot is a sibling of the elevated synergy row. Its hand must
+   win at that sibling stacking level, not only inside the slot's pseudo-element. */
+.has-tutorial .board-side > .unit-wrapper.tutorial-highlight { z-index: 10001 !important; }
+.has-tutorial .board-side > .unit-wrapper.tutorial-highlight::after { top: var(--tutorial-hand-top, -45px); }
 @media (prefers-reduced-motion: reduce) {
   .tutorial-target-glow, .tutorial-highlight { animation: none; }
 }

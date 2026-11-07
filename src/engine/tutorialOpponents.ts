@@ -15,6 +15,7 @@ export function createTutorialEnemyTeam(opponentId?: string): (Unit | null)[] {
     const choice = TUTORIAL_OPPONENTS.find(opponent => opponent.id === opponentId) ?? TUTORIAL_OPPONENTS[0];
     const team: (Unit | null)[] = choice.units.map(id => {
         const unit = new Unit(ALL_UNITS[id]);
+        unit.imageUrl = unit.battleImageUrl || unit.imageUrl;
         unit.level = choice.level;
         const base = ALL_UNITS[id].baseStats;
         for (let level = 1; level < choice.level; level++) {

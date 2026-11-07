@@ -20,6 +20,7 @@ import {BattleControls} from './components/BattleControls';
 import {analytics, startAnalyticsDelivery} from './analytics/collector';
 import {terminalOutcome} from './analytics/gameTracking';
 import {useFormationSynergyAnchor} from './presentation/useFormationSynergyAnchor';
+import {useTutorialPointerClearance} from './presentation/useTutorialPointerClearance';
 import type { BattleLog } from './engine/BattleSimulator';
 import { ALL_UNITS } from './data/AllUnits';
 import { SYNERGIES } from './models/Synergies';
@@ -489,6 +490,8 @@ function App() {
     const formationKey = `${game.phase}:${game.playerTeam.map(unit => unit?.id ?? '').join(',')}:${game.opponentTeam.map(unit => unit?.id ?? '').join(',')}`;
     useFormationSynergyAnchor(playerFormation, formationKey);
     useFormationSynergyAnchor(enemyFormation, formationKey);
+    useTutorialPointerClearance(tutorialStep > 0 && game.phase === GamePhase.SHOP && !showOpponentSelect && !showEncyclopedia,
+        `${tutorialStep}:${formationKey}:${selected?.source}:${selected?.index}`);
     const keepBattleScene = Boolean(selectedBattleSceneClass) && (game.phase === GamePhase.BATTLE || game.phase === GamePhase.VICTORY || game.phase === GamePhase.GAME_OVER);
     const battleSceneClass = keepBattleScene ? selectedBattleSceneClass : '';
     const preparationSceneClass = (() => {
@@ -2138,11 +2141,10 @@ function App() {
                         <h2 id="opponent-selection-title" className="selection-title">請選擇你的對手</h2>
                         <div className="opponent-cards-container selection-choices">
                             {opponentChoices.map((npc) => (
-                                <SelectionCard key={npc.id} className="opponent-card--choice" selected={opponentSelection.selected === npc} disabled={!isTutorialOpponentAllowed(tutorialStep, npc.id)} onChoose={() => opponentSelection.choose(npc)}>
+                                <SelectionCard key={npc.id} className={`opponent-card--choice ${tutorialStep > 0 && tutorialStep < 10 && isTutorialOpponentAllowed(tutorialStep, npc.id) ? 'tutorial-opponent-available' : ''}`} selected={opponentSelection.selected === npc} disabled={!isTutorialOpponentAllowed(tutorialStep, npc.id)} onChoose={() => opponentSelection.choose(npc)}>
                                     {npc.difficulty && <span className={`selection-badge difficulty-${npc.difficulty}`}>{npc.difficulty === 'VERY_HARD' ? 'EXTREME' : npc.difficulty}</span>}
                                     <div className="selection-art opponent-portrait"><img src={npc.url} alt={npc.name} /></div>
                                     <div className="opponent-name opponent-card__name">{npc.name}</div>
-                                    {!isTutorialOpponentAllowed(tutorialStep, npc.id) && <span className="tutorial-opponent-lock">教學僅開放簡單</span>}
                                     <div className="opponent-core" aria-label="代表角色">
                                         {(opponentPreviewTeams.current.get(npc.id) ?? []).filter((unit): unit is Unit => unit !== null).slice(0, 3).map(unit => <img key={unit.id} src={unit.imageUrl.replace('01.webp', '00.webp')} alt={unit.name} title={unit.name} data-template-id={unit.templateId} data-unit-id={unit.id} />)}
                                     </div>

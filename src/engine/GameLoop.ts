@@ -149,8 +149,22 @@ export class GameLoop {
 
         // Infinite Pool Selection (Progressive Schedule)
         if (this.edition.id === 'infinite') {
+            if (this.turn === 1 && !this.processedTurns.has(this.turn)) {
+                const candidates = Object.values(ALL_UNITS).filter(u =>
+                    u.tier === 1 &&
+                    !u.isHiddenFromShop &&
+                    this.edition.availableUnitIds.includes(u.id) &&
+                    !this.activePoolUnitIds.includes(u.id) &&
+                    !this.bannedPoolUnitIds.includes(u.id)
+                );
+                // Draw without replacement; a restricted roster may contain fewer than five.
+                for (let draw = 0; draw < 5 && candidates.length > 0; draw++) {
+                    const index = Math.floor(Math.random() * candidates.length);
+                    this.activePoolUnitIds.push(candidates.splice(index, 1)[0].id);
+                }
+                this.processedTurns.add(this.turn);
+            }
             const schedule: Record<number, { tier: number, count: number }[]> = {
-                1: [{ tier: 1, count: 5 }],
                 2: [{ tier: 2, count: 5 }],
                 3: [{ tier: 3, count: 5 }],
                 6: [{ tier: 4, count: 4 }],

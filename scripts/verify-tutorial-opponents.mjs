@@ -35,6 +35,7 @@ try {
             assert.ok(team.filter(Boolean).every(u=>u.level === choice.level));
             for (const unit of team.filter(Boolean)) {
                 const base = ALL_UNITS[unit.templateId].baseStats;
+                assert.equal(unit.imageUrl, ALL_UNITS[unit.templateId].battleImageUrl || ALL_UNITS[unit.templateId].imageUrl, 'Tutorial combat uses battle artwork, not shop portrait');
                 assert.equal(unit.stats.attack, base.attack + (choice.level-1)*Math.floor(base.attack*.5));
             }
         }
@@ -42,6 +43,7 @@ try {
         for (const [name, Simulator] of Object.entries({BattleSimulator, HeadlessBattleSimulator})) for (const order of orders) {
             const player = [...order.map(id=>new Unit(ALL_UNITS[id])), null, null];
             const sim = new Simulator(player, teams.get(expected[0].id));
+            assert.ok(sim.enemyTeam.filter(Boolean).every(u=>u.imageUrl === (ALL_UNITS[u.templateId].battleImageUrl || ALL_UNITS[u.templateId].imageUrl)), `${name}: enemy battle art survives cloning`);
             sim.delay = async()=>{}; sim.playAnimation = async()=>{}; sim.playTeamAnimation = async()=>{};
             await sim.init();
             let steps = 0;
